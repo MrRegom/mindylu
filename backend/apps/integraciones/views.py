@@ -333,11 +333,8 @@ def publicar_en_facebook(request):
 
     # 2. Armar el mensaje si no viene uno personalizado
     if not custom_message:
-        variantes_str = ", ".join([f"{v.talla} ({v.color})" for v in prenda.variantes.all() if v.cantidad > 0])
         custom_message = (
             f"✨ ¡Nuevo! {prenda.nombre}\n"
-            f"💰 A solo ${prenda.precio}\n"
-            f"👗 Tallas/Colores disponibles: {variantes_str if variantes_str else 'Consultar disponibilidad'}\n\n"
             f"¡Escríbenos para reservar el tuyo! 💛"
         )
 
@@ -404,16 +401,6 @@ def publicar_lote_en_facebook(request):
                 res_data = res.json()
                 if 'id' in res_data:
                     media_ids.append({"media_fbid": res_data['id']})
-                    
-                    # Generar texto de variantes (ej: XL, L, S)
-                    tallas_list = prenda.variantes.values_list('talla', flat=True).distinct()
-                    tallas_str = ", ".join(tallas_list)
-                    if not tallas_str or tallas_str == 'Única':
-                        tallas_texto = "Talla Única"
-                    else:
-                        tallas_texto = f"Tallas: {tallas_str}"
-                        
-                    detalles_texto.append(f"• {prenda.nombre} - ${prenda.precio} ({tallas_texto})")
             except Exception as e:
                 error_msg = str(e)
                 if hasattr(e, 'response') and e.response is not None:
@@ -425,12 +412,15 @@ def publicar_lote_en_facebook(request):
 
     # 2. Armar el mensaje si no viene uno personalizado
     if not custom_message:
-        custom_message = (
-            f"✨ ¡Llegó mercadería nueva! ✨\n\n"
-            f"Echa un vistazo a nuestras nuevas prendas:\n"
-            f"{chr(10).join(detalles_texto)}\n\n"
-            f"¡Escríbenos por mensaje directo para reservar la tuya! 💛"
-        )
+        # Intentar obtener el mensaje_facebook del CicloVenta de la primera prenda
+        ciclo = prendas.first().ciclo
+        if ciclo and ciclo.mensaje_facebook:
+            custom_message = ciclo.mensaje_facebook
+        else:
+            custom_message = (
+                f"✨ ¡Llegó mercadería nueva! ✨\n\n"
+                f"¡Escríbenos por mensaje directo para reservar la tuya! 💛"
+            )
 
     # 3. Publicar el post con las fotos adjuntas
     try:

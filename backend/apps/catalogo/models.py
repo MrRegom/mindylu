@@ -22,6 +22,7 @@ class CicloVenta(models.Model):
     fecha_publicacion = models.DateTimeField(auto_now_add=True)
     fecha_programada = models.DateTimeField(null=True, blank=True, help_text=_('Fecha para publicarse automáticamente'))
     url_facebook_post = models.URLField(blank=True, null=True, help_text=_('URL del post original si vino de FB'))
+    mensaje_facebook = models.TextField(blank=True, null=True, help_text=_('Mensaje personalizado para Facebook'))
     estado = models.CharField(max_length=20, choices=Estado.choices, default=Estado.ACTIVO)
 
     class Meta:

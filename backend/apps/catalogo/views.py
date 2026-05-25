@@ -81,6 +81,7 @@ class PrendaViewSet(viewsets.ModelViewSet):
             items_str = request.data.get('items', '[]')
             items = json.loads(items_str)
             fecha_programada_str = request.data.get('fecha_programada', None)
+            mensaje_facebook = request.data.get('mensaje', '')
         except json.JSONDecodeError:
             return Response({'error': 'JSON de items inválido.'}, status=status.HTTP_400_BAD_REQUEST)
             
@@ -90,10 +91,10 @@ class PrendaViewSet(viewsets.ModelViewSet):
         creadas_ids = []
         try:
             with transaction.atomic():
-                # Crear CicloVenta para este lote
                 from dateutil.parser import parse
                 ciclo = CicloVenta.objects.create(
                     tenant=request.user.tenant,
+                    mensaje_facebook=mensaje_facebook,
                     estado=CicloVenta.Estado.PROGRAMADO if fecha_programada_str else CicloVenta.Estado.ACTIVO
                 )
                 if fecha_programada_str:

@@ -31,7 +31,7 @@ def ejecutar_publicacion_lote(ciclo_id):
         return
 
     media_ids = []
-    detalles_texto = []
+    media_ids = []
 
     for prenda in prendas:
         imagen = prenda.imagenes.first()
@@ -45,19 +45,14 @@ def ejecutar_publicacion_lote(ciclo_id):
                 res_data = res.json()
                 if 'id' in res_data:
                     media_ids.append({"media_fbid": res_data['id']})
-                    
-                    tallas_list = prenda.variantes.values_list('talla', flat=True).distinct()
-                    tallas_str = ", ".join(tallas_list)
-                    tallas_texto = "Talla Única" if not tallas_str or tallas_str == 'Única' else f"Tallas: {tallas_str}"
-                        
-                    detalles_texto.append(f"• {prenda.nombre} - ${prenda.precio} ({tallas_texto})")
             except Exception as e:
                 print(f"Error subiendo imagen a Facebook: {e}")
 
     if media_ids:
-        mensaje = f"✨ ¡Llegó mercadería nueva! ✨\n\nEcha un vistazo a nuestras nuevas prendas:\n"
-        mensaje += "\n".join(detalles_texto)
-        mensaje += "\n\n¡Escríbenos por mensaje directo para reservar la tuya! 💛"
+        if ciclo.mensaje_facebook:
+            mensaje = ciclo.mensaje_facebook
+        else:
+            mensaje = "✨ ¡Llegó mercadería nueva! ✨\n\n¡Escríbenos por mensaje directo para reservar la tuya! 💛"
 
         try:
             url_feed = f"https://graph.facebook.com/v19.0/{page_id}/feed"

@@ -11,7 +11,7 @@ const CargaMasiva = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [items, setItems] = useState([]);
   const [publicarFacebook, setPublicarFacebook] = useState(true);
-
+  const [mensajeFacebook, setMensajeFacebook] = useState('');
   const [fechaProgramada, setFechaProgramada] = useState('');
 
   const handleFiles = async (e) => {
@@ -119,6 +119,9 @@ const CargaMasiva = () => {
       if (fechaProgramada) {
         payload.append('fecha_programada', new Date(fechaProgramada).toISOString());
       }
+      if (publicarFacebook) {
+        payload.append('mensaje', mensajeFacebook);
+      }
       
       items.forEach((item, index) => {
         payload.append(`imagenes_${index}`, item.file);
@@ -134,7 +137,8 @@ const CargaMasiva = () => {
       if (!fechaProgramada && publicarFacebook && creadas_ids.length > 0) {
         try {
           await api.post('/integraciones/publicar-lote-facebook/', {
-            prenda_ids: creadas_ids
+            prenda_ids: creadas_ids,
+            mensaje: mensajeFacebook
           });
           alert(`¡${creadas_ids.length} prendas guardadas y publicadas en Facebook como álbum!`);
         } catch (fbError) {
@@ -265,7 +269,7 @@ const CargaMasiva = () => {
           </div>
 
           <div className="form-section glass facebook-push-section" style={{ marginTop: 24 }}>
-            <div className="facebook-toggle-wrapper" style={{ marginBottom: fechaProgramada ? 16 : 0 }}>
+            <div className="facebook-toggle-wrapper" style={{ marginBottom: 16 }}>
               <div className="facebook-toggle-info">
                 <Share2 size={24} color="#1877F2" />
                 <div>
@@ -276,6 +280,18 @@ const CargaMasiva = () => {
             </div>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div className="input-group">
+                <label>Texto de la publicación</label>
+                <textarea 
+                  placeholder="Ej: ✨ ¡Llegó mercadería nueva! ✨&#10;No te quedes sin la tuya..."
+                  value={mensajeFacebook}
+                  onChange={(e) => setMensajeFacebook(e.target.value)}
+                  rows={4}
+                  style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #ddd', resize: 'vertical' }}
+                />
+                <small style={{ color: '#666' }}>Las tallas, colores y stock se guardarán internamente, pero no se publicarán en Facebook.</small>
+              </div>
+
               <label style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.5)', padding: '12px', borderRadius: '8px' }}>
                 <input 
                   type="radio" 
