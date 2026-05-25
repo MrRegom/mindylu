@@ -14,34 +14,34 @@ const Layout = () => {
     <div className="layout-container">
       <main className="main-content">
         <Outlet />
+        
+        <nav className="bottom-nav glass">
+          <a href="/" className={`nav-item ${location.pathname === '/' ? 'active' : ''}`}>
+            <Home size={22} />
+            <span>Inicio</span>
+          </a>
+          <a href="/catalogo" className={`nav-item ${location.pathname.includes('/catalogo') ? 'active' : ''}`}>
+            <Search size={22} />
+            <span>Catálogo</span>
+          </a>
+          <a href="/sincronizacion" className={`nav-item ${location.pathname.includes('/sincronizacion') ? 'active' : ''}`}>
+            <Sparkles size={22} />
+            <span>Magia IA</span>
+          </a>
+          <a href="/entregas" className={`nav-item ${location.pathname.includes('/entregas') ? 'active' : ''}`}>
+            <ShoppingBag size={22} />
+            <span>Entregas</span>
+          </a>
+          <a href="/clientas" className={`nav-item ${location.pathname.includes('/clientas') ? 'active' : ''}`}>
+            <User size={22} />
+            <span>Clientas</span>
+          </a>
+          <a href="/cuentas" className={`nav-item ${location.pathname.includes('/cuentas') ? 'active' : ''}`}>
+            <CreditCard size={22} />
+            <span>Cuentas</span>
+          </a>
+        </nav>
       </main>
-
-      <nav className="bottom-nav glass">
-        <a href="/" className={`nav-item ${location.pathname === '/' ? 'active' : ''}`}>
-          <Home size={22} />
-          <span>Inicio</span>
-        </a>
-        <a href="/catalogo" className={`nav-item ${location.pathname.includes('/catalogo') ? 'active' : ''}`}>
-          <Search size={22} />
-          <span>Catálogo</span>
-        </a>
-        <a href="/sincronizacion" className={`nav-item ${location.pathname.includes('/sincronizacion') ? 'active' : ''}`}>
-          <Sparkles size={22} />
-          <span>Magia IA</span>
-        </a>
-        <a href="/entregas" className={`nav-item ${location.pathname.includes('/entregas') ? 'active' : ''}`}>
-          <ShoppingBag size={22} />
-          <span>Entregas</span>
-        </a>
-        <a href="/clientas" className={`nav-item ${location.pathname.includes('/clientas') ? 'active' : ''}`}>
-          <User size={22} />
-          <span>Clientas</span>
-        </a>
-        <a href="/cuentas" className={`nav-item ${location.pathname.includes('/cuentas') ? 'active' : ''}`}>
-          <CreditCard size={22} />
-          <span>Cuentas</span>
-        </a>
-      </nav>
     </div>
   );
 };
