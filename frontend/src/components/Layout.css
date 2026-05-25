@@ -13,23 +13,25 @@
   position: relative;
 }
 
-/* Isla Flotante Glassmorphism */
+/* Isla Flotante Glassmorphism Premium */
 .bottom-nav {
   position: fixed;
-  bottom: 24px;
-  left: 24px;
-  right: 24px;
-  height: 64px;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 40px);
+  max-width: 440px;
+  height: 68px;
   display: flex;
   justify-content: space-around;
   align-items: center;
   z-index: 90;
-  border-radius: var(--radius-full);
-  background: rgba(var(--color-surface-rgb), 0.7);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border-radius: 34px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05), 0 5px 15px rgba(212, 163, 163, 0.15);
 }
 
 .nav-item {

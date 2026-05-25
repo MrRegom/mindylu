@@ -1,40 +1,42 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
 :root {
-  /* Brand Colors - Inspirado en la imagen (Magenta vibrante y rosas pastel) */
-  --color-primary: #FF4D8D; /* Magenta vibrante para botones y textos principales */
-  --color-primary-dark: #E63574;
-  --color-primary-light: #FFE5EF; /* Rosa muy pálido para fondos de iconos */
-  --color-primary-rgb: 255, 77, 141;
+  /* Brand Colors - Premium Feminine Aesthetic (Dusty Rose, Nude, Pearl) */
+  --color-primary: #D4A3A3; /* Dusty Rose / Rose Gold */
+  --color-primary-dark: #B58484;
+  --color-primary-light: #F7EFEF; /* Nude ultra claro */
+  --color-primary-rgb: 212, 163, 163;
   
-  /* Neutral Colors - Fondos limpios y textos elegantes */
-  --color-bg: #F5F6F8; /* Gris muy claro/blanco humo para el fondo general */
-  --color-surface: #FFFFFF; /* Blanco puro para las tarjetas */
+  /* Neutral Colors */
+  --color-bg: #FAF9F6; /* Pearl White / Crema muy claro */
+  --color-surface: #FFFFFF;
   --color-surface-rgb: 255, 255, 255;
-  --color-text: #2D2B4A; /* Azul marino/gris oscuro elegante para el texto */
-  --color-text-muted: #8E8CA3;
-  --color-border: #F0F0F5;
+  --color-text: #3D3939; /* Carbón suave para los textos */
+  --color-text-muted: #8F8B8B;
+  --color-border: #EFEAEA;
   
   /* Status Colors */
-  --color-success: #10B981;
-  --color-success-bg: rgba(16, 185, 129, 0.1);
-  --color-warning: #F59E0B;
-  --color-warning-bg: rgba(245, 158, 11, 0.1);
-  --color-danger: #F472B6;
-  --color-danger-bg: rgba(244, 114, 182, 0.1);
+  --color-success: #8EAE9D; /* Sage Green pastel */
+  --color-success-bg: rgba(142, 174, 157, 0.1);
+  --color-warning: #D4B483; /* Soft Gold */
+  --color-warning-bg: rgba(212, 180, 131, 0.1);
+  --color-danger: #D48C8C; /* Muted Coral */
+  --color-danger-bg: rgba(212, 140, 140, 0.1);
   
   /* UI Elements */
-  --radius-sm: 12px;
-  --radius-md: 20px;
+  --radius-sm: 16px;
+  --radius-md: 24px;
   --radius-lg: 32px;
   --radius-full: 9999px;
   
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 15px 35px rgba(0, 0, 0, 0.08);
-  --shadow-glow: 0 0 20px rgba(255, 77, 141, 0.3);
+  /* Sombras ultra suaves tipo iOS 17 */
+  --shadow-sm: 0 4px 15px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.07);
+  --shadow-glow: 0 8px 24px rgba(212, 163, 163, 0.35);
   
-  --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  /* Transición "Spring" fluida */
+  --transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 * {
@@ -45,10 +47,10 @@
 }
 
 body {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Inter', sans-serif;
   background-color: var(--color-bg);
   color: var(--color-text);
-  line-height: 1.5;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   position: relative;
   overflow-x: hidden;
@@ -76,11 +78,13 @@ body {
   overflow: hidden;
 }
 
-/* Typography */
+/* Typography Premium */
 h1, h2, h3, h4 {
+  font-family: 'Playfair Display', serif;
   font-weight: 600;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: #2C2929;
+  letter-spacing: -0.01em;
 }
 
 /* Buttons */
@@ -120,26 +124,28 @@ h1, h2, h3, h4 {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  background: var(--color-primary);
   color: #FFF;
   box-shadow: var(--shadow-glow);
-  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
 }
 
 .btn-primary:hover {
-  box-shadow: 0 0 30px rgba(var(--color-primary-rgb), 0.6);
+  background: var(--color-primary-dark);
+  box-shadow: 0 10px 30px rgba(var(--color-primary-rgb), 0.4);
   transform: translateY(-2px);
 }
 
 .btn-secondary {
-  background: rgba(var(--color-surface-rgb), 0.5);
-  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
   color: var(--color-text);
-  border: 1px solid var(--color-border);
+  border: 1px solid rgba(212, 163, 163, 0.3);
 }
 
 .btn-secondary:hover {
-  background: rgba(var(--color-surface-rgb), 0.8);
+  background: rgba(255, 255, 255, 0.95);
+  border-color: var(--color-primary);
 }
 
 .btn-icon-simple {
@@ -199,10 +205,10 @@ h1, h2, h3, h4 {
 
 /* Glassmorphism utilities */
 .glass {
-  background: rgba(var(--color-surface-rgb), 0.65);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
   box-shadow: var(--shadow-md);
   border-radius: var(--radius-lg);
 }
