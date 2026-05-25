@@ -91,14 +91,14 @@ class PrendaViewSet(viewsets.ModelViewSet):
         creadas_ids = []
         try:
             with transaction.atomic():
-                from dateutil.parser import parse
+                from django.utils.dateparse import parse_datetime
                 ciclo = CicloVenta.objects.create(
                     tenant=request.user.tenant,
                     mensaje_facebook=mensaje_facebook,
                     estado=CicloVenta.Estado.PROGRAMADO if fecha_programada_str else CicloVenta.Estado.ACTIVO
                 )
                 if fecha_programada_str:
-                    ciclo.fecha_programada = parse(fecha_programada_str)
+                    ciclo.fecha_programada = parse_datetime(fecha_programada_str)
                     ciclo.save()
 
                 for i, item in enumerate(items):
