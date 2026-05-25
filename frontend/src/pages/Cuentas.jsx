@@ -69,8 +69,27 @@ const Cuentas = () => {
 
   const copiarDatos = (c) => {
     const texto = `${c.banco}\n${c.tipo_cuenta}\nNº ${c.numero_cuenta}\nNombre: ${c.nombre_titular}\nRUT: ${c.rut_titular}`;
-    navigator.clipboard.writeText(texto);
-    alert("¡Datos bancarios copiados al portapapeles!");
+    
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(texto).then(() => {
+        alert("¡Datos bancarios copiados al portapapeles!");
+      });
+    } else {
+      const textArea = document.createElement("textarea");
+      textArea.value = texto;
+      textArea.style.position = "absolute";
+      textArea.style.left = "-999999px";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        alert("¡Datos bancarios copiados al portapapeles!");
+      } catch (err) {
+        alert("Error al copiar. Tu navegador bloquea esta acción en HTTP.");
+      }
+      document.body.removeChild(textArea);
+    }
   };
 
   const getProgressColor = (estado) => {
