@@ -1,0 +1,228 @@
+.prenda-form-container {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: var(--color-bg);
+  padding-bottom: 40px;
+}
+
+.form-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+}
+
+.form-header h2 {
+  font-size: 1.25rem;
+  margin: 0;
+}
+
+.btn-back {
+  background: none;
+  border: none;
+  color: var(--color-text);
+  padding: 8px;
+  margin-left: -8px;
+  cursor: pointer;
+}
+
+.prenda-form {
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.form-section {
+  padding: 20px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-section h3 {
+  font-size: 1.1rem;
+  margin-bottom: 4px;
+  color: var(--color-primary-dark);
+}
+
+.section-header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.form-select {
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-size: 1rem;
+  font-family: inherit;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23666666%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px top 50%;
+  background-size: 12px auto;
+}
+
+.form-select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+.btn-small-outline {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  border: 1px solid var(--color-primary);
+  color: var(--color-primary-dark);
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.variantes-list-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.variante-edit-card {
+  background-color: var(--color-bg);
+  padding: 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+}
+
+.variante-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.input-group.mini {
+  margin-bottom: 0;
+  flex: 1;
+}
+
+.input-group.mini label {
+  font-size: 0.75rem;
+}
+
+.input-group.mini input {
+  padding: 10px;
+  font-size: 0.9rem;
+}
+
+.btn-delete-icon {
+  background: none;
+  border: none;
+  color: var(--color-error);
+  padding: 10px;
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  margin-bottom: 2px;
+}
+
+.form-actions {
+  margin-top: 16px;
+}
+
+/* Facebook Push Section */
+.facebook-push-section {
+  background: linear-gradient(135deg, rgba(24, 119, 242, 0.05), rgba(24, 119, 242, 0.15));
+  border: 1px solid rgba(24, 119, 242, 0.3);
+}
+
+.facebook-toggle-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.facebook-toggle-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.facebook-toggle-info h4 {
+  margin: 0 0 2px 0;
+  font-size: 1rem;
+  color: var(--color-text);
+}
+
+.facebook-toggle-info p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+/* iOS Style Switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.switch input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #1877F2;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #1877F2;
+}
+
+input:checked + .slider:before {
+  transform: translateX(22px);
+}
+
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}

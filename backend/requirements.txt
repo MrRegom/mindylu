@@ -1,0 +1,33 @@
+# ─────────────────────────────────────────────────────────────
+# MindyLu — Dependencias Backend
+# ─────────────────────────────────────────────────────────────
+
+# Framework principal
+Django==5.1.4
+djangorestframework==3.15.2
+
+# Base de datos
+psycopg2-binary==2.9.10
+
+# Autenticación JWT
+djangorestframework-simplejwt==5.3.1
+
+# CORS (permitir peticiones desde React)
+django-cors-headers==4.6.0
+
+# Variables de entorno
+python-decouple==3.8
+
+# Imágenes y OCR
+Pillow==12.2.0
+
+# Requests HTTP (para Facebook API)
+requests==2.32.3
+
+# Utilidades
+python-slugify==8.0.4
+
+# Producción (Deploy a Render / AWS / etc)
+gunicorn==21.2.0
+whitenoise==6.6.0
+dj-database-url==2.1.0

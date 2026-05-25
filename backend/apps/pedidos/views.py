@@ -1,0 +1,214 @@
+# ─────────────────────────────────────────────────────────────
+# apps/pedidos/views.py
+# ─────────────────────────────────────────────────────────────
+
+from rest_framework import viewsets, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from django.db import transaction
+from django.utils import timezone
+
+from apps.catalogo.models import PrendaVariante
+from apps.clientas.models import Clienta
+from .models import PuntoEntrega, Pedido, ItemPedido, EntregaDiaria
+from .serializers import (
+    PuntoEntregaSerializer, PedidoSerializer, 
+    EntregaDiariaSerializer, PedidoCreateDesdeCatalogoSerializer
+)
+
+
+class PuntoEntregaViewSet(viewsets.ModelViewSet):
+    serializer_class = PuntoEntregaSerializer
+
+    def get_queryset(self):
+        return PuntoEntrega.objects.filter(tenant=self.request.user.tenant)
+
+
+class PedidoViewSet(viewsets.ModelViewSet):
+    serializer_class = PedidoSerializer
+
+    def get_queryset(self):
+        return Pedido.objects.filter(tenant=self.request.user.tenant)
+
+    @action(detail=False, methods=['post'], url_path='crear-desde-catalogo')
+    def crear_desde_catalogo(self, request):
+        """
+        Endpoint que recibe los datos desde el Modal de Catálogo y orquesta la creación:
+        1. Descuenta stock de la variante.
+        2. Crea el Pedido.
+        3. Crea el ItemPedido.
+        4. Agrega a la EntregaDiaria correspondiente.
+        """
+        serializer = PedidoCreateDesdeCatalogoSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        data = serializer.validated_data
+        tenant = request.user.tenant
+
+        try:
+            with transaction.atomic():
+                # 1. Obtener y validar variante
+                variante = PrendaVariante.objects.select_for_update().get(id=data['variante_id'], prenda__tenant=tenant)
+                if variante.cantidad < data['cantidad']:
+                    return Response({'error': 'No hay stock suficiente.'}, status=status.HTTP_400_BAD_REQUEST)
+                
+                # Descontar stock
+                variante.cantidad -= data['cantidad']
+                variante.save()
+
+                # Revisar si la prenda debe cambiar a agotada
+                if variante.prenda.variantes.filter(cantidad__gt=0).count() == 0:
+                    variante.prenda.estado = 'agotada'
+                    variante.prenda.save()
+
+                # 2. Obtener clienta
+                clienta = Clienta.objects.get(id=data['clienta_id'], tenant=tenant)
+
+                # 3. Determinar fecha y punto según entrega programada
+                fecha_entrega = data.get('fecha_entrega_acordada')
+                punto_id = data.get('punto_entrega_id')
+                entrega_programada = None
+                
+                if data.get('entrega_diaria_id'):
+                    try:
+                        entrega_programada = EntregaDiaria.objects.get(id=data['entrega_diaria_id'], tenant=tenant)
+                        fecha_entrega = entrega_programada.fecha
+                        punto_id = entrega_programada.punto_entrega_id
+                    except EntregaDiaria.DoesNotExist:
+                        pass
+                
+                # 4. Obtener o crear Pedido
+                # Buscamos si la clienta ya tiene un pedido "apartado" asignado a la misma fecha y lugar de entrega
+                pedido = None
+                if entrega_programada:
+                    pedido = entrega_programada.pedidos.filter(
+                        clienta=clienta,
+                        estado='apartado'
+                    ).first()
+                elif fecha_entrega and punto_id:
+                    pedido = Pedido.objects.filter(
+                        tenant=tenant,
+                        clienta=clienta,
+                        fecha_entrega_acordada=fecha_entrega,
+                        punto_entrega_id=punto_id,
+                        estado='apartado'
+                    ).first()
+
+                if pedido:
+                    # Si ya existe, concatenamos las notas si vienen nuevas
+                    nuevas_notas = data.get('notas', '')
+                    if nuevas_notas:
+                        pedido.notas = f"{pedido.notas} | {nuevas_notas}" if pedido.notas else nuevas_notas
+                        pedido.save()
+                else:
+                    # Si no existe, creamos uno nuevo
+                    pedido = Pedido.objects.create(
+                        tenant=tenant,
+                        clienta=clienta,
+                        fecha_entrega_acordada=fecha_entrega,
+                        punto_entrega_id=punto_id,
+                        notas=data.get('notas', '')
+                    )
+
+                # 5. Crear o actualizar ItemPedido
+                # Si la misma variante ya estaba en el pedido, sumamos cantidad. Si no, creamos un item nuevo.
+                item_pedido, created = ItemPedido.objects.get_or_create(
+                    pedido=pedido,
+                    variante=variante,
+                    defaults={'cantidad': 0, 'precio_unitario': variante.prenda.precio}
+                )
+                item_pedido.cantidad += data['cantidad']
+                item_pedido.save()
+
+                # 6. Organizar en EntregaDiaria
+                if entrega_programada:
+                    entrega_programada.pedidos.add(pedido)
+                elif pedido.fecha_entrega_acordada and pedido.punto_entrega_id:
+                    entrega, created = EntregaDiaria.objects.get_or_create(
+                        tenant=tenant,
+                        fecha=pedido.fecha_entrega_acordada,
+                        punto_entrega_id=pedido.punto_entrega_id
+                    )
+                    entrega.pedidos.add(pedido)
+
+            return Response({'status': 'Pedido creado exitosamente', 'pedido_id': pedido.id}, status=status.HTTP_201_CREATED)
+
+        except PrendaVariante.DoesNotExist:
+            return Response({'error': 'Variante no encontrada.'}, status=status.HTTP_404_NOT_FOUND)
+        except Clienta.DoesNotExist:
+            return Response({'error': 'Clienta no encontrada.'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @action(detail=True, methods=['post'], url_path='cancelar')
+    def cancelar(self, request, pk=None):
+        """
+        Cancela el pedido y devuelve el stock.
+        """
+        pedido = self.get_object()
+        
+        if pedido.estado in [Pedido.Estado.CANCELADO, Pedido.Estado.ENTREGADO]:
+            return Response({'error': 'No se puede cancelar en este estado.'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        try:
+            with transaction.atomic():
+                pedido.estado = Pedido.Estado.CANCELADO
+                pedido.save()
+                
+                # Quitar del viaje de entrega si estaba
+                if pedido.rutas_entrega.exists():
+                    for ruta in pedido.rutas_entrega.all():
+                        ruta.pedidos.remove(pedido)
+
+                # Devolver stock
+                for item in pedido.items.select_for_update().all():
+                    variante = item.variante
+                    variante.cantidad += item.cantidad
+                    variante.save()
+                    
+                    if variante.prenda.estado == 'agotada':
+                        variante.prenda.estado = 'activa'
+                        variante.prenda.save()
+                        
+            return Response({'status': 'Pedido cancelado y stock devuelto.'})
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class EntregaDiariaViewSet(viewsets.ModelViewSet):
+    """
+    Vista para el Tablero del Día.
+    Trae las entregas de hoy o futuras ordenadas y permite editar la hora.
+    """
+    serializer_class = EntregaDiariaSerializer
+
+    def get_queryset(self):
+        hoy = timezone.localdate()
+        return EntregaDiaria.objects.filter(
+            tenant=self.request.user.tenant,
+            fecha__gte=hoy
+        ).prefetch_related('pedidos', 'pedidos__clienta', 'pedidos__items__variante__prenda')
+
+    def create(self, request, *args, **kwargs):
+        # Evitamos el error de unique_together si el usuario intenta crear una ruta que ya existe.
+        tenant = request.user.tenant
+        fecha = request.data.get('fecha')
+        punto_entrega_id = request.data.get('punto_entrega')
+        hora_estimada = request.data.get('hora_estimada')
+        
+        if not fecha or not punto_entrega_id:
+            return Response({'error': 'Faltan datos'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        entrega, created = EntregaDiaria.objects.get_or_create(
+            tenant=tenant,
+            fecha=fecha,
+            punto_entrega_id=punto_entrega_id
+        )
+        
+        if hora_estimada:
+            entrega.hora_estimada = hora_estimada
+            entrega.save()
+            
+        serializer = self.get_serializer(entrega)
+        return Response(serializer.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)

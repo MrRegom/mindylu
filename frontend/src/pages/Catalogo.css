@@ -1,0 +1,274 @@
+.catalogo-container {
+  padding: 20px;
+}
+
+.catalogo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.catalogo-header h1 {
+  font-size: 1.75rem;
+  margin-bottom: 4px;
+}
+
+.catalogo-header p {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.btn-icon {
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border-radius: var(--radius-full);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 48px 24px;
+  border-radius: var(--radius-lg);
+  margin-top: 32px;
+}
+
+.empty-icon {
+  width: 80px;
+  height: 80px;
+  background-color: var(--color-primary-light);
+  color: var(--color-primary-dark);
+  border-radius: var(--radius-full);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.empty-state h3 {
+  margin-bottom: 8px;
+}
+
+.empty-state p {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+.prendas-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.prenda-card {
+  display: flex;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  background-color: var(--color-surface);
+}
+
+.prenda-foto {
+  width: 120px;
+  min-height: 120px;
+  flex-shrink: 0;
+  background-color: var(--color-bg);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.prenda-foto img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.foto-placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.3;
+}
+
+.badge-agotado {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background-color: rgba(239, 68, 68, 0.9);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  backdrop-filter: blur(4px);
+}
+
+.prenda-info {
+  flex: 1;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.prenda-info h3 {
+  font-size: 1.1rem;
+  margin-bottom: 4px;
+}
+
+.precio {
+  font-weight: bold;
+  color: var(--color-primary-dark);
+  margin-bottom: 12px;
+}
+
+.variantes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: auto;
+  max-height: 160px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.variantes-list::-webkit-scrollbar {
+  width: 4px;
+}
+.variantes-list::-webkit-scrollbar-thumb {
+  background-color: var(--color-border);
+  border-radius: 4px;
+}
+
+.variante-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--color-bg);
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+}
+
+.variante-item.agotada {
+  opacity: 0.5;
+}
+
+.variante-detalle {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.variante-color {
+  font-weight: 500;
+}
+
+.variante-talla {
+  background-color: var(--color-border);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+
+.variante-stock {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stock-num {
+  color: var(--color-text-muted);
+}
+
+.btn-vender {
+  background-color: var(--color-success);
+  color: white;
+  border: none;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.btn-vender:active {
+  transform: scale(0.9);
+}
+
+.btn-vender:disabled {
+  background-color: var(--color-border);
+  cursor: not-allowed;
+}
+
+/* Barra Flotante de Venta en Curso - Caso A */
+.venta-flotante-bar {
+  position: fixed;
+  bottom: 84px; /* Flota por encima de la barra de navegación */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 500px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
+  border-radius: 16px;
+  padding: 12px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 99; /* Por debajo de modales, pero por encima de todo el catálogo */
+}
+
+.venta-flotante-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-primary-dark);
+}
+
+.cart-badge {
+  background: var(--color-primary);
+  color: white;
+  min-width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: bold;
+  padding: 0 4px;
+}
+
+.venta-flotante-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-small {
+  padding: 6px 12px !important;
+  font-size: 0.8rem !important;
+  height: auto !important;
+  border-radius: 8px !important;
+}

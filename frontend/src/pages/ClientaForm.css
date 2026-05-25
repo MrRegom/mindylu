@@ -1,0 +1,44 @@
+.clienta-form-container {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: var(--color-bg);
+  padding-bottom: 40px;
+}
+
+/* Reusa algunos estilos del Formulario de Prendas para mantener consistencia */
+.clienta-form {
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 14px;
+  color: var(--color-text-muted);
+}
+
+.input-with-icon input,
+.input-with-icon textarea {
+  padding-left: 42px;
+  width: 100%;
+}
+
+.input-help {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin-top: 6px;
+  margin-left: 4px;
+}
+
+.align-top {
+  align-items: flex-start;
+}
