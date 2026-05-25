@@ -30,3 +30,4 @@ dj-database-url==2.1.0
 
 # Filtros
 django-filter==24.3
+django-apscheduler==0.7.0
