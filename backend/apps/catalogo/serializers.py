@@ -3,7 +3,14 @@
 # ─────────────────────────────────────────────────────────────
 
 from rest_framework import serializers
-from .models import CicloVenta, Prenda, PrendaVariante, PrendaImagen
+from .models import CicloVenta, Prenda, PrendaVariante, PrendaImagen, Categoria
+
+
+class CategoriaSerializer(serializers.ModelSerializer):
+    """Serializer CRUD para las categorías del tenant."""
+    class Meta:
+        model = Categoria
+        fields = ['id', 'nombre']
 
 
 class PrendaImagenSerializer(serializers.ModelSerializer):
@@ -22,15 +29,17 @@ class PrendaVarianteSerializer(serializers.ModelSerializer):
 class PrendaSerializer(serializers.ModelSerializer):
     variantes = PrendaVarianteSerializer(many=True, read_only=True)
     imagenes = PrendaImagenSerializer(many=True, read_only=True)
-    
+    categoria_nombre = serializers.CharField(source='categoria.nombre', read_only=True, default=None)
+
     class Meta:
         model = Prenda
         fields = [
-            'id', 'nombre', 'precio', 'foto_url', 
-            'talla_tipo', 'estado', 'fecha_creacion',
+            'id', 'nombre', 'precio', 'foto_url',
+            'talla_tipo', 'estado', 'fecha_creacion', 'fecha_ultima_carga',
+            'categoria', 'categoria_nombre',
             'variantes', 'imagenes', 'ciclo'
         ]
-        read_only_fields = ['estado', 'fecha_creacion']
+        read_only_fields = ['estado', 'fecha_creacion', 'fecha_ultima_carga']
 
 
 class PrendaCreateUpdateSerializer(serializers.ModelSerializer):
@@ -39,38 +48,28 @@ class PrendaCreateUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Prenda
         fields = [
-            'id', 'nombre', 'precio', 'foto_url', 
-            'talla_tipo', 'ciclo', 'variantes'
+            'id', 'nombre', 'precio', 'foto_url',
+            'talla_tipo', 'ciclo', 'categoria', 'variantes'
         ]
 
     def create(self, validated_data):
         variantes_data = validated_data.pop('variantes', [])
-        # Obtenemos el tenant del request
         tenant = self.context['request'].user.tenant
-        
         prenda = Prenda.objects.create(tenant=tenant, **validated_data)
-        
         for var_data in variantes_data:
             PrendaVariante.objects.create(prenda=prenda, **var_data)
-            
         return prenda
 
     def update(self, instance, validated_data):
         variantes_data = validated_data.pop('variantes', None)
-        
-        # Actualizar campos de la Prenda
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
-        
         if variantes_data is not None:
             variantes_enviadas_ids = [item.get('id') for item in variantes_data if item.get('id')]
-            
-            # Actualizar o crear
             for var_data in variantes_data:
                 var_id = var_data.get('id')
                 if var_id:
-                    # Actualizar existente
                     try:
                         variante = PrendaVariante.objects.get(id=var_id, prenda=instance)
                         variante.color = var_data.get('color', variante.color)
@@ -80,13 +79,8 @@ class PrendaCreateUpdateSerializer(serializers.ModelSerializer):
                     except PrendaVariante.DoesNotExist:
                         pass
                 else:
-                    # Crear nueva
                     PrendaVariante.objects.create(prenda=instance, **var_data)
-            
-            # Las que están en la base de datos pero no vinieron en la petición se marcan como agotadas (cantidad=0)
-            # para no romper el historial de pedidos con IntegrityError
             PrendaVariante.objects.filter(prenda=instance).exclude(id__in=variantes_enviadas_ids).update(cantidad=0)
-            
         return instance
 
 

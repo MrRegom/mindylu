@@ -1,408 +1,428 @@
-import React, { useState } from 'react';
+// ─────────────────────────────────────────────────────────────
+// frontend/src/pages/CargaMasiva.jsx
+// Flujo de subida de fotos con detección de duplicados (Combobox).
+// La App es la fuente de verdad; Facebook es solo un canal.
+// ─────────────────────────────────────────────────────────────
+
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Save, Upload, Trash2, Share2, Plus, Sparkles } from 'lucide-react';
+import { ArrowLeft, Upload, Save, Plus, Trash2, AlertCircle, Check, X } from 'lucide-react';
 import api from '../services/api';
 import './CargaMasiva.css';
 
-import { compressImage } from '../utils/imageCompression';
+const COLORES_OPCIONES = ['Negro', 'Blanco', 'Café', 'Beige', 'Gris', 'Rosado', 'Rojo', 'Azul', 'Verde', 'Único'];
+const TALLAS_OPCIONES = ['Estándar', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'Única'];
 
-const TALLAS_DISPONIBLES = ['S', 'M', 'L', 'XL', 'estándar', '34', '36', '38', '40', '42', '44', '34/36', '36/38', '38/40', 'Única'];
-const COLORES_DISPONIBLES = ['Negro', 'Blanco', 'Rojo', 'Azul', 'Verde', 'Amarillo', 'Gris', 'Beige', 'Café', 'Rosado', 'Morado', 'Naranjo', 'Multicolor', 'Por defecto', 'Único'];
+// ── Componente: Combobox de búsqueda de prendas ────────────────────────────
+const PrendaCombobox = ({ prendas, value, onChange, placeholder }) => {
+  const [query, setQuery] = useState(value || '');
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
 
-const CargaMasiva = () => {
-  const navigate = useNavigate();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [items, setItems] = useState([]);
-  const [publicarFacebook, setPublicarFacebook] = useState(true);
-  const [mensajeFacebook, setMensajeFacebook] = useState('');
-  const [fechaProgramada, setFechaProgramada] = useState('');
-  const [lotesProgramados, setLotesProgramados] = useState([]);
+  const filtradas = prendas.filter(p =>
+    p.nombre.toLowerCase().includes(query.toLowerCase())
+  );
 
-  React.useEffect(() => {
-    fetchLotesProgramados();
+  useEffect(() => {
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  const fetchLotesProgramados = async () => {
-    try {
-      const res = await api.get('/catalogo/ciclos/programados/');
-      setLotesProgramados(res.data);
-    } catch (error) {
-      console.error("Error al obtener lotes programados", error);
-    }
+  const seleccionar = (prenda) => {
+    setQuery(prenda.nombre);
+    setOpen(false);
+    onChange({ tipo: 'existente', prenda });
   };
 
-  const handleFiles = async (e) => {
-    const files = Array.from(e.target.files);
-    if (!files.length) return;
-
-    // Comprimir todas las imágenes antes de agregarlas al estado
-    const newItemsPromises = files.map(async (file) => {
-      let compressedFile = file;
-      try {
-        compressedFile = await compressImage(file, 1080, 0.7);
-      } catch (err) {
-        console.error('Error comprimiendo imagen', err);
-      }
-      return {
-        id: Math.random().toString(36).substring(7),
-        file: compressedFile,
-        preview: URL.createObjectURL(compressedFile),
-        nombre: '',
-        precio: '',
-        variantes: [
-          { id: Math.random().toString(36).substring(7), color: 'Único', talla: 'Única', cantidad: 1 }
-        ]
-      };
-    });
-
-    const newItems = await Promise.all(newItemsPromises);
-
-    setItems(prev => [...prev, ...newItems]);
-    e.target.value = ''; // Reset input
-  };
-
-  const removeItem = (id) => {
-    setItems(prev => prev.filter(item => item.id !== id));
-  };
-
-  const handleChange = (id, field, value) => {
-    setItems(prev => prev.map(item => {
-      if (item.id === id) {
-        return { ...item, [field]: value };
-      }
-      return item;
-    }));
-  };
-
-  const handleVarianteChange = (itemId, varId, field, value) => {
-    setItems(prev => prev.map(item => {
-      if (item.id === itemId) {
-        return {
-          ...item,
-          variantes: item.variantes.map(v => v.id === varId ? { ...v, [field]: value } : v)
-        };
-      }
-      return item;
-    }));
-  };
-
-  const addVariante = (itemId) => {
-    setItems(prev => prev.map(item => {
-      if (item.id === itemId) {
-        return {
-          ...item,
-          variantes: [...item.variantes, { id: Math.random().toString(36).substring(7), color: '', talla: '', cantidad: 1 }]
-        };
-      }
-      return item;
-    }));
-  };
-
-  const removeVariante = (itemId, varId) => {
-    setItems(prev => prev.map(item => {
-      if (item.id === itemId) {
-        return {
-          ...item,
-          variantes: item.variantes.filter(v => v.id !== varId)
-        };
-      }
-      return item;
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (items.length === 0) return;
-    
-    // Validación básica
-    const incompletos = items.some(item => !item.nombre || !item.precio || item.variantes.length === 0);
-    if (incompletos) {
-      alert("Por favor, ponle nombre, precio y al menos una variante a todas las prendas.");
-      return;
-    }
-
-    setIsSubmitting(true);
-    
-    try {
-      const payload = new FormData();
-      
-      const cleanItems = items.map(item => ({
-        nombre: item.nombre,
-        precio: item.precio,
-        variantes: item.variantes
-      }));
-      
-      payload.append('items', JSON.stringify(cleanItems));
-      if (fechaProgramada) {
-        payload.append('fecha_programada', new Date(fechaProgramada).toISOString());
-      }
-      if (publicarFacebook) {
-        payload.append('mensaje', mensajeFacebook);
-      }
-      
-      items.forEach((item, index) => {
-        payload.append(`imagenes_${index}`, item.file);
-      });
-
-      // 1. Crear las prendas masivamente
-      const res = await api.post('/catalogo/prendas/bulk_create/', payload, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-      const creadas_ids = res.data.prenda_ids;
-
-      // 2. Si no es programado y marcó publicar en FB, mandamos los IDs a publicar AHORA
-      if (!fechaProgramada && publicarFacebook && creadas_ids.length > 0) {
-        try {
-          await api.post('/integraciones/publicar-lote-facebook/', {
-            prenda_ids: creadas_ids,
-            mensaje: mensajeFacebook
-          });
-          alert(`¡${creadas_ids.length} prendas guardadas y publicadas en Facebook como álbum!`);
-        } catch (fbError) {
-          console.error("Error al publicar en FB:", fbError);
-          alert(`Se guardaron las prendas, pero falló la publicación en Facebook.`);
-        }
-      } else if (fechaProgramada) {
-        alert(`¡${creadas_ids.length} prendas guardadas y programadas para ${new Date(fechaProgramada).toLocaleString()}!`);
-      }
-
-      navigate('/catalogo');
-    } catch (error) {
-      console.error("Error en carga masiva:", error);
-      alert("Hubo un error al realizar la carga masiva.");
-      setIsSubmitting(false);
-    }
+  const confirmarNueva = () => {
+    setOpen(false);
+    onChange({ tipo: 'nueva', nombre: query });
   };
 
   return (
-    <div className="carga-masiva-container animate-fade-in" style={{ padding: '20px', paddingBottom: '100px' }}>
-      {items.length === 0 ? (
-        <>
-          <div className="catalogo-header" style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div style={{ color: 'var(--color-primary)' }}><Sparkles size={28} /></div>
+    <div ref={ref} style={{ position: 'relative' }}>
+      <input
+        className="input-field"
+        value={query}
+        placeholder={placeholder || '🔍 Buscar o escribir nombre de prenda...'}
+        onChange={(e) => { setQuery(e.target.value); setOpen(true); onChange(null); }}
+        onFocus={() => setOpen(true)}
+        style={{ width: '100%' }}
+      />
+      {open && (
+        <div style={{
+          position: 'absolute', top: '110%', left: 0, right: 0, zIndex: 9999,
+          background: 'var(--color-card)', borderRadius: 'var(--radius-md)',
+          boxShadow: 'var(--shadow-lg)', maxHeight: '220px', overflowY: 'auto',
+          border: '1px solid rgba(var(--color-primary-rgb), 0.2)'
+        }}>
+          {filtradas.length > 0 && filtradas.map(p => (
+            <div
+              key={p.id}
+              onClick={() => seleccionar(p)}
+              style={{
+                padding: '12px 16px', cursor: 'pointer', fontSize: '0.9rem',
+                borderBottom: '1px solid rgba(0,0,0,0.05)',
+                display: 'flex', alignItems: 'center', gap: '10px'
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = 'rgba(var(--color-primary-rgb), 0.08)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+            >
+              {p.imagenes?.[0]?.imagen && (
+                <img src={p.imagenes[0].imagen} alt={p.nombre} style={{ width: 36, height: 36, objectFit: 'cover', borderRadius: 6 }} />
+              )}
               <div>
-                <h1 style={{ fontSize: '1.8rem', fontFamily: 'Playfair Display', margin: '0 0 2px 0' }}>Auto-Catálogo</h1>
-                <p style={{ color: 'var(--color-text-muted)', margin: 0, fontSize: '0.9rem' }}>Inteligente con IA ✨</p>
+                <div style={{ fontWeight: 600 }}>{p.nombre}</div>
+                <div style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)' }}>${p.precio} · {p.variantes?.length} variante(s)</div>
               </div>
             </div>
-          </div>
+          ))}
+          {query.trim() && (
+            <div
+              onClick={confirmarNueva}
+              style={{
+                padding: '12px 16px', cursor: 'pointer', fontSize: '0.9rem',
+                color: 'var(--color-primary)', fontWeight: 600,
+                display: 'flex', alignItems: 'center', gap: '8px'
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = 'rgba(var(--color-primary-rgb), 0.08)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+            >
+              <Plus size={16} /> Crear nueva prenda "{query}"
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
 
-          <div className="card scan-card" style={{ background: 'var(--color-primary-gradient)', color: 'white', padding: '24px', borderRadius: 'var(--radius-lg)', position: 'relative', overflow: 'hidden', marginBottom: '32px' }}>
-            <h2 style={{ fontSize: '1.5rem', marginBottom: '12px', zIndex: 2, position: 'relative' }}>Escanea tus publicaciones ✨</h2>
-            <p style={{ fontSize: '0.9rem', opacity: 0.9, marginBottom: '24px', maxWidth: '75%', zIndex: 2, position: 'relative', lineHeight: 1.4 }}>
-              Importa prendas directamente de tus Lives de Facebook con OCR para descripciones y precios.
-            </p>
-            <div className="upload-btn-wrapper" style={{ position: 'relative', zIndex: 2 }}>
-              <button className="btn" style={{ background: 'white', color: 'var(--color-primary-dark)', width: 'auto', padding: '12px 24px', borderRadius: 'var(--radius-full)' }}>
-                Escanear publicación
-              </button>
-              <input type="file" multiple accept="image/*" onChange={handleFiles} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }} />
-            </div>
-            {/* Background Camera Icon Decoration */}
-            <div style={{ position: 'absolute', right: '-10px', bottom: '-10px', opacity: 0.15, transform: 'rotate(-15deg)', zIndex: 1 }}>
-              <Upload size={140} />
-            </div>
-          </div>
+// ── Componente: Tarjeta de foto por identificar ───────────────────────────
+const FotoCard = ({ foto, index, prendas, categorias, onRemove, onChange }) => {
+  const [seleccion, setSeleccion] = useState(null); // { tipo: 'existente'|'nueva', prenda?, nombre? }
+  const [precio, setPrecio] = useState('');
+  const [categoriaId, setCategoriaId] = useState('');
+  const [variantes, setVariantes] = useState([{ color: 'Único', talla: 'Estándar', cantidad: 1 }]);
 
-          {lotesProgramados.length > 0 && (
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '16px' }}>
-                <h3 style={{ fontSize: '1.1rem', margin: 0 }}>Lotes Programados</h3>
+  const actualizarPadre = (sel, p, c, v) => {
+    const s = sel !== undefined ? sel : seleccion;
+    const pr = p !== undefined ? p : precio;
+    const ca = c !== undefined ? c : categoriaId;
+    const va = v !== undefined ? v : variantes;
+    onChange(index, { seleccion: s, precio: pr, categoriaId: ca, variantes: va });
+  };
+
+  const handleSeleccion = (val) => {
+    setSeleccion(val);
+    actualizarPadre(val, precio, categoriaId, variantes);
+  };
+
+  const agregarVariante = () => {
+    const nuevas = [...variantes, { color: 'Único', talla: 'Estándar', cantidad: 1 }];
+    setVariantes(nuevas);
+    actualizarPadre(seleccion, precio, categoriaId, nuevas);
+  };
+
+  const actualizarVariante = (i, campo, valor) => {
+    const nuevas = variantes.map((v, idx) => idx === i ? { ...v, [campo]: valor } : v);
+    setVariantes(nuevas);
+    actualizarPadre(seleccion, precio, categoriaId, nuevas);
+  };
+
+  const eliminarVariante = (i) => {
+    const nuevas = variantes.filter((_, idx) => idx !== i);
+    setVariantes(nuevas);
+    actualizarPadre(seleccion, precio, categoriaId, nuevas);
+  };
+
+  return (
+    <div className="card glass animate-slide-up" style={{ marginBottom: 16, padding: 0, overflow: 'hidden' }}>
+      <div style={{ display: 'flex', gap: 0 }}>
+        {/* Foto */}
+        <div style={{ width: 100, minHeight: 120, flexShrink: 0, position: 'relative', background: '#f0f0f0' }}>
+          <img src={foto.preview} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          <button
+            onClick={() => onRemove(index)}
+            style={{ position: 'absolute', top: 4, right: 4, background: 'rgba(0,0,0,0.5)', border: 'none', borderRadius: '50%', width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'white' }}
+          >
+            <X size={12} />
+          </button>
+        </div>
+
+        {/* Formulario */}
+        <div style={{ flex: 1, padding: '12px 14px' }}>
+          {/* Combobox */}
+          <PrendaCombobox prendas={prendas} onChange={handleSeleccion} />
+
+          {seleccion && seleccion.tipo === 'nueva' && (
+            <>
+              <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+                <div style={{ flex: 1 }}>
+                  <label style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Precio $</label>
+                  <input
+                    type="number" className="input-field" value={precio}
+                    onChange={e => { setPrecio(e.target.value); actualizarPadre(seleccion, e.target.value, categoriaId, variantes); }}
+                    placeholder="Ej: 7990"
+                    style={{ width: '100%', padding: '8px 10px', marginTop: 4 }}
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Categoría</label>
+                  <select
+                    className="input-field"
+                    value={categoriaId}
+                    onChange={e => { setCategoriaId(e.target.value); actualizarPadre(seleccion, precio, e.target.value, variantes); }}
+                    style={{ width: '100%', padding: '8px 10px', marginTop: 4 }}
+                  >
+                    <option value="">Sin categoría</option>
+                    {categorias.map(c => <option key={c.id} value={c.id}>{c.nombre}</option>)}
+                  </select>
+                </div>
               </div>
-              
-              <div style={{ display: 'flex', gap: '16px', overflowX: 'auto', paddingBottom: '16px', scrollbarWidth: 'none' }}>
-                {lotesProgramados.map((lote) => (
-                  <div key={lote.id} className="card" style={{ minWidth: '220px', padding: 0, overflow: 'hidden', border: '2px solid var(--color-primary)' }}>
-                    {lote.prendas && lote.prendas.length > 0 && (
-                      <img src={lote.prendas[0].foto_url || (lote.prendas[0].imagenes?.[0]?.imagen)} style={{ width: '100%', height: '140px', objectFit: 'cover' }} alt="Lote" />
-                    )}
-                    <div style={{ padding: '16px' }}>
-                      <p style={{ color: 'var(--color-primary)', fontSize: '0.85rem', fontWeight: 600, marginBottom: '8px' }}>
-                        Para el: {new Date(lote.fecha_programada).toLocaleString()}
-                      </p>
-                      <p style={{ fontSize: '0.85rem', marginBottom: '0', fontWeight: 500 }}>
-                        {lote.prendas?.length} prendas listas para subir.
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+            </>
+          )}
+
+          {seleccion && seleccion.tipo === 'existente' && (
+            <div style={{ marginTop: 8, padding: '8px 10px', background: 'rgba(var(--color-primary-rgb), 0.08)', borderRadius: 8, fontSize: '0.82rem', color: 'var(--color-primary)', fontWeight: 600 }}>
+              <AlertCircle size={13} style={{ verticalAlign: 'middle', marginRight: 4 }} />
+              Ya existe en tu catálogo. Se sumará stock.
             </div>
           )}
 
-        </>
-      ) : (
-        <form className="carga-masiva-form" onSubmit={handleSubmit}>
-          <div className="items-grid">
-            {items.map((item, index) => (
-              <div key={item.id} className="item-row glass animate-slide-up">
-                <div className="item-foto">
-                  <img src={item.preview} alt={`prenda-${index}`} />
-                  <button type="button" className="btn-remove-row" onClick={() => removeItem(item.id)}>
-                    <Trash2 size={16} />
-                  </button>
-                </div>
-                
-                <div className="item-inputs">
-                  <div className="input-group mini">
-                    <label>Nombre *</label>
-                    <input 
-                      type="text" 
-                      placeholder="Ej: Vestido Lanilla" 
-                      value={item.nombre}
-                      onChange={(e) => handleChange(item.id, 'nombre', e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="input-group mini">
-                    <label>Precio *</label>
-                    <input 
-                      type="number" 
-                      placeholder="$" 
-                      value={item.precio}
-                      onChange={(e) => handleChange(item.id, 'precio', e.target.value)}
-                      required
-                    />
-                  </div>
-                  
-                  <div className="item-variantes">
-                    <div className="item-variantes-header">
-                      <label>Variantes (Talla/Color/Stock)</label>
-                      <button type="button" className="btn-add-mini" onClick={() => addVariante(item.id)}>
-                        <Plus size={14} /> Add
-                      </button>
-                    </div>
-                    {item.variantes.map((v) => (
-                      <div key={v.id} className="variante-mini-row">
-                        <div className="variante-fields">
-                          <div className="variante-field-group">
-                            <label>Color</label>
-                            <select 
-                              value={v.color}
-                              onChange={(e) => handleVarianteChange(item.id, v.id, 'color', e.target.value)}
-                              className="input-mini"
-                              style={{ WebkitAppearance: 'none', background: 'transparent' }}
-                            >
-                              {COLORES_DISPONIBLES.map(c => <option key={c} value={c}>{c}</option>)}
-                            </select>
-                          </div>
-                          <div className="variante-field-group">
-                            <label>Talla</label>
-                            <select 
-                              value={v.talla}
-                              onChange={(e) => handleVarianteChange(item.id, v.id, 'talla', e.target.value)}
-                              className="input-mini"
-                              style={{ WebkitAppearance: 'none', background: 'transparent' }}
-                            >
-                              {TALLAS_DISPONIBLES.map(t => <option key={t} value={t}>{t}</option>)}
-                            </select>
-                          </div>
-                          <div className="variante-field-group">
-                            <label>Stock</label>
-                            <input 
-                              type="number" 
-                              min="1"
-                              placeholder="Ej: 3"
-                              value={v.cantidad}
-                              onChange={(e) => handleVarianteChange(item.id, v.id, 'cantidad', e.target.value)}
-                              className="input-mini stock-mini"
-                              required
-                            />
-                          </div>
-                        </div>
-                        {item.variantes.length > 1 && (
-                          <button type="button" className="btn-remove-mini" onClick={() => removeVariante(item.id, v.id)}>
-                            <Trash2 size={16} />
-                          </button>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="form-section glass facebook-push-section" style={{ marginTop: 24 }}>
-            <div className="facebook-toggle-wrapper" style={{ marginBottom: 16 }}>
-              <div className="facebook-toggle-info">
-                <Share2 size={24} color="#1877F2" />
-                <div>
-                  <h4>Álbum de Facebook</h4>
-                  <p>¿Cuándo deseas publicarlo en FB?</p>
-                </div>
-              </div>
-            </div>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <div className="input-group">
-                <label>Texto de la publicación</label>
-                <textarea 
-                  placeholder="Ej: ✨ ¡Llegó mercadería nueva! ✨&#10;No te quedes sin la tuya..."
-                  value={mensajeFacebook}
-                  onChange={(e) => setMensajeFacebook(e.target.value)}
-                  rows={4}
-                  style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #ddd', resize: 'vertical' }}
-                />
-                <small style={{ color: '#666' }}>Las tallas, colores y stock se guardarán internamente, pero no se publicarán en Facebook.</small>
-              </div>
-
-              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.5)', padding: '12px', borderRadius: '8px' }}>
-                <input 
-                  type="radio" 
-                  name="schedule_type" 
-                  checked={!fechaProgramada}
-                  onChange={() => {
-                    setFechaProgramada('');
-                    setPublicarFacebook(true);
-                  }}
-                />
-                <div>
-                  <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>Publicar Inmediatamente</div>
-                  <div style={{ fontSize: '0.8rem', color: '#666' }}>Sube todo a Facebook en este instante</div>
-                </div>
-              </label>
-
-              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.5)', padding: '12px', borderRadius: '8px' }}>
-                <input 
-                  type="radio" 
-                  name="schedule_type" 
-                  checked={!!fechaProgramada}
-                  onChange={() => {
-                    const d = new Date();
-                    d.setHours(d.getHours() + 1);
-                    d.setMinutes(0);
-                    // Format to datetime-local expected string YYYY-MM-DDThh:mm
-                    setFechaProgramada(d.toISOString().slice(0, 16));
-                  }}
-                />
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>Programar para después</div>
-                  <div style={{ fontSize: '0.8rem', color: '#666' }}>Elige la fecha y hora exacta</div>
-                  {fechaProgramada && (
-                    <input 
-                      type="datetime-local" 
-                      value={fechaProgramada}
-                      onChange={(e) => setFechaProgramada(e.target.value)}
-                      style={{ marginTop: '8px', width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }}
-                    />
+          {/* Variantes */}
+          {seleccion && (
+            <div style={{ marginTop: 10 }}>
+              <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginBottom: 6 }}>Colores / Tallas</div>
+              {variantes.map((v, i) => (
+                <div key={i} style={{ display: 'flex', gap: 6, marginBottom: 6, alignItems: 'center' }}>
+                  <select
+                    className="input-field"
+                    value={v.color}
+                    onChange={e => actualizarVariante(i, 'color', e.target.value)}
+                    style={{ flex: 1, padding: '6px 8px', fontSize: '0.82rem' }}
+                  >
+                    {COLORES_OPCIONES.map(c => <option key={c}>{c}</option>)}
+                  </select>
+                  <select
+                    className="input-field"
+                    value={v.talla}
+                    onChange={e => actualizarVariante(i, 'talla', e.target.value)}
+                    style={{ flex: 1, padding: '6px 8px', fontSize: '0.82rem' }}
+                  >
+                    {TALLAS_OPCIONES.map(t => <option key={t}>{t}</option>)}
+                  </select>
+                  <input
+                    type="number" min="1" value={v.cantidad}
+                    onChange={e => actualizarVariante(i, 'cantidad', parseInt(e.target.value) || 1)}
+                    style={{ width: 44, padding: '6px 6px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.1)', textAlign: 'center', fontSize: '0.82rem' }}
+                  />
+                  {variantes.length > 1 && (
+                    <button onClick={() => eliminarVariante(i)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-danger)' }}>
+                      <Trash2 size={14} />
+                    </button>
                   )}
                 </div>
-              </label>
+              ))}
+              <button onClick={agregarVariante} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-primary)', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: 4, padding: 0, marginTop: 2 }}>
+                <Plus size={13} /> Agregar color/talla
+              </button>
             </div>
-          </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
 
-          <div className="fixed-bottom-bar glass">
-            <div className="summary-info">
-              <span>{items.length} prendas listas</span>
+
+// ── Página principal ───────────────────────────────────────────────────────
+const CargaMasiva = () => {
+  const navigate = useNavigate();
+  const [fotos, setFotos] = useState([]);             // [{ file, preview }]
+  const [fotosData, setFotosData] = useState({});     // { index: { seleccion, precio, variantes } }
+  const [prendas, setPrendas] = useState([]);         // catálogo existente
+  const [categorias, setCategorias] = useState([]);
+  const [lotesProgramados, setLotesProgramados] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [resultado, setResultado] = useState(null);   // { guardadas, sumadas }
+
+  useEffect(() => {
+    fetchDatos();
+  }, []);
+
+  const fetchDatos = async () => {
+    try {
+      const [rPrendas, rCats, rLotes] = await Promise.all([
+        api.get('/catalogo/prendas/'),
+        api.get('/catalogo/categorias/'),
+        api.get('/catalogo/ciclos/programados/')
+      ]);
+      setPrendas(rPrendas.data);
+      setCategorias(rCats.data);
+      setLotesProgramados(rLotes.data);
+    } catch (e) {
+      console.error('Error al cargar datos:', e);
+    }
+  };
+
+  const handleFiles = (e) => {
+    const files = Array.from(e.target.files);
+    const nuevas = files.map(f => ({ file: f, preview: URL.createObjectURL(f) }));
+    setFotos(prev => [...prev, ...nuevas]);
+  };
+
+  const handleRemove = (index) => {
+    setFotos(prev => prev.filter((_, i) => i !== index));
+    setFotosData(prev => {
+      const next = { ...prev };
+      delete next[index];
+      return next;
+    });
+  };
+
+  const handleChange = (index, data) => {
+    setFotosData(prev => ({ ...prev, [index]: data }));
+  };
+
+  const handleGuardar = async () => {
+    // Validar que todas las fotos tengan selección
+    const sinSeleccion = fotos.filter((_, i) => !fotosData[i]?.seleccion);
+    if (sinSeleccion.length > 0) {
+      alert(`Falta identificar ${sinSeleccion.length} foto(s). Selecciona o crea una prenda para cada una.`);
+      return;
+    }
+    setIsSubmitting(true);
+    let guardadas = 0;
+    let sumadas = 0;
+
+    for (let i = 0; i < fotos.length; i++) {
+      const { seleccion, precio, categoriaId, variantes } = fotosData[i];
+      const foto = fotos[i];
+
+      try {
+        if (seleccion.tipo === 'existente') {
+          // Sumar stock a la prenda existente
+          await api.post('/catalogo/prendas/asociar_stock/', {
+            prenda_id: seleccion.prenda.id,
+            variantes: variantes
+          });
+          sumadas++;
+        } else {
+          // Crear prenda nueva con la foto
+          const formData = new FormData();
+          formData.append('nombre', seleccion.nombre);
+          formData.append('precio', precio || 0);
+          if (categoriaId) formData.append('categoria_id', categoriaId);
+          formData.append('variantes', JSON.stringify(variantes));
+          formData.append('imagen', foto.file);
+          await api.post('/catalogo/prendas/subir_foto/', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          });
+          guardadas++;
+        }
+      } catch (e) {
+        console.error('Error al guardar prenda', i, e);
+      }
+    }
+
+    setIsSubmitting(false);
+    setResultado({ guardadas, sumadas });
+    setFotos([]);
+    setFotosData({});
+    await fetchDatos(); // Recargar catálogo y lotes
+  };
+
+  // Vista de éxito
+  if (resultado) {
+    return (
+      <div className="carga-masiva-container animate-fade-in" style={{ padding: 24, paddingBottom: 100, textAlign: 'center' }}>
+        <div style={{ fontSize: '4rem', marginBottom: 16 }}>✅</div>
+        <h2 style={{ marginBottom: 8 }}>¡Guardado en el catálogo!</h2>
+        {resultado.guardadas > 0 && <p style={{ color: 'var(--color-text-muted)' }}>{resultado.guardadas} prenda(s) nueva(s) creada(s).</p>}
+        {resultado.sumadas > 0 && <p style={{ color: 'var(--color-text-muted)' }}>{resultado.sumadas} prenda(s) con stock actualizado.</p>}
+        <p style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', marginTop: 8 }}>
+          Para publicar en Facebook, ve al Catálogo y selecciona las prendas que quieres publicar.
+        </p>
+        <button className="btn btn-primary" style={{ marginTop: 24 }} onClick={() => { setResultado(null); }}>
+          Subir más fotos
+        </button>
+        <button className="btn" style={{ marginTop: 12, width: '100%', background: 'transparent', color: 'var(--color-primary)', fontWeight: 600 }} onClick={() => navigate('/catalogo')}>
+          Ir al Catálogo →
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="carga-masiva-container animate-fade-in" style={{ padding: '20px', paddingBottom: '120px' }}>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+        <button onClick={() => navigate(-1)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+          <ArrowLeft size={22} />
+        </button>
+        <div>
+          <h1 style={{ margin: 0, fontSize: '1.5rem' }}>Subir Fotos</h1>
+          <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>El catálogo es la fuente de verdad ✨</p>
+        </div>
+      </div>
+
+      {/* Zona de arrastre / subida */}
+      <label style={{
+        display: 'block', border: '2px dashed rgba(var(--color-primary-rgb), 0.4)',
+        borderRadius: 'var(--radius-lg)', padding: '28px 20px', textAlign: 'center',
+        cursor: 'pointer', marginBottom: 20, background: 'rgba(var(--color-primary-rgb), 0.03)'
+      }}>
+        <Upload size={32} color="var(--color-primary)" style={{ marginBottom: 8 }} />
+        <div style={{ fontWeight: 600, marginBottom: 4 }}>Toca para seleccionar fotos</div>
+        <div style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)' }}>Puedes subir varias a la vez</div>
+        <input type="file" accept="image/*" multiple onChange={handleFiles} style={{ display: 'none' }} />
+      </label>
+
+      {/* Tarjetas de fotos */}
+      {fotos.map((foto, i) => (
+        <FotoCard
+          key={i}
+          index={i}
+          foto={foto}
+          prendas={prendas}
+          categorias={categorias}
+          onRemove={handleRemove}
+          onChange={handleChange}
+        />
+      ))}
+
+      {/* Botón guardar */}
+      {fotos.length > 0 && (
+        <button
+          className="btn btn-primary"
+          onClick={handleGuardar}
+          disabled={isSubmitting}
+          style={{ width: '100%', padding: '14px', fontSize: '1rem', marginTop: 8, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8 }}
+        >
+          <Save size={18} />
+          {isSubmitting ? 'Guardando...' : `Guardar ${fotos.length} foto(s) en el Catálogo`}
+        </button>
+      )}
+
+      {/* Lotes programados */}
+      {lotesProgramados.length > 0 && (
+        <div style={{ marginTop: 32 }}>
+          <h3 style={{ fontSize: '1rem', marginBottom: 12 }}>📅 Lotes Programados</h3>
+          {lotesProgramados.map(lote => (
+            <div key={lote.id} className="card" style={{ padding: '12px 16px', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 12, border: '1.5px solid rgba(var(--color-primary-rgb), 0.3)' }}>
+              {lote.prendas?.[0]?.imagenes?.[0]?.imagen && (
+                <img src={lote.prendas[0].imagenes[0].imagen} style={{ width: 44, height: 44, borderRadius: 8, objectFit: 'cover' }} alt="" />
+              )}
+              <div>
+                <div style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--color-primary)' }}>
+                  {new Date(lote.fecha_programada).toLocaleString()}
+                </div>
+                <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>{lote.prendas?.length} prendas</div>
+              </div>
             </div>
-            <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
-              <Save size={20} />
-              {isSubmitting ? 'Procesando...' : (fechaProgramada ? 'Dejar Programado' : 'Publicar Ahora')}
-            </button>
-          </div>
-        </form>
+          ))}
+        </div>
       )}
     </div>
   );

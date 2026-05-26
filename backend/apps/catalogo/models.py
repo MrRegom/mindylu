@@ -34,6 +34,24 @@ class CicloVenta(models.Model):
         return f"Ciclo {self.fecha_publicacion.strftime('%d/%m/%Y')} - {self.get_estado_display()}"
 
 
+class Categoria(models.Model):
+    """
+    Categorías de prendas definidas por la tienda (ej: Sweaters, Blusas).
+    Cada tenant gestiona las suyas propias — aislamiento multi-tenant.
+    """
+    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name='categorias')
+    nombre = models.CharField(max_length=100, verbose_name=_('Nombre'))
+
+    class Meta:
+        ordering = ['nombre']
+        verbose_name = _('Categoría')
+        verbose_name_plural = _('Categorías')
+        unique_together = ['tenant', 'nombre']  # No duplicar categorías por tenant
+
+    def __str__(self):
+        return self.nombre
+
+
 class Prenda(models.Model):
     """
     Una prenda base en el catálogo (ej: Chaleco de Lana).
@@ -49,6 +67,13 @@ class Prenda(models.Model):
 
     tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name='prendas')
     ciclo = models.ForeignKey(CicloVenta, on_delete=models.SET_NULL, null=True, blank=True, related_name='prendas')
+    categoria = models.ForeignKey(
+        Categoria,
+        on_delete=models.SET_NULL,
+        null=True, blank=True,
+        related_name='prendas',
+        verbose_name=_('Categoría')
+    )
     
     nombre = models.CharField(max_length=255)
     precio = models.DecimalField(max_digits=10, decimal_places=0) # CLP no usa decimales
@@ -56,9 +81,14 @@ class Prenda(models.Model):
     talla_tipo = models.CharField(max_length=20, choices=TipoTalla.choices, default=TipoTalla.UNICA)
     estado = models.CharField(max_length=20, choices=Estado.choices, default=Estado.DISPONIBLE)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_ultima_carga = models.DateTimeField(
+        auto_now=True,
+        verbose_name=_('Última vez cargada'),
+        help_text=_('Se actualiza cada vez que se sube stock a esta prenda. Usado para el filtro "nuevas de hoy".')
+    )
 
     class Meta:
-        ordering = ['-fecha_creacion']
+        ordering = ['-fecha_ultima_carga']
         verbose_name = _('Prenda')
         verbose_name_plural = _('Prendas')
 
