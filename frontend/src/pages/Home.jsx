@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Sparkles, DollarSign, Package, CreditCard, TrendingUp, RefreshCw } from 'lucide-react';
+import { Sparkles, DollarSign, Package, CreditCard, TrendingUp, RefreshCw, User, ShoppingBag } from 'lucide-react';
 import api from '../services/api';
 import './Home.css';
 
