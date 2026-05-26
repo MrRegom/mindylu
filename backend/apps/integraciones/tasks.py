@@ -36,11 +36,17 @@ def ejecutar_publicacion_lote(ciclo_id):
 
     for prenda in prendas:
         imagen = prenda.imagenes.first()
-        if imagen:
+        if imagen or prenda.foto_url:
             try:
                 url_photo = f"https://graph.facebook.com/v19.0/{page_id}/photos"
-                files = {'source': open(imagen.imagen.path, 'rb')}
                 data = {'published': 'false', 'access_token': access_token}
+                files = None
+                
+                if imagen and imagen.imagen:
+                    files = {'source': open(imagen.imagen.path, 'rb')}
+                else:
+                    data['url'] = prenda.foto_url
+
                 res = requests.post(url_photo, data=data, files=files)
                 res.raise_for_status()
                 res_data = res.json()
