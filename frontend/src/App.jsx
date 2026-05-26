@@ -13,6 +13,7 @@ import Cuentas from './pages/Cuentas';
 import Sincronizacion from './pages/Sincronizacion';
 import LotesProgramados from './pages/LotesProgramados';
 import LoteAddFotos from './pages/LoteAddFotos';
+import Perfil from './pages/Perfil';
 
 function App() {
   // Leemos el token real para ver si está logueado
@@ -41,6 +42,7 @@ function App() {
           <Route path="/clientas" element={<Clientas />} />
           <Route path="/cuentas" element={<Cuentas />} />
           <Route path="/sincronizacion" element={<Sincronizacion />} />
+          <Route path="/perfil" element={<Perfil />} />
         </Route>
       </Routes>
     </Router>

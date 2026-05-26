@@ -4,7 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Check, ImageIcon, Trash2, Search, Edit2 } from 'lucide-react';
+import { Plus, Check, ImageIcon, Trash2, Search, Edit2, Rocket } from 'lucide-react';
 import api from '../services/api';
 import VenderModal from '../components/VenderModal';
 import EditarPrendaModal from '../components/EditarPrendaModal';
@@ -140,8 +140,8 @@ const Catalogo = () => {
         </div>
         <div style={{ display: 'flex', gap: '8px' }}>
           <button className="btn-icon-simple" title="Buscar" style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', color: 'var(--color-text)' }}><Search size={20} /></button>
-          <button className="btn-icon-simple" onClick={() => navigate('/catalogo/lotes')} title="Filtros" style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', color: 'var(--color-text)' }}><span style={{ fontSize: '1.2rem' }}>▽</span></button>
-          <button className="btn-icon-simple" onClick={() => navigate('/catalogo/nueva')} title="Añadir" style={{ background: 'var(--color-primary-gradient)', color: '#FFF', border: 'none' }}><Plus size={20} /></button>
+          <button className="btn-icon-simple" onClick={() => navigate('/catalogo/nueva')} title="Añadir una prenda manual" style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', color: 'var(--color-text)' }}><Plus size={20} /></button>
+          <button className="btn-icon-simple" onClick={() => navigate('/catalogo/carga-masiva')} title="Carga Masiva con Magia" style={{ background: 'var(--color-primary-gradient)', color: '#FFF', border: 'none' }}><Rocket size={20} /></button>
         </div>
       </div>
 
