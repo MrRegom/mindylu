@@ -188,38 +188,7 @@ const CargaMasiva = () => {
             </div>
           </div>
 
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '16px' }}>
-              <h3 style={{ fontSize: '1.1rem', margin: 0 }}>Últimas publicaciones</h3>
-              <span style={{ color: 'var(--color-primary)', fontSize: '0.9rem', fontWeight: 500 }}>Ver todas</span>
-            </div>
-            
-            <div style={{ display: 'flex', gap: '16px', overflowX: 'auto', paddingBottom: '16px', scrollbarWidth: 'none' }}>
-              {/* Dummy Post 1 */}
-              <div className="card" style={{ minWidth: '220px', padding: 0, overflow: 'hidden' }}>
-                <img src="https://images.unsplash.com/photo-1551048632-24e444b48a3e?auto=format&fit=crop&q=80&w=300" style={{ width: '100%', height: '180px', objectFit: 'cover' }} alt="Live" />
-                <div style={{ padding: '16px' }}>
-                  <p style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', marginBottom: '8px' }}>24 may 2026, 06:31 p.m.</p>
-                  <p style={{ fontSize: '0.85rem', marginBottom: '16px', fontWeight: 500, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                    ✨ Prenditas disponibles para entrega inmediata...
-                  </p>
-                  <button className="btn btn-primary" style={{ padding: '8px', fontSize: '0.9rem' }}>Procesar</button>
-                </div>
-              </div>
-              
-              {/* Dummy Post 2 */}
-              <div className="card" style={{ minWidth: '220px', padding: 0, overflow: 'hidden' }}>
-                <img src="https://images.unsplash.com/photo-1554568218-0f1715e72254?auto=format&fit=crop&q=80&w=300" style={{ width: '100%', height: '180px', objectFit: 'cover' }} alt="Live" />
-                <div style={{ padding: '16px' }}>
-                  <p style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', marginBottom: '8px' }}>22 may 2026, 09:27 p.m.</p>
-                  <p style={{ fontSize: '0.85rem', marginBottom: '16px', fontWeight: 500, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                    Sábado 23 entregar a las 13 hrs en lider placilla...
-                  </p>
-                  <button className="btn btn-primary" style={{ padding: '8px', fontSize: '0.9rem' }}>Procesar</button>
-                </div>
-              </div>
-            </div>
-          </div>
+
         </>
       ) : (
         <form className="carga-masiva-form" onSubmit={handleSubmit}>
