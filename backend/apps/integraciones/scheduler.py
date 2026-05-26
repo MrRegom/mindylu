@@ -8,9 +8,9 @@ import sys
 # Mantiene una única instancia del scheduler
 scheduler = BackgroundScheduler(timezone=settings.TIME_ZONE)
 
-def start_scheduler():
+def start_scheduler(force=False):
     # Evita correr el scheduler en el proceso de automigración o comandos de manage.py (excepto runserver)
-    if 'runserver' not in sys.argv:
+    if 'runserver' not in sys.argv and not force:
         return
 
     # Si ya está corriendo, no lo arrancamos de nuevo
