@@ -25,8 +25,8 @@ def ejecutar_publicacion_lote(ciclo_id):
         ciclo.save()
         return
 
-    access_token = settings.FACEBOOK_PAGE_ACCESS_TOKEN
-    page_id = settings.FACEBOOK_PAGE_ID
+    access_token = getattr(settings, 'FACEBOOK_PAGE_ACCESS_TOKEN', None)
+    page_id = getattr(settings, 'FACEBOOK_PAGE_ID', None)
 
     if not access_token or not page_id:
         print("Configuración de Facebook faltante en el servidor.")
