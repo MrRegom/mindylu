@@ -218,7 +218,9 @@
 /* Barra Flotante de Venta en Curso - Caso A */
 .venta-flotante-bar {
   position: fixed;
-  bottom: 84px; /* Flota por encima de la barra de navegación */
+  bottom: 100px; /* Flota por encima de la barra de navegación */
+  z-index: 100;
+
   left: 50%;
   transform: translateX(-50%);
   width: 90%;
