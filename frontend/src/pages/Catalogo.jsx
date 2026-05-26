@@ -4,7 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Check, ImageIcon, Trash2, Search, Edit2, Rocket, X, Send, Clock, Sparkles } from 'lucide-react';
+import { Plus, Check, ImageIcon, Trash2, Search, Edit2, Rocket, X, Share2, Calendar, Star } from 'lucide-react';
 import api from '../services/api';
 import VenderModal from '../components/VenderModal';
 import EditarPrendaModal from '../components/EditarPrendaModal';
@@ -157,7 +157,7 @@ const Catalogo = () => {
             title={modoPublicar ? 'Cancelar selección' : 'Publicar en Facebook'}
             style={{ background: modoPublicar ? 'var(--color-primary-gradient)' : 'var(--color-surface)', color: modoPublicar ? '#FFF' : 'var(--color-text)', border: modoPublicar ? 'none' : '1px solid var(--color-border)' }}
           >
-            <Send size={20} />
+            <Share2 size={20} />
           </button>
           <button className="btn-icon-simple" onClick={() => navigate('/catalogo/nueva')} title="Añadir prenda manual" style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', color: 'var(--color-text)' }}>
             <Plus size={20} />
@@ -171,10 +171,10 @@ const Catalogo = () => {
       {/* Banner modo publicar */}
       {modoPublicar && (
         <div style={{ background: 'rgba(var(--color-primary-rgb), 0.1)', border: '1.5px solid rgba(var(--color-primary-rgb), 0.3)', borderRadius: 'var(--radius-md)', padding: '12px 16px', marginBottom: 16, fontSize: '0.88rem', color: 'var(--color-primary)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Send size={15} />
+          <Share2 size={15} />
           Modo publicar activo — toca las prendas para seleccionarlas
           <button onClick={seleccionarTodasHoy} style={{ marginLeft: 'auto', background: 'var(--color-primary)', color: 'white', border: 'none', borderRadius: 20, padding: '4px 12px', fontSize: '0.78rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
-            <Sparkles size={12} /> Nuevas de hoy
+            <Star size={12} /> Nuevas de hoy
           </button>
         </div>
       )}
@@ -370,7 +370,7 @@ const Catalogo = () => {
               style={{ width: '100%', borderRadius: 12, padding: 12, border: '1px solid rgba(0,0,0,0.1)', marginBottom: 16, resize: 'none', fontSize: '0.9rem' }}
             />
             <label style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', display: 'block', marginBottom: 6 }}>
-              <Clock size={13} style={{ verticalAlign: 'middle', marginRight: 4 }} />
+              <Calendar size={13} style={{ verticalAlign: 'middle', marginRight: 4 }} />
               Programar para (opcional)
             </label>
             <input
