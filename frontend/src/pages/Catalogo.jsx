@@ -4,6 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { createPortal } from 'react-dom';
 import { Plus, Check, ImageIcon, Trash2, Search, Edit2, Rocket, X, Share2, Calendar, Star } from 'lucide-react';
 import api from '../services/api';
 import VenderModal from '../components/VenderModal';
@@ -361,9 +362,9 @@ const Catalogo = () => {
       )}
 
       {/* Modal de publicación */}
-      {publicarModal && (
+      {publicarModal && createPortal(
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 99999, display: 'flex', alignItems: 'flex-end' }} onClick={() => setPublicarModal(false)}>
-          <div className="glass" onClick={e => e.stopPropagation()} style={{ width: '100%', borderRadius: '20px 20px 0 0', padding: '24px 24px 100px 24px' }}>
+          <div className="glass" onClick={e => e.stopPropagation()} style={{ width: '100%', borderRadius: '20px 20px 0 0', padding: 24, paddingBottom: 'calc(24px + env(safe-area-inset-bottom))' }}>
             <h3 style={{ margin: '0 0 16px 0' }}>Publicar {seleccionadas.size} prenda(s)</h3>
             <label style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', display: 'block', marginBottom: 6 }}>Texto del post</label>
             <textarea
@@ -392,7 +393,8 @@ const Catalogo = () => {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Modales */}
