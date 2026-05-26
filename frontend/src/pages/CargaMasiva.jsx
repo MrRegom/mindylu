@@ -16,6 +16,20 @@ const CargaMasiva = () => {
   const [publicarFacebook, setPublicarFacebook] = useState(true);
   const [mensajeFacebook, setMensajeFacebook] = useState('');
   const [fechaProgramada, setFechaProgramada] = useState('');
+  const [lotesProgramados, setLotesProgramados] = useState([]);
+
+  React.useEffect(() => {
+    fetchLotesProgramados();
+  }, []);
+
+  const fetchLotesProgramados = async () => {
+    try {
+      const res = await api.get('/catalogo/ciclos/programados/');
+      setLotesProgramados(res.data);
+    } catch (error) {
+      console.error("Error al obtener lotes programados", error);
+    }
+  };
 
   const handleFiles = async (e) => {
     const files = Array.from(e.target.files);
@@ -191,6 +205,31 @@ const CargaMasiva = () => {
             </div>
           </div>
 
+          {lotesProgramados.length > 0 && (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '16px' }}>
+                <h3 style={{ fontSize: '1.1rem', margin: 0 }}>Lotes Programados</h3>
+              </div>
+              
+              <div style={{ display: 'flex', gap: '16px', overflowX: 'auto', paddingBottom: '16px', scrollbarWidth: 'none' }}>
+                {lotesProgramados.map((lote) => (
+                  <div key={lote.id} className="card" style={{ minWidth: '220px', padding: 0, overflow: 'hidden', border: '2px solid var(--color-primary)' }}>
+                    {lote.prendas && lote.prendas.length > 0 && (
+                      <img src={lote.prendas[0].foto_url || (lote.prendas[0].imagenes?.[0]?.imagen)} style={{ width: '100%', height: '140px', objectFit: 'cover' }} alt="Lote" />
+                    )}
+                    <div style={{ padding: '16px' }}>
+                      <p style={{ color: 'var(--color-primary)', fontSize: '0.85rem', fontWeight: 600, marginBottom: '8px' }}>
+                        Para el: {new Date(lote.fecha_programada).toLocaleString()}
+                      </p>
+                      <p style={{ fontSize: '0.85rem', marginBottom: '0', fontWeight: 500 }}>
+                        {lote.prendas?.length} prendas listas para subir.
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
         </>
       ) : (
