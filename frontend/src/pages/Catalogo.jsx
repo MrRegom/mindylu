@@ -40,16 +40,20 @@ const Catalogo = () => {
       const params = {};
       if (categoriaActiva) params.categoria = categoriaActiva;
       if (soloHoy) params.solo_hoy = 'true';
-      const [rPrendas, rCats] = await Promise.all([
-        api.get('/catalogo/prendas/', { params }),
-        api.get('/catalogo/categorias/')
-      ]);
+      const rPrendas = await api.get('/catalogo/prendas/', { params });
       setPrendas(rPrendas.data.results || rPrendas.data);
-      setCategorias(rCats.data);
     } catch (error) {
-      console.error('Error al cargar el catálogo:', error);
+      console.error('Error al cargar prendas:', error);
+      setPrendas([]);
     } finally {
       setIsLoading(false);
+    }
+    // Categorias en llamada separada — no bloquea el catalogo si falla
+    try {
+      const rCats = await api.get('/catalogo/categorias/');
+      setCategorias(Array.isArray(rCats.data) ? rCats.data : (rCats.data.results || []));
+    } catch (error) {
+      console.error('Error al cargar categorias:', error);
     }
   };
 
