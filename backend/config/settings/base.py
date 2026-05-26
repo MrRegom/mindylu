@@ -144,3 +144,7 @@ CORS_ALLOWED_ORIGINS = config(
     cast=lambda v: [s.strip() for s in v.split(',')]
 )
 CORS_ALLOW_CREDENTIALS = True
+
+# ─── Integraciones (Facebook) ─────────────────────────────────
+FACEBOOK_PAGE_ID = config('FACEBOOK_PAGE_ID', default='')
+FACEBOOK_PAGE_ACCESS_TOKEN = config('FACEBOOK_ACCESS_TOKEN', default='')
