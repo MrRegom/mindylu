@@ -158,27 +158,70 @@ const CargaMasiva = () => {
   };
 
   return (
-    <div className="carga-masiva-container animate-fade-in">
-      <div className="form-header glass">
-        <button className="btn-back" onClick={() => navigate('/catalogo')} type="button">
-          <ArrowLeft size={24} />
-        </button>
-        <h2>Carga Masiva Rápidisima 🚀</h2>
-        <div style={{ width: 24 }}></div>
-      </div>
+    <div className="carga-masiva-container animate-fade-in" style={{ padding: '20px', paddingBottom: '100px' }}>
+      {items.length === 0 ? (
+        <>
+          <div className="catalogo-header" style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ color: 'var(--color-primary)' }}><Sparkles size={28} /></div>
+              <div>
+                <h1 style={{ fontSize: '1.8rem', fontFamily: 'Playfair Display', margin: '0 0 2px 0' }}>Auto-Catálogo</h1>
+                <p style={{ color: 'var(--color-text-muted)', margin: 0, fontSize: '0.9rem' }}>Inteligente con IA ✨</p>
+              </div>
+            </div>
+          </div>
 
-      <div className="uploader-header-card glass">
-        <div className="upload-btn-wrapper">
-          <button className="btn btn-secondary">
-            <Upload size={20} style={{ marginRight: 8 }} />
-            Seleccionar 40+ Fotos
-          </button>
-          <input type="file" multiple accept="image/*" onChange={handleFiles} />
-        </div>
-        <p>Sube todas las fotos de un golpe y ponle precio en segundos.</p>
-      </div>
+          <div className="card scan-card" style={{ background: 'var(--color-primary-gradient)', color: 'white', padding: '24px', borderRadius: 'var(--radius-lg)', position: 'relative', overflow: 'hidden', marginBottom: '32px' }}>
+            <h2 style={{ fontSize: '1.5rem', marginBottom: '12px', zIndex: 2, position: 'relative' }}>Escanea tus publicaciones ✨</h2>
+            <p style={{ fontSize: '0.9rem', opacity: 0.9, marginBottom: '24px', maxWidth: '75%', zIndex: 2, position: 'relative', lineHeight: 1.4 }}>
+              Importa prendas directamente de tus Lives de Facebook con OCR para descripciones y precios.
+            </p>
+            <div className="upload-btn-wrapper" style={{ position: 'relative', zIndex: 2 }}>
+              <button className="btn" style={{ background: 'white', color: 'var(--color-primary-dark)', width: 'auto', padding: '12px 24px', borderRadius: 'var(--radius-full)' }}>
+                Escanear publicación
+              </button>
+              <input type="file" multiple accept="image/*" onChange={handleFiles} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }} />
+            </div>
+            {/* Background Camera Icon Decoration */}
+            <div style={{ position: 'absolute', right: '-10px', bottom: '-10px', opacity: 0.15, transform: 'rotate(-15deg)', zIndex: 1 }}>
+              <Upload size={140} />
+            </div>
+          </div>
 
-      {items.length > 0 && (
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '16px' }}>
+              <h3 style={{ fontSize: '1.1rem', margin: 0 }}>Últimas publicaciones</h3>
+              <span style={{ color: 'var(--color-primary)', fontSize: '0.9rem', fontWeight: 500 }}>Ver todas</span>
+            </div>
+            
+            <div style={{ display: 'flex', gap: '16px', overflowX: 'auto', paddingBottom: '16px', scrollbarWidth: 'none' }}>
+              {/* Dummy Post 1 */}
+              <div className="card" style={{ minWidth: '220px', padding: 0, overflow: 'hidden' }}>
+                <img src="https://images.unsplash.com/photo-1551048632-24e444b48a3e?auto=format&fit=crop&q=80&w=300" style={{ width: '100%', height: '180px', objectFit: 'cover' }} alt="Live" />
+                <div style={{ padding: '16px' }}>
+                  <p style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', marginBottom: '8px' }}>24 may 2026, 06:31 p.m.</p>
+                  <p style={{ fontSize: '0.85rem', marginBottom: '16px', fontWeight: 500, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                    ✨ Prenditas disponibles para entrega inmediata...
+                  </p>
+                  <button className="btn btn-primary" style={{ padding: '8px', fontSize: '0.9rem' }}>Procesar</button>
+                </div>
+              </div>
+              
+              {/* Dummy Post 2 */}
+              <div className="card" style={{ minWidth: '220px', padding: 0, overflow: 'hidden' }}>
+                <img src="https://images.unsplash.com/photo-1554568218-0f1715e72254?auto=format&fit=crop&q=80&w=300" style={{ width: '100%', height: '180px', objectFit: 'cover' }} alt="Live" />
+                <div style={{ padding: '16px' }}>
+                  <p style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', marginBottom: '8px' }}>22 may 2026, 09:27 p.m.</p>
+                  <p style={{ fontSize: '0.85rem', marginBottom: '16px', fontWeight: 500, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                    Sábado 23 entregar a las 13 hrs en lider placilla...
+                  </p>
+                  <button className="btn btn-primary" style={{ padding: '8px', fontSize: '0.9rem' }}>Procesar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      ) : (
         <form className="carga-masiva-form" onSubmit={handleSubmit}>
           <div className="items-grid">
             {items.map((item, index) => (

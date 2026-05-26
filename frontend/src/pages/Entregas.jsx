@@ -391,86 +391,94 @@ const Entregas = () => {
       ) : (
         <div className="dias-list">
           {Object.keys(entregasPorFecha).sort().map(fecha => (
-            <div key={fecha} className="dia-section animate-slide-up">
-              {/* Cabecera del Día con Botón Compacto de Copiar Itinerario (Caso B - Ícono solamente) */}
-              <div className="dia-header-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '8px' }}>
-                <h2 className="dia-titulo" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 8, fontSize: '1.15rem' }}>
-                  <Calendar size={20} className="icon-gold" /> 
+            <div key={fecha} className="dia-section animate-slide-up" style={{ marginBottom: '32px' }}>
+              <div className="dia-header-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                <h2 className="dia-titulo" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 8, fontSize: '1.1rem', color: 'var(--color-primary-dark)' }}>
+                  <Calendar size={18} /> 
                   {formatDate(fecha)}
                 </h2>
                 
-                {/* Botón ultra-compacto tipo ícono */}
                 <button 
-                  className="btn-icon-simple" 
                   onClick={() => copiarItinerarioDia(fecha, entregasPorFecha[fecha])}
-                  style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 8px', borderRadius: 8, background: 'rgba(212, 175, 55, 0.08)', color: 'var(--color-primary)' }}
-                  title="Copiar itinerario completo del día"
+                  style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 'var(--radius-sm)', background: 'var(--color-danger-bg)', color: 'var(--color-danger)', border: '1px solid rgba(239, 71, 111, 0.2)', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer' }}
                 >
-                  <Copy size={16} />
-                  <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>Copiar</span>
+                  <Copy size={14} />
+                  Copiar
                 </button>
               </div>
               
-              {entregasPorFecha[fecha].map(entrega => (
-                <div key={entrega.id} className="entrega-card glass">
-                  <div className="entrega-card-header">
-                    <h3>
-                      <MapPin size={18} />
-                      {entrega.punto_entrega_detalle?.nombre || 'Punto sin nombre'}
-                    </h3>
-                    <div className="hora-badge-container">
-                      {entrega.hora_estimada ? (
-                        <span className="hora-badge" onClick={() => handleSetHora(entrega.id, entrega.hora_estimada)} style={{cursor: 'pointer'}} title="Cambiar hora">
-                          <Clock size={14} /> {entrega.hora_estimada.substring(0, 5)}
-                          <Edit2 size={12} style={{marginLeft: '4px', opacity: 0.7}} />
-                        </span>
-                      ) : (
-                        <button className="btn-set-hora" onClick={() => handleSetHora(entrega.id, null)}>
-                          <Clock size={14} /> Fijar Hora
-                        </button>
-                      )}
-                    </div>
-                  </div>
+              <div className="timeline-container" style={{ position: 'relative', paddingLeft: '24px' }}>
+                {/* Línea vertical */}
+                <div style={{ position: 'absolute', left: '11px', top: '24px', bottom: '24px', width: '2px', background: 'var(--color-primary-light)', zIndex: 0 }}></div>
 
-                  <div className="pedidos-list">
-                    {entrega.pedidos.map(pedido => (
-                      <div key={pedido.id} className="pedido-item">
-                        <div className="pedido-info" style={{ flex: 1.5 }}>
-                          <div className="cliente-nombre">
-                            <span className="dot"></span>
-                            {pedido.clienta_detalle?.nombre}
-                          </div>
-                          <div className="pedido-resumen" style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginTop: 2 }}>
-                            {pedido.items.length} prenda(s) - ${pedido.total.toLocaleString('es-CL')}
-                            {pedido.notas && <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--color-primary-dark)', fontStyle: 'italic', marginTop: 2 }}>📝 {pedido.notas}</span>}
+                {entregasPorFecha[fecha].map((entrega, index) => {
+                  const isActive = true; // Para simular el diseño, expandiremos todos los que tengan pedidos
+                  return (
+                    <div key={entrega.id} className="entrega-timeline-item" style={{ position: 'relative', zIndex: 1, marginBottom: '24px' }}>
+                      {/* Nodo circular */}
+                      <div style={{ position: 'absolute', left: '-20px', top: '14px', width: '14px', height: '14px', borderRadius: '50%', background: 'white', border: '3px solid var(--color-primary)', boxShadow: '0 0 0 4px var(--color-bg)' }}></div>
+                      
+                      <div className="entrega-card" style={{ background: 'transparent', padding: '0', boxShadow: 'none' }}>
+                        <div className="entrega-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                          <h3 style={{ fontSize: '1.05rem', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <MapPin size={18} color="var(--color-text)" />
+                            {entrega.punto_entrega_detalle?.nombre || 'Punto sin nombre'}
+                          </h3>
+                          <div className="hora-badge-container">
+                            {entrega.hora_estimada ? (
+                              <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }} onClick={() => handleSetHora(entrega.id, entrega.hora_estimada)}>
+                                <Clock size={14} /> {entrega.hora_estimada.substring(0, 5)}
+                                <Edit2 size={12} style={{marginLeft: '2px', opacity: 0.5}} />
+                              </span>
+                            ) : (
+                              <button style={{ background: 'none', border: 'none', color: 'var(--color-primary)', fontSize: '0.85rem', cursor: 'pointer' }} onClick={() => handleSetHora(entrega.id, null)}>
+                                Fijar Hora
+                              </button>
+                            )}
                           </div>
                         </div>
 
-                        {/* Botones de acción ultra-compactos con íconos solamente (Caso B) */}
-                        <div style={{ display: 'flex', gap: '12px', alignItems: 'center', justifyContent: 'flex-end', flex: 1 }}>
-                          <button 
-                            className="btn-icon-simple danger"
-                            onClick={() => handleCancelarPedido(pedido.id)}
-                            title="Cancelar pedido y devolver stock"
-                            style={{ padding: '6px', borderRadius: '50%', background: 'rgba(239, 68, 68, 0.08)', display: 'inline-flex' }}
-                          >
-                            <XCircle size={18} />
-                          </button>
-                          
-                          <button 
-                            className="btn-icon-simple"
-                            onClick={() => copiarMensaje(pedido, entrega)}
-                            title="Copiar recordatorio de WhatsApp"
-                            style={{ padding: '6px', borderRadius: '50%', background: 'rgba(37, 211, 102, 0.08)', color: '#25D366', display: 'inline-flex' }}
-                          >
-                            <MessageCircle size={18} />
-                          </button>
-                        </div>
+                        {entrega.pedidos.length > 0 && (
+                          <div className="pedidos-list card" style={{ background: 'rgba(0,0,0,0.02)', border: 'none', padding: '16px' }}>
+                            {entrega.pedidos.map(pedido => (
+                              <div key={pedido.id} className="pedido-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                <div className="pedido-info">
+                                  <div className="cliente-nombre" style={{ fontWeight: 600, fontSize: '0.95rem', marginBottom: '4px' }}>
+                                    {pedido.clienta_detalle?.nombre}
+                                  </div>
+                                  <div className="pedido-resumen" style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>
+                                    {pedido.items.length} prenda(s) - ${pedido.total.toLocaleString('es-CL')}
+                                  </div>
+                                  {pedido.notas && (
+                                    <div style={{ color: 'var(--color-danger)', fontSize: '0.8rem', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                      <span style={{ transform: 'rotate(45deg)' }}>📌</span> {pedido.notas}
+                                    </div>
+                                  )}
+                                </div>
+
+                                <div style={{ display: 'flex', gap: '8px' }}>
+                                  <button 
+                                    onClick={() => handleCancelarPedido(pedido.id)}
+                                    style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'var(--color-danger-bg)', color: 'var(--color-danger)', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                                  >
+                                    <XCircle size={18} />
+                                  </button>
+                                  <button 
+                                    onClick={() => copiarMensaje(pedido, entrega)}
+                                    style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'var(--color-success)', color: 'white', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                                  >
+                                    <MessageCircle size={18} />
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           ))}
         </div>

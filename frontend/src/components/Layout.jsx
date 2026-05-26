@@ -17,28 +17,24 @@ const Layout = () => {
         
         <nav className="bottom-nav glass">
           <a href="/" className={`nav-item ${location.pathname === '/' ? 'active' : ''}`}>
-            <Home size={22} />
+            <Home size={24} />
             <span>Inicio</span>
           </a>
           <a href="/catalogo" className={`nav-item ${location.pathname.includes('/catalogo') ? 'active' : ''}`}>
-            <Search size={22} />
+            <Search size={24} />
             <span>Catálogo</span>
           </a>
           <a href="/sincronizacion" className={`nav-item ${location.pathname.includes('/sincronizacion') ? 'active' : ''}`}>
-            <Sparkles size={22} />
+            <Sparkles size={24} />
             <span>Magia IA</span>
           </a>
           <a href="/entregas" className={`nav-item ${location.pathname.includes('/entregas') ? 'active' : ''}`}>
-            <ShoppingBag size={22} />
+            <ShoppingBag size={24} />
             <span>Entregas</span>
           </a>
-          <a href="/clientas" className={`nav-item ${location.pathname.includes('/clientas') ? 'active' : ''}`}>
-            <User size={22} />
-            <span>Clientas</span>
-          </a>
-          <a href="/cuentas" className={`nav-item ${location.pathname.includes('/cuentas') ? 'active' : ''}`}>
-            <CreditCard size={22} />
-            <span>Cuentas</span>
+          <a href="/clientas" className={`nav-item ${location.pathname.includes('/clientas') || location.pathname.includes('/cuentas') ? 'active' : ''}`}>
+            <User size={24} />
+            <span>Más</span>
           </a>
         </nav>
       </main>

@@ -1,42 +1,43 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
 :root {
-  /* Brand Colors - Premium Feminine Aesthetic (Dusty Rose, Nude, Pearl) */
-  --color-primary: #D4A3A3; /* Dusty Rose / Rose Gold */
-  --color-primary-dark: #B58484;
-  --color-primary-light: #F7EFEF; /* Nude ultra claro */
-  --color-primary-rgb: 212, 163, 163;
+  /* Brand Colors - Premium Feminine Aesthetic (Mockup Matching) */
+  --color-primary: #FF758C; /* Vibrant Pink / Coral */
+  --color-primary-dark: #E65A71;
+  --color-primary-light: #FFEFF1; /* Nude ultra claro */
+  --color-primary-gradient: linear-gradient(135deg, #FF758C 0%, #FF8E9E 100%);
+  --color-primary-rgb: 255, 117, 140;
   
   /* Neutral Colors */
-  --color-bg: #FAF9F6; /* Pearl White / Crema muy claro */
+  --color-bg: #FCFBFA; /* Pearl White / Crema muy claro */
   --color-surface: #FFFFFF;
   --color-surface-rgb: 255, 255, 255;
-  --color-text: #3D3939; /* Carbón suave para los textos */
+  --color-text: #2C2C2C; /* Carbón suave para los textos */
   --color-text-muted: #8F8B8B;
-  --color-border: #EFEAEA;
+  --color-border: #F0EBEB;
   
   /* Status Colors */
-  --color-success: #8EAE9D; /* Sage Green pastel */
-  --color-success-bg: rgba(142, 174, 157, 0.1);
-  --color-warning: #D4B483; /* Soft Gold */
-  --color-warning-bg: rgba(212, 180, 131, 0.1);
-  --color-danger: #D48C8C; /* Muted Coral */
-  --color-danger-bg: rgba(212, 140, 140, 0.1);
+  --color-success: #67C587; /* Green pastel vibrante */
+  --color-success-bg: rgba(103, 197, 135, 0.1);
+  --color-warning: #FFD166; /* Soft Gold */
+  --color-warning-bg: rgba(255, 209, 102, 0.1);
+  --color-danger: #EF476F; /* Muted Coral */
+  --color-danger-bg: rgba(239, 71, 111, 0.1);
   
   /* UI Elements */
-  --radius-sm: 16px;
-  --radius-md: 24px;
-  --radius-lg: 32px;
+  --radius-sm: 12px;
+  --radius-md: 20px;
+  --radius-lg: 28px;
   --radius-full: 9999px;
   
-  /* Sombras ultra suaves tipo iOS 17 */
-  --shadow-sm: 0 4px 15px rgba(0, 0, 0, 0.03);
-  --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.05);
-  --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.07);
-  --shadow-glow: 0 8px 24px rgba(212, 163, 163, 0.35);
+  /* Sombras ultra suaves tipo iOS */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.08);
+  --shadow-glow: 0 8px 24px rgba(255, 117, 140, 0.35);
   
   /* Transición "Spring" fluida */
-  --transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  --transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 * {
@@ -124,15 +125,14 @@ h1, h2, h3, h4 {
 }
 
 .btn-primary {
-  background: var(--color-primary);
+  background: var(--color-primary-gradient);
   color: #FFF;
   box-shadow: var(--shadow-glow);
-  border: 1px solid rgba(255,255,255,0.2);
+  border: none;
 }
 
 .btn-primary:hover {
-  background: var(--color-primary-dark);
-  box-shadow: 0 10px 30px rgba(var(--color-primary-rgb), 0.4);
+  box-shadow: 0 10px 30px rgba(var(--color-primary-rgb), 0.5);
   transform: translateY(-2px);
 }
 
@@ -204,13 +204,36 @@ h1, h2, h3, h4 {
 }
 
 /* Glassmorphism utilities */
+/* Utilidades Premium */
 .glass {
-  background: rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: var(--shadow-sm);
+  border-radius: var(--radius-md);
+}
+
+.card {
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: 20px;
+  border: 1px solid rgba(0,0,0,0.02);
+  transition: var(--transition);
+}
+
+.card:hover {
   box-shadow: var(--shadow-md);
-  border-radius: var(--radius-lg);
+}
+
+.badge {
+  background: var(--color-bg);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
 }
 
 /* Animations */

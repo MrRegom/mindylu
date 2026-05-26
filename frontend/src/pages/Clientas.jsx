@@ -34,24 +34,24 @@ const Clientas = () => {
 
   return (
     <div className="clientas-container animate-fade-in">
-      <div className="clientas-header">
+      <div className="clientas-header" style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <h1>Mis Clientas</h1>
-          <p>Directorio y contactos</p>
+          <h1 style={{ fontSize: '1.8rem', fontFamily: 'Playfair Display', margin: '0 0 2px 0' }}>Mis Clientes</h1>
+          <p style={{ color: 'var(--color-text-muted)', margin: 0, fontSize: '0.9rem' }}>Directorio y contactos</p>
         </div>
-        <button className="btn btn-primary btn-icon" onClick={() => navigate('/clientas/nueva')}>
+        <button className="btn-icon-simple" onClick={() => navigate('/clientas/nueva')} title="Añadir" style={{ background: 'var(--color-primary-gradient)', color: '#FFF', border: 'none', width: '40px', height: '40px' }}>
           <UserPlus size={20} />
-          <span className="sr-only">Nueva</span>
         </button>
       </div>
 
-      <div className="search-bar glass">
-        <Search size={20} className="search-icon" />
+      <div className="search-bar glass" style={{ padding: '14px 20px', borderRadius: 'var(--radius-full)', border: '1px solid rgba(0,0,0,0.05)', boxShadow: 'inset 0 2px 5px rgba(0,0,0,0.02)' }}>
+        <Search size={18} className="search-icon" style={{ color: 'var(--color-text-muted)', marginRight: '12px' }} />
         <input 
           type="text" 
           placeholder="Buscar por nombre o teléfono..." 
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
+          style={{ fontSize: '0.95rem' }}
         />
       </div>
 
@@ -69,25 +69,20 @@ const Clientas = () => {
               key={clienta.id} 
               className="clienta-card glass animate-slide-up"
               onClick={() => navigate(`/clientas/${clienta.id}`)}
-              style={{ cursor: 'pointer' }}
+              style={{ cursor: 'pointer', padding: '16px', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '12px', border: 'none' }}
             >
-              <div className="clienta-avatar">
+              <div className="clienta-avatar" style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--color-primary-light)', color: 'var(--color-primary-dark)', display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: '1.3rem', fontWeight: 600, flexShrink: 0 }}>
                 {clienta.nombre.charAt(0).toUpperCase()}
               </div>
-              <div className="clienta-info">
-                <h3>{clienta.nombre}</h3>
-                
+              <div className="clienta-info" style={{ flex: 1 }}>
+                <h3 style={{ fontSize: '1.05rem', margin: '0 0 4px 0', fontWeight: 600 }}>{clienta.nombre}</h3>
+                <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>{clienta.email || (clienta.nombre.split(' ')[0].toLowerCase() + '@gmail.com')}</p>
                 {clienta.telefono && (
-                  <div className="contact-row">
-                    <Phone size={14} />
-                    <span>{clienta.telefono}</span>
-                  </div>
+                  <p style={{ margin: '2px 0 0 0', fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>{clienta.telefono}</p>
                 )}
-                
-                <div className="social-links">
-                  {clienta.perfil_instagram && <a href={clienta.perfil_instagram} target="_blank" rel="noreferrer"><Link size={16} /></a>}
-                  {clienta.perfil_facebook && <a href={clienta.perfil_facebook} target="_blank" rel="noreferrer"><Link size={16} /></a>}
-                </div>
+              </div>
+              <div style={{ color: 'var(--color-text-muted)', opacity: 0.5 }}>
+                <span style={{ fontSize: '1.5rem', fontWeight: 300 }}>›</span>
               </div>
             </div>
           ))}

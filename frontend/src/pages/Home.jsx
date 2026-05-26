@@ -37,62 +37,98 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="home-container animate-fade-in">
-      <div className="home-header">
-        <div className="header-icon-wrapper">
-          <Sparkles className="header-icon" />
-        </div>
+    <div className="home-container animate-fade-in" style={{ paddingBottom: '100px' }}>
+      <div className="home-header" style={{ marginBottom: '24px' }}>
         <div>
-          <h1>¡Hola, MindyLu!</h1>
-          <p>Aquí tienes el resumen de tu negocio hoy.</p>
+          <h1 style={{ fontSize: '2rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            ¡Hola, MindyLu! <span style={{ color: 'var(--color-warning)' }}>✨</span>
+          </h1>
+          <p>Aquí tienes el resumen de tu negocio</p>
         </div>
-        <button className="btn-refresh" onClick={fetchDashboard} title="Actualizar datos">
-          <RefreshCw size={20} className={isLoading ? "spin" : ""} />
-        </button>
+        <div className="header-avatar" style={{ width: 48, height: 48, borderRadius: '50%', overflow: 'hidden', marginLeft: 'auto', border: '2px solid white', boxShadow: 'var(--shadow-sm)' }}>
+          <img src="https://i.pravatar.cc/150?img=5" alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        </div>
       </div>
       
-      <div className="dashboard-grid">
-        {/* Tarjeta 1: Ventas Hoy */}
-        <div className="dash-card glass animate-slide-up" style={{ animationDelay: '0.1s' }}>
-          <div className="card-icon success-icon">
-            <TrendingUp size={24} />
-          </div>
-          <div className="card-content">
-            <p className="card-label">Ventas de Hoy</p>
-            <h2 className="card-value">{isLoading ? '...' : formatCurrency(stats.ventas_hoy)}</h2>
-          </div>
+      {/* Ventas del día (Full width) */}
+      <div className="card animate-slide-up" style={{ marginBottom: '20px', animationDelay: '0.1s' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+          <h3 style={{ fontSize: '1.1rem', margin: 0 }}>Ventas del día</h3>
+          <span className="badge">Hoy ∨</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
+          <h2 style={{ fontSize: '2.5rem', margin: 0 }}>{isLoading ? '...' : formatCurrency(stats.ventas_hoy)}</h2>
+          <span style={{ color: 'var(--color-success)', fontSize: '0.85rem', fontWeight: 600, background: 'var(--color-success-bg)', padding: '2px 8px', borderRadius: '12px' }}>+12% <span style={{ color: 'var(--color-text-muted)', fontWeight: 400 }}>vs ayer</span></span>
+        </div>
+        {/* Placeholder para el gráfico de líneas (SVG simple para simular el mockup) */}
+        <div style={{ height: '60px', marginTop: '16px', position: 'relative' }}>
+          <svg viewBox="0 0 100 30" preserveAspectRatio="none" style={{ width: '100%', height: '100%' }}>
+            <path d="M0,25 Q10,15 20,20 T40,10 T60,18 T80,5 T100,0" fill="none" stroke="var(--color-primary)" strokeWidth="2" />
+            <path d="M0,25 Q10,15 20,20 T40,10 T60,18 T80,5 T100,0 L100,30 L0,30 Z" fill="url(#grad)" opacity="0.3" />
+            <defs>
+              <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="var(--color-primary)" stopOpacity="1" />
+                <stop offset="100%" stopColor="var(--color-primary)" stopOpacity="0" />
+              </linearGradient>
+            </defs>
+            <circle cx="80" cy="5" r="3" fill="white" stroke="var(--color-primary)" strokeWidth="1.5" />
+          </svg>
+        </div>
+      </div>
+
+      <div className="dashboard-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
+        {/* Tarjeta: Entregas */}
+        <div className="card animate-slide-up" style={{ animationDelay: '0.2s', padding: '16px' }}>
+          <div style={{ color: 'var(--color-warning)', marginBottom: '12px' }}><Package size={24} /></div>
+          <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: '0 0 4px 0' }}>Entregas pendientes</p>
+          <h2 style={{ fontSize: '1.8rem', margin: 0 }}>{isLoading ? '...' : stats.entregas_pendientes}</h2>
         </div>
 
-        {/* Tarjeta 2: Entregas Pendientes */}
-        <div className="dash-card glass animate-slide-up" style={{ animationDelay: '0.2s' }}>
-          <div className="card-icon warning-icon">
-            <Package size={24} />
-          </div>
-          <div className="card-content">
-            <p className="card-label">Entregas Pend.</p>
-            <h2 className="card-value">{isLoading ? '...' : stats.entregas_pendientes}</h2>
-          </div>
+        {/* Tarjeta: Prendas */}
+        <div className="card animate-slide-up" style={{ animationDelay: '0.3s', padding: '16px' }}>
+          <div style={{ color: 'var(--color-primary)', marginBottom: '12px' }}><CreditCard size={24} /></div>
+          <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: '0 0 4px 0' }}>Prendas activas</p>
+          <h2 style={{ fontSize: '1.8rem', margin: 0 }}>{isLoading ? '...' : stats.prendas_activas}</h2>
         </div>
 
-        {/* Tarjeta 3: Saldos por Cobrar */}
-        <div className="dash-card glass animate-slide-up" style={{ animationDelay: '0.3s' }}>
-          <div className="card-icon danger-icon">
-            <DollarSign size={24} />
-          </div>
-          <div className="card-content">
-            <p className="card-label">Saldos por Cobrar</p>
-            <h2 className="card-value">{isLoading ? '...' : formatCurrency(stats.saldos_pendientes)}</h2>
-          </div>
+        {/* Tarjeta: Saldos */}
+        <div className="card animate-slide-up" style={{ animationDelay: '0.4s', padding: '16px' }}>
+          <div style={{ color: 'var(--color-danger)', marginBottom: '12px' }}><DollarSign size={24} /></div>
+          <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: '0 0 4px 0' }}>Saldos por cobrar</p>
+          <h2 style={{ fontSize: '1.5rem', margin: 0 }}>{isLoading ? '...' : formatCurrency(stats.saldos_pendientes)}</h2>
         </div>
 
-        {/* Tarjeta 4: Catálogo */}
-        <div className="dash-card glass animate-slide-up" style={{ animationDelay: '0.4s' }}>
-          <div className="card-icon primary-icon">
-            <CreditCard size={24} />
+        {/* Tarjeta: Clientes */}
+        <div className="card animate-slide-up" style={{ animationDelay: '0.5s', padding: '16px' }}>
+          <div style={{ color: 'var(--color-success)', marginBottom: '12px' }}><User size={24} /></div>
+          <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: '0 0 4px 0' }}>Clientes</p>
+          <h2 style={{ fontSize: '1.8rem', margin: 0 }}>124</h2>
+        </div>
+      </div>
+
+      {/* Banner Nueva Colección */}
+      <div className="card animate-slide-up promo-banner" style={{ animationDelay: '0.6s', padding: 0, position: 'relative', overflow: 'hidden', backgroundColor: 'var(--color-primary-light)' }}>
+        <div style={{ padding: '24px', position: 'relative', zIndex: 2, width: '60%' }}>
+          <p style={{ color: 'var(--color-primary-dark)', fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>✨ Nueva colección</p>
+          <h2 style={{ fontSize: '1.8rem', margin: '0 0 16px 0', fontFamily: 'Playfair Display', lineHeight: 1.1 }}>Otoño 2024</h2>
+          <button className="btn btn-primary" style={{ padding: '10px 20px', fontSize: '0.9rem', width: 'auto' }}>Ver colección</button>
+        </div>
+        <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=400" alt="Otoño 2024" style={{ position: 'absolute', right: 0, top: 0, height: '100%', width: '50%', objectFit: 'cover', clipPath: 'polygon(20% 0, 100% 0, 100% 100%, 0% 100%)' }} />
+      </div>
+
+      <div style={{ marginTop: '32px' }}>
+        <h3 style={{ fontSize: '1.1rem', marginBottom: '16px' }}>Actividad reciente</h3>
+        <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px' }}>
+          <div style={{ background: 'var(--color-danger-bg)', color: 'var(--color-danger)', width: 40, height: 40, borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <ShoppingBag size={20} />
           </div>
-          <div className="card-content">
-            <p className="card-label">Prendas Activas</p>
-            <h2 className="card-value">{isLoading ? '...' : stats.prendas_activas}</h2>
+          <div style={{ flex: 1 }}>
+            <p style={{ margin: 0, fontWeight: 600, fontSize: '0.95rem' }}>Nueva orden recibida</p>
+            <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.8rem' }}>#0008 Paula Romero</p>
+          </div>
+          <div style={{ textAlign: 'right' }}>
+            <p style={{ margin: 0, color: 'var(--color-success)', fontWeight: 600, fontSize: '0.95rem' }}>$5.990</p>
+            <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.75rem' }}>Hace 5 min</p>
           </div>
         </div>
       </div>

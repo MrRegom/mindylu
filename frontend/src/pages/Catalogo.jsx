@@ -133,39 +133,38 @@ const Catalogo = () => {
 
   return (
     <div className="catalogo-container animate-fade-in">
-      <div className="catalogo-header">
+      <div className="catalogo-header" style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <h1>Catálogo</h1>
-          <p>{prendas.length} prendas activas</p>
+          <h1 style={{ fontSize: '2rem', fontFamily: 'Playfair Display', margin: '0 0 4px 0' }}>Catálogo</h1>
+          <p style={{ color: 'var(--color-text-muted)', margin: 0, fontSize: '0.9rem' }}>{prendas.length} prendas activas</p>
         </div>
         <div style={{ display: 'flex', gap: '8px' }}>
-          <button className="btn btn-secondary btn-icon" onClick={() => navigate('/catalogo/lotes')} title="Lotes Programados" style={{ background: 'rgba(24, 119, 242, 0.1)', color: '#1877F2', borderColor: 'transparent' }}>
-            <span style={{ fontSize: '1.2rem' }}>🕒</span>
-            <span className="sr-only">Programados</span>
-          </button>
-          <button className="btn btn-secondary btn-icon" onClick={() => navigate('/catalogo/carga-masiva')} title="Carga Masiva Rápidisima">
-            <span style={{ fontSize: '1.2rem', paddingRight: '4px' }}>🚀</span>
-            <span className="sr-only">Lote</span>
-          </button>
-          <button className="btn btn-primary btn-icon" onClick={() => navigate('/catalogo/nueva')} title="Producto Único">
-            <Plus size={20} />
-            <span className="sr-only">Nueva</span>
-          </button>
+          <button className="btn-icon-simple" title="Buscar" style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', color: 'var(--color-text)' }}><Search size={20} /></button>
+          <button className="btn-icon-simple" onClick={() => navigate('/catalogo/lotes')} title="Filtros" style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', color: 'var(--color-text)' }}><span style={{ fontSize: '1.2rem' }}>▽</span></button>
+          <button className="btn-icon-simple" onClick={() => navigate('/catalogo/nueva')} title="Añadir" style={{ background: 'var(--color-primary-gradient)', color: '#FFF', border: 'none' }}><Plus size={20} /></button>
         </div>
       </div>
 
-      <div className="catalogo-search" style={{ marginBottom: 20 }}>
+      <div className="catalogo-search" style={{ marginBottom: '16px' }}>
         <div className="search-input-container" style={{ position: 'relative' }}>
-          <Search size={18} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)' }} />
+          <Search size={18} style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)' }} />
           <input 
             type="text" 
-            placeholder="Buscar prenda por nombre..." 
+            placeholder="Buscar prenda por nombre, color..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="glass-input"
-            style={{ width: '100%', padding: '12px 12px 12px 38px', borderRadius: 'var(--radius-md)' }}
+            className="glass"
+            style={{ width: '100%', padding: '14px 14px 14px 44px', borderRadius: 'var(--radius-full)', border: '1px solid rgba(0,0,0,0.05)', fontSize: '0.95rem', boxShadow: 'inset 0 2px 5px rgba(0,0,0,0.02)' }}
           />
         </div>
+      </div>
+
+      <div className="catalogo-pills" style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '12px', marginBottom: '8px', scrollbarWidth: 'none' }}>
+        <button className="badge" style={{ background: 'var(--color-primary-gradient)', color: 'white', padding: '6px 16px', fontSize: '0.85rem' }}>Todas</button>
+        <button className="badge" style={{ background: 'var(--color-surface)', padding: '6px 16px', fontSize: '0.85rem', border: '1px solid var(--color-border)' }}>Suéteres</button>
+        <button className="badge" style={{ background: 'var(--color-surface)', padding: '6px 16px', fontSize: '0.85rem', border: '1px solid var(--color-border)' }}>Blusas</button>
+        <button className="badge" style={{ background: 'var(--color-surface)', padding: '6px 16px', fontSize: '0.85rem', border: '1px solid var(--color-border)' }}>Vestidos</button>
+        <button className="badge" style={{ background: 'var(--color-surface)', padding: '6px 16px', fontSize: '0.85rem', border: '1px solid var(--color-border)' }}>Pantalones</button>
       </div>
 
       {isLoading ? (

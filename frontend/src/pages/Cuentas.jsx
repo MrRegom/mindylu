@@ -100,13 +100,13 @@ const Cuentas = () => {
 
   return (
     <div className="cuentas-container animate-fade-in">
-      <div className="cuentas-header">
+      <div className="cuentas-header" style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <h1>Cuentas Bancarias</h1>
-          <p>Control de límites y abonos del mes</p>
+          <h1 style={{ fontSize: '1.8rem', fontFamily: 'Playfair Display', margin: '0 0 2px 0' }}>Cuentas Bancarias</h1>
+          <p style={{ color: 'var(--color-text-muted)', margin: 0, fontSize: '0.9rem' }}>Control de límites y abonos</p>
         </div>
-        <button className="btn-icon-simple" onClick={handleCrearCuenta} style={{ background: 'var(--color-primary-light)', color: 'var(--color-primary-dark)' }}>
-          <Plus size={24} />
+        <button className="btn-icon-simple" onClick={handleCrearCuenta} title="Añadir Cuenta" style={{ background: 'var(--color-primary-gradient)', color: '#FFF', border: 'none', width: '40px', height: '40px' }}>
+          <Plus size={20} />
         </button>
       </div>
 
