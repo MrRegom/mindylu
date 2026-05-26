@@ -363,7 +363,7 @@ const Catalogo = () => {
       {/* Modal de publicación */}
       {publicarModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 99999, display: 'flex', alignItems: 'flex-end' }} onClick={() => setPublicarModal(false)}>
-          <div className="glass" onClick={e => e.stopPropagation()} style={{ width: '100%', borderRadius: '20px 20px 0 0', padding: 24 }}>
+          <div className="glass" onClick={e => e.stopPropagation()} style={{ width: '100%', borderRadius: '20px 20px 0 0', padding: '24px 24px 100px 24px' }}>
             <h3 style={{ margin: '0 0 16px 0' }}>Publicar {seleccionadas.size} prenda(s)</h3>
             <label style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', display: 'block', marginBottom: 6 }}>Texto del post</label>
             <textarea
