@@ -293,7 +293,7 @@ const Catalogo = () => {
                       </div>
                     )}
                   </div>
-                  <div className="precio" style={{ marginTop: 4 }}>${prenda.precio?.toLocaleString('es-CL')}</div>
+                  <div className="precio" style={{ marginTop: 4 }}>${Number(prenda.precio || 0).toLocaleString('es-CL')}</div>
 
                   {!modoPublicar && (
                     <div className="variantes-list" style={{ marginTop: 12 }}>
