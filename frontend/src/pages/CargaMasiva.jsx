@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Save, Upload, Trash2, Share2, Plus } from 'lucide-react';
+import { ArrowLeft, Save, Upload, Trash2, Share2, Plus, Sparkles } from 'lucide-react';
 import api from '../services/api';
 import './CargaMasiva.css';
 
