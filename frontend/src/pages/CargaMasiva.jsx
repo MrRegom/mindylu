@@ -6,6 +6,9 @@ import './CargaMasiva.css';
 
 import { compressImage } from '../utils/imageCompression';
 
+const TALLAS_DISPONIBLES = ['S', 'M', 'L', 'XL', 'estándar', '34', '36', '38', '40', '42', '44', '34/36', '36/38', '38/40', 'Única'];
+const COLORES_DISPONIBLES = ['Negro', 'Blanco', 'Rojo', 'Azul', 'Verde', 'Amarillo', 'Gris', 'Beige', 'Café', 'Rosado', 'Morado', 'Naranjo', 'Multicolor', 'Por defecto', 'Único'];
+
 const CargaMasiva = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -236,23 +239,25 @@ const CargaMasiva = () => {
                         <div className="variante-fields">
                           <div className="variante-field-group">
                             <label>Color</label>
-                            <input 
-                              type="text" 
-                              placeholder="Ej: Rojo" 
+                            <select 
                               value={v.color}
                               onChange={(e) => handleVarianteChange(item.id, v.id, 'color', e.target.value)}
                               className="input-mini"
-                            />
+                              style={{ WebkitAppearance: 'none', background: 'transparent' }}
+                            >
+                              {COLORES_DISPONIBLES.map(c => <option key={c} value={c}>{c}</option>)}
+                            </select>
                           </div>
                           <div className="variante-field-group">
                             <label>Talla</label>
-                            <input 
-                              type="text" 
-                              placeholder="Ej: L" 
+                            <select 
                               value={v.talla}
                               onChange={(e) => handleVarianteChange(item.id, v.id, 'talla', e.target.value)}
                               className="input-mini"
-                            />
+                              style={{ WebkitAppearance: 'none', background: 'transparent' }}
+                            >
+                              {TALLAS_DISPONIBLES.map(t => <option key={t} value={t}>{t}</option>)}
+                            </select>
                           </div>
                           <div className="variante-field-group">
                             <label>Stock</label>

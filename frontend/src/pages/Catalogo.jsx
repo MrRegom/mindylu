@@ -4,7 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Check, ImageIcon, Trash2, Search, Edit2, Rocket } from 'lucide-react';
+import { Plus, Check, ImageIcon, Trash2, Search, Edit2, Rocket, X } from 'lucide-react';
 import api from '../services/api';
 import VenderModal from '../components/VenderModal';
 import EditarPrendaModal from '../components/EditarPrendaModal';
@@ -33,6 +33,7 @@ const Catalogo = () => {
     entrega_diaria_id: '',
     notas: ''
   });
+  const [fullscreenImage, setFullscreenImage] = useState(null);
 
   const fetchCatalogo = async () => {
     setIsLoading(true);
@@ -178,7 +179,10 @@ const Catalogo = () => {
         <div className="prendas-grid">
           {filteredPrendas.map((prenda) => (
             <div key={prenda.id} className="prenda-card glass animate-slide-up">
-              <div className="prenda-foto">
+              <div className="prenda-foto" onClick={() => {
+                  const imgUrl = (prenda.imagenes && prenda.imagenes.length > 0) ? prenda.imagenes[0].imagen : prenda.foto_url;
+                  if(imgUrl) setFullscreenImage(imgUrl);
+                }} style={{ cursor: 'pointer' }}>
                 {prenda.imagenes && prenda.imagenes.length > 0 ? (
                   <img src={prenda.imagenes[0].imagen} alt={prenda.nombre} />
                 ) : prenda.foto_url ? (
@@ -274,6 +278,16 @@ const Catalogo = () => {
         prenda={prendaAEditar}
         onSuccess={handleEdicionExitosa}
       />
+
+      {/* FULLSCREEN IMAGE MODAL */}
+      {fullscreenImage && (
+        <div className="fullscreen-image-overlay animate-fade-in" onClick={() => setFullscreenImage(null)} style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh', backgroundColor: 'rgba(0,0,0,0.9)', zIndex: 100000, display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer' }}>
+          <button style={{ position: 'absolute', top: 20, right: 20, background: 'none', border: 'none', color: 'white', cursor: 'pointer', padding: 10 }} onClick={() => setFullscreenImage(null)}>
+            <X size={32} />
+          </button>
+          <img src={fullscreenImage} alt="Fullscreen" style={{ maxWidth: '95%', maxHeight: '95%', objectFit: 'contain' }} />
+        </div>
+      )}
     </div>
   );
 };
