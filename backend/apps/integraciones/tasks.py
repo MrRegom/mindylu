@@ -5,13 +5,17 @@ import requests
 
 def ejecutar_publicacion_lote(ciclo_id):
     """
-    Se ejecuta de forma asíncrona por APScheduler.
+    Se ejecuta por APScheduler (programado) o inmediatamente (publicar_seleccionadas).
     Busca el CicloVenta, extrae sus prendas, y las publica en Facebook.
+    Acepta ciclos en estado PROGRAMADO o ACTIVO (publicación inmediata sin fecha).
     """
     try:
-        ciclo = CicloVenta.objects.get(id=ciclo_id, estado=CicloVenta.Estado.PROGRAMADO)
+        ciclo = CicloVenta.objects.get(
+            id=ciclo_id,
+            estado__in=[CicloVenta.Estado.PROGRAMADO, CicloVenta.Estado.ACTIVO]
+        )
     except CicloVenta.DoesNotExist:
-        print(f"Lote {ciclo_id} no encontrado o ya no está programado.")
+        print(f"Lote {ciclo_id} no encontrado o ya está cerrado.")
         return
 
     prendas = ciclo.prendas.all()
@@ -21,16 +25,13 @@ def ejecutar_publicacion_lote(ciclo_id):
         ciclo.save()
         return
 
-    # Lógica extraída de publicar_lote_en_facebook (simplificada sin request user, usamos tenant del ciclo)
-    # Asumimos que el tenant tiene token de fb configurado
     access_token = settings.FACEBOOK_PAGE_ACCESS_TOKEN
     page_id = settings.FACEBOOK_PAGE_ID
-    
+
     if not access_token or not page_id:
         print("Configuración de Facebook faltante en el servidor.")
         return
 
-    media_ids = []
     media_ids = []
 
     for prenda in prendas:
@@ -64,15 +65,17 @@ def ejecutar_publicacion_lote(ciclo_id):
             res_feed = requests.post(url_feed, json=payload)
             res_feed.raise_for_status()
             res_data = res_feed.json()
-            
-            # Guardamos la URL
+
             if 'id' in res_data:
                 ciclo.url_facebook_post = f"https://facebook.com/{res_data['id']}"
-                
+                print(f"Post publicado exitosamente: {ciclo.url_facebook_post}")
+
         except Exception as e:
             print(f"Error creando el post final en Facebook: {e}")
+    else:
+        print(f"Lote {ciclo_id}: ninguna prenda tenía imagen. No se publicó en Facebook.")
 
-    # Independientemente de si falló Facebook (por red), lo pasamos a ACTIVO para que esté disponible en el catálogo
+    # Marcar como activo independientemente del resultado de Facebook
     ciclo.estado = CicloVenta.Estado.ACTIVO
     ciclo.save()
-    print(f"Lote {ciclo_id} publicado y activado correctamente.")
+    print(f"Lote {ciclo_id} procesado correctamente.")
