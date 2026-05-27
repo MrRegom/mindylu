@@ -5,6 +5,39 @@ import api from '../services/api';
 import './SubidaMasiva.css';
 import { showAlert, showConfirm, showToast, showPrompt } from '../utils/alerts';
 
+const compressImage = (file, maxWidth = 1000) => {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target.result;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxWidth) {
+          height = Math.round((height * maxWidth) / width);
+          width = maxWidth;
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        canvas.toBlob((blob) => {
+          resolve(new File([blob], file.name, {
+            type: 'image/jpeg',
+            lastModified: Date.now()
+          }));
+        }, 'image/jpeg', 0.8);
+      };
+    };
+  });
+};
+
 const SubidaMasiva = () => {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
@@ -48,11 +81,19 @@ const SubidaMasiva = () => {
     fetchDatos();
   }, []);
 
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const files = Array.from(e.target.files);
     if (!files.length) return;
 
-    const newItems = files.map(file => ({
+    setIsSubmitting(true);
+    showToast('Comprimiendo imágenes...', 'info');
+    
+    // Comprimir todas las imágenes en paralelo
+    const compressedFiles = await Promise.all(
+      files.map(file => compressImage(file))
+    );
+
+    const newItems = compressedFiles.map(file => ({
       id: Date.now() + Math.random(),
       file,
       preview: URL.createObjectURL(file),
@@ -64,6 +105,9 @@ const SubidaMasiva = () => {
     }));
 
     setItems(prev => [...prev, ...newItems]);
+    setIsSubmitting(false);
+    showToast('Imágenes listas para editar', 'success');
+
     // Limpiar input para permitir seleccionar los mismos archivos después si se borran
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -229,7 +273,7 @@ const SubidaMasiva = () => {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       
-      showToast('¡Lote creado exitosamente! Se está publicando en Facebook.', 'success');
+      showToast('¡Lote guardado en tu catálogo exitosamente!', 'success');
       navigate('/catalogo');
     } catch (error) {
       console.error("Error guardando lote masivo:", error);
@@ -251,7 +295,7 @@ const SubidaMasiva = () => {
           onClick={handleGuardar}
           disabled={isSubmitting || items.length === 0}
         >
-          {isSubmitting ? 'Guardando...' : 'Guardar y Publicar'}
+          {isSubmitting ? 'Procesando...' : 'Guardar en Catálogo'}
         </button>
       </div>
 
