@@ -31,6 +31,8 @@ const PrendaForm = () => {
     { id: Date.now(), color: 'Negro', talla: 'Única', cantidad: 1 }
   ]);
 
+  const [nombresExistentes, setNombresExistentes] = useState([]);
+
   useEffect(() => {
     // Cargar categorías al montar
     const fetchCategorias = async () => {
@@ -41,7 +43,20 @@ const PrendaForm = () => {
         console.error("Error cargando categorías:", error);
       }
     };
+    // Cargar prendas existentes para el autocompletado
+    const fetchPrendas = async () => {
+      try {
+        const res = await api.get('/catalogo/prendas/');
+        const prendas = res.data.results || res.data;
+        // Extraer nombres únicos
+        const nombresUnicos = [...new Set(prendas.map(p => p.nombre))];
+        setNombresExistentes(nombresUnicos);
+      } catch (error) {
+        console.error("Error cargando prendas:", error);
+      }
+    };
     fetchCategorias();
+    fetchPrendas();
   }, []);
 
   const handleInputChange = (e) => {
@@ -73,7 +88,7 @@ const PrendaForm = () => {
     // Actualizar las variantes existentes con el nuevo tipo
     setVariantes(prev => prev.map(v => ({
       ...v,
-      talla: newTipo === 'unica' ? 'Única' : 'M'
+      talla: newTipo === 'unica' ? 'Única' : (v.talla === 'Única' ? 'M' : v.talla)
     })));
   };
 
@@ -143,11 +158,17 @@ const PrendaForm = () => {
             <input 
               type="text" 
               name="nombre"
-              placeholder="Ej: Chaleco de Lana" 
+              list="nombres-prendas"
+              placeholder="Ej: Chaleco de Lana (Busca o crea)" 
               value={formData.nombre}
               onChange={handleInputChange}
               required 
             />
+            <datalist id="nombres-prendas">
+              {nombresExistentes.map(nombre => (
+                <option key={nombre} value={nombre} />
+              ))}
+            </datalist>
           </div>
 
           <div className="input-group">
@@ -208,22 +229,25 @@ const PrendaForm = () => {
                     </select>
                   </div>
                   
-                  {formData.talla_tipo === 'por_talla' && (
-                    <div className="input-group mini">
-                      <label>Talla</label>
-                      <select 
-                        value={variante.talla}
-                        onChange={(e) => handleVarianteChange(variante.id, 'talla', e.target.value)}
-                        required
-                        className="form-select"
-                      >
-                        <option value="">Elegir talla...</option>
-                        {TALLAS_PREDEFINIDAS.map(t => (
+                  <div className="input-group mini">
+                    <label>Talla</label>
+                    <select 
+                      value={variante.talla}
+                      onChange={(e) => handleVarianteChange(variante.id, 'talla', e.target.value)}
+                      required
+                      className="form-select"
+                      disabled={formData.talla_tipo === 'unica'}
+                    >
+                      <option value="">Elegir talla...</option>
+                      {formData.talla_tipo === 'unica' ? (
+                        <option value="Única">Única</option>
+                      ) : (
+                        TALLAS_PREDEFINIDAS.map(t => (
                           <option key={t} value={t}>{t}</option>
-                        ))}
-                      </select>
-                    </div>
-                  )}
+                        ))
+                      )}
+                    </select>
+                  </div>
 
                   <div className="input-group mini" style={{ width: '80px' }}>
                     <label>Cant.</label>
