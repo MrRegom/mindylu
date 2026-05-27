@@ -39,16 +39,6 @@ const SubidaMasiva = () => {
       }
     };
     fetchDatos();
-  }, []); {
-    const fetchCategorias = async () => {
-      try {
-        const res = await api.get('/catalogo/categorias/');
-        setCategorias(Array.isArray(res.data) ? res.data : (res.data.results || []));
-      } catch (error) {
-        console.error("Error cargando categorías:", error);
-      }
-    };
-    fetchCategorias();
   }, []);
 
   const handleFileChange = (e) => {
