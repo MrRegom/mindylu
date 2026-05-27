@@ -63,6 +63,16 @@ const PrendaForm = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handlePrecioChange = (e) => {
+    let val = e.target.value.replace(/\D/g, '');
+    if (!val) {
+      setFormData(prev => ({ ...prev, precio: '' }));
+      return;
+    }
+    const num = parseInt(val, 10);
+    setFormData(prev => ({ ...prev, precio: num.toLocaleString('es-CL') }));
+  };
+
   const handleNombreChange = async (e) => {
     const value = e.target.value;
     if (value === 'CREAR_NUEVO') {
@@ -125,7 +135,8 @@ const PrendaForm = () => {
     try {
       const payload = new FormData();
       payload.append('nombre', formData.nombre);
-      payload.append('precio', formData.precio);
+      const precioLimpio = formData.precio.toString().replace(/\./g, '');
+      payload.append('precio', precioLimpio);
       payload.append('talla_tipo', formData.talla_tipo);
       if (formData.categoria) {
         payload.append('categoria_id', formData.categoria);
@@ -198,12 +209,13 @@ const PrendaForm = () => {
           <div className="input-group">
             <label>Precio (CLP)</label>
             <input 
-              type="number" 
+              type="text" 
+              inputMode="numeric"
               name="precio"
-              placeholder="Ej: 15000" 
+              placeholder="Ej: 15.000" 
               value={formData.precio}
-              onChange={handleInputChange}
-              required 
+              onChange={handlePrecioChange}
+              required
             />
           </div>
 

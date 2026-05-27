@@ -20,7 +20,7 @@ const EditarPrendaModal = ({ isOpen, onClose, prenda, onSuccess }) => {
     if (isOpen && prenda) {
       setFormData({
         nombre: prenda.nombre || '',
-        precio: prenda.precio || 0,
+        precio: prenda.precio ? prenda.precio.toLocaleString('es-CL') : '',
       });
       // Clonar las variantes para no modificar el estado original hasta guardar
       setVariantes(
@@ -34,6 +34,16 @@ const EditarPrendaModal = ({ isOpen, onClose, prenda, onSuccess }) => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handlePrecioChange = (e) => {
+    let val = e.target.value.replace(/\D/g, '');
+    if (!val) {
+      setFormData(prev => ({ ...prev, precio: '' }));
+      return;
+    }
+    const num = parseInt(val, 10);
+    setFormData(prev => ({ ...prev, precio: num.toLocaleString('es-CL') }));
   };
 
   const handleVarianteChange = (tempId, field, value) => {
@@ -59,9 +69,10 @@ const EditarPrendaModal = ({ isOpen, onClose, prenda, onSuccess }) => {
     setIsSubmitting(true);
     
     // Preparar el payload
+    const precioLimpio = formData.precio.toString().replace(/\./g, '');
     const payload = {
       nombre: formData.nombre,
-      precio: parseInt(formData.precio, 10),
+      precio: parseInt(precioLimpio, 10),
       variantes: variantes.map(v => {
         const item = { color: v.color, talla: v.talla, cantidad: parseInt(v.cantidad, 10) || 0 };
         if (v.id) item.id = v.id;
@@ -120,12 +131,13 @@ const EditarPrendaModal = ({ isOpen, onClose, prenda, onSuccess }) => {
           <div className="form-group">
             <label>Precio ($)</label>
             <input 
-              type="number" 
+              type="text" 
+              inputMode="numeric"
               name="precio" 
               value={formData.precio === 0 ? '' : formData.precio} 
-              onChange={handleInputChange} 
+              onChange={handlePrecioChange} 
               className="glass-input"
-              placeholder="Ej: 15000"
+              placeholder="Ej: 15.000"
               required 
             />
           </div>
