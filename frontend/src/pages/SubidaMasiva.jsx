@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Upload, Save, Copy, Trash2, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Upload, Save, Copy, Trash2, CheckCircle2, Plus } from 'lucide-react';
 import api from '../services/api';
 import './SubidaMasiva.css';
 import { showAlert, showConfirm, showToast } from '../utils/alerts';
@@ -11,6 +11,8 @@ const SubidaMasiva = () => {
   
   const [items, setItems] = useState([]);
   const [categorias, setCategorias] = useState([]);
+  const [tallas, setTallas] = useState([]);
+  const [colores, setColores] = useState([]);
   const [nombresExistentes, setNombresExistentes] = useState([]);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -18,11 +20,15 @@ const SubidaMasiva = () => {
   useEffect(() => {
     const fetchDatos = async () => {
       try {
-        const [resCat, resNombres] = await Promise.all([
+        const [resCat, resNombres, resTallas, resColores] = await Promise.all([
           api.get('/catalogo/categorias/'),
-          api.get('/catalogo/nombres-prendas/')
+          api.get('/catalogo/nombres-prendas/'),
+          api.get('/catalogo/tallas/'),
+          api.get('/catalogo/colores/')
         ]);
         setCategorias(Array.isArray(resCat.data) ? resCat.data : (resCat.data.results || []));
+        setTallas(resTallas.data.results || resTallas.data);
+        setColores(resColores.data.results || resColores.data);
         
         const nombresPred = resNombres.data.results || resNombres.data;
         const resCatPrendas = await api.get('/catalogo/prendas/');
@@ -52,7 +58,8 @@ const SubidaMasiva = () => {
       nombre: '',
       precio_compra: '',
       precio: '',
-      categoria_id: ''
+      categoria_id: '',
+      variantes: [{ id: Date.now() + Math.random(), color: 'Único', talla: 'Única', cantidad: 1 }]
     }));
 
     setItems(prev => [...prev, ...newItems]);
@@ -107,6 +114,38 @@ const SubidaMasiva = () => {
     }
   };
 
+  const handleAddVariante = (itemId) => {
+    setItems(prev => prev.map(item => {
+      if (item.id !== itemId) return item;
+      return {
+        ...item,
+        variantes: [...item.variantes, { id: Date.now() + Math.random(), color: '', talla: 'Única', cantidad: 1 }]
+      };
+    }));
+  };
+
+  const handleRemoveVariante = (itemId, varId) => {
+    setItems(prev => prev.map(item => {
+      if (item.id !== itemId) return item;
+      return {
+        ...item,
+        variantes: item.variantes.filter(v => v.id !== varId)
+      };
+    }));
+  };
+
+  const handleVarianteChange = (itemId, varId, field, value) => {
+    setItems(prev => prev.map(item => {
+      if (item.id !== itemId) return item;
+      return {
+        ...item,
+        variantes: item.variantes.map(v => 
+          v.id === varId ? { ...v, [field]: value } : v
+        )
+      };
+    }));
+  };
+
   const aplicarATodas = () => {
     if (items.length <= 1) return;
     const first = items[0];
@@ -123,6 +162,8 @@ const SubidaMasiva = () => {
           precio: first.precio || item.precio,
           precio_compra: first.precio_compra || item.precio_compra,
           categoria_id: first.categoria_id || item.categoria_id,
+          // Clonar variantes (asignando nuevos IDs para evitar problemas de key en react)
+          variantes: first.variantes.map(v => ({ ...v, id: Date.now() + Math.random() }))
         };
       }));
       showToast('Datos copiados a todas las fotos', 'success');
@@ -150,8 +191,12 @@ const SubidaMasiva = () => {
         precio: parseInt(item.precio.toString().replace(/\./g, ''), 10),
         precio_compra: item.precio_compra ? parseInt(item.precio_compra.toString().replace(/\./g, ''), 10) : null,
         categoria_id: item.categoria_id || null,
-        talla_tipo: 'unica',
-        variantes: [{ color: 'Único', talla: 'Única', cantidad: 1 }] // Variantes por defecto para bulk
+        talla_tipo: item.variantes.some(v => v.talla !== 'Única') ? 'multiple' : 'unica',
+        variantes: item.variantes.map(v => ({
+          color: v.color || 'Único',
+          talla: v.talla || 'Única',
+          cantidad: parseInt(v.cantidad, 10) || 1
+        }))
       }));
 
       payload.append('items', JSON.stringify(itemsList));
@@ -327,6 +372,102 @@ const SubidaMasiva = () => {
                       ))}
                     </div>
                   )}
+                </div>
+
+                {/* SECCION VARIANTES POR ITEM */}
+                <div className="variantes-section">
+                  <div className="variantes-header">
+                    <h4>Variantes y Stock</h4>
+                    <button type="button" className="btn-add-variante" onClick={() => handleAddVariante(item.id)}>
+                      <Plus size={14} /> Agregar
+                    </button>
+                  </div>
+                  
+                  <div className="variantes-list">
+                    {item.variantes.map(variante => (
+                      <div key={variante.id} className="variante-row">
+                        <div className="input-group mini" style={{ position: 'relative' }}>
+                          <label>Color</label>
+                          <div
+                            className={`custom-select-trigger ${variante.color ? 'has-value' : ''}`}
+                            onClick={() => setActiveDropdown(prev => prev === `color-${variante.id}` ? null : `color-${variante.id}`)}
+                          >
+                            <span>{variante.color || 'Elegir color...'}</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <polyline points="6 9 12 15 18 9" />
+                            </svg>
+                          </div>
+                          {activeDropdown === `color-${variante.id}` && (
+                            <div className="custom-select-dropdown" style={{ zIndex: 100 }}>
+                              {colores.map(c => (
+                                <div
+                                  key={c.id}
+                                  className={`custom-select-option ${variante.color === c.nombre ? 'selected' : ''}`}
+                                  onClick={() => {
+                                    handleVarianteChange(item.id, variante.id, 'color', c.nombre);
+                                    setActiveDropdown(null);
+                                  }}
+                                >
+                                  {c.nombre}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div className="input-group mini" style={{ position: 'relative' }}>
+                          <label>Talla</label>
+                          <div
+                            className={`custom-select-trigger ${variante.talla ? 'has-value' : ''}`}
+                            onClick={() => setActiveDropdown(prev => prev === `talla-${variante.id}` ? null : `talla-${variante.id}`)}
+                          >
+                            <span>{variante.talla || 'Elegir talla...'}</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <polyline points="6 9 12 15 18 9" />
+                            </svg>
+                          </div>
+                          {activeDropdown === `talla-${variante.id}` && (
+                            <div className="custom-select-dropdown" style={{ zIndex: 100 }}>
+                              {tallas.map(t => (
+                                <div
+                                  key={t.id}
+                                  className={`custom-select-option ${variante.talla === t.nombre ? 'selected' : ''}`}
+                                  onClick={() => {
+                                    handleVarianteChange(item.id, variante.id, 'talla', t.nombre);
+                                    setActiveDropdown(null);
+                                  }}
+                                >
+                                  {t.nombre}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="input-group mini cant-input">
+                          <label>Cant.</label>
+                          <input 
+                            type="number" 
+                            min="1"
+                            value={variante.cantidad}
+                            onChange={(e) => handleVarianteChange(item.id, variante.id, 'cantidad', e.target.value)}
+                            required
+                          />
+                        </div>
+                        
+                        {item.variantes.length > 1 && (
+                          <button 
+                            type="button" 
+                            className="btn-delete-icon"
+                            onClick={() => handleRemoveVariante(item.id, variante.id)}
+                            title="Eliminar variante"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
