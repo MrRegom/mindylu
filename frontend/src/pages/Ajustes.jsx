@@ -96,25 +96,25 @@ const Ajustes = () => {
         <MantenedorList 
           titulo="Categorías" 
           icono={<Tag size={20} className="icon-accent" />} 
-          endpoint="/api/v1/catalogo/categorias/" 
+          endpoint="/catalogo/categorias/" 
           placeholder="Nueva categoría (ej. Pantalones)"
         />
         <MantenedorList 
           titulo="Nombres de Prendas" 
           icono={<Type size={20} className="icon-accent" />} 
-          endpoint="/api/v1/catalogo/nombres-prendas/" 
+          endpoint="/catalogo/nombres-prendas/" 
           placeholder="Nuevo nombre base"
         />
         <MantenedorList 
           titulo="Colores" 
           icono={<Palette size={20} className="icon-accent" />} 
-          endpoint="/api/v1/catalogo/colores/" 
+          endpoint="/catalogo/colores/" 
           placeholder="Nuevo color (ej. Burdeo)"
         />
         <MantenedorList 
           titulo="Tallas" 
           icono={<Search size={20} className="icon-accent" />} 
-          endpoint="/api/v1/catalogo/tallas/" 
+          endpoint="/catalogo/tallas/" 
           placeholder="Nueva talla (ej. XXL)"
         />
       </div>

@@ -48,7 +48,7 @@
 }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
   background-color: var(--color-bg);
   color: var(--color-text);
   line-height: 1.6;
@@ -79,12 +79,12 @@ body {
   overflow: hidden;
 }
 
-/* Typography Premium */
+/* Typography Modern / WhatsApp Style */
 h1, h2, h3, h4 {
-  font-family: 'Playfair Display', serif;
+  font-family: inherit;
   font-weight: 600;
   line-height: 1.25;
-  color: #2C2929;
+  color: #111b21; /* Darker, modern native color */
   letter-spacing: -0.01em;
 }
 

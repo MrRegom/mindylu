@@ -82,6 +82,29 @@ El frontend está construido como una Single Page Application (SPA) convertida e
 
 ---
 
-## 6. Firma de Arquitecto
+## 6. Funcionalidades Clave y Decisiones Recientes (Estado Actual)
+
+Para mantener el contexto del sistema, aquí se documentan las características principales implementadas recientemente:
+
+### 6.1. Gestión de Catálogo, Prendas y Ajustes Base
+- **Mantenedores (Ajustes):** La aplicación cuenta con una pantalla de `Ajustes` (reemplazando el botón "Magia IA"). En ella se administran mediante CRUD los catálogos base (Tallas, Colores, Categorías y Nombres de Prendas). Todos operan a través del `Tenant` correspondiente.
+- **Creación de Prendas (PrendaForm):** 
+  - Soporte para subir múltiples imágenes nativamente (`ImageUploader`).
+  - **Autocompletado de Nombres y Categorías:** Las opciones ya no son "quemadas" en el frontend, sino que se cargan dinámicamente llamando a los endpoints `/catalogo/nombres-prendas/`, `/catalogo/colores/`, `/catalogo/tallas/` y `/catalogo/categorias/`.
+  - Usa `<datalist>` nativo de HTML5 para sugerir nombres y permitir añadir variables sin bloquear al usuario.
+  - **Variantes Dinámicas:** Los selects de tallas y colores leen directamente de la base de datos a través de la API. La lógica de "Talla Única" pre-asigna y deshabilita el selector sin ocultarlo para mejor UX.
+
+### 6.2. Integración con Meta (Facebook Graph API v19.0)
+- Ubicada en la app `integraciones` (`tasks.py`).
+- **Flujo de Publicación Masiva:** Desde el Catálogo, el usuario selecciona múltiples prendas y presiona "Publicar en Facebook". El sistema genera un solo post consolidado tipo "Álbum/Carrusel".
+- **Lógica de Subida (API Facebook):** 
+  1. Se suben las imágenes a Facebook como *unpublished photos* (`published: false`).
+  2. Se toma el arreglo de IDs devueltos y se hace un POST al endpoint `/feed` de la página (`attached_media`), lo cual junta todo en una sola publicación pública.
+- **Resiliencia de Entorno:** Si no hay credenciales configuradas en el `.env`, el servidor captura el error (`getattr` seguro) y no colapsa, mostrando errores controlados al usuario.
+- **Modo Desarrollo vs Live:** Las publicaciones requieren que la app en Facebook for Developers esté en modo *Live*, de lo contrario solo los administradores podrán ver los posts generados por la API.
+
+---
+
+## 7. Firma de Arquitecto
 
 *Al interactuar con este proyecto, prometo honrar esta arquitectura, escribiendo código limpio, escalable, modular y testeable. Toda respuesta y generación de código debe alinearse con estos estándares profesionales de la industria.*
