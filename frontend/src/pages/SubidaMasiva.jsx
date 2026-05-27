@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Upload, Save, Copy, Trash2, CheckCircle2, Plus } from 'lucide-react';
 import api from '../services/api';
 import './SubidaMasiva.css';
-import { showAlert, showConfirm, showToast } from '../utils/alerts';
+import { showAlert, showConfirm, showToast, showPrompt } from '../utils/alerts';
 
 const SubidaMasiva = () => {
   const navigate = useNavigate();
@@ -95,7 +95,7 @@ const SubidaMasiva = () => {
 
   const handleNombreChange = async (id, value) => {
     if (value === 'CREAR_NUEVO') {
-      const nuevoNombre = window.prompt('Ingresa el nombre de la nueva prenda:');
+      const nuevoNombre = await showPrompt('Nueva Prenda', 'Ingresa el nombre de la nueva prenda:');
       if (nuevoNombre && nuevoNombre.trim()) {
         let nombreLimpio = nuevoNombre.trim().toLowerCase().split(/\s+/).map(word => 
           word.charAt(0).toUpperCase() + word.slice(1)
@@ -111,6 +111,24 @@ const SubidaMasiva = () => {
       }
     } else {
       updateItem(id, 'nombre', value);
+    }
+  };
+
+  const handleCategoriaChange = async (id, value) => {
+    if (value === 'CREAR_NUEVO') {
+      const nuevaCat = await showPrompt('Nueva Categoría', 'Ej: Pantalones y Jeans');
+      if (nuevaCat && nuevaCat.trim()) {
+        try {
+          const res = await api.post('/catalogo/categorias/', { nombre: nuevaCat.trim() });
+          setCategorias(prev => [...prev, res.data]);
+          updateItem(id, 'categoria_id', res.data.id);
+          showToast('Categoría creada', 'success');
+        } catch (error) {
+          showAlert('Error al crear la categoría.');
+        }
+      }
+    } else {
+      updateItem(id, 'categoria_id', value);
     }
   };
 
@@ -265,7 +283,14 @@ const SubidaMasiva = () => {
 
         <div className="items-list">
           {items.map((item, index) => (
-            <div key={item.id} className="item-row glass animate-slide-up" style={{ animationDelay: `${index * 0.05}s` }}>
+            <div 
+              key={item.id} 
+              className="item-row glass animate-slide-up" 
+              style={{ 
+                animationDelay: `${index * 0.05}s`,
+                zIndex: activeDropdown && String(activeDropdown).includes(item.id) ? 100 : 1
+              }}
+            >
               <div className="item-photo">
                 <img src={item.preview} alt="preview" />
                 <button className="btn-remove-item" onClick={() => removeItem(item.id)}>
@@ -363,13 +388,22 @@ const SubidaMasiva = () => {
                           key={cat.id}
                           className={`custom-select-option ${String(item.categoria_id) === String(cat.id) ? 'selected' : ''}`}
                           onClick={() => {
-                            updateItem(item.id, 'categoria_id', cat.id);
+                            handleCategoriaChange(item.id, cat.id);
                             setActiveDropdown(null);
                           }}
                         >
                           {cat.nombre}
                         </div>
                       ))}
+                      <div
+                        className="custom-select-option custom-select-agregar"
+                        onClick={async () => {
+                          setActiveDropdown(null);
+                          await handleCategoriaChange(item.id, 'CREAR_NUEVO');
+                        }}
+                      >
+                        + Agregar nuevo...
+                      </div>
                     </div>
                   )}
                 </div>
