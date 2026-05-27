@@ -2,7 +2,7 @@
 # apps/catalogo/views.py
 # ─────────────────────────────────────────────────────────────
 
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import Prenda, CicloVenta, PrendaVariante, Categoria
@@ -425,3 +425,36 @@ class CicloVentaViewSet(viewsets.ModelViewSet):
             return Response({'mensaje': f'Se agregaron {len(creadas_ids)} prendas al lote.', 'prenda_ids': creadas_ids}, status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+from .models import ColorPredefinido, TallaPredefinida, NombrePrendaPredefinido
+from .serializers import ColorPredefinidoSerializer, TallaPredefinidaSerializer, NombrePrendaPredefinidoSerializer
+
+class ColorPredefinidoViewSet(viewsets.ModelViewSet):
+    serializer_class = ColorPredefinidoSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return ColorPredefinido.objects.filter(tenant=self.request.user.tenant)
+
+    def perform_create(self, serializer):
+        serializer.save(tenant=self.request.user.tenant)
+
+class TallaPredefinidaViewSet(viewsets.ModelViewSet):
+    serializer_class = TallaPredefinidaSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return TallaPredefinida.objects.filter(tenant=self.request.user.tenant)
+
+    def perform_create(self, serializer):
+        serializer.save(tenant=self.request.user.tenant)
+
+class NombrePrendaPredefinidoViewSet(viewsets.ModelViewSet):
+    serializer_class = NombrePrendaPredefinidoSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return NombrePrendaPredefinido.objects.filter(tenant=self.request.user.tenant)
+
+    def perform_create(self, serializer):
+        serializer.save(tenant=self.request.user.tenant)

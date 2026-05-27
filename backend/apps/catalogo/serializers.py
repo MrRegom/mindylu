@@ -3,8 +3,22 @@
 # ─────────────────────────────────────────────────────────────
 
 from rest_framework import serializers
-from .models import CicloVenta, Prenda, PrendaVariante, PrendaImagen, Categoria
+from .models import CicloVenta, Prenda, PrendaVariante, PrendaImagen, Categoria, ColorPredefinido, TallaPredefinida, NombrePrendaPredefinido
 
+class ColorPredefinidoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ColorPredefinido
+        fields = ['id', 'nombre']
+
+class TallaPredefinidaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TallaPredefinida
+        fields = ['id', 'nombre']
+
+class NombrePrendaPredefinidoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NombrePrendaPredefinido
+        fields = ['id', 'nombre']
 
 class CategoriaSerializer(serializers.ModelSerializer):
     """Serializer CRUD para las categorías del tenant."""

@@ -153,3 +153,45 @@ class PrendaVariante(models.Model):
             self.prenda.actualizar_estado()
             return True
         return False
+
+
+class ColorPredefinido(models.Model):
+    """Colores autogestionables desde la pantalla de Ajustes."""
+    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name='colores_predefinidos')
+    nombre = models.CharField(max_length=100)
+
+    class Meta:
+        ordering = ['nombre']
+        verbose_name = _('Color Predefinido')
+        unique_together = ['tenant', 'nombre']
+
+    def __str__(self):
+        return self.nombre
+
+
+class TallaPredefinida(models.Model):
+    """Tallas autogestionables desde la pantalla de Ajustes."""
+    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name='tallas_predefinidas')
+    nombre = models.CharField(max_length=50)
+
+    class Meta:
+        ordering = ['nombre']
+        verbose_name = _('Talla Predefinida')
+        unique_together = ['tenant', 'nombre']
+
+    def __str__(self):
+        return self.nombre
+
+
+class NombrePrendaPredefinido(models.Model):
+    """Nombres de prendas base para el autocompletado."""
+    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name='nombres_prendas_predefinidos')
+    nombre = models.CharField(max_length=255)
+
+    class Meta:
+        ordering = ['nombre']
+        verbose_name = _('Nombre de Prenda Predefinido')
+        unique_together = ['tenant', 'nombre']
+
+    def __str__(self):
+        return self.nombre
