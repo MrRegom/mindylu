@@ -424,14 +424,14 @@ const SubidaMasiva = () => {
                           <label>Color</label>
                           <div
                             className={`custom-select-trigger ${variante.color ? 'has-value' : ''}`}
-                            onClick={() => setActiveDropdown(prev => prev === `color-${variante.id}` ? null : `color-${variante.id}`)}
+                            onClick={() => setActiveDropdown(prev => prev === `color-${item.id}-${variante.id}` ? null : `color-${item.id}-${variante.id}`)}
                           >
                             <span>{variante.color || 'Elegir color...'}</span>
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                               <polyline points="6 9 12 15 18 9" />
                             </svg>
                           </div>
-                          {activeDropdown === `color-${variante.id}` && (
+                          {activeDropdown === `color-${item.id}-${variante.id}` && (
                             <div className="custom-select-dropdown" style={{ zIndex: 100 }}>
                               {colores.map(c => (
                                 <div
@@ -453,14 +453,14 @@ const SubidaMasiva = () => {
                           <label>Talla</label>
                           <div
                             className={`custom-select-trigger ${variante.talla ? 'has-value' : ''}`}
-                            onClick={() => setActiveDropdown(prev => prev === `talla-${variante.id}` ? null : `talla-${variante.id}`)}
+                            onClick={() => setActiveDropdown(prev => prev === `talla-${item.id}-${variante.id}` ? null : `talla-${item.id}-${variante.id}`)}
                           >
                             <span>{variante.talla || 'Elegir talla...'}</span>
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                               <polyline points="6 9 12 15 18 9" />
                             </svg>
                           </div>
-                          {activeDropdown === `talla-${variante.id}` && (
+                          {activeDropdown === `talla-${item.id}-${variante.id}` && (
                             <div className="custom-select-dropdown" style={{ zIndex: 100 }}>
                               {tallas.map(t => (
                                 <div
