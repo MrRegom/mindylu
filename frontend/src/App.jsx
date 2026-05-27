@@ -10,6 +10,7 @@ import Clientas from './pages/Clientas';
 import ClientaForm from './pages/ClientaForm';
 import ClientaDetail from './pages/ClientaDetail';
 import Cuentas from './pages/Cuentas';
+import Ajustes from './pages/Ajustes';
 import Sincronizacion from './pages/Sincronizacion';
 import LotesProgramados from './pages/LotesProgramados';
 import LoteAddFotos from './pages/LoteAddFotos';
@@ -41,7 +42,7 @@ function App() {
           <Route path="/clientas/:id" element={<ClientaDetail />} />
           <Route path="/clientas" element={<Clientas />} />
           <Route path="/cuentas" element={<Cuentas />} />
-          <Route path="/sincronizacion" element={<Sincronizacion />} />
+          <Route path="/ajustes" element={<Ajustes />} />
           <Route path="/perfil" element={<Perfil />} />
         </Route>
       </Routes>

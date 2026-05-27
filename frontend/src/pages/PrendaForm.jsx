@@ -5,19 +5,12 @@ import api from '../services/api';
 import ImageUploader from '../components/ImageUploader';
 import './PrendaForm.css';
 
-const COLORES_PREDEFINIDOS = [
-  'Blanco', 'Negro', 'Gris', 'Beige', 'Café', 'Rojo', 'Azul', 'Verde', 
-  'Amarillo', 'Rosa', 'Morado', 'Naranja', 'Celeste', 'Mostaza', 'Vino', 'Multicolor'
-];
-
-const TALLAS_PREDEFINIDAS = [
-  'S', 'M', 'L', 'XL', 'XXL', '36', '38', '40', '42', '44', '46'
-];
-
 const PrendaForm = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [categorias, setCategorias] = useState([]);
+  const [colores, setColores] = useState([]);
+  const [tallas, setTallas] = useState([]);
   const [images, setImages] = useState([]);
   
   const [formData, setFormData] = useState({
@@ -34,29 +27,34 @@ const PrendaForm = () => {
   const [nombresExistentes, setNombresExistentes] = useState([]);
 
   useEffect(() => {
-    // Cargar categorías al montar
-    const fetchCategorias = async () => {
+    const fetchData = async () => {
       try {
-        const res = await api.get('/catalogo/categorias/');
-        setCategorias(res.data.results || res.data);
-      } catch (error) {
-        console.error("Error cargando categorías:", error);
-      }
-    };
-    // Cargar prendas existentes para el autocompletado
-    const fetchPrendas = async () => {
-      try {
-        const res = await api.get('/catalogo/prendas/');
-        const prendas = res.data.results || res.data;
-        // Extraer nombres únicos
-        const nombresUnicos = [...new Set(prendas.map(p => p.nombre))];
+        const [resCat, resColores, resTallas, resNombres] = await Promise.all([
+          api.get('/catalogo/categorias/'),
+          api.get('/catalogo/colores/'),
+          api.get('/catalogo/tallas/'),
+          api.get('/catalogo/nombres-prendas/')
+        ]);
+        setCategorias(resCat.data.results || resCat.data);
+        setColores(resColores.data.results || resColores.data);
+        setTallas(resTallas.data.results || resTallas.data);
+        
+        // Obtener nombres predefinidos
+        const nombresPred = resNombres.data.results || resNombres.data;
+        
+        // Obtener prendas existentes para complementar nombres
+        const resPrendas = await api.get('/catalogo/prendas/');
+        const prendas = resPrendas.data.results || resPrendas.data;
+        const nombresUnicos = [...new Set([
+          ...nombresPred.map(n => n.nombre), 
+          ...prendas.map(p => p.nombre)
+        ])];
         setNombresExistentes(nombresUnicos);
       } catch (error) {
-        console.error("Error cargando prendas:", error);
+        console.error("Error cargando datos iniciales:", error);
       }
     };
-    fetchCategorias();
-    fetchPrendas();
+    fetchData();
   }, []);
 
   const handleInputChange = (e) => {
@@ -223,8 +221,8 @@ const PrendaForm = () => {
                       className="form-select"
                     >
                       <option value="">Elegir color...</option>
-                      {COLORES_PREDEFINIDOS.map(c => (
-                        <option key={c} value={c}>{c}</option>
+                      {colores.map(c => (
+                        <option key={c.id} value={c.nombre}>{c.nombre}</option>
                       ))}
                     </select>
                   </div>
@@ -242,8 +240,8 @@ const PrendaForm = () => {
                       {formData.talla_tipo === 'unica' ? (
                         <option value="Única">Única</option>
                       ) : (
-                        TALLAS_PREDEFINIDAS.map(t => (
-                          <option key={t} value={t}>{t}</option>
+                        tallas.map(t => (
+                          <option key={t.id} value={t.nombre}>{t.nombre}</option>
                         ))
                       )}
                     </select>

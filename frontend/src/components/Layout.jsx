@@ -1,5 +1,5 @@
 import { Outlet, useLocation } from 'react-router-dom';
-import { Home, Search, ShoppingBag, User, CreditCard, Sparkles } from 'lucide-react';
+import { Home, Search, ShoppingBag, User, CreditCard, Settings } from 'lucide-react';
 import './Layout.css';
 
 const Layout = () => {
@@ -23,9 +23,9 @@ const Layout = () => {
             <Search size={22} />
             <span>Catálogo</span>
           </a>
-          <a href="/sincronizacion" className={`nav-item ${location.pathname.includes('/sincronizacion') ? 'active' : ''}`} style={{ fontSize: '0.65rem' }}>
-            <Sparkles size={22} />
-            <span>Magia IA</span>
+          <a href="/ajustes" className={`nav-item ${location.pathname.includes('/ajustes') ? 'active' : ''}`} style={{ fontSize: '0.65rem' }}>
+            <Settings size={22} />
+            <span>Ajustes</span>
           </a>
           <a href="/entregas" className={`nav-item ${location.pathname.includes('/entregas') ? 'active' : ''}`} style={{ fontSize: '0.65rem' }}>
             <ShoppingBag size={22} />
