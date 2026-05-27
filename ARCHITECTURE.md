@@ -94,6 +94,9 @@ Para mantener el contexto del sistema, aquí se documentan las características 
   - Usa `<datalist>` nativo de HTML5 para sugerir nombres y permitir añadir variables sin bloquear al usuario.
   - **Variantes Dinámicas:** Los selects de tallas y colores leen directamente de la base de datos a través de la API. La lógica de "Talla Única" pre-asigna y deshabilita el selector sin ocultarlo para mejor UX.
 
+### REGLA DE ORO DE DESARROLLO CONTINUO
+- **"Solo solucionar lo que se pide sin dañar el resto de la aplicación."** Es imperativo NO introducir bugs de regresión (como romper endpoints API o CSS de otros módulos) al implementar un cambio menor. Se debe garantizar que la app siga avanzando firmemente sin retrocesos.
+
 ### 6.2. Integración con Meta (Facebook Graph API v19.0)
 - Ubicada en la app `integraciones` (`tasks.py`).
 - **Flujo de Publicación Masiva:** Desde el Catálogo, el usuario selecciona múltiples prendas y presiona "Publicar en Facebook". El sistema genera un solo post consolidado tipo "Álbum/Carrusel".

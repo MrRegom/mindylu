@@ -11,6 +11,12 @@ const api = axios.create({
 // Interceptor para inyectar el token JWT en cada petición
 api.interceptors.request.use(
   (config) => {
+    // Si la ruta empieza con /, Axios la trata como absoluta desde el dominio, ignorando el path de baseURL.
+    // Esto quita el / inicial para que se anexe correctamente a http://dominio.com/api/v1/
+    if (config.url && config.url.startsWith('/')) {
+      config.url = config.url.substring(1);
+    }
+    
     const token = localStorage.getItem('access_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
