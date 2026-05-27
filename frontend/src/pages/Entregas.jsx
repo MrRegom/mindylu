@@ -487,6 +487,7 @@ const Entregas = () => {
                           </div>
                         </div>
 
+                        {entrega.pedidos.length > 0 && (
                           <div className="pedidos-list card" style={{ background: 'rgba(0,0,0,0.02)', border: 'none', padding: '16px' }}>
                             {entrega.pedidos.map(pedido => (
                               <div key={pedido.id} className={`pedido-item ${pedido.estado === 'entregado' ? 'pedido-entregado' : ''}`} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
