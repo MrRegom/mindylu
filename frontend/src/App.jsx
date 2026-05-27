@@ -16,6 +16,8 @@ import LotesProgramados from './pages/LotesProgramados';
 import LoteAddFotos from './pages/LoteAddFotos';
 import Perfil from './pages/Perfil';
 
+import SubidaMasiva from './pages/SubidaMasiva';
+
 function App() {
   // Leemos el token real para ver si está logueado
   const isAuthenticated = !!localStorage.getItem('access_token');
@@ -32,6 +34,7 @@ function App() {
         }>
           <Route path="/" element={<Home />} />
           <Route path="/catalogo/nueva" element={<PrendaForm />} />
+          <Route path="/catalogo/subida-masiva" element={<SubidaMasiva />} />
           <Route path="/catalogo/carga-masiva" element={<CargaMasiva />} />
           <Route path="/catalogo/lotes" element={<LotesProgramados />} />
           <Route path="/catalogo/lotes/:id/editar" element={<LoteAddFotos />} />

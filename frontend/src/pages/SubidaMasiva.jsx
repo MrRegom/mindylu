@@ -1,0 +1,250 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, Upload, Save, Copy, Trash2, CheckCircle2 } from 'lucide-react';
+import api from '../services/api';
+import './SubidaMasiva.css';
+import { showAlert, showConfirm, showToast } from '../utils/alerts';
+
+const SubidaMasiva = () => {
+  const navigate = useNavigate();
+  const fileInputRef = useRef(null);
+  
+  const [items, setItems] = useState([]);
+  const [categorias, setCategorias] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    const fetchCategorias = async () => {
+      try {
+        const res = await api.get('/catalogo/categorias/');
+        setCategorias(Array.isArray(res.data) ? res.data : (res.data.results || []));
+      } catch (error) {
+        console.error("Error cargando categorías:", error);
+      }
+    };
+    fetchCategorias();
+  }, []);
+
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
+
+    const newItems = files.map(file => ({
+      id: Date.now() + Math.random(),
+      file,
+      preview: URL.createObjectURL(file),
+      nombre: '',
+      precio_compra: '',
+      precio: '',
+      categoria_id: ''
+    }));
+
+    setItems(prev => [...prev, ...newItems]);
+    // Limpiar input para permitir seleccionar los mismos archivos después si se borran
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const removeItem = (id) => {
+    setItems(prev => {
+      const filtered = prev.filter(i => i.id !== id);
+      // Revoke object URL to prevent memory leaks
+      const removed = prev.find(i => i.id === id);
+      if (removed) URL.revokeObjectURL(removed.preview);
+      return filtered;
+    });
+  };
+
+  const updateItem = (id, field, value) => {
+    setItems(prev => prev.map(item => {
+      if (item.id !== id) return item;
+
+      if (field === 'precio' || field === 'precio_compra') {
+        const valLimpio = value.replace(/\D/g, '');
+        const num = valLimpio ? parseInt(valLimpio, 10) : '';
+        return { ...item, [field]: num ? num.toLocaleString('es-CL') : '' };
+      }
+
+      return { ...item, [field]: value };
+    }));
+  };
+
+  const aplicarATodas = () => {
+    if (items.length <= 1) return;
+    const first = items[0];
+    if (!first.precio && !first.precio_compra && !first.categoria_id) {
+      showToast('Llena el primer producto para copiar sus datos.', 'warning');
+      return;
+    }
+    
+    if (window.confirm('¿Copiar el precio y categoría de la primera foto a todas las demás?')) {
+      setItems(prev => prev.map((item, index) => {
+        if (index === 0) return item;
+        return {
+          ...item,
+          precio: first.precio || item.precio,
+          precio_compra: first.precio_compra || item.precio_compra,
+          categoria_id: first.categoria_id || item.categoria_id,
+        };
+      }));
+      showToast('Datos copiados a todas las fotos', 'success');
+    }
+  };
+
+  const handleGuardar = async () => {
+    if (items.length === 0) {
+      showAlert('Agrega al menos una foto.');
+      return;
+    }
+
+    const invalidItem = items.find(i => !i.nombre || !i.precio);
+    if (invalidItem) {
+      showAlert('Todas las fotos deben tener un Nombre y Precio de Venta.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const payload = new FormData();
+      
+      const itemsList = items.map(item => ({
+        nombre: item.nombre,
+        precio: parseInt(item.precio.toString().replace(/\./g, ''), 10),
+        precio_compra: item.precio_compra ? parseInt(item.precio_compra.toString().replace(/\./g, ''), 10) : null,
+        categoria_id: item.categoria_id || null,
+        talla_tipo: 'unica',
+        variantes: [{ color: 'Único', talla: 'Única', cantidad: 1 }] // Variantes por defecto para bulk
+      }));
+
+      payload.append('items', JSON.stringify(itemsList));
+      
+      // Adjuntar imágenes
+      items.forEach((item, index) => {
+        payload.append(`imagenes_${index}`, item.file);
+      });
+
+      await api.post('/catalogo/prendas/bulk_create/', payload, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      
+      showToast('¡Lote creado exitosamente! Se está publicando en Facebook.', 'success');
+      navigate('/catalogo');
+    } catch (error) {
+      console.error("Error guardando lote masivo:", error);
+      showAlert('Hubo un error al guardar el lote.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="subida-masiva-container animate-fade-in">
+      <div className="form-header glass">
+        <button className="btn-back" onClick={() => navigate('/catalogo')} type="button" disabled={isSubmitting}>
+          <ArrowLeft size={24} />
+        </button>
+        <h2>Subida Masiva (Lote)</h2>
+        <button 
+          className="btn-guardar-header"
+          onClick={handleGuardar}
+          disabled={isSubmitting || items.length === 0}
+        >
+          {isSubmitting ? 'Guardando...' : 'Guardar y Publicar'}
+        </button>
+      </div>
+
+      <div className="subida-content">
+        <div className="upload-zone-wrapper">
+          <input 
+            type="file" 
+            multiple 
+            accept="image/*"
+            style={{display: 'none'}}
+            ref={fileInputRef}
+            onChange={handleFileChange}
+          />
+          <button className="btn-upload-massive" onClick={() => fileInputRef.current.click()}>
+            <Upload size={32} />
+            <span>Seleccionar múltiples fotos (Ej: 70 fotos)</span>
+          </button>
+        </div>
+
+        {items.length > 0 && (
+          <div className="bulk-actions glass">
+            <div className="bulk-count">
+              <strong>{items.length}</strong> foto{items.length > 1 ? 's' : ''} seleccionada{items.length > 1 ? 's' : ''}
+            </div>
+            <button className="btn-aplicar-todas" onClick={aplicarATodas} title="Copiar datos de la primera foto a las demás">
+              <Copy size={16} /> Aplicar precio y categoría a todas
+            </button>
+          </div>
+        )}
+
+        <div className="items-list">
+          {items.map((item, index) => (
+            <div key={item.id} className="item-row glass animate-slide-up" style={{ animationDelay: `${index * 0.05}s` }}>
+              <div className="item-photo">
+                <img src={item.preview} alt="preview" />
+                <button className="btn-remove-item" onClick={() => removeItem(item.id)}>
+                  <Trash2 size={16} />
+                </button>
+                <div className="item-number">{index + 1}</div>
+              </div>
+              
+              <div className="item-fields">
+                <div className="field-group">
+                  <label>Nombre prenda</label>
+                  <input 
+                    type="text" 
+                    placeholder="Ej: Sweater Lana" 
+                    value={item.nombre}
+                    onChange={(e) => updateItem(item.id, 'nombre', e.target.value)}
+                  />
+                </div>
+                
+                <div className="field-row">
+                  <div className="field-group">
+                    <label>Precio Costo</label>
+                    <input 
+                      type="text" 
+                      inputMode="numeric"
+                      placeholder="Ej: 5.000" 
+                      value={item.precio_compra}
+                      onChange={(e) => updateItem(item.id, 'precio_compra', e.target.value)}
+                    />
+                  </div>
+                  <div className="field-group">
+                    <label>Precio Venta</label>
+                    <input 
+                      type="text" 
+                      inputMode="numeric"
+                      placeholder="Ej: 15.000" 
+                      value={item.precio}
+                      onChange={(e) => updateItem(item.id, 'precio', e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div className="field-group">
+                  <label>Categoría</label>
+                  <select 
+                    value={item.categoria_id}
+                    onChange={(e) => updateItem(item.id, 'categoria_id', e.target.value)}
+                  >
+                    <option value="">Ninguna</option>
+                    {categorias.map(c => (
+                      <option key={c.id} value={c.id}>{c.nombre}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default SubidaMasiva;

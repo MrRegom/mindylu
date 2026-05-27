@@ -168,7 +168,7 @@ const Catalogo = () => {
           <button className="btn-icon-simple" onClick={() => navigate('/catalogo/nueva')} title="Añadir prenda manual" style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', color: 'var(--color-text)' }}>
             <Plus size={20} />
           </button>
-          <button className="btn-icon-simple" onClick={() => navigate('/catalogo/carga-masiva')} title="Subir fotos" style={{ background: 'var(--color-primary-gradient)', color: '#FFF', border: 'none' }}>
+          <button className="btn-icon-simple" onClick={() => navigate('/catalogo/subida-masiva')} title="Subida Masiva (Lote)" style={{ background: 'var(--color-primary-gradient)', color: '#FFF', border: 'none' }}>
             <Rocket size={20} />
           </button>
         </div>

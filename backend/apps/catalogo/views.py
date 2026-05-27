@@ -251,12 +251,16 @@ class PrendaViewSet(viewsets.ModelViewSet):
                     ciclo.save()
 
                 for i, item in enumerate(items):
+                    cat_id = item.get('categoria_id')
+                    precio_comp = item.get('precio_compra')
                     prenda = Prenda.objects.create(
                         tenant=request.user.tenant,
                         ciclo=ciclo,
                         nombre=item.get('nombre', 'Producto Sin Nombre'),
                         precio=int(item.get('precio', 0)),
-                        talla_tipo='unica'
+                        precio_compra=int(precio_comp) if precio_comp else None,
+                        categoria_id=cat_id if cat_id else None,
+                        talla_tipo=item.get('talla_tipo', 'unica')
                     )
                     variantes_list = item.get('variantes', [])
                     if not variantes_list:
