@@ -1,6 +1,6 @@
 .page-ajustes {
   padding-bottom: 80px;
-  background-color: #f0f2f5; /* Color de fondo tipo WhatsApp Web / iOS Settings */
+  background-color: #f0f2f5;
   min-height: 100vh;
 }
 
@@ -39,6 +39,7 @@
   }
 }
 
+/* ── Tarjeta mantenedor ── */
 .mantenedor-card {
   display: flex;
   flex-direction: column;
@@ -65,24 +66,153 @@
 }
 
 .icon-accent {
-  color: #00a884; /* Acento tipo WhatsApp */
+  color: #00a884;
 }
 
+/* ── Lista de ítems ── */
+.mantenedor-lista {
+  display: flex;
+  flex-direction: column;
+  max-height: 240px;
+  overflow-y: auto;
+  background: #ffffff;
+}
+
+.mantenedor-lista::-webkit-scrollbar {
+  width: 4px;
+}
+
+.mantenedor-lista::-webkit-scrollbar-thumb {
+  background-color: #d1d7db;
+  border-radius: 4px;
+}
+
+.text-muted {
+  padding: 1.25rem;
+  color: #8696a0;
+  font-size: 0.9rem;
+  text-align: center;
+  font-style: italic;
+}
+
+/* ── Ítem individual (modo vista) ── */
+.mantenedor-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid #f0f2f5;
+  background: #ffffff;
+  transition: background-color 0.15s;
+  min-height: 48px;
+  box-sizing: border-box;
+}
+
+.mantenedor-item:hover {
+  background-color: #f5f6f6;
+}
+
+.mantenedor-nombre {
+  font-size: 0.95rem;
+  color: #3b4a54;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mantenedor-acciones {
+  display: flex;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+/* ── Ítem en modo edición inline ── */
+.mantenedor-edit-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: 100%;
+}
+
+.mantenedor-edit-input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.4rem 0.6rem;
+  border: 1.5px solid #00a884;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: #111b21;
+  background: #f0fbf8;
+  outline: none;
+}
+
+/* ── Botones de acción (lápiz, check, X, basura) ── */
+.btn-icon-edit,
+.btn-icon-danger,
+.btn-icon-success,
+.btn-icon-muted {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.35rem;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s;
+  flex-shrink: 0;
+}
+
+.btn-icon-edit {
+  color: #667781;
+}
+.btn-icon-edit:hover {
+  background: rgba(0, 168, 132, 0.1);
+  color: #00a884;
+}
+
+.btn-icon-danger {
+  color: #ea0038;
+}
+.btn-icon-danger:hover {
+  background: rgba(234, 0, 56, 0.1);
+}
+
+.btn-icon-success {
+  color: #00a884;
+}
+.btn-icon-success:hover {
+  background: rgba(0, 168, 132, 0.12);
+}
+
+.btn-icon-muted {
+  color: #8696a0;
+}
+.btn-icon-muted:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+/* ── Formulario de agregar (siempre visible abajo) ── */
 .mantenedor-form {
   display: flex;
-  gap: 0.75rem;
-  padding: 1rem 1.25rem;
-  background: #ffffff;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.85rem 1rem;
+  border-top: 1.5px solid #e9edef;
+  background: #f9fafb;
 }
 
 .mantenedor-form input {
   flex: 1;
-  padding: 0.75rem 1rem;
+  min-width: 0;
+  padding: 0.65rem 0.9rem;
   border-radius: 8px;
   border: 1px solid #d1d7db;
   background: #ffffff;
   color: #111b21;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   transition: border-color 0.2s;
 }
 
@@ -92,80 +222,27 @@
 }
 
 .mantenedor-form input::placeholder {
-  color: #8696a0;
+  color: #adb5bd;
 }
 
-.mantenedor-form .btn-primary {
+/* Botón Agregar con texto */
+.btn-agregar {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.65rem 1rem;
   background-color: #00a884;
   border: none;
   border-radius: 8px;
   color: white;
-  width: 44px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  font-size: 0.88rem;
+  font-weight: 600;
   cursor: pointer;
+  white-space: nowrap;
   transition: background-color 0.2s;
+  flex-shrink: 0;
 }
 
-.mantenedor-form .btn-primary:hover {
+.btn-agregar:hover {
   background-color: #008f6f;
-}
-
-.mantenedor-lista {
-  display: flex;
-  flex-direction: column;
-  max-height: 250px;
-  overflow-y: auto;
-  background: #ffffff;
-}
-
-.mantenedor-lista::-webkit-scrollbar {
-  width: 6px;
-}
-
-.mantenedor-lista::-webkit-scrollbar-thumb {
-  background-color: #d1d7db;
-  border-radius: 4px;
-}
-
-.text-muted {
-  padding: 1rem 1.25rem;
-  color: #8696a0;
-  font-size: 0.9rem;
-  text-align: center;
-  font-style: italic;
-}
-
-.mantenedor-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.85rem 1.25rem;
-  border-top: 1px solid #f0f2f5;
-  background: #ffffff;
-  font-size: 0.95rem;
-  color: #3b4a54;
-}
-
-.mantenedor-item:hover {
-  background-color: #f5f6f6;
-}
-
-.btn-icon-danger {
-  background: none;
-  border: none;
-  color: #ea0038;
-  cursor: pointer;
-  padding: 0.4rem;
-  border-radius: 6px;
-  transition: background-color 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.btn-icon-danger:hover {
-  background: rgba(234, 0, 56, 0.1);
 }

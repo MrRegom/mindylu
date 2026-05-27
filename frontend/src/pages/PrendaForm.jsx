@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Plus, Trash2, Save } from 'lucide-react';
 import api from '../services/api';
@@ -26,6 +26,19 @@ const PrendaForm = () => {
   ]);
 
   const [nombresExistentes, setNombresExistentes] = useState([]);
+  const [dropdownNombreOpen, setDropdownNombreOpen] = useState(false);
+  const dropdownNombreRef = useRef(null);
+
+  // Cerrar dropdown al hacer click fuera
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownNombreRef.current && !dropdownNombreRef.current.contains(e.target)) {
+        setDropdownNombreOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -190,20 +203,45 @@ const PrendaForm = () => {
         <div className="form-section glass">
           <h3>Detalles Base</h3>
           
-          <div className="input-group">
+          <div className="input-group" ref={dropdownNombreRef} style={{ position: 'relative' }}>
             <label>Nombre de la prenda</label>
-            <select 
-              name="nombre"
-              value={formData.nombre}
-              onChange={handleNombreChange}
-              required
+            {/* Dropdown custom — no usa select nativo para evitar overflow en móvil */}
+            <div
+              className={`custom-select-trigger ${formData.nombre ? 'has-value' : ''}`}
+              onClick={() => setDropdownNombreOpen(prev => !prev)}
             >
-              <option value="" disabled>Selecciona o crea una prenda...</option>
-              {nombresExistentes.map(nombre => (
-                <option key={nombre} value={nombre}>{nombre}</option>
-              ))}
-              <option value="CREAR_NUEVO" style={{ fontWeight: 'bold', color: '#00a884' }}>+ Agregar...</option>
-            </select>
+              <span>{formData.nombre || 'Selecciona o crea una prenda...'}</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </div>
+            {dropdownNombreOpen && (
+              <div className="custom-select-dropdown">
+                {nombresExistentes.map(nombre => (
+                  <div
+                    key={nombre}
+                    className={`custom-select-option ${formData.nombre === nombre ? 'selected' : ''}`}
+                    onClick={() => {
+                      setFormData(prev => ({ ...prev, nombre }));
+                      setDropdownNombreOpen(false);
+                    }}
+                  >
+                    {nombre}
+                  </div>
+                ))}
+                <div
+                  className="custom-select-option custom-select-agregar"
+                  onClick={async () => {
+                    setDropdownNombreOpen(false);
+                    await handleNombreChange({ target: { value: 'CREAR_NUEVO' } });
+                  }}
+                >
+                  + Agregar nuevo...
+                </div>
+              </div>
+            )}
+            {/* Campo hidden para validación required */}
+            <input type="text" value={formData.nombre} required readOnly style={{ position: 'absolute', opacity: 0, height: 0, pointerEvents: 'none' }} />
           </div>
 
           <div className="input-group">
