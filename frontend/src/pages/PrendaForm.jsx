@@ -4,6 +4,7 @@ import { ArrowLeft, Plus, Trash2, Save } from 'lucide-react';
 import api from '../services/api';
 import ImageUploader from '../components/ImageUploader';
 import './PrendaForm.css';
+import { showAlert, showConfirm, showToast } from '../utils/alerts';
 
 const PrendaForm = () => {
   const navigate = useNavigate();
@@ -125,7 +126,7 @@ const PrendaForm = () => {
       navigate('/catalogo');
     } catch (error) {
       console.error("Error guardando:", error);
-      alert("Hubo un error al guardar la prenda.");
+      showAlert("Hubo un error al guardar la prenda.");
       setIsSubmitting(false);
     }
   };

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { X, Plus, Trash2, Save, Package } from 'lucide-react';
 import api from '../services/api';
 import './EditarPrendaModal.css';
+import { showAlert, showConfirm, showToast } from '../utils/alerts';
 
 const TALLAS_DISPONIBLES = ['S', 'M', 'L', 'XL', 'estándar', '34', '36', '38', '40', '42', '44', '34/36', '36/38', '38/40'];
 const COLORES_DISPONIBLES = ['Negro', 'Blanco', 'Rojo', 'Azul', 'Verde', 'Amarillo', 'Gris', 'Beige', 'Café', 'Rosado', 'Morado', 'Naranjo', 'Multicolor', 'Por defecto'];
@@ -73,7 +74,7 @@ const EditarPrendaModal = ({ isOpen, onClose, prenda, onSuccess }) => {
       onSuccess();
     } catch (error) {
       console.error("Error al actualizar la prenda:", error);
-      alert("Hubo un error al guardar los cambios.");
+      showAlert("Hubo un error al guardar los cambios.");
     } finally {
       setIsSubmitting(false);
     }

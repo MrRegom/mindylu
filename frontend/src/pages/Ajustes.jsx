@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Settings, Plus, Trash2, Tag, Palette, Type, Search } from 'lucide-react';
 import api from '../services/api';
 import './Ajustes.css';
+import { showAlert, showConfirm, showToast } from '../utils/alerts';
 
 const MantenedorList = ({ titulo, icono, endpoint, placeholder }) => {
   const [items, setItems] = useState([]);
@@ -32,17 +33,17 @@ const MantenedorList = ({ titulo, icono, endpoint, placeholder }) => {
       setNuevoItem('');
       fetchItems();
     } catch (error) {
-      alert(`Error al guardar ${titulo}`);
+      showAlert(`Error al guardar ${titulo}`);
     }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('¿Seguro que quieres borrar este elemento?')) return;
+    if (!await showConfirm('¿Seguro que quieres borrar este elemento?')) return;
     try {
       await api.delete(`${endpoint}${id}/`);
       fetchItems();
     } catch (error) {
-      alert(`Error al borrar ${titulo}`);
+      showAlert(`Error al borrar ${titulo}`);
     }
   };
 

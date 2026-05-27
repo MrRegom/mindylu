@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { RefreshCw, Check, X, AlertCircle, Sparkles, Image as ImageIcon, Link2, Search, ArrowLeft, Camera, Plus, AlertTriangle } from 'lucide-react';
 import api from '../services/api';
 import './Sincronizacion.css';
+import { showAlert, showConfirm, showToast } from '../utils/alerts';
 
 const TALLAS_DISPONIBLES = ['S', 'M', 'L', 'XL', 'estándar', '34', '36', '38', '40', '42', '44', '34/36', '36/38', '38/40'];
 const COLORES_DISPONIBLES = ['Negro', 'Blanco', 'Rojo', 'Azul', 'Verde', 'Amarillo', 'Gris', 'Beige', 'Café', 'Rosado', 'Morado', 'Naranjo', 'Multicolor', 'Por defecto'];
@@ -92,7 +93,7 @@ const Sincronizacion = () => {
       
       // Alerta informativa si se gatilló el fallback automático por token expirado
       if (response.data.simulado && response.data.mensaje) {
-        alert(response.data.mensaje);
+        showAlert(response.data.mensaje);
       }
 
       // Función auxiliar para extraer la URL de Facebook sin los tokens de seguridad que cambian
@@ -119,7 +120,7 @@ const Sincronizacion = () => {
       setHasScanned(true);
     } catch (error) {
       const msg = error.response?.data?.error || "Error al sincronizar con Facebook";
-      alert(msg);
+      showAlert(msg);
       console.error(error);
     } finally {
       setIsScanning(false);
@@ -258,10 +259,10 @@ const Sincronizacion = () => {
       descartar(currentPrendaToFuse.facebook_post_id);
       cerrarFusionModal();
       await fetchCatalogo();
-      alert(`¡Stock fusionado correctamente en "${selectedExistingPrenda.nombre}"!`);
+      showAlert(`¡Stock fusionado correctamente en "${selectedExistingPrenda.nombre}"!`);
     } catch (error) {
       console.error("Error al asociar stock:", error);
-      alert(error.response?.data?.error || "Error al fusionar stock con el catálogo.");
+      showAlert(error.response?.data?.error || "Error al fusionar stock con el catálogo.");
     } finally {
       setIsSubmittingFusion(false);
     }

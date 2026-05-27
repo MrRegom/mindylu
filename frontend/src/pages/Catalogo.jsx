@@ -10,6 +10,7 @@ import api from '../services/api';
 import VenderModal from '../components/VenderModal';
 import EditarPrendaModal from '../components/EditarPrendaModal';
 import './Catalogo.css';
+import { showAlert, showConfirm, showToast } from '../utils/alerts';
 
 const Catalogo = () => {
   const navigate = useNavigate();
@@ -86,12 +87,12 @@ const Catalogo = () => {
   };
 
   const handleArchivarPrenda = async (prendaId, nombre) => {
-    if (window.confirm(`¿Deshabilitar "${nombre}" del catálogo?`)) {
+    if (await showConfirm(`¿Deshabilitar "${nombre}" del catálogo?`)) {
       try {
         await api.delete(`/catalogo/prendas/${prendaId}/`);
         fetchCatalogo();
       } catch (error) {
-        alert('No se pudo deshabilitar la prenda.');
+        showAlert('No se pudo deshabilitar la prenda.');
       }
     }
   };
@@ -113,11 +114,11 @@ const Catalogo = () => {
     const hace24h = new Date(Date.now() - 24 * 60 * 60 * 1000);
     const ids = filteredPrendas.filter(p => new Date(p.fecha_ultima_carga) >= hace24h).map(p => p.id);
     setSeleccionadas(new Set(ids));
-    if (ids.length === 0) alert('No hay prendas cargadas en las últimas 24 horas.');
+    if (ids.length === 0) showAlert('No hay prendas cargadas en las últimas 24 horas.');
   };
 
   const handlePublicar = async () => {
-    if (seleccionadas.size === 0) { alert('Selecciona al menos una prenda.'); return; }
+    if (seleccionadas.size === 0) { showAlert('Selecciona al menos una prenda.'); return; }
     setPublicando(true);
     try {
       await api.post('/catalogo/prendas/publicar_seleccionadas/', {
@@ -125,7 +126,7 @@ const Catalogo = () => {
         mensaje: mensajePublicar,
         fecha_programada: fechaPublicar || null
       });
-      alert(fechaPublicar ? `¡Lote programado para el ${new Date(fechaPublicar).toLocaleString()}!` : '¡Publicado en Facebook exitosamente!');
+      showAlert(fechaPublicar ? `¡Lote programado para el ${new Date(fechaPublicar).toLocaleString()}!` : '¡Publicado en Facebook exitosamente!');
       setModoPublicar(false);
       setSeleccionadas(new Set());
       setPublicarModal(false);
@@ -133,7 +134,7 @@ const Catalogo = () => {
       setFechaPublicar('');
       fetchCatalogo();
     } catch (e) {
-      alert('Error al publicar: ' + (e.response?.data?.error || e.message));
+      showAlert('Error al publicar: ' + (e.response?.data?.error || e.message));
     } finally {
       setPublicando(false);
     }

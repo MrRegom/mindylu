@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Phone, Link as LinkIcon, ShoppingBag, Edit, Calendar, Trash2 } from 'lucide-react';
 import api from '../services/api';
 import './ClientaDetail.css';
+import { showAlert, showConfirm, showToast } from '../utils/alerts';
 
 const ClientaDetail = () => {
   const { id } = useParams();
@@ -27,13 +28,13 @@ const ClientaDetail = () => {
   }, [id]);
 
   const handleDelete = async () => {
-    if (window.confirm("¿Estás segura de que deseas eliminar esta clienta?")) {
+    if (await showConfirm("¿Estás segura de que deseas eliminar esta clienta?")) {
       setIsDeleting(true);
       try {
         await api.delete(`/clientas/${id}/`);
         navigate('/clientas');
       } catch (error) {
-        alert("Error al eliminar clienta.");
+        showAlert("Error al eliminar clienta.");
         setIsDeleting(false);
       }
     }

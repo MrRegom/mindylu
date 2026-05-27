@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { CreditCard, Plus, ArrowDownToLine, Copy } from 'lucide-react';
 import api from '../services/api';
 import './Cuentas.css';
+import { showAlert, showConfirm, showToast } from '../utils/alerts';
 
 const Cuentas = () => {
   const [cuentas, setCuentas] = useState([]);
@@ -47,7 +48,7 @@ const Cuentas = () => {
       });
       fetchCuentas();
     } catch (error) {
-      alert("Error al crear la cuenta");
+      showAlert("Error al crear la cuenta");
     }
   };
 
@@ -63,7 +64,7 @@ const Cuentas = () => {
       });
       fetchCuentas();
     } catch (error) {
-      alert("Error registrando abono");
+      showAlert("Error registrando abono");
     }
   };
 
@@ -72,7 +73,7 @@ const Cuentas = () => {
     
     if (navigator.clipboard && window.isSecureContext) {
       navigator.clipboard.writeText(texto).then(() => {
-        alert("¡Datos bancarios copiados al portapapeles!");
+        showAlert("¡Datos bancarios copiados al portapapeles!");
       });
     } else {
       const textArea = document.createElement("textarea");
@@ -84,9 +85,9 @@ const Cuentas = () => {
       textArea.select();
       try {
         document.execCommand('copy');
-        alert("¡Datos bancarios copiados al portapapeles!");
+        showAlert("¡Datos bancarios copiados al portapapeles!");
       } catch (err) {
-        alert("Error al copiar. Tu navegador bloquea esta acción en HTTP.");
+        showAlert("Error al copiar. Tu navegador bloquea esta acción en HTTP.");
       }
       document.body.removeChild(textArea);
     }

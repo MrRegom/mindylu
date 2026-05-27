@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { Calendar, MapPin, MessageCircle, Package, Clock, Edit2, Copy, XCircle } from 'lucide-react';
 import api from '../services/api';
 import './Entregas.css';
+import { showAlert, showConfirm, showToast } from '../utils/alerts';
 
 /**
  * Componente Entregas
@@ -34,14 +35,14 @@ const Entregas = () => {
   };
 
   const handleCancelarPedido = async (pedidoId) => {
-    if (window.confirm("¿Seguro que deseas cancelar este pedido? Las prendas volverán automáticamente al catálogo.")) {
+    if (await showConfirm("¿Seguro que deseas cancelar este pedido? Las prendas volverán automáticamente al catálogo.")) {
       try {
         await api.post(`/pedidos/${pedidoId}/cancelar/`);
-        alert("Pedido cancelado. El stock ha sido devuelto.");
+        showAlert("Pedido cancelado. El stock ha sido devuelto.");
         fetchEntregas();
       } catch (error) {
         console.error(error);
-        alert(error.response?.data?.error || "Error al cancelar el pedido.");
+        showAlert(error.response?.data?.error || "Error al cancelar el pedido.");
       }
     }
   };
@@ -60,7 +61,7 @@ const Entregas = () => {
         await api.patch(`/pedidos/entregas/${entregaId}/`, { hora_estimada: horaLimpia });
         fetchEntregas();
       } catch (error) {
-        alert("Hubo un error al guardar la hora.");
+        showAlert("Hubo un error al guardar la hora.");
         console.error(error);
       }
     }
@@ -123,7 +124,7 @@ const Entregas = () => {
     if (navigator.clipboard && navigator.clipboard.writeText) {
       try {
         await navigator.clipboard.writeText(texto);
-        alert("¡Mensaje copiado al portapapeles! Listo para pegar en WhatsApp.");
+        showAlert("¡Mensaje copiado al portapapeles! Listo para pegar en WhatsApp.");
         return;
       } catch (err) {
         console.warn("Fallo Clipboard API, usando fallback...");
@@ -132,9 +133,9 @@ const Entregas = () => {
 
     const exito = copiarAlPortapapelesFallback(texto);
     if (exito) {
-      alert("¡Mensaje copiado al portapapeles! Listo para pegar en WhatsApp.");
+      showAlert("¡Mensaje copiado al portapapeles! Listo para pegar en WhatsApp.");
     } else {
-      alert("No se pudo copiar el texto automáticamente. Intenta copiarlo manualmente.");
+      showAlert("No se pudo copiar el texto automáticamente. Intenta copiarlo manualmente.");
     }
   };
 
@@ -160,7 +161,7 @@ const Entregas = () => {
       if (navigator.clipboard && navigator.clipboard.writeText) {
         try {
           await navigator.clipboard.writeText(texto);
-          alert("¡Itinerario del día copiado! Listo para compartir en WhatsApp.");
+          showAlert("¡Itinerario del día copiado! Listo para compartir en WhatsApp.");
           return;
         } catch (err) {
           console.warn("Fallo Clipboard API, usando fallback...");
@@ -169,9 +170,9 @@ const Entregas = () => {
 
       const exito = copiarAlPortapapelesFallback(texto);
       if (exito) {
-        alert("¡Itinerario del día copiado! Listo para compartir en WhatsApp.");
+        showAlert("¡Itinerario del día copiado! Listo para compartir en WhatsApp.");
       } else {
-        alert("No se pudo copiar el itinerario automáticamente.");
+        showAlert("No se pudo copiar el itinerario automáticamente.");
       }
     };
 
@@ -187,7 +188,7 @@ const Entregas = () => {
         await fetchPuntosEntrega(); // Refrescar modal
         fetchEntregas(); // Refrescar tablero para ver cambio instantáneo
       } catch (error) {
-        alert("No se pudo editar el nombre del lugar.");
+        showAlert("No se pudo editar el nombre del lugar.");
         console.error(error);
       }
     }
@@ -255,7 +256,7 @@ const Entregas = () => {
   const guardarNuevasRutas = async () => {
     const puntoIds = Object.keys(nuevaRutaData.puntosSeleccionados);
     if (puntoIds.length === 0) {
-      alert("Debes seleccionar al menos un lugar.");
+      showAlert("Debes seleccionar al menos un lugar.");
       return;
     }
 
@@ -274,7 +275,7 @@ const Entregas = () => {
       fetchEntregas();
     } catch (e) {
       console.error(e);
-      alert("Hubo un error al crear las rutas.");
+      showAlert("Hubo un error al crear las rutas.");
     }
   };
 
@@ -292,7 +293,7 @@ const Entregas = () => {
           }
         }));
       } catch (error) {
-        alert("No se pudo crear el lugar.");
+        showAlert("No se pudo crear el lugar.");
       }
     }
   };

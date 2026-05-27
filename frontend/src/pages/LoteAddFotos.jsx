@@ -5,6 +5,7 @@ import api from '../services/api';
 import './CargaMasiva.css';
 
 import { compressImage } from '../utils/imageCompression';
+import { showAlert, showConfirm, showToast } from '../utils/alerts';
 
 const LoteAddFotos = () => {
   const { id } = useParams();
@@ -71,7 +72,7 @@ const LoteAddFotos = () => {
     
     const incompletos = items.some(item => !item.nombre || !item.precio || item.variantes.length === 0);
     if (incompletos) {
-      alert("Por favor, completa nombre, precio y al menos una variante.");
+      showAlert("Por favor, completa nombre, precio y al menos una variante.");
       return;
     }
 
@@ -92,11 +93,11 @@ const LoteAddFotos = () => {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       
-      alert(`¡${items.length} fotos añadidas al lote programado!`);
+      showAlert(`¡${items.length} fotos añadidas al lote programado!`);
       navigate('/catalogo/lotes');
     } catch (error) {
       console.error("Error agregando fotos:", error);
-      alert("Hubo un error al agregar las fotos al lote.");
+      showAlert("Hubo un error al agregar las fotos al lote.");
       setIsSubmitting(false);
     }
   };

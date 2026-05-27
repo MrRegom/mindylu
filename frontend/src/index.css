@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+﻿@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
 :root {
   /* Brand Colors - Premium Feminine Aesthetic (Mockup Matching) */
@@ -12,7 +12,7 @@
   --color-bg: #FCFBFA; /* Pearl White / Crema muy claro */
   --color-surface: #FFFFFF;
   --color-surface-rgb: 255, 255, 255;
-  --color-text: #2C2C2C; /* Carbón suave para los textos */
+  --color-text: #2C2C2C; /* CarbÃ³n suave para los textos */
   --color-text-muted: #8F8B8B;
   --color-border: #F0EBEB;
   
@@ -36,7 +36,7 @@
   --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.08);
   --shadow-glow: 0 8px 24px rgba(255, 117, 140, 0.35);
   
-  /* Transición "Spring" fluida */
+  /* TransiciÃ³n "Spring" fluida */
   --transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
@@ -253,4 +253,36 @@ h1, h2, h3, h4 {
 
 .animate-fade-in {
   animation: fadeIn 0.5s ease-out forwards;
+}
+
+
+/* Estilos para SweetAlert2 móviles (estilo WhatsApp) */
+.swal-mobile-popup {
+  border-radius: 16px !important;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.1) !important;
+}
+
+.swal-mobile-toast {
+  border-radius: 12px !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
+}
+
+.swal-btn-primary {
+  background-color: #00a884 !important;
+  color: white !important;
+  border-radius: 999px !important;
+  padding: 10px 24px !important;
+  font-weight: 600 !important;
+  margin: 0 8px !important;
+  border: none !important;
+}
+
+.swal-btn-secondary {
+  background-color: #f0f2f5 !important;
+  color: #111b21 !important;
+  border-radius: 999px !important;
+  padding: 10px 24px !important;
+  font-weight: 600 !important;
+  margin: 0 8px !important;
+  border: none !important;
 }

@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { X, Search, Calendar, UserPlus, Plus, Trash2, ShoppingBag } from 'lucide-react';
 import api from '../services/api';
 import './VenderModal.css';
+import { showAlert, showConfirm, showToast } from '../utils/alerts';
 
 /**
  * Componente VenderModal
@@ -119,7 +120,7 @@ const VenderModal = ({ isOpen, onClose, ventaActiva, setVentaActiva, onSuccess }
   const handleAddProductToCart = (prendaObj, varianteObj) => {
     const exists = cart.find(c => c.variante_id === varianteObj.id);
     if (exists) {
-      alert("Este producto ya está en tu lista. Puedes aumentar su cantidad.");
+      showAlert("Este producto ya está en tu lista. Puedes aumentar su cantidad.");
       return;
     }
     
@@ -141,11 +142,11 @@ const VenderModal = ({ isOpen, onClose, ventaActiva, setVentaActiva, onSuccess }
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.clienta_id) {
-      alert("Debes seleccionar una clienta.");
+      showAlert("Debes seleccionar una clienta.");
       return;
     }
     if (cart.length === 0) {
-      alert("Debes agregar al menos una prenda al carrito.");
+      showAlert("Debes agregar al menos una prenda al carrito.");
       return;
     }
 
@@ -167,7 +168,7 @@ const VenderModal = ({ isOpen, onClose, ventaActiva, setVentaActiva, onSuccess }
       onSuccess();
     } catch (error) {
       console.error("Error al registrar pedido(s):", error);
-      alert(error.response?.data?.error || "Error al registrar el pedido.");
+      showAlert(error.response?.data?.error || "Error al registrar el pedido.");
     } finally {
       setIsSubmitting(false);
     }
@@ -229,7 +230,7 @@ const VenderModal = ({ isOpen, onClose, ventaActiva, setVentaActiva, onSuccess }
                       setSearchQuery('');
                       fetchClientas();
                     } catch(e) {
-                      alert("Error creando clienta rápida.");
+                      showAlert("Error creando clienta rápida.");
                     }
                   }}
                 >

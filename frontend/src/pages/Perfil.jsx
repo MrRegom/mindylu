@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Camera, Save, Lock, Mail, User } from 'lucide-react';
 import './Perfil.css';
+import { showAlert, showConfirm, showToast } from '../utils/alerts';
 
 const Perfil = () => {
   const [perfil, setPerfil] = useState({
@@ -25,7 +26,7 @@ const Perfil = () => {
 
   const handleGuardar = (e) => {
     e.preventDefault();
-    alert('¡Perfil actualizado con éxito!');
+    showAlert('¡Perfil actualizado con éxito!');
   };
 
   return (

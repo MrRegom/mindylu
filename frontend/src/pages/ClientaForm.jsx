@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, User, Phone, AlignLeft } from 'lucide-react';
 import api from '../services/api';
 import './ClientaForm.css';
+import { showAlert, showConfirm, showToast } from '../utils/alerts';
 
 const ClientaForm = () => {
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ const ClientaForm = () => {
           });
         } catch (error) {
           console.error("Error cargando clienta:", error);
-          alert("Error cargando datos.");
+          showAlert("Error cargando datos.");
           navigate('/clientas');
         }
       };
@@ -56,9 +57,9 @@ const ClientaForm = () => {
     } catch (error) {
       console.error("Error guardando clienta:", error);
       if (error.response?.data?.non_field_errors) {
-        alert("Ya existe una clienta con este número de teléfono en tu tienda.");
+        showAlert("Ya existe una clienta con este número de teléfono en tu tienda.");
       } else {
-        alert("Hubo un error al guardar. Revisa los datos.");
+        showAlert("Hubo un error al guardar. Revisa los datos.");
       }
     } finally {
       setIsSubmitting(false);

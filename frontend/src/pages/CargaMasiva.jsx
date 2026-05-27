@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Upload, Save, Plus, Trash2, AlertCircle, Check, X } from 'lucide-react';
 import api from '../services/api';
 import './CargaMasiva.css';
+import { showAlert, showConfirm, showToast } from '../utils/alerts';
 
 const COLORES_OPCIONES = ['Negro', 'Blanco', 'Café', 'Beige', 'Gris', 'Rosado', 'Rojo', 'Azul', 'Verde', 'Único'];
 const TALLAS_OPCIONES = ['Estándar', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'Única'];
@@ -289,7 +290,7 @@ const CargaMasiva = () => {
     // Validar que todas las fotos tengan selección
     const sinSeleccion = fotos.filter((_, i) => !fotosData[i]?.seleccion);
     if (sinSeleccion.length > 0) {
-      alert(`Falta identificar ${sinSeleccion.length} foto(s). Selecciona o crea una prenda para cada una.`);
+      showAlert(`Falta identificar ${sinSeleccion.length} foto(s). Selecciona o crea una prenda para cada una.`);
       return;
     }
     setIsSubmitting(true);
