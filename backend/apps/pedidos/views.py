@@ -175,6 +175,46 @@ class PedidoViewSet(viewsets.ModelViewSet):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    @action(detail=True, methods=['post'], url_path='entregar')
+    def entregar(self, request, pk=None):
+        """
+        Marca el pedido como Entregado.
+        """
+        pedido = self.get_object()
+        if pedido.estado != Pedido.Estado.APARTADO and pedido.estado != Pedido.Estado.PAGADO:
+            return Response({'error': 'Solo se pueden entregar pedidos apartados o pagados.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            with transaction.atomic():
+                pedido.estado = Pedido.Estado.ENTREGADO
+                pedido.save()
+            return Response({'status': 'Pedido marcado como entregado.'})
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @action(detail=True, methods=['post'], url_path='desvincular_ruta')
+    def desvincular_ruta(self, request, pk=None):
+        """
+        Quita el pedido de la ruta diaria actual (para inasistencias o reagendamiento), 
+        pero lo mantiene en estado APARTADO.
+        """
+        pedido = self.get_object()
+        ruta_id = request.data.get('ruta_id')
+        
+        try:
+            with transaction.atomic():
+                if ruta_id:
+                    ruta = EntregaDiaria.objects.get(id=ruta_id, tenant=request.user.tenant)
+                    ruta.pedidos.remove(pedido)
+                else:
+                    # Remover de todas las rutas si no se especifica
+                    for ruta in pedido.rutas_entrega.all():
+                        ruta.pedidos.remove(pedido)
+            return Response({'status': 'Pedido desvinculado de la ruta correctamente.'})
+        except EntregaDiaria.DoesNotExist:
+            return Response({'error': 'Ruta no encontrada.'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class EntregaDiariaViewSet(viewsets.ModelViewSet):
     """

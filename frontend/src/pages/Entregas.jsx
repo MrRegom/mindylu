@@ -3,7 +3,7 @@
 // ─────────────────────────────────────────────────────────────
 
 import { useState, useEffect } from 'react';
-import { Calendar, MapPin, MessageCircle, Package, Clock, Edit2, Copy, XCircle } from 'lucide-react';
+import { Calendar, MapPin, MessageCircle, Package, Clock, Edit2, Copy, XCircle, CheckCircle, RefreshCcw } from 'lucide-react';
 import api from '../services/api';
 import './Entregas.css';
 import { showAlert, showConfirm, showToast } from '../utils/alerts';
@@ -37,12 +37,36 @@ const Entregas = () => {
   const handleCancelarPedido = async (pedidoId) => {
     if (await showConfirm("¿Seguro que deseas cancelar este pedido? Las prendas volverán automáticamente al catálogo.")) {
       try {
-        await api.post(`/pedidos/${pedidoId}/cancelar/`);
+        await api.post(`/pedidos/pedidos/${pedidoId}/cancelar/`);
         showAlert("Pedido cancelado. El stock ha sido devuelto.");
         fetchEntregas();
       } catch (error) {
         console.error(error);
         showAlert(error.response?.data?.error || "Error al cancelar el pedido.");
+      }
+    }
+  };
+
+  const handleEntregarPedido = async (pedidoId) => {
+    try {
+      await api.post(`/pedidos/pedidos/${pedidoId}/entregar/`);
+      showToast("¡Pedido marcado como entregado! ✅");
+      fetchEntregas();
+    } catch (error) {
+      console.error(error);
+      showAlert(error.response?.data?.error || "Error al marcar como entregado.");
+    }
+  };
+
+  const handleDesvincularPedido = async (pedidoId, rutaId) => {
+    if (await showConfirm("¿Seguro que deseas reagendar? El pedido saldrá de esta ruta pero mantendrá las prendas apartadas.")) {
+      try {
+        await api.post(`/pedidos/pedidos/${pedidoId}/desvincular_ruta/`, { ruta_id: rutaId });
+        showToast("Pedido reagendado.");
+        fetchEntregas();
+      } catch (error) {
+        console.error(error);
+        showAlert(error.response?.data?.error || "Error al reagendar.");
       }
     }
   };
@@ -463,13 +487,13 @@ const Entregas = () => {
                           </div>
                         </div>
 
-                        {entrega.pedidos.length > 0 && (
                           <div className="pedidos-list card" style={{ background: 'rgba(0,0,0,0.02)', border: 'none', padding: '16px' }}>
                             {entrega.pedidos.map(pedido => (
-                              <div key={pedido.id} className="pedido-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                              <div key={pedido.id} className={`pedido-item ${pedido.estado === 'entregado' ? 'pedido-entregado' : ''}`} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                 <div className="pedido-info">
                                   <div className="cliente-nombre" style={{ fontWeight: 600, fontSize: '0.95rem', marginBottom: '4px' }}>
                                     {pedido.clienta_detalle?.nombre}
+                                    {pedido.estado === 'entregado' && <span style={{ marginLeft: '8px', color: '#00a884', fontSize: '0.8rem' }}>✅ Entregado</span>}
                                   </div>
                                   <div className="pedido-resumen" style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>
                                     {pedido.items.length} prenda(s) - ${pedido.total.toLocaleString('es-CL')}
@@ -481,19 +505,41 @@ const Entregas = () => {
                                   )}
                                 </div>
 
-                                <div style={{ display: 'flex', gap: '8px' }}>
+                                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'flex-end', maxWidth: '160px' }}>
+                                  {pedido.estado !== 'entregado' && (
+                                    <>
+                                      <button 
+                                        onClick={() => handleEntregarPedido(pedido.id)}
+                                        style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(0, 168, 132, 0.1)', color: '#00a884', border: '1px solid rgba(0,168,132,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                                        title="Marcar como entregado"
+                                      >
+                                        <CheckCircle size={18} />
+                                      </button>
+                                      <button 
+                                        onClick={() => handleDesvincularPedido(pedido.id, entrega.id)}
+                                        style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(212, 175, 55, 0.1)', color: 'var(--color-primary-dark)', border: '1px solid rgba(212,175,55,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                                        title="Reagendar / Quitar de esta ruta"
+                                      >
+                                        <RefreshCcw size={18} />
+                                      </button>
+                                    </>
+                                  )}
                                   <button 
                                     onClick={() => handleCancelarPedido(pedido.id)}
                                     style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'var(--color-danger-bg)', color: 'var(--color-danger)', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                                    title="Cancelar pedido por completo"
                                   >
                                     <XCircle size={18} />
                                   </button>
-                                  <button 
-                                    onClick={() => copiarMensaje(pedido, entrega)}
-                                    style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'var(--color-success)', color: 'white', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
-                                  >
-                                    <MessageCircle size={18} />
-                                  </button>
+                                  {pedido.estado !== 'entregado' && (
+                                    <button 
+                                      onClick={() => copiarMensaje(pedido, entrega)}
+                                      style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'var(--color-success)', color: 'white', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                                      title="Copiar mensaje de WhatsApp"
+                                    >
+                                      <MessageCircle size={18} />
+                                    </button>
+                                  )}
                                 </div>
                               </div>
                             ))}

@@ -179,3 +179,15 @@
   background-color: rgba(226, 109, 117, 0.1);
   border-color: var(--color-danger);
 }
+
+.pedido-entregado {
+  opacity: 0.6;
+  background-color: rgba(0, 168, 132, 0.05);
+  border: 1px solid rgba(0, 168, 132, 0.2);
+  transition: all 0.3s ease;
+}
+
+.pedido-entregado .cliente-nombre {
+  text-decoration: line-through;
+  color: var(--color-text-muted);
+}
