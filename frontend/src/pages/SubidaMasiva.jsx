@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Upload, Save, Copy, Trash2, CheckCircle2, Plus } from 'lucide-react';
+import GlobalSpinner from '../components/GlobalSpinner';
 import api from '../services/api';
 import './SubidaMasiva.css';
 import { showAlert, showConfirm, showToast, showPrompt } from '../utils/alerts';
@@ -285,6 +286,7 @@ const SubidaMasiva = () => {
 
   return (
     <div className="subida-masiva-container animate-fade-in">
+      <GlobalSpinner isVisible={isSubmitting} text="Guardando y subiendo..." />
       <div className="form-header glass">
         <button className="btn-back" onClick={() => navigate('/catalogo')} type="button" disabled={isSubmitting}>
           <ArrowLeft size={24} />

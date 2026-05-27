@@ -26,7 +26,28 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Interceptor para manejar tokens expirados (opcional para MVP, pero buena práctica)
+// Función auxiliar para no enviar logs de los propios logs (evitar bucle infinito)
+const sendErrorLog = (error) => {
+  const url = error.config?.url || '';
+  if (url.includes('logs/')) return;
+  
+  try {
+    const errorMsg = error.response?.data?.error || error.message;
+    const stack = error.stack || JSON.stringify(error.response?.data || {});
+    // Enviar asíncronamente sin esperar respuesta
+    axios.post(API_URL + 'logs/', {
+      tipo: 'FRONTEND',
+      mensaje: `[${error.config?.method?.toUpperCase()}] ${url} - ${errorMsg}`,
+      stack_trace: stack
+    }, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('access_token')}`
+      }
+    }).catch(() => {});
+  } catch (e) {}
+};
+
+// Interceptor para manejar tokens expirados y registrar errores
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -36,6 +57,9 @@ api.interceptors.response.use(
       localStorage.removeItem('refresh_token');
       localStorage.removeItem('user');
       window.location.href = '/login';
+    } else {
+      // Registrar error en el backend
+      sendErrorLog(error);
     }
     return Promise.reject(error);
   }

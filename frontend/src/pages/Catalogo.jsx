@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { Plus, Check, ImageIcon, Trash2, Search, Edit2, Rocket, X, Share2, Calendar, Star, Images } from 'lucide-react';
+import GlobalSpinner from '../components/GlobalSpinner';
 import api from '../services/api';
 import VenderModal from '../components/VenderModal';
 import EditarPrendaModal from '../components/EditarPrendaModal';
@@ -148,6 +149,7 @@ const Catalogo = () => {
 
   return (
     <div className="catalogo-container animate-fade-in">
+      <GlobalSpinner isVisible={publicando} text="Publicando en Facebook..." />
 
       {/* Header */}
       <div className="catalogo-header" style={{ marginBottom: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

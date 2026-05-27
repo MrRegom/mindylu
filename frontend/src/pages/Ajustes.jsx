@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { Settings, Plus, Trash2, Tag, Palette, Type, Pencil, Check, X, Ruler } from 'lucide-react';
+import { Settings, Plus, Trash2, Tag, Palette, Type, Pencil, Check, X, Ruler, Terminal, ChevronRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import './Ajustes.css';
 import { showAlert, showConfirm, showToast } from '../utils/alerts';
@@ -200,6 +201,16 @@ const Ajustes = () => {
           endpoint="/catalogo/tallas/"
           placeholder="Nueva talla (ej. XXL)"
         />
+      </div>
+
+      <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'center' }}>
+        <button 
+          onClick={() => window.location.href = '/ajustes/logs'}
+          style={{ background: '#fff1f0', color: '#ff4d4f', border: '1px solid #ffa39e', padding: '12px 24px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: 600, fontSize: '0.95rem' }}
+        >
+          <Terminal size={20} />
+          Ver Registro de Errores del Sistema (Logs)
+        </button>
       </div>
     </div>
   );

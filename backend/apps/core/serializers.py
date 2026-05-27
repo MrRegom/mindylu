@@ -6,7 +6,7 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 from django.utils.translation import gettext_lazy as _
-from apps.core.models import Usuario, Tenant
+from apps.core.models import Usuario, Tenant, ErrorLog
 from slugify import slugify
 
 
@@ -92,3 +92,8 @@ class UsuarioSerializer(serializers.ModelSerializer):
             'fecha_registro',
         ]
         read_only_fields = fields
+
+class ErrorLogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ErrorLog
+        fields = '__all__'

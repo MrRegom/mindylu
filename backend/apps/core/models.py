@@ -113,3 +113,21 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return f'{self.nombre} <{self.email}>'
+
+class ErrorLog(models.Model):
+    TIPO_CHOICES = (
+        ('FRONTEND', 'Frontend'),
+        ('BACKEND', 'Backend'),
+    )
+    tipo = models.CharField(max_length=20, choices=TIPO_CHOICES)
+    mensaje = models.TextField()
+    stack_trace = models.TextField(blank=True, null=True)
+    fecha = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-fecha']
+        verbose_name = 'Log de Error'
+        verbose_name_plural = 'Logs de Errores'
+
+    def __str__(self):
+        return f"[{self.tipo}] {self.fecha.strftime('%Y-%m-%d %H:%M:%S')} - {self.mensaje[:50]}"
