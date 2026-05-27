@@ -11,7 +11,7 @@ const MantenedorList = ({ titulo, icono, endpoint, placeholder }) => {
   const fetchItems = async () => {
     try {
       const res = await api.get(endpoint);
-      setItems(res.data);
+      setItems(res.data.results || res.data);
     } catch (error) {
       console.error(`Error al cargar ${titulo}:`, error);
     } finally {
