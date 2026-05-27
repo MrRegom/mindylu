@@ -4,7 +4,7 @@ import { ArrowLeft, Plus, Trash2, Save } from 'lucide-react';
 import api from '../services/api';
 import ImageUploader from '../components/ImageUploader';
 import './PrendaForm.css';
-import { showAlert, showConfirm, showToast } from '../utils/alerts';
+import { showAlert, showConfirm, showToast, showPrompt } from '../utils/alerts';
 
 const PrendaForm = () => {
   const navigate = useNavigate();
@@ -61,6 +61,24 @@ const PrendaForm = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleNombreChange = async (e) => {
+    const value = e.target.value;
+    if (value === 'CREAR_NUEVO') {
+      const nuevoNombre = await showPrompt('Nuevo nombre de prenda', 'Ej: Chaleco de Lana');
+      if (nuevoNombre && nuevoNombre.trim()) {
+        const nombreLimpio = nuevoNombre.trim();
+        if (!nombresExistentes.includes(nombreLimpio)) {
+          setNombresExistentes(prev => [...prev, nombreLimpio].sort());
+        }
+        setFormData(prev => ({ ...prev, nombre: nombreLimpio }));
+      } else {
+        setFormData(prev => ({ ...prev, nombre: prev.nombre || '' }));
+      }
+    } else {
+      setFormData(prev => ({ ...prev, nombre: value }));
+    }
   };
 
   const handleAddVariante = () => {
@@ -154,20 +172,18 @@ const PrendaForm = () => {
           
           <div className="input-group">
             <label>Nombre de la prenda</label>
-            <input 
-              type="text" 
+            <select 
               name="nombre"
-              list="nombres-prendas"
-              placeholder="Ej: Chaleco de Lana (Busca o crea)" 
               value={formData.nombre}
-              onChange={handleInputChange}
-              required 
-            />
-            <datalist id="nombres-prendas">
+              onChange={handleNombreChange}
+              required
+            >
+              <option value="" disabled>Selecciona o crea una prenda...</option>
               {nombresExistentes.map(nombre => (
-                <option key={nombre} value={nombre} />
+                <option key={nombre} value={nombre}>{nombre}</option>
               ))}
-            </datalist>
+              <option value="CREAR_NUEVO" style={{ fontWeight: 'bold', color: '#00a884' }}>+ Crear nuevo nombre...</option>
+            </select>
           </div>
 
           <div className="input-group">

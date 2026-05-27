@@ -58,3 +58,23 @@ export const showToast = (mensaje, type = 'success') => {
     title: mensaje
   });
 };
+
+export const showPrompt = async (titulo, placeholder = '') => {
+  const result = await Swal.fire({
+    ...swalConfig,
+    title: titulo,
+    input: 'text',
+    inputPlaceholder: placeholder,
+    showCancelButton: true,
+    confirmButtonText: 'Aceptar',
+    cancelButtonText: 'Cancelar',
+    width: '320px',
+    padding: '1.5em',
+    inputValidator: (value) => {
+      if (!value) {
+        return '¡Necesitas escribir algo!';
+      }
+    }
+  });
+  return result.isConfirmed ? result.value : null;
+};
