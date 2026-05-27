@@ -5,7 +5,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
-import { Plus, Check, ImageIcon, Trash2, Search, Edit2, Rocket, X, Share2, Calendar, Star } from 'lucide-react';
+import { Plus, Check, ImageIcon, Trash2, Search, Edit2, Rocket, X, Share2, Calendar, Star, Images } from 'lucide-react';
 import api from '../services/api';
 import VenderModal from '../components/VenderModal';
 import EditarPrendaModal from '../components/EditarPrendaModal';
@@ -169,7 +169,7 @@ const Catalogo = () => {
             <Plus size={20} />
           </button>
           <button className="btn-icon-simple" onClick={() => navigate('/catalogo/subida-masiva')} title="Subida Masiva (Lote)" style={{ background: 'var(--color-primary-gradient)', color: '#FFF', border: 'none' }}>
-            <Rocket size={20} />
+            <Images size={20} />
           </button>
         </div>
       </div>

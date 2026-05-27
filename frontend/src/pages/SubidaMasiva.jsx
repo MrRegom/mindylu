@@ -11,9 +11,35 @@ const SubidaMasiva = () => {
   
   const [items, setItems] = useState([]);
   const [categorias, setCategorias] = useState([]);
+  const [nombresExistentes, setNombresExistentes] = useState([]);
+  const [activeDropdown, setActiveDropdown] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
+    const fetchDatos = async () => {
+      try {
+        const [resCat, resNombres] = await Promise.all([
+          api.get('/catalogo/categorias/'),
+          api.get('/catalogo/nombres-prendas/')
+        ]);
+        setCategorias(Array.isArray(resCat.data) ? resCat.data : (resCat.data.results || []));
+        
+        const nombresPred = resNombres.data.results || resNombres.data;
+        const resCatPrendas = await api.get('/catalogo/prendas/');
+        const prendas = resCatPrendas.data.results || resCatPrendas.data;
+        
+        const nombresUnicos = [...new Set([
+          ...nombresPred.map(n => n.nombre), 
+          ...prendas.map(p => p.nombre)
+        ])].filter(n => n && n.trim() !== '').sort();
+        
+        setNombresExistentes(nombresUnicos);
+      } catch (error) {
+        console.error("Error cargando datos:", error);
+      }
+    };
+    fetchDatos();
+  }, []); {
     const fetchCategorias = async () => {
       try {
         const res = await api.get('/catalogo/categorias/');
@@ -68,6 +94,27 @@ const SubidaMasiva = () => {
 
       return { ...item, [field]: value };
     }));
+  };
+
+  const handleNombreChange = async (id, value) => {
+    if (value === 'CREAR_NUEVO') {
+      const nuevoNombre = window.prompt('Ingresa el nombre de la nueva prenda:');
+      if (nuevoNombre && nuevoNombre.trim()) {
+        let nombreLimpio = nuevoNombre.trim().toLowerCase().split(/\s+/).map(word => 
+          word.charAt(0).toUpperCase() + word.slice(1)
+        ).join(' ');
+
+        const existente = nombresExistentes.find(n => n.toLowerCase() === nombreLimpio.toLowerCase());
+        if (existente) {
+          nombreLimpio = existente;
+        } else {
+          setNombresExistentes(prev => [...prev, nombreLimpio].sort());
+        }
+        updateItem(id, 'nombre', nombreLimpio);
+      }
+    } else {
+      updateItem(id, 'nombre', value);
+    }
   };
 
   const aplicarATodas = () => {
@@ -193,14 +240,42 @@ const SubidaMasiva = () => {
               </div>
               
               <div className="item-fields">
-                <div className="field-group">
-                  <label>Nombre prenda</label>
-                  <input 
-                    type="text" 
-                    placeholder="Ej: Sweater Lana" 
-                    value={item.nombre}
-                    onChange={(e) => updateItem(item.id, 'nombre', e.target.value)}
-                  />
+                <div className="field-group input-group" style={{ position: 'relative' }}>
+                  <label>Nombre de la prenda</label>
+                  <div
+                    className={`custom-select-trigger ${item.nombre ? 'has-value' : ''}`}
+                    onClick={() => setActiveDropdown(prev => prev === `nombre-${item.id}` ? null : `nombre-${item.id}`)}
+                  >
+                    <span>{item.nombre || 'Selecciona o crea una prenda...'}</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                  </div>
+                  {activeDropdown === `nombre-${item.id}` && (
+                    <div className="custom-select-dropdown" style={{ zIndex: 100 }}>
+                      {nombresExistentes.map(nombre => (
+                        <div
+                          key={nombre}
+                          className={`custom-select-option ${item.nombre === nombre ? 'selected' : ''}`}
+                          onClick={() => {
+                            updateItem(item.id, 'nombre', nombre);
+                            setActiveDropdown(null);
+                          }}
+                        >
+                          {nombre}
+                        </div>
+                      ))}
+                      <div
+                        className="custom-select-option custom-select-agregar"
+                        onClick={async () => {
+                          setActiveDropdown(null);
+                          await handleNombreChange(item.id, 'CREAR_NUEVO');
+                        }}
+                      >
+                        + Agregar nuevo...
+                      </div>
+                    </div>
+                  )}
                 </div>
                 
                 <div className="field-row">
@@ -226,17 +301,42 @@ const SubidaMasiva = () => {
                   </div>
                 </div>
 
-                <div className="field-group">
+                <div className="field-group input-group" style={{ position: 'relative' }}>
                   <label>Categoría</label>
-                  <select 
-                    value={item.categoria_id}
-                    onChange={(e) => updateItem(item.id, 'categoria_id', e.target.value)}
+                  <div
+                    className={`custom-select-trigger ${item.categoria_id ? 'has-value' : ''}`}
+                    onClick={() => setActiveDropdown(prev => prev === `categoria-${item.id}` ? null : `categoria-${item.id}`)}
                   >
-                    <option value="">Ninguna</option>
-                    {categorias.map(c => (
-                      <option key={c.id} value={c.id}>{c.nombre}</option>
-                    ))}
-                  </select>
+                    <span>{categorias.find(c => String(c.id) === String(item.categoria_id))?.nombre || 'Selecciona una categoría'}</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                  </div>
+                  {activeDropdown === `categoria-${item.id}` && (
+                    <div className="custom-select-dropdown" style={{ zIndex: 100 }}>
+                      <div
+                        className={`custom-select-option ${!item.categoria_id ? 'selected' : ''}`}
+                        onClick={() => {
+                          updateItem(item.id, 'categoria_id', '');
+                          setActiveDropdown(null);
+                        }}
+                      >
+                        Ninguna
+                      </div>
+                      {categorias.map(cat => (
+                        <div
+                          key={cat.id}
+                          className={`custom-select-option ${String(item.categoria_id) === String(cat.id) ? 'selected' : ''}`}
+                          onClick={() => {
+                            updateItem(item.id, 'categoria_id', cat.id);
+                            setActiveDropdown(null);
+                          }}
+                        >
+                          {cat.nombre}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
