@@ -11,6 +11,7 @@ const EditarPrendaModal = ({ isOpen, onClose, prenda, onSuccess }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     nombre: '',
+    precio_compra: '',
     precio: '',
   });
   const [variantes, setVariantes] = useState([]);
@@ -20,6 +21,7 @@ const EditarPrendaModal = ({ isOpen, onClose, prenda, onSuccess }) => {
     if (isOpen && prenda) {
       setFormData({
         nombre: prenda.nombre || '',
+        precio_compra: prenda.precio_compra ? prenda.precio_compra.toLocaleString('es-CL') : '',
         precio: prenda.precio ? prenda.precio.toLocaleString('es-CL') : '',
       });
       // Clonar las variantes para no modificar el estado original hasta guardar
@@ -37,13 +39,14 @@ const EditarPrendaModal = ({ isOpen, onClose, prenda, onSuccess }) => {
   };
 
   const handlePrecioChange = (e) => {
-    let val = e.target.value.replace(/\D/g, '');
+    const { name, value } = e.target;
+    let val = value.replace(/\D/g, '');
     if (!val) {
-      setFormData(prev => ({ ...prev, precio: '' }));
+      setFormData(prev => ({ ...prev, [name]: '' }));
       return;
     }
     const num = parseInt(val, 10);
-    setFormData(prev => ({ ...prev, precio: num.toLocaleString('es-CL') }));
+    setFormData(prev => ({ ...prev, [name]: num.toLocaleString('es-CL') }));
   };
 
   const handleVarianteChange = (tempId, field, value) => {
@@ -73,6 +76,7 @@ const EditarPrendaModal = ({ isOpen, onClose, prenda, onSuccess }) => {
     const payload = {
       nombre: formData.nombre,
       precio: parseInt(precioLimpio, 10),
+      precio_compra: formData.precio_compra ? parseInt(formData.precio_compra.toString().replace(/\./g, ''), 10) : null,
       variantes: variantes.map(v => {
         const item = { color: v.color, talla: v.talla, cantidad: parseInt(v.cantidad, 10) || 0 };
         if (v.id) item.id = v.id;
@@ -129,7 +133,20 @@ const EditarPrendaModal = ({ isOpen, onClose, prenda, onSuccess }) => {
           </div>
 
           <div className="form-group">
-            <label>Precio ($)</label>
+            <label>Precio Costo / Compra ($) <span style={{fontSize: '0.8rem', color: 'var(--color-text-muted)'}}>(Opcional)</span></label>
+            <input 
+              type="text" 
+              inputMode="numeric"
+              name="precio_compra" 
+              value={formData.precio_compra} 
+              onChange={handlePrecioChange} 
+              className="glass-input"
+              placeholder="Ej: 8.000"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Precio Venta ($)</label>
             <input 
               type="text" 
               inputMode="numeric"

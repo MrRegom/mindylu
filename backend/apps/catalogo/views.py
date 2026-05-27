@@ -204,9 +204,10 @@ class PrendaViewSet(viewsets.ModelViewSet):
                     from apps.integraciones.scheduler import schedule_publicacion_lote
                     schedule_publicacion_lote(ciclo.id, ciclo.fecha_programada)
                 else:
-                    # Publicar inmediatamente
-                    from apps.integraciones.tasks import ejecutar_publicacion_lote
-                    ejecutar_publicacion_lote(ciclo.id)
+                    # Publicar inmediatamente (en segundo plano)
+                    from django.utils import timezone
+                    from apps.integraciones.scheduler import schedule_publicacion_lote
+                    schedule_publicacion_lote(ciclo.id, timezone.now())
 
             return Response({
                 'mensaje': f'{prendas.count()} prendas enviadas a publicar.',
@@ -276,6 +277,10 @@ class PrendaViewSet(viewsets.ModelViewSet):
                 if fecha_programada_str:
                     from apps.integraciones.scheduler import schedule_publicacion_lote
                     schedule_publicacion_lote(ciclo.id, ciclo.fecha_programada)
+                else:
+                    from django.utils import timezone
+                    from apps.integraciones.scheduler import schedule_publicacion_lote
+                    schedule_publicacion_lote(ciclo.id, timezone.now())
 
             return Response({
                 'mensaje': f'Se crearon {len(creadas_ids)} prendas masivamente.',

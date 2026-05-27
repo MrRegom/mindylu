@@ -16,6 +16,7 @@ const PrendaForm = () => {
   
   const [formData, setFormData] = useState({
     nombre: '',
+    precio_compra: '',
     precio: '',
     categoria: '',
     talla_tipo: 'unica',
@@ -76,13 +77,14 @@ const PrendaForm = () => {
   };
 
   const handlePrecioChange = (e) => {
-    let val = e.target.value.replace(/\D/g, '');
+    const { name, value } = e.target;
+    let val = value.replace(/\D/g, '');
     if (!val) {
-      setFormData(prev => ({ ...prev, precio: '' }));
+      setFormData(prev => ({ ...prev, [name]: '' }));
       return;
     }
     const num = parseInt(val, 10);
-    setFormData(prev => ({ ...prev, precio: num.toLocaleString('es-CL') }));
+    setFormData(prev => ({ ...prev, [name]: num.toLocaleString('es-CL') }));
   };
 
   const handleNombreChange = async (e) => {
@@ -149,6 +151,10 @@ const PrendaForm = () => {
       payload.append('nombre', formData.nombre);
       const precioLimpio = formData.precio.toString().replace(/\./g, '');
       payload.append('precio', precioLimpio);
+      if (formData.precio_compra) {
+        const precioCompraLimpio = formData.precio_compra.toString().replace(/\./g, '');
+        payload.append('precio_compra', precioCompraLimpio);
+      }
       payload.append('talla_tipo', formData.talla_tipo);
       if (formData.categoria) {
         payload.append('categoria_id', formData.categoria);
@@ -242,7 +248,19 @@ const PrendaForm = () => {
           </div>
 
           <div className="input-group">
-            <label>Precio (CLP)</label>
+            <label>Precio de Costo / Compra (CLP) <span style={{fontWeight: 'normal', color: 'var(--color-text-muted)'}}>(Opcional)</span></label>
+            <input 
+              type="text" 
+              inputMode="numeric"
+              name="precio_compra"
+              placeholder="Ej: 8.000" 
+              value={formData.precio_compra}
+              onChange={handlePrecioChange}
+            />
+          </div>
+
+          <div className="input-group">
+            <label>Precio de Venta (CLP)</label>
             <input 
               type="text" 
               inputMode="numeric"
