@@ -312,7 +312,7 @@ const Entregas = () => {
       </div>
 
       {isCrearModalOpen && (
-        <div className="modal-overlay animate-fade-in">
+        <div className="modal-overlay animate-fade-in" style={{ paddingBottom: '90px' }}>
           <div className="modal-content animate-slide-up glass" style={{ maxWidth: '500px' }}>
             <div className="modal-header">
               <h3>Programar Viaje</h3>
