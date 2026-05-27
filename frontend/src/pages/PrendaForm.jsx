@@ -68,8 +68,17 @@ const PrendaForm = () => {
     if (value === 'CREAR_NUEVO') {
       const nuevoNombre = await showPrompt('Nuevo nombre de prenda', 'Ej: Chaleco de Lana');
       if (nuevoNombre && nuevoNombre.trim()) {
-        const nombreLimpio = nuevoNombre.trim();
-        if (!nombresExistentes.includes(nombreLimpio)) {
+        // Formato Title Case adaptado a español (ej: "sWeaTer" -> "Sweater", "ChaQueta" -> "Chaqueta")
+        let nombreLimpio = nuevoNombre.trim().toLowerCase().split(/\s+/).map(word => 
+          word.charAt(0).toUpperCase() + word.slice(1)
+        ).join(' ');
+
+        // Verificar si ya existe sin importar las mayúsculas/minúsculas previas
+        const existente = nombresExistentes.find(n => n.toLowerCase() === nombreLimpio.toLowerCase());
+        
+        if (existente) {
+          nombreLimpio = existente;
+        } else {
           setNombresExistentes(prev => [...prev, nombreLimpio].sort());
         }
         setFormData(prev => ({ ...prev, nombre: nombreLimpio }));
@@ -182,7 +191,7 @@ const PrendaForm = () => {
               {nombresExistentes.map(nombre => (
                 <option key={nombre} value={nombre}>{nombre}</option>
               ))}
-              <option value="CREAR_NUEVO" style={{ fontWeight: 'bold', color: '#00a884' }}>+ Crear nuevo nombre...</option>
+              <option value="CREAR_NUEVO" style={{ fontWeight: 'bold', color: '#00a884' }}>+ Agregar...</option>
             </select>
           </div>
 
