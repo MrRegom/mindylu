@@ -16,6 +16,7 @@ const SubidaMasiva = () => {
   const [nombresExistentes, setNombresExistentes] = useState([]);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [previewImage, setPreviewImage] = useState(null); // Estado para la imagen ampliada
 
   useEffect(() => {
     const fetchDatos = async () => {
@@ -291,9 +292,15 @@ const SubidaMasiva = () => {
                 zIndex: activeDropdown && String(activeDropdown).includes(item.id) ? 100 : 1
               }}
             >
-              <div className="item-photo">
+              <div className="item-photo" onClick={() => setPreviewImage(item.preview)} style={{cursor: 'pointer'}}>
                 <img src={item.preview} alt="preview" />
-                <button className="btn-remove-item" onClick={() => removeItem(item.id)}>
+                <button 
+                  className="btn-remove-item" 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removeItem(item.id);
+                  }}
+                >
                   <Trash2 size={16} />
                 </button>
                 <div className="item-number">{index + 1}</div>
@@ -508,6 +515,57 @@ const SubidaMasiva = () => {
           ))}
         </div>
       </div>
+
+      {/* Modal de Vista Previa de Imagen */}
+      {previewImage && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0, left: 0, right: 0, bottom: 0,
+            backgroundColor: 'rgba(0,0,0,0.85)',
+            zIndex: 9999,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: '20px'
+          }}
+          onClick={() => setPreviewImage(null)}
+        >
+          <img 
+            src={previewImage} 
+            alt="Preview Ampliada" 
+            style={{
+              maxWidth: '100%',
+              maxHeight: '100%',
+              objectFit: 'contain',
+              borderRadius: '8px'
+            }}
+          />
+          <button 
+            style={{
+              position: 'absolute',
+              top: '20px',
+              right: '20px',
+              background: 'rgba(255,255,255,0.2)',
+              border: 'none',
+              color: '#fff',
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer'
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              setPreviewImage(null);
+            }}
+          >
+            ✕
+          </button>
+        </div>
+      )}
     </div>
   );
 };
