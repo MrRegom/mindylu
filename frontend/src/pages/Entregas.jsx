@@ -231,6 +231,22 @@ const Entregas = () => {
     setIsCrearModalOpen(true);
   };
 
+  const handleEditarDia = async (fecha) => {
+    await fetchPuntosEntrega();
+    // entregas es el state global, entregasPorFecha se deriva de él.
+    // Usaremos la lista de entregas filtrada por la fecha solicitada.
+    const entregasDelDia = entregas.filter(e => e.fecha === fecha);
+    const puntosSeleccionados = {};
+    entregasDelDia.forEach(e => {
+      puntosSeleccionados[e.punto_entrega] = e.hora_estimada || '';
+    });
+    setNuevaRutaData({
+      fecha: fecha,
+      puntosSeleccionados
+    });
+    setIsCrearModalOpen(true);
+  };
+
   const togglePunto = (puntoId) => {
     setNuevaRutaData(prev => {
       const newPuntos = { ...prev.puntosSeleccionados };
@@ -398,14 +414,22 @@ const Entregas = () => {
                   <Calendar size={18} /> 
                   {formatDate(fecha)}
                 </h2>
-                
-                <button 
-                  onClick={() => copiarItinerarioDia(fecha, entregasPorFecha[fecha])}
-                  style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 'var(--radius-sm)', background: 'var(--color-danger-bg)', color: 'var(--color-danger)', border: '1px solid rgba(239, 71, 111, 0.2)', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer' }}
-                >
-                  <Copy size={14} />
-                  Copiar
-                </button>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button 
+                    onClick={() => handleEditarDia(fecha)}
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', borderRadius: 'var(--radius-sm)', background: 'rgba(212, 175, 55, 0.1)', color: 'var(--color-primary-dark)', border: '1px solid rgba(212, 175, 55, 0.2)', cursor: 'pointer' }}
+                    title="Editar lugares de este día"
+                  >
+                    <Edit2 size={16} />
+                  </button>
+                  <button 
+                    onClick={() => copiarItinerarioDia(fecha, entregasPorFecha[fecha])}
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', borderRadius: 'var(--radius-sm)', background: 'var(--color-danger-bg)', color: 'var(--color-danger)', border: '1px solid rgba(239, 71, 111, 0.2)', cursor: 'pointer' }}
+                    title="Copiar Itinerario"
+                  >
+                    <Copy size={16} />
+                  </button>
+                </div>
               </div>
               
               <div className="timeline-container" style={{ position: 'relative', paddingLeft: '24px' }}>
