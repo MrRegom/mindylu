@@ -1,25 +1,48 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, Trash2, Save, Share2 } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Save } from 'lucide-react';
 import api from '../services/api';
 import ImageUploader from '../components/ImageUploader';
 import './PrendaForm.css';
 
+const COLORES_PREDEFINIDOS = [
+  'Blanco', 'Negro', 'Gris', 'Beige', 'Café', 'Rojo', 'Azul', 'Verde', 
+  'Amarillo', 'Rosa', 'Morado', 'Naranja', 'Celeste', 'Mostaza', 'Vino', 'Multicolor'
+];
+
+const TALLAS_PREDEFINIDAS = [
+  'S', 'M', 'L', 'XL', 'XXL', '36', '38', '40', '42', '44', '46'
+];
+
 const PrendaForm = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [publicarFacebook, setPublicarFacebook] = useState(false);
+  const [categorias, setCategorias] = useState([]);
   const [images, setImages] = useState([]);
   
   const [formData, setFormData] = useState({
     nombre: '',
     precio: '',
+    categoria: '',
     talla_tipo: 'unica',
   });
 
   const [variantes, setVariantes] = useState([
-    { id: Date.now(), color: '', talla: 'Única', cantidad: 1 }
+    { id: Date.now(), color: 'Negro', talla: 'Única', cantidad: 1 }
   ]);
+
+  useEffect(() => {
+    // Cargar categorías al montar
+    const fetchCategorias = async () => {
+      try {
+        const res = await api.get('/catalogo/categorias/');
+        setCategorias(res.data.results || res.data);
+      } catch (error) {
+        console.error("Error cargando categorías:", error);
+      }
+    };
+    fetchCategorias();
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -29,7 +52,7 @@ const PrendaForm = () => {
   const handleAddVariante = () => {
     setVariantes(prev => [
       ...prev, 
-      { id: Date.now(), color: '', talla: formData.talla_tipo === 'unica' ? 'Única' : '', cantidad: 1 }
+      { id: Date.now(), color: 'Negro', talla: formData.talla_tipo === 'unica' ? 'Única' : 'M', cantidad: 1 }
     ]);
   };
 
@@ -50,7 +73,7 @@ const PrendaForm = () => {
     // Actualizar las variantes existentes con el nuevo tipo
     setVariantes(prev => prev.map(v => ({
       ...v,
-      talla: newTipo === 'unica' ? 'Única' : ''
+      talla: newTipo === 'unica' ? 'Única' : 'M'
     })));
   };
 
@@ -63,6 +86,9 @@ const PrendaForm = () => {
       payload.append('nombre', formData.nombre);
       payload.append('precio', formData.precio);
       payload.append('talla_tipo', formData.talla_tipo);
+      if (formData.categoria) {
+        payload.append('categoria_id', formData.categoria);
+      }
       
       const cleanVariantes = variantes.map(v => ({
         color: v.color,
@@ -76,31 +102,12 @@ const PrendaForm = () => {
         payload.append('imagenes', imgObj.file);
       });
 
-      // 1. Guardar la prenda en el backend local
-      const res = await api.post('/catalogo/prendas/', payload, {
+      // Guardar la prenda en el backend local
+      await api.post('/catalogo/prendas/', payload, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       });
-      const nuevaPrenda = res.data;
-
-      // 2. Si marcó "Publicar en Facebook", enviarla
-      if (publicarFacebook && images.length > 0) {
-        try {
-          await api.post('/integraciones/publicar-en-facebook/', {
-            prenda_id: nuevaPrenda.id
-            // 'mensaje' puede ir vacío para auto-generación en el backend
-          });
-          alert("¡Prenda guardada y publicada en Facebook exitosamente!");
-        } catch (fbError) {
-          console.error("Error al publicar en FB:", fbError);
-          alert("La prenda se guardó, pero hubo un error al publicar en Facebook.");
-        }
-      } else if (publicarFacebook && images.length === 0) {
-        alert("La prenda se guardó localmente, pero se requiere al menos una foto para publicarla en Facebook.");
-      } else {
-        // alert("Prenda guardada exitosamente.");
-      }
 
       navigate('/catalogo');
     } catch (error) {
@@ -122,7 +129,7 @@ const PrendaForm = () => {
 
       <form className="prenda-form" onSubmit={handleSubmit}>
         
-        {/* GALERÍA DE FOTOS (NUEVO COMPONENTE) */}
+        {/* GALERÍA DE FOTOS */}
         <div className="form-section glass">
           <h3>Fotos del Producto</h3>
           <ImageUploader images={images} setImages={setImages} />
@@ -156,6 +163,16 @@ const PrendaForm = () => {
           </div>
 
           <div className="input-group">
+            <label>Categoría</label>
+            <select name="categoria" value={formData.categoria} onChange={handleInputChange} className="form-select">
+              <option value="">Selecciona una categoría (Opcional)</option>
+              {categorias.map(cat => (
+                <option key={cat.id} value={cat.id}>{cat.nombre}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="input-group">
             <label>Tipo de Talla</label>
             <select name="talla_tipo" value={formData.talla_tipo} onChange={handleTallaTipoChange} className="form-select">
               <option value="unica">Talla Única</option>
@@ -178,25 +195,33 @@ const PrendaForm = () => {
                 <div className="variante-row">
                   <div className="input-group mini">
                     <label>Color</label>
-                    <input 
-                      type="text" 
-                      placeholder="Ej: Rojo" 
+                    <select 
                       value={variante.color}
                       onChange={(e) => handleVarianteChange(variante.id, 'color', e.target.value)}
                       required
-                    />
+                      className="form-select"
+                    >
+                      <option value="">Elegir color...</option>
+                      {COLORES_PREDEFINIDOS.map(c => (
+                        <option key={c} value={c}>{c}</option>
+                      ))}
+                    </select>
                   </div>
                   
                   {formData.talla_tipo === 'por_talla' && (
                     <div className="input-group mini">
                       <label>Talla</label>
-                      <input 
-                        type="text" 
-                        placeholder="Ej: M" 
+                      <select 
                         value={variante.talla}
                         onChange={(e) => handleVarianteChange(variante.id, 'talla', e.target.value)}
                         required
-                      />
+                        className="form-select"
+                      >
+                        <option value="">Elegir talla...</option>
+                        {TALLAS_PREDEFINIDAS.map(t => (
+                          <option key={t} value={t}>{t}</option>
+                        ))}
+                      </select>
                     </div>
                   )}
 
@@ -223,26 +248,6 @@ const PrendaForm = () => {
                 </div>
               </div>
             ))}
-          </div>
-        </div>
-
-        <div className="form-section glass facebook-push-section">
-          <div className="facebook-toggle-wrapper">
-            <div className="facebook-toggle-info">
-              <Share2 size={24} color="#1877F2" />
-              <div>
-                <h4>Publicar en Facebook</h4>
-                <p>Crea un álbum automáticamente en tu página con estas fotos.</p>
-              </div>
-            </div>
-            <label className="switch">
-              <input 
-                type="checkbox" 
-                checked={publicarFacebook} 
-                onChange={(e) => setPublicarFacebook(e.target.checked)} 
-              />
-              <span className="slider round"></span>
-            </label>
           </div>
         </div>
 
