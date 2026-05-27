@@ -44,9 +44,11 @@
   display: flex;
   flex-direction: column;
   background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(11, 20, 26, 0.08);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
   overflow: hidden;
+  margin-bottom: 0.5rem;
+  border: 1px solid var(--color-border);
 }
 
 .mantenedor-header {
@@ -54,7 +56,7 @@
   align-items: center;
   gap: 0.75rem;
   padding: 1rem 1.25rem;
-  border-bottom: 1px solid #f0f2f5;
+  border-bottom: 1px solid var(--color-border);
   background: #ffffff;
 }
 
@@ -62,11 +64,11 @@
   margin: 0;
   font-size: 1.05rem;
   font-weight: 600;
-  color: #111b21;
+  color: var(--color-text);
 }
 
 .icon-accent {
-  color: #00a884;
+  color: var(--color-primary);
 }
 
 /* ── Lista de ítems ── */
@@ -140,11 +142,11 @@
   flex: 1;
   min-width: 0;
   padding: 0.4rem 0.6rem;
-  border: 1.5px solid #00a884;
+  border: 1.5px solid var(--color-primary);
   border-radius: 6px;
   font-size: 0.9rem;
-  color: #111b21;
-  background: #f0fbf8;
+  color: var(--color-text);
+  background: var(--color-primary-light);
   outline: none;
 }
 
@@ -181,10 +183,10 @@
 }
 
 .btn-icon-success {
-  color: #00a884;
+  color: var(--color-success);
 }
 .btn-icon-success:hover {
-  background: rgba(0, 168, 132, 0.12);
+  background: var(--color-success-bg);
 }
 
 .btn-icon-muted {
@@ -218,11 +220,11 @@
 
 .mantenedor-form input:focus {
   outline: none;
-  border-color: #00a884;
+  border-color: var(--color-primary);
 }
 
 .mantenedor-form input::placeholder {
-  color: #adb5bd;
+  color: var(--color-text-muted);
 }
 
 /* Botón Agregar con texto */
@@ -231,9 +233,9 @@
   align-items: center;
   gap: 0.35rem;
   padding: 0.65rem 1rem;
-  background-color: #00a884;
+  background-color: var(--color-primary);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   color: white;
   font-size: 0.88rem;
   font-weight: 600;
@@ -244,5 +246,5 @@
 }
 
 .btn-agregar:hover {
-  background-color: #008f6f;
+  background-color: var(--color-primary-dark);
 }

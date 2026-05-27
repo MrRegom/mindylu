@@ -2,7 +2,7 @@
   min-height: 100vh;
   min-height: 100dvh;
   background-color: var(--color-bg);
-  padding-bottom: 40px;
+  padding-bottom: 120px; /* Evita que el botón de guardar se oculte tras el tab bar */
 }
 
 .form-header {
@@ -187,11 +187,18 @@
   display: flex;
   gap: 12px;
   align-items: flex-end;
+  flex-wrap: wrap; /* Permite que los elementos pasen a otra línea en pantallas pequeñas */
 }
 
 .input-group.mini {
   margin-bottom: 0;
-  flex: 1;
+  flex: 1 1 calc(50% - 6px); /* Ocupar la mitad del ancho menos el gap */
+  min-width: 120px;
+}
+
+.input-group.mini.cant-input {
+  flex: 1 1 80px; /* Cantidad ocupa un poco menos */
+  min-width: 80px;
 }
 
 .input-group.mini label {

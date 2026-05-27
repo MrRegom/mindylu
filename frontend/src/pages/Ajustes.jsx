@@ -155,7 +155,7 @@ const MantenedorList = ({ titulo, icono, endpoint, placeholder }) => {
           onChange={(e) => setNuevoItem(e.target.value)}
           placeholder={placeholder}
         />
-        <button type="submit" className="btn btn-primary btn-agregar">
+        <button type="submit" className="btn-agregar">
           <Plus size={16} />
           <span>Agregar</span>
         </button>

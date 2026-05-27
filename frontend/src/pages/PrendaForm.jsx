@@ -29,11 +29,17 @@ const PrendaForm = () => {
   const [dropdownNombreOpen, setDropdownNombreOpen] = useState(false);
   const dropdownNombreRef = useRef(null);
 
-  // Cerrar dropdown al hacer click fuera
+  const [dropdownTallaTipoOpen, setDropdownTallaTipoOpen] = useState(false);
+  const dropdownTallaTipoRef = useRef(null);
+
+  // Cerrar dropdowns al hacer click fuera
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownNombreRef.current && !dropdownNombreRef.current.contains(e.target)) {
         setDropdownNombreOpen(false);
+      }
+      if (dropdownTallaTipoRef.current && !dropdownTallaTipoRef.current.contains(e.target)) {
+        setDropdownTallaTipoOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -267,12 +273,39 @@ const PrendaForm = () => {
             </select>
           </div>
 
-          <div className="input-group">
+          <div className="input-group" ref={dropdownTallaTipoRef} style={{ position: 'relative' }}>
             <label>Tipo de Talla</label>
-            <select name="talla_tipo" value={formData.talla_tipo} onChange={handleTallaTipoChange} className="form-select">
-              <option value="unica">Talla Única</option>
-              <option value="por_talla">Varias Tallas (S, M, L...)</option>
-            </select>
+            <div
+              className={`custom-select-trigger ${formData.talla_tipo ? 'has-value' : ''}`}
+              onClick={() => setDropdownTallaTipoOpen(prev => !prev)}
+            >
+              <span>{formData.talla_tipo === 'unica' ? 'Talla Única' : 'Varias Tallas (S, M, L...)'}</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </div>
+            {dropdownTallaTipoOpen && (
+              <div className="custom-select-dropdown">
+                <div
+                  className={`custom-select-option ${formData.talla_tipo === 'unica' ? 'selected' : ''}`}
+                  onClick={() => {
+                    handleTallaTipoChange({ target: { name: 'talla_tipo', value: 'unica' } });
+                    setDropdownTallaTipoOpen(false);
+                  }}
+                >
+                  Talla Única
+                </div>
+                <div
+                  className={`custom-select-option ${formData.talla_tipo === 'por_talla' ? 'selected' : ''}`}
+                  onClick={() => {
+                    handleTallaTipoChange({ target: { name: 'talla_tipo', value: 'por_talla' } });
+                    setDropdownTallaTipoOpen(false);
+                  }}
+                >
+                  Varias Tallas (S, M, L...)
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -323,7 +356,7 @@ const PrendaForm = () => {
                     </select>
                   </div>
 
-                  <div className="input-group mini" style={{ width: '80px' }}>
+                  <div className="input-group mini cant-input">
                     <label>Cant.</label>
                     <input 
                       type="number" 
