@@ -26,20 +26,13 @@ const PrendaForm = () => {
   ]);
 
   const [nombresExistentes, setNombresExistentes] = useState([]);
-  const [dropdownNombreOpen, setDropdownNombreOpen] = useState(false);
-  const dropdownNombreRef = useRef(null);
-
-  const [dropdownTallaTipoOpen, setDropdownTallaTipoOpen] = useState(false);
-  const dropdownTallaTipoRef = useRef(null);
+  const [activeDropdown, setActiveDropdown] = useState(null);
 
   // Cerrar dropdowns al hacer click fuera
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (dropdownNombreRef.current && !dropdownNombreRef.current.contains(e.target)) {
-        setDropdownNombreOpen(false);
-      }
-      if (dropdownTallaTipoRef.current && !dropdownTallaTipoRef.current.contains(e.target)) {
-        setDropdownTallaTipoOpen(false);
+      if (!e.target.closest('.custom-select-trigger') && !e.target.closest('.custom-select-dropdown')) {
+        setActiveDropdown(null);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -209,19 +202,18 @@ const PrendaForm = () => {
         <div className="form-section glass">
           <h3>Detalles Base</h3>
           
-          <div className="input-group" ref={dropdownNombreRef} style={{ position: 'relative' }}>
+          <div className="input-group" style={{ position: 'relative' }}>
             <label>Nombre de la prenda</label>
-            {/* Dropdown custom — no usa select nativo para evitar overflow en móvil */}
             <div
               className={`custom-select-trigger ${formData.nombre ? 'has-value' : ''}`}
-              onClick={() => setDropdownNombreOpen(prev => !prev)}
+              onClick={() => setActiveDropdown(prev => prev === 'nombre' ? null : 'nombre')}
             >
               <span>{formData.nombre || 'Selecciona o crea una prenda...'}</span>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <polyline points="6 9 12 15 18 9" />
               </svg>
             </div>
-            {dropdownNombreOpen && (
+            {activeDropdown === 'nombre' && (
               <div className="custom-select-dropdown">
                 {nombresExistentes.map(nombre => (
                   <div
@@ -229,7 +221,7 @@ const PrendaForm = () => {
                     className={`custom-select-option ${formData.nombre === nombre ? 'selected' : ''}`}
                     onClick={() => {
                       setFormData(prev => ({ ...prev, nombre }));
-                      setDropdownNombreOpen(false);
+                      setActiveDropdown(null);
                     }}
                   >
                     {nombre}
@@ -238,7 +230,7 @@ const PrendaForm = () => {
                 <div
                   className="custom-select-option custom-select-agregar"
                   onClick={async () => {
-                    setDropdownNombreOpen(false);
+                    setActiveDropdown(null);
                     await handleNombreChange({ target: { value: 'CREAR_NUEVO' } });
                   }}
                 >
@@ -246,7 +238,6 @@ const PrendaForm = () => {
                 </div>
               </div>
             )}
-            {/* Campo hidden para validación required */}
             <input type="text" value={formData.nombre} required readOnly style={{ position: 'absolute', opacity: 0, height: 0, pointerEvents: 'none' }} />
           </div>
 
@@ -263,34 +254,62 @@ const PrendaForm = () => {
             />
           </div>
 
-          <div className="input-group">
+          <div className="input-group" style={{ position: 'relative' }}>
             <label>Categoría</label>
-            <select name="categoria" value={formData.categoria} onChange={handleInputChange} className="form-select">
-              <option value="">Selecciona una categoría (Opcional)</option>
-              {categorias.map(cat => (
-                <option key={cat.id} value={cat.id}>{cat.nombre}</option>
-              ))}
-            </select>
+            <div
+              className={`custom-select-trigger ${formData.categoria ? 'has-value' : ''}`}
+              onClick={() => setActiveDropdown(prev => prev === 'categoria' ? null : 'categoria')}
+            >
+              <span>{categorias.find(c => String(c.id) === String(formData.categoria))?.nombre || 'Selecciona una categoría (Opcional)'}</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </div>
+            {activeDropdown === 'categoria' && (
+              <div className="custom-select-dropdown">
+                <div
+                  className={`custom-select-option ${!formData.categoria ? 'selected' : ''}`}
+                  onClick={() => {
+                    handleInputChange({ target: { name: 'categoria', value: '' } });
+                    setActiveDropdown(null);
+                  }}
+                >
+                  Ninguna
+                </div>
+                {categorias.map(cat => (
+                  <div
+                    key={cat.id}
+                    className={`custom-select-option ${String(formData.categoria) === String(cat.id) ? 'selected' : ''}`}
+                    onClick={() => {
+                      handleInputChange({ target: { name: 'categoria', value: cat.id } });
+                      setActiveDropdown(null);
+                    }}
+                  >
+                    {cat.nombre}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
-          <div className="input-group" ref={dropdownTallaTipoRef} style={{ position: 'relative' }}>
+          <div className="input-group" style={{ position: 'relative' }}>
             <label>Tipo de Talla</label>
             <div
               className={`custom-select-trigger ${formData.talla_tipo ? 'has-value' : ''}`}
-              onClick={() => setDropdownTallaTipoOpen(prev => !prev)}
+              onClick={() => setActiveDropdown(prev => prev === 'talla_tipo' ? null : 'talla_tipo')}
             >
               <span>{formData.talla_tipo === 'unica' ? 'Talla Única' : 'Varias Tallas (S, M, L...)'}</span>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <polyline points="6 9 12 15 18 9" />
               </svg>
             </div>
-            {dropdownTallaTipoOpen && (
+            {activeDropdown === 'talla_tipo' && (
               <div className="custom-select-dropdown">
                 <div
                   className={`custom-select-option ${formData.talla_tipo === 'unica' ? 'selected' : ''}`}
                   onClick={() => {
                     handleTallaTipoChange({ target: { name: 'talla_tipo', value: 'unica' } });
-                    setDropdownTallaTipoOpen(false);
+                    setActiveDropdown(null);
                   }}
                 >
                   Talla Única
@@ -299,7 +318,7 @@ const PrendaForm = () => {
                   className={`custom-select-option ${formData.talla_tipo === 'por_talla' ? 'selected' : ''}`}
                   onClick={() => {
                     handleTallaTipoChange({ target: { name: 'talla_tipo', value: 'por_talla' } });
-                    setDropdownTallaTipoOpen(false);
+                    setActiveDropdown(null);
                   }}
                 >
                   Varias Tallas (S, M, L...)
@@ -321,39 +340,69 @@ const PrendaForm = () => {
             {variantes.map((variante) => (
               <div key={variante.id} className="variante-edit-card animate-slide-up">
                 <div className="variante-row">
-                  <div className="input-group mini">
+                  <div className="input-group mini" style={{ position: 'relative' }}>
                     <label>Color</label>
-                    <select 
-                      value={variante.color}
-                      onChange={(e) => handleVarianteChange(variante.id, 'color', e.target.value)}
-                      required
-                      className="form-select"
+                    <div
+                      className={`custom-select-trigger ${variante.color ? 'has-value' : ''}`}
+                      onClick={() => setActiveDropdown(prev => prev === `color-${variante.id}` ? null : `color-${variante.id}`)}
                     >
-                      <option value="">Elegir color...</option>
-                      {colores.map(c => (
-                        <option key={c.id} value={c.nombre}>{c.nombre}</option>
-                      ))}
-                    </select>
+                      <span>{variante.color || 'Elegir color...'}</span>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <polyline points="6 9 12 15 18 9" />
+                      </svg>
+                    </div>
+                    {activeDropdown === `color-${variante.id}` && (
+                      <div className="custom-select-dropdown">
+                        {colores.map(c => (
+                          <div
+                            key={c.id}
+                            className={`custom-select-option ${variante.color === c.nombre ? 'selected' : ''}`}
+                            onClick={() => {
+                              handleVarianteChange(variante.id, 'color', c.nombre);
+                              setActiveDropdown(null);
+                            }}
+                          >
+                            {c.nombre}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <input type="text" value={variante.color} required readOnly style={{ position: 'absolute', opacity: 0, height: 0, pointerEvents: 'none' }} />
                   </div>
                   
-                  <div className="input-group mini">
+                  <div className="input-group mini" style={{ position: 'relative' }}>
                     <label>Talla</label>
-                    <select 
-                      value={variante.talla}
-                      onChange={(e) => handleVarianteChange(variante.id, 'talla', e.target.value)}
-                      required
-                      className="form-select"
-                      disabled={formData.talla_tipo === 'unica'}
+                    <div
+                      className={`custom-select-trigger ${variante.talla ? 'has-value' : ''}`}
+                      onClick={() => {
+                        if (formData.talla_tipo !== 'unica') {
+                          setActiveDropdown(prev => prev === `talla-${variante.id}` ? null : `talla-${variante.id}`);
+                        }
+                      }}
+                      style={{ opacity: formData.talla_tipo === 'unica' ? 0.6 : 1, cursor: formData.talla_tipo === 'unica' ? 'not-allowed' : 'pointer' }}
                     >
-                      <option value="">Elegir talla...</option>
-                      {formData.talla_tipo === 'unica' ? (
-                        <option value="Única">Única</option>
-                      ) : (
-                        tallas.map(t => (
-                          <option key={t.id} value={t.nombre}>{t.nombre}</option>
-                        ))
-                      )}
-                    </select>
+                      <span>{variante.talla || 'Elegir talla...'}</span>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <polyline points="6 9 12 15 18 9" />
+                      </svg>
+                    </div>
+                    {activeDropdown === `talla-${variante.id}` && formData.talla_tipo !== 'unica' && (
+                      <div className="custom-select-dropdown">
+                        {tallas.map(t => (
+                          <div
+                            key={t.id}
+                            className={`custom-select-option ${variante.talla === t.nombre ? 'selected' : ''}`}
+                            onClick={() => {
+                              handleVarianteChange(variante.id, 'talla', t.nombre);
+                              setActiveDropdown(null);
+                            }}
+                          >
+                            {t.nombre}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <input type="text" value={variante.talla} required readOnly style={{ position: 'absolute', opacity: 0, height: 0, pointerEvents: 'none' }} />
                   </div>
 
                   <div className="input-group mini cant-input">
