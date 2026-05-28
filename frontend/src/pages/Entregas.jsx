@@ -456,29 +456,39 @@ const Entregas = () => {
                 </div>
               </div>
               
-              <div className="timeline-container" style={{ position: 'relative', paddingLeft: '24px' }}>
-                {/* Línea vertical */}
-                <div style={{ position: 'absolute', left: '11px', top: '24px', bottom: '24px', width: '2px', background: 'var(--color-primary-light)', zIndex: 0 }}></div>
-
+              <div className="timeline-container" style={{ position: 'relative' }}>
                 {entregasPorFecha[fecha].map((entrega, index) => {
                   const isActive = true; // Para simular el diseño, expandiremos todos los que tengan pedidos
                   return (
                     <div key={entrega.id} className="entrega-timeline-item" style={{ position: 'relative', zIndex: 1, marginBottom: '24px' }}>
-                      {/* Nodo circular */}
-                      <div style={{ position: 'absolute', left: '-20px', top: '14px', width: '14px', height: '14px', borderRadius: '50%', background: 'white', border: '3px solid var(--color-primary)', boxShadow: '0 0 0 4px var(--color-bg)' }}></div>
-                      
                       <div className="entrega-card" style={{ background: 'transparent', padding: '0', boxShadow: 'none' }}>
                         <div className="entrega-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                           <h3 style={{ fontSize: '1.05rem', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <MapPin size={18} color="var(--color-text)" />
                             {entrega.punto_entrega_detalle?.nombre || 'Punto sin nombre'}
                           </h3>
-                          <div className="hora-badge-container">
+                          <div className="hora-badge-container" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                             {entrega.hora_estimada ? (
-                              <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }} onClick={() => handleSetHora(entrega.id, entrega.hora_estimada)}>
-                                <Clock size={14} /> {entrega.hora_estimada.substring(0, 5)}
-                                <Edit2 size={12} style={{marginLeft: '2px', opacity: 0.5}} />
-                              </span>
+                              <>
+                                <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }} onClick={() => handleSetHora(entrega.id, entrega.hora_estimada)}>
+                                  <Clock size={14} /> {entrega.hora_estimada.substring(0, 5)}
+                                  <Edit2 size={12} style={{marginLeft: '2px', opacity: 0.5}} />
+                                </span>
+                                <button 
+                                  onClick={(e) => { 
+                                    e.stopPropagation(); 
+                                    const texto = `${entrega.punto_entrega_detalle?.nombre || 'Punto sin nombre'} ${entrega.hora_estimada.substring(0, 5)}`;
+                                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                                      navigator.clipboard.writeText(texto);
+                                      showToast('Ruta copiada');
+                                    }
+                                  }}
+                                  style={{ background: 'rgba(239, 71, 111, 0.1)', border: 'none', padding: '4px', borderRadius: '4px', cursor: 'pointer', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                  title="Copiar ruta y hora"
+                                >
+                                  <Copy size={14} />
+                                </button>
+                              </>
                             ) : (
                               <button style={{ background: 'none', border: 'none', color: 'var(--color-primary)', fontSize: '0.85rem', cursor: 'pointer' }} onClick={() => handleSetHora(entrega.id, null)}>
                                 Fijar Hora
