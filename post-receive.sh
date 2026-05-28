@@ -20,6 +20,10 @@ do
         source venv/bin/activate
         pip install -r requirements.txt
         python manage.py migrate
+        
+        # Ejecutar renombrado de prendas si aplica (management command)
+        python manage.py renombrar_recuperados
+
         python manage.py collectstatic --noinput
         
         # Auto-seed: Garantizar datos iniciales si la BD está vacía
