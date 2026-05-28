@@ -39,6 +39,11 @@ El proyecto utiliza un sistema de integración continua ligero basado en Git (Pu
 
 **REGLA:** NUNCA modificar código directamente en el servidor de producción. Todo cambio debe hacerse en local y subirse por Git.
 
+### 2.1. REGLA INQUEBRANTABLE DE PROTECCIÓN DE DATOS (NUNCA ROMPER)
+- **JAMÁS hacer commit o push de archivos de base de datos locales** (`db_local.sqlite3`, volcados SQL, etc.) al repositorio. Hacerlo sobreescribirá y DESTRUIRÁ la base de datos de producción durante el auto-deploy.
+- Estos archivos **DEBEN ESTAR SIEMPRE en `.gitignore`** y ser ignorados por el control de versiones.
+- **Bajo ninguna circunstancia** se inyectarán scripts "temporales" de rescate en archivos base del sistema (`wsgi.py`, `manage.py`) saltándose los principios de la arquitectura para resolver incidentes en producción. Todo rescate o migración de datos debe hacerse mediante los comandos de migración nativos de Django (`python manage.py makemigrations / migrate`) o scripts de administración (management commands) ejecutados explícitamente y con precaución.
+
 ---
 
 ## 3. Principios de Arquitectura (Backend Django)
