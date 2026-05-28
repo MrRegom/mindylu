@@ -475,12 +475,23 @@ const Entregas = () => {
                                   <Edit2 size={12} style={{marginLeft: '2px', opacity: 0.5}} />
                                 </span>
                                 <button 
-                                  onClick={(e) => { 
+                                  onClick={async (e) => { 
                                     e.stopPropagation(); 
-                                    const texto = `${entrega.punto_entrega_detalle?.nombre || 'Punto sin nombre'} ${entrega.hora_estimada.substring(0, 5)}`;
+                                    const texto = `${entrega.punto_entrega_detalle?.nombre || 'Punto sin nombre'} - ${entrega.hora_estimada.substring(0, 5)} hrs`;
                                     if (navigator.clipboard && navigator.clipboard.writeText) {
-                                      navigator.clipboard.writeText(texto);
-                                      showToast('Ruta copiada');
+                                      try {
+                                        await navigator.clipboard.writeText(texto);
+                                        showAlert(`¡Copiado!: ${texto}`);
+                                        return;
+                                      } catch (err) {
+                                        console.warn("Fallo Clipboard API, usando fallback...");
+                                      }
+                                    }
+                                    const exito = copiarAlPortapapelesFallback(texto);
+                                    if (exito) {
+                                      showAlert(`¡Copiado!: ${texto}`);
+                                    } else {
+                                      showAlert("No se pudo copiar automáticamente.");
                                     }
                                   }}
                                   style={{ background: 'rgba(239, 71, 111, 0.1)', border: 'none', padding: '4px', borderRadius: '4px', cursor: 'pointer', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
