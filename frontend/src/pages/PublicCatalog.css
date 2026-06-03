@@ -15,14 +15,14 @@
 }
 
 .lp-root {
-  --color-black:  #111111;
+  --color-black:  #2c2c2c;
   --color-white:  #ffffff;
-  --color-beige:  #f5f0eb;
-  --color-beige2: #ede7de;
-  --color-rose:   #e8b4b8;
-  --color-rose2:  #d4919a;
-  --color-text:   #2a2a2a;
-  --color-muted:  #888888;
+  --color-beige:  #faf6f0;
+  --color-beige2: #f3efe9;
+  --color-rose:   #ebd5d5;
+  --color-rose2:  #d9a5a5;
+  --color-text:   #4a4a4a;
+  --color-muted:  #999999;
   --ff-title: 'Playfair Display', Georgia, serif;
   --ff-body:  'Poppins', system-ui, sans-serif;
   --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -55,9 +55,9 @@
 
 .lp-nav-brand {
   font-family: var(--ff-title);
-  font-size: 1.5rem;
-  font-weight: 700;
-  letter-spacing: 0.5px;
+  font-size: 1.6rem;
+  font-weight: 400;
+  letter-spacing: 1px;
   color: var(--color-black);
   text-decoration: none;
 }
@@ -221,12 +221,12 @@
   background: var(--color-white);
   color: var(--color-black);
   border: none;
-  padding: 16px 36px;
-  border-radius: 999px;
+  padding: 16px 40px;
+  border-radius: 4px;
   font-family: var(--ff-body);
   font-size: 0.85rem;
-  font-weight: 600;
-  letter-spacing: 1px;
+  font-weight: 500;
+  letter-spacing: 2px;
   text-transform: uppercase;
   cursor: pointer;
   transition: var(--transition);
@@ -235,19 +235,19 @@
 .lp-btn-primary:hover {
   background: var(--color-beige);
   transform: translateY(-2px);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
 }
 
 .lp-btn-outline {
   background: transparent;
   color: var(--color-white);
-  border: 1.5px solid rgba(255,255,255,0.6);
-  padding: 16px 36px;
-  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.8);
+  padding: 16px 40px;
+  border-radius: 4px;
   font-family: var(--ff-body);
   font-size: 0.85rem;
-  font-weight: 500;
-  letter-spacing: 1px;
+  font-weight: 400;
+  letter-spacing: 2px;
   text-transform: uppercase;
   cursor: pointer;
   transition: var(--transition);
@@ -315,8 +315,8 @@
 
 .lp-section-title {
   font-family: var(--ff-title);
-  font-size: clamp(2rem, 3.5vw, 3rem);
-  font-weight: 700;
+  font-size: clamp(2rem, 3.5vw, 2.8rem);
+  font-weight: 400;
   color: var(--color-black);
   line-height: 1.2;
   margin-bottom: 48px;
@@ -408,14 +408,14 @@
 
 .lp-btn-ghost {
   background: none;
-  border: 1.5px solid var(--color-black);
+  border: 1px solid var(--color-black);
   color: var(--color-black);
-  padding: 12px 28px;
-  border-radius: 999px;
+  padding: 12px 32px;
+  border-radius: 4px;
   font-family: var(--ff-body);
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 1px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 2px;
   text-transform: uppercase;
   cursor: pointer;
   transition: var(--transition);
@@ -540,17 +540,18 @@
   background: var(--color-white);
   color: var(--color-black);
   border: none;
-  padding: 10px 16px;
-  border-radius: 999px;
+  padding: 12px 16px;
+  border-radius: 4px;
   font-family: var(--ff-body);
   font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.5px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-transform: uppercase;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 8px;
   transform: translateY(10px);
   opacity: 0;
   transition: all var(--transition);
@@ -644,22 +645,26 @@
 
 .lp-filter-btn {
   background: none;
-  border: 1px solid #ddd;
+  border: 1px solid transparent;
+  border-bottom: 1px solid #ddd;
   color: var(--color-muted);
-  padding: 8px 20px;
-  border-radius: 999px;
+  padding: 8px 16px;
+  border-radius: 0;
   font-family: var(--ff-body);
-  font-size: 0.78rem;
-  font-weight: 500;
+  font-size: 0.8rem;
+  font-weight: 400;
+  letter-spacing: 1px;
+  text-transform: uppercase;
   cursor: pointer;
   transition: var(--transition);
 }
 
 .lp-filter-btn:hover,
 .lp-filter-btn.active {
-  background: var(--color-black);
-  border-color: var(--color-black);
-  color: var(--color-white);
+  background: none;
+  border-color: transparent;
+  border-bottom: 1px solid var(--color-black);
+  color: var(--color-black);
 }
 
 /* ── Categorías Grid ──────────────────────────────────────── */
@@ -723,9 +728,9 @@
 .lp-cat-name {
   font-family: var(--ff-title);
   font-size: 1.1rem;
-  font-weight: 600;
+  font-weight: 400;
   color: white;
-  letter-spacing: 0.3px;
+  letter-spacing: 1px;
 }
 
 /* ── Sección Cómo Comprar ─────────────────────────────────── */

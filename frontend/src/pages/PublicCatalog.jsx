@@ -226,7 +226,7 @@ const PublicCatalog = () => {
 
       {/* ── Navbar ── */}
       <nav className="lp-nav">
-        <a className="lp-nav-brand" href="/">Lu<span>Prenditas</span></a>
+        <a className="lp-nav-brand" href="/">{config?.tienda_nombre || 'MindyLu'}</a>
 
         <ul className="lp-nav-links">
           <li><a onClick={() => scrollTo(catalogRef)}>Catálogo</a></li>
@@ -284,18 +284,18 @@ const PublicCatalog = () => {
 
       {/* ── Banner rotante ── */}
       <div className="lp-banner" style={{ marginTop: 70 }}>
-        <div className="lp-banner-track">
+        <div className="lp-banner-track" style={{ animationDuration: `${config?.marquesina_velocidad || 25}s` }}>
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="lp-banner-item">
-              <span className="lp-banner-text">{config?.marquesina_texto || 'Nueva Colección 2025'}</span>
+              <span className="lp-banner-text">{config?.marquesina_texto || 'NUEVA COLECCIÓN 2025'}</span>
               <span className="lp-banner-dot" />
             </div>
           ))}
         </div>
-        <div className="lp-banner-track">
+        <div className="lp-banner-track" style={{ animationDuration: `${config?.marquesina_velocidad || 25}s` }}>
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={`dup-${i}`} className="lp-banner-item">
-              <span className="lp-banner-text">{config?.marquesina_texto || 'Nueva Colección 2025'}</span>
+              <span className="lp-banner-text">{config?.marquesina_texto || 'NUEVA COLECCIÓN 2025'}</span>
               <span className="lp-banner-dot" />
             </div>
           ))}
@@ -304,10 +304,16 @@ const PublicCatalog = () => {
 
       {/* ── Hero ── */}
       <section className="lp-hero">
-        <img src={config?.banner_imagen || "/images/hero.jpg"} alt={config?.banner_titulo || "LuPrenditas - Moda Femenina"} className="lp-hero-img" />
+        <img 
+          src={config?.banner_imagen ? (
+            config.banner_imagen.startsWith('http') ? config.banner_imagen : `${API_BASE.replace('/api/v1', '')}${config.banner_imagen}`
+          ) : "/images/hero.jpg"} 
+          alt={config?.banner_titulo || `${config?.tienda_nombre || 'MindyLu'} - Moda Femenina`} 
+          className="lp-hero-img" 
+        />
         <div className="lp-hero-overlay" />
         <div className="lp-hero-content">
-          <div className="lp-hero-tag">✦ {config?.tienda_nombre || 'LuPrenditas'}</div>
+          <div className="lp-hero-tag">✦ {config?.tienda_nombre || 'MindyLu'}</div>
           <h1 className="lp-hero-title">
             {config?.banner_titulo ? (
               <div dangerouslySetInnerHTML={{ __html: config.banner_titulo.replace(/\n/g, '<br />') }} />
@@ -411,7 +417,7 @@ const PublicCatalog = () => {
         <p className="lp-splash-quote">
           "Cada prenda tiene una historia. La tuya comienza aquí."
         </p>
-        <p className="lp-splash-author">LuPrenditas · Boutique Exclusiva</p>
+        <p className="lp-splash-author">{config?.tienda_nombre || 'MindyLu'} · Boutique Exclusiva</p>
       </div>
 
       {/* ── Cómo Comprar ── */}
@@ -538,7 +544,7 @@ const PublicCatalog = () => {
       <footer className="lp-footer">
         <div className="lp-footer-top">
           <div>
-            <span className="lp-footer-brand">Lu<span>Prenditas</span></span>
+            <span className="lp-footer-brand">{config?.tienda_nombre || 'MindyLu'}</span>
             <p className="lp-footer-desc">
               Boutique de moda femenina exclusiva.<br />
               Moda seleccionada especialmente para ti,<br />
@@ -586,7 +592,7 @@ const PublicCatalog = () => {
         </div>
 
         <div className="lp-footer-bottom">
-          <span>© 2025 LuPrenditas · Boutique Femenina</span>
+          <span>© 2026 {config?.tienda_nombre || 'MindyLu'} · Boutique Femenina</span>
           <span>Hecho con 💕 para ti</span>
         </div>
       </footer>

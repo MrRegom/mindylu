@@ -168,9 +168,11 @@ const MantenedorList = ({ titulo, icono, endpoint, placeholder }) => {
 const ConfiguracionTiendaForm = () => {
   const [config, setConfig] = useState({
     marquesina_texto: '',
+    marquesina_velocidad: 25,
     banner_titulo: '',
     banner_subtitulo: '',
-    whatsapp_numero: '',
+    whatsapp_numero: '56972677820',
+    tienda_nombre: 'MindyLu',
   });
   const [bannerFile, setBannerFile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -207,9 +209,11 @@ const ConfiguracionTiendaForm = () => {
     try {
       const formData = new FormData();
       formData.append('marquesina_texto', config.marquesina_texto || '');
+      formData.append('marquesina_velocidad', config.marquesina_velocidad || 25);
       formData.append('banner_titulo', config.banner_titulo || '');
       formData.append('banner_subtitulo', config.banner_subtitulo || '');
       formData.append('whatsapp_numero', config.whatsapp_numero || '');
+      formData.append('tienda_nombre', config.tienda_nombre || 'MindyLu');
       
       if (bannerFile) {
         formData.append('banner_imagen', bannerFile);
@@ -240,76 +244,27 @@ const ConfiguracionTiendaForm = () => {
         <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--color-text-strong)' }}>Apariencia de la Tienda</h2>
       </div>
       
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-        <div className="form-group">
-          <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 500, marginBottom: '8px' }}>
-            <Type size={16} /> Texto de Marquesina (Scroll Superior)
-          </label>
-          <input 
-            type="text" 
-            name="marquesina_texto"
-            className="input-field" 
-            value={config.marquesina_texto || ''}
-            onChange={handleChange}
-            placeholder="Ej: NUEVA COLECCIÓN 2025 • ENVÍOS A TODO EL PAÍS"
-          />
-        </div>
-
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        
+        {/* ROW 1: Nombre de tienda y WhatsApp */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
           <div className="form-group">
-            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 500, marginBottom: '8px' }}>
-              <Type size={16} /> Título del Banner Principal
+            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600, marginBottom: '8px', color: 'var(--color-text-strong)' }}>
+              <Type size={16} /> Nombre de la Tienda (UI)
             </label>
             <input 
               type="text" 
-              name="banner_titulo"
+              name="tienda_nombre"
               className="input-field" 
-              value={config.banner_titulo || ''}
+              value={config.tienda_nombre || ''}
               onChange={handleChange}
-              placeholder="Ej: Moda femenina seleccionada..."
+              placeholder="Ej: MindyLu"
+              style={{ padding: '12px', borderRadius: '8px', border: '1px solid #e5e7eb', width: '100%' }}
             />
           </div>
 
           <div className="form-group">
-            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 500, marginBottom: '8px' }}>
-              <Type size={16} /> Subtítulo del Banner
-            </label>
-            <input 
-              type="text" 
-              name="banner_subtitulo"
-              className="input-field" 
-              value={config.banner_subtitulo || ''}
-              onChange={handleChange}
-              placeholder="Ej: Prendas únicas, elegantes..."
-            />
-          </div>
-        </div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-          <div className="form-group">
-            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 500, marginBottom: '8px' }}>
-              <Upload size={16} /> Imagen del Banner Principal
-            </label>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <input 
-                type="file" 
-                accept="image/*"
-                onChange={handleFileChange}
-                className="input-field"
-                style={{ flex: 1, padding: '8px' }}
-              />
-              {config.banner_imagen && !bannerFile && (
-                <img 
-                  src={config.banner_imagen} 
-                  alt="Banner actual" 
-                  style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '8px', border: '1px solid var(--color-border)' }} 
-                />
-              )}
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 500, marginBottom: '8px' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600, marginBottom: '8px', color: 'var(--color-text-strong)' }}>
               <Phone size={16} /> Número de WhatsApp para Pedidos
             </label>
             <input 
@@ -318,16 +273,110 @@ const ConfiguracionTiendaForm = () => {
               className="input-field" 
               value={config.whatsapp_numero || ''}
               onChange={handleChange}
-              placeholder="Ej: 56912345678 (Incluir código de país sin +)"
+              placeholder="Ej: 56912345678"
+              style={{ padding: '12px', borderRadius: '8px', border: '1px solid #e5e7eb', width: '100%' }}
             />
           </div>
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
-          <button type="submit" className="btn btn-primary" disabled={saving}>
-            {saving ? 'Guardando...' : 'Guardar Apariencia'}
-          </button>
+        {/* ROW 2: Marquesina */}
+        <div style={{ display: 'grid', gridTemplateColumns: '3fr 1fr', gap: '20px' }}>
+          <div className="form-group">
+            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600, marginBottom: '8px', color: 'var(--color-text-strong)' }}>
+              <Type size={16} /> Texto de Marquesina (Scroll Superior)
+            </label>
+            <input 
+              type="text" 
+              name="marquesina_texto"
+              className="input-field" 
+              value={config.marquesina_texto || ''}
+              onChange={handleChange}
+              placeholder="Ej: NUEVA COLECCIÓN 2025 • ENVÍOS A TODO EL PAÍS"
+              style={{ padding: '12px', borderRadius: '8px', border: '1px solid #e5e7eb', width: '100%' }}
+            />
+          </div>
+          <div className="form-group">
+            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600, marginBottom: '8px', color: 'var(--color-text-strong)' }}>
+              <Clock size={16} /> Vel. Marquesina (s)
+            </label>
+            <input 
+              type="number" 
+              name="marquesina_velocidad"
+              className="input-field" 
+              value={config.marquesina_velocidad || 25}
+              onChange={handleChange}
+              min="5" max="100"
+              style={{ padding: '12px', borderRadius: '8px', border: '1px solid #e5e7eb', width: '100%' }}
+            />
+          </div>
         </div>
+
+        {/* ROW 3: Banner Titulo y Subtitulo */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+          <div className="form-group">
+            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600, marginBottom: '8px', color: 'var(--color-text-strong)' }}>
+              <Type size={16} /> Título del Banner Principal
+            </label>
+            <textarea 
+              name="banner_titulo"
+              className="input-field" 
+              value={config.banner_titulo || ''}
+              onChange={handleChange}
+              rows="3"
+              placeholder="Ej: Moda femenina seleccionada..."
+              style={{ padding: '12px', borderRadius: '8px', border: '1px solid #e5e7eb', width: '100%', resize: 'none' }}
+            />
+          </div>
+
+          <div className="form-group">
+            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600, marginBottom: '8px', color: 'var(--color-text-strong)' }}>
+              <Type size={16} /> Subtítulo del Banner
+            </label>
+            <textarea 
+              name="banner_subtitulo"
+              className="input-field" 
+              value={config.banner_subtitulo || ''}
+              onChange={handleChange}
+              rows="3"
+              placeholder="Ej: Prendas únicas, elegantes..."
+              style={{ padding: '12px', borderRadius: '8px', border: '1px solid #e5e7eb', width: '100%', resize: 'none' }}
+            />
+          </div>
+        </div>
+
+        {/* ROW 4: Imagen Banner */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px' }}>
+          <div className="form-group">
+            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600, marginBottom: '8px', color: 'var(--color-text-strong)' }}>
+              <Upload size={16} /> Imagen del Banner Principal
+            </label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              {config.banner_imagen && (
+                <img 
+                  src={config.banner_imagen} 
+                  alt="Banner actual" 
+                  style={{ width: '80px', height: '60px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #eee' }} 
+                />
+              )}
+              <input 
+                type="file" 
+                accept="image/*"
+                onChange={handleFileChange}
+                className="input-field"
+                style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px dashed #cbd5e1', background: '#f8fafc' }}
+              />
+            </div>
+          </div>
+        </div>
+
+        <button 
+          type="submit" 
+          disabled={saving}
+          className="btn-primary"
+          style={{ padding: '14px', borderRadius: '8px', fontSize: '1rem', fontWeight: 600, marginTop: '8px' }}
+        >
+          {saving ? 'Guardando...' : 'Guardar Apariencia'}
+        </button>
       </form>
     </div>
   );
