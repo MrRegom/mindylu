@@ -7,8 +7,8 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import './PublicCatalog.css';
 
-// La URL base del API sin el prefijo /api/ (se agrega por separado)
-const BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1/').replace(/\/api\/v1\/?$/, '');
+// La URL base del API ya tiene el formato http://host/api/v1/
+const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1/').replace(/\/$/, '');
 
 const WaIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 16 16">
@@ -32,7 +32,7 @@ const PublicCatalog = () => {
 
   const fetchCategorias = async () => {
     try {
-      const res = await axios.get(`${BASE_URL}/api/v1/catalogo/publico/categorias/`);
+      const res = await axios.get(`${API_BASE}/catalogo/publico/categorias/`);
       const data = Array.isArray(res.data) ? res.data : (res.data.results || []);
       setCategorias(data);
     } catch (error) {
@@ -43,7 +43,7 @@ const PublicCatalog = () => {
   const fetchPrendas = async () => {
     setLoading(true);
     try {
-      let url = `${BASE_URL}/api/v1/catalogo/publico/prendas/`;
+      let url = `${API_BASE}/catalogo/publico/prendas/`;
       if (categoriaSel) url += `?categoria=${categoriaSel}`;
       const res = await axios.get(url);
       const data = Array.isArray(res.data) ? res.data : (res.data.results || []);

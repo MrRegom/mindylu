@@ -62,16 +62,20 @@ body {
   100% { transform: rotate(10deg) scale(1.1); }
 }
 
-/* Base Layout for Mobile App Feel */
+/* Base Layout — Panel admin: mobile centrado | Catálogo público: fullwidth */
 #root {
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Panel de administración: ancho mobile centrado */
+body.page-admin #root {
   height: 100vh;
   height: 100dvh;
   max-width: 480px;
   margin: 0 auto;
-  position: relative;
-  /* Fondo cristalino para toda la app en desktop */
   background: rgba(var(--color-surface-rgb), 0.4);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);

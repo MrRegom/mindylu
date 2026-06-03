@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import PublicCatalog from './pages/PublicCatalog';
 import Layout from './components/Layout';
 import Login from './pages/Login';
@@ -17,8 +17,19 @@ import Sincronizacion from './pages/Sincronizacion';
 import LotesProgramados from './pages/LotesProgramados';
 import LoteAddFotos from './pages/LoteAddFotos';
 import Perfil from './pages/Perfil';
-
 import SubidaMasiva from './pages/SubidaMasiva';
+import { useEffect } from 'react';
+
+// Componente auxiliar: aplica clase CSS al body según si estamos en el panel o no
+function BodyClassManager() {
+  const location = useLocation();
+  useEffect(() => {
+    const isAdmin = location.pathname.startsWith('/panel') || location.pathname.startsWith('/login');
+    document.body.classList.toggle('page-admin', isAdmin);
+    document.body.classList.toggle('page-public', !isAdmin);
+  }, [location]);
+  return null;
+}
 
 function App() {
   // Leemos el token real para ver si está logueado
@@ -26,6 +37,7 @@ function App() {
 
   return (
     <Router>
+      <BodyClassManager />
       <Routes>
         <Route path="/panel/login" element={
           isAuthenticated ? <Navigate to="/panel" replace /> : <Login />
