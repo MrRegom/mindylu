@@ -54,10 +54,11 @@
 }
 
 .lp-nav-brand {
-  font-family: var(--ff-title);
-  font-size: 1.6rem;
-  font-weight: 400;
-  letter-spacing: 1px;
+  font-family: 'Didot', 'Playfair Display', 'Bodoni MT', serif;
+  font-size: 1.8rem;
+  font-weight: 300;
+  font-style: italic;
+  letter-spacing: 2px;
   color: var(--color-black);
   text-decoration: none;
 }

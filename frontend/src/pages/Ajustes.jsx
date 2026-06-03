@@ -351,11 +351,18 @@ const ConfiguracionTiendaForm = () => {
               <Upload size={16} /> Imagen del Banner Principal
             </label>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              {config.banner_imagen && (
+              {config.banner_imagen && !bannerFile && (
                 <img 
                   src={config.banner_imagen} 
                   alt="Banner actual" 
                   style={{ width: '80px', height: '60px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #eee' }} 
+                />
+              )}
+              {bannerFile && (
+                <img 
+                  src={URL.createObjectURL(bannerFile)} 
+                  alt="Nuevo banner" 
+                  style={{ width: '80px', height: '60px', objectFit: 'cover', borderRadius: '4px', border: '2px solid var(--color-black)' }} 
                 />
               )}
               <input 
