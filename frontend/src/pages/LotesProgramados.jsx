@@ -33,7 +33,7 @@ const LotesProgramados = () => {
     <div className="catalogo-container animate-fade-in" style={{ paddingBottom: 80 }}>
       <div className="catalogo-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <button className="btn-back" onClick={() => navigate('/catalogo')} type="button" style={{ background: 'none', border: 'none', padding: 0 }}>
+          <button className="btn-back" onClick={() => navigate('/panel/catalogo')} type="button" style={{ background: 'none', border: 'none', padding: 0 }}>
             <ArrowLeft size={24} />
           </button>
           <div>

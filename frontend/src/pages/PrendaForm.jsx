@@ -186,7 +186,7 @@ const PrendaForm = () => {
         }
       });
 
-      navigate('/catalogo');
+      navigate('/panel/catalogo');
     } catch (error) {
       console.error("Error guardando:", error);
       showAlert("Hubo un error al guardar la prenda.");
@@ -197,7 +197,7 @@ const PrendaForm = () => {
   return (
     <div className="prenda-form-container animate-fade-in">
       <div className="form-header glass">
-        <button className="btn-back" onClick={() => navigate('/catalogo')} type="button">
+        <button className="btn-back" onClick={() => navigate('/panel/catalogo')} type="button">
           <ArrowLeft size={24} />
         </button>
         <h2>Nueva Prenda</h2>

@@ -281,7 +281,7 @@ const SubidaMasiva = () => {
       });
       
       showToast('¡Lote guardado en tu catálogo exitosamente!', 'success');
-      navigate('/catalogo');
+      navigate('/panel/catalogo');
     } catch (error) {
       console.error("Error guardando lote masivo:", error);
       showAlert('Hubo un error al guardar el lote.');
@@ -294,7 +294,7 @@ const SubidaMasiva = () => {
     <div className="subida-masiva-container animate-fade-in">
       <GlobalSpinner isVisible={isSubmitting} text="Guardando y subiendo..." />
       <div className="form-header glass">
-        <button className="btn-back" onClick={() => navigate('/catalogo')} type="button" disabled={isSubmitting}>
+        <button className="btn-back" onClick={() => navigate('/panel/catalogo')} type="button" disabled={isSubmitting}>
           <ArrowLeft size={24} />
         </button>
         <h2>Subida Masiva (Lote)</h2>

@@ -348,7 +348,7 @@ const CargaMasiva = () => {
         <button className="btn btn-primary" style={{ marginTop: 24 }} onClick={() => { setResultado(null); }}>
           Subir más fotos
         </button>
-        <button className="btn" style={{ marginTop: 12, width: '100%', background: 'transparent', color: 'var(--color-primary)', fontWeight: 600 }} onClick={() => navigate('/catalogo')}>
+        <button className="btn" style={{ marginTop: 12, width: '100%', background: 'transparent', color: 'var(--color-primary)', fontWeight: 600 }} onClick={() => navigate('/panel/catalogo')}>
           Ir al Catálogo →
         </button>
       </div>
