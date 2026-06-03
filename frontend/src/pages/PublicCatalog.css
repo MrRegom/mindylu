@@ -347,13 +347,34 @@
 .lp-banner {
   background: var(--color-black);
   color: var(--color-white);
-  padding: 16px 20px;
+  padding: 16px 0;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 16px;
   overflow: hidden;
   margin-top: 70px; /* Para que no se pise con el navbar */
+  white-space: nowrap;
+}
+
+.lp-banner-track {
+  display: inline-flex;
+  align-items: center;
+  animation: marquee 25s linear infinite;
+}
+
+.lp-banner-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  padding-right: 16px;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
 }
 
 .lp-banner-text {

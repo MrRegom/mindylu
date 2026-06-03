@@ -284,12 +284,22 @@ const PublicCatalog = () => {
 
       {/* ── Banner rotante ── */}
       <div className="lp-banner" style={{ marginTop: 70 }}>
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} style={{ display: 'contents' }}>
-            <span className="lp-banner-text">{config?.marquesina_texto || 'Nueva Colección 2025'}</span>
-            <span className="lp-banner-dot" />
-          </div>
-        ))}
+        <div className="lp-banner-track">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="lp-banner-item">
+              <span className="lp-banner-text">{config?.marquesina_texto || 'Nueva Colección 2025'}</span>
+              <span className="lp-banner-dot" />
+            </div>
+          ))}
+        </div>
+        <div className="lp-banner-track">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={`dup-${i}`} className="lp-banner-item">
+              <span className="lp-banner-text">{config?.marquesina_texto || 'Nueva Colección 2025'}</span>
+              <span className="lp-banner-dot" />
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* ── Hero ── */}
