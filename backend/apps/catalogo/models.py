@@ -64,6 +64,8 @@ class Prenda(models.Model):
         DISPONIBLE = 'disponible', _('Disponible')
         RESERVADA = 'reservada', _('Reservada')
         VENDIDA = 'vendida', _('Vendida')
+        AGOTADA = 'agotada', _('Agotada')
+        ARCHIVADA = 'archivada', _('Archivada')
 
     tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name='prendas')
     ciclo = models.ForeignKey(CicloVenta, on_delete=models.SET_NULL, null=True, blank=True, related_name='prendas')
