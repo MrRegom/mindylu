@@ -30,6 +30,8 @@ function App() {
         <Route path="/panel/login" element={
           isAuthenticated ? <Navigate to="/panel" replace /> : <Login />
         } />
+        {/* Compatibilidad con la ruta antigua /login */}
+        <Route path="/login" element={<Navigate to="/panel/login" replace />} />
         
         {/* Catálogo Público (Sin Login) */}
         <Route path="/" element={<PublicCatalog />} />

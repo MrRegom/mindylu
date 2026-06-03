@@ -39,8 +39,8 @@ const Login = () => {
       localStorage.setItem('refresh_token', response.data.tokens.refresh);
       localStorage.setItem('user', JSON.stringify(response.data.usuario));
       
-      // Redirigir al inicio y recargar para que App.jsx detecte el token
-      window.location.href = '/';
+      // Redirigir al panel de administración
+      window.location.href = '/panel';
       
     } catch (err) {
       console.error("Error en login:", err);

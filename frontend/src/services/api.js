@@ -56,7 +56,7 @@ api.interceptors.response.use(
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
       localStorage.removeItem('user');
-      window.location.href = '/login';
+      window.location.href = '/panel/login';
     } else {
       // Registrar error en el backend
       sendErrorLog(error);
