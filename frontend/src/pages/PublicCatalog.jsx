@@ -38,6 +38,7 @@ const abrirWhatsAppGeneral = () => {
 
 // ── Tarjeta de Producto ────────────────────────────────────
 const ProductCard = ({ prenda }) => {
+  const [imgError, setImgError] = useState(false);
   const estado = prenda.estado || 'disponible';
   
   let imagen = prenda.imagenes?.[0]?.imagen || prenda.foto_url;
@@ -47,7 +48,11 @@ const ProductCard = ({ prenda }) => {
   }
   
   const precio = parseInt(prenda.precio || 0).toLocaleString('es-CL');
-  const tallas = prenda.variantes?.map(v => v.talla).filter(Boolean).join(' · ');
+  
+  // Deduplicar tallas para que no diga "estándar - estándar - estándar"
+  const tallasArray = prenda.variantes?.map(v => (v.talla || '').toLowerCase()).filter(Boolean) || [];
+  const tallasUnicas = [...new Set(tallasArray)].map(t => t.charAt(0).toUpperCase() + t.slice(1));
+  const tallas = tallasUnicas.join(' · ');
 
   const estadoLabel = {
     disponible: 'Disponible',
@@ -58,12 +63,16 @@ const ProductCard = ({ prenda }) => {
   return (
     <article className="lp-card">
       <div className="lp-card-img-wrap">
-        {imagen ? (
-          <img src={imagen} alt={prenda.nombre} loading="lazy" />
+        {imagen && !imgError ? (
+          <img 
+            src={imagen} 
+            alt={prenda.nombre} 
+            loading="lazy" 
+            onError={() => setImgError(true)}
+          />
         ) : (
           <div className="lp-card-no-img">
-            <span>👗</span>
-            <span>Sin foto</span>
+            <span style={{ fontSize: '1.5rem' }}>👗</span>
           </div>
         )}
         <div className={`lp-card-status ${estado}`}>{estadoLabel}</div>
