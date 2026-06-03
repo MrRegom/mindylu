@@ -94,7 +94,7 @@ const LoteAddFotos = () => {
       });
       
       showAlert(`¡${items.length} fotos añadidas al lote programado!`);
-      navigate('/catalogo/lotes');
+      navigate('/panel/catalogo/lotes');
     } catch (error) {
       console.error("Error agregando fotos:", error);
       showAlert("Hubo un error al agregar las fotos al lote.");
@@ -105,7 +105,7 @@ const LoteAddFotos = () => {
   return (
     <div className="carga-masiva-container animate-fade-in">
       <div className="form-header glass">
-        <button className="btn-back" onClick={() => navigate('/catalogo/lotes')} type="button">
+        <button className="btn-back" onClick={() => navigate('/panel/catalogo/lotes')} type="button">
           <ArrowLeft size={24} />
         </button>
         <h2>Añadir al Lote 🕒</h2>

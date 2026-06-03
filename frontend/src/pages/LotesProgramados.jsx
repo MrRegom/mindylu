@@ -63,7 +63,7 @@ const LotesProgramados = () => {
                 <button 
                   className="btn btn-secondary btn-icon"
                   style={{ padding: '4px 8px', fontSize: '0.8rem', height: 'auto' }}
-                  onClick={() => navigate(`/catalogo/lotes/${lote.id}/editar`)}
+                  onClick={() => navigate(`/panel/catalogo/lotes/${lote.id}/editar`)}
                 >
                   <Plus size={16} /> Añadir Fotos
                 </button>
