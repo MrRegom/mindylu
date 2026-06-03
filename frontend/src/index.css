@@ -83,6 +83,15 @@ body.page-admin #root {
   overflow: hidden;
 }
 
+/* En desktop el panel también es fullwidth */
+@media (min-width: 900px) {
+  body.page-admin #root {
+    max-width: 100%;
+    overflow: auto;
+    height: 100vh;
+  }
+}
+
 /* Typography Modern / WhatsApp Style */
 h1, h2, h3, h4 {
   font-family: inherit;
