@@ -347,12 +347,13 @@
 .lp-banner {
   background: var(--color-black);
   color: var(--color-white);
-  padding: 24px 80px;
+  padding: 16px 20px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 24px;
+  gap: 16px;
   overflow: hidden;
+  margin-top: 70px; /* Para que no se pise con el navbar */
 }
 
 .lp-banner-text {
@@ -435,11 +436,15 @@
   aspect-ratio: 3/4;
   background: var(--color-beige);
   overflow: hidden;
-  border-radius: 4px;
-  margin-bottom: 16px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  display: block;
 }
 
 .lp-card-img-wrap img {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -510,20 +515,36 @@
   background: var(--color-white);
   color: var(--color-black);
   border: none;
-  padding: 12px 24px;
+  padding: 10px 16px;
   border-radius: 999px;
   font-family: var(--ff-body);
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.5px;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  gap: 6px;
   transform: translateY(10px);
   opacity: 0;
   transition: all var(--transition);
   white-space: nowrap;
+  width: 90%;
+}
+
+@media (max-width: 900px) {
+  .lp-card-overlay {
+    background: transparent;
+    align-items: flex-end;
+    padding-bottom: 12px;
+  }
+  .lp-card-btn {
+    transform: translateY(0);
+    opacity: 1;
+    background: rgba(255,255,255,0.95);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
 }
 
 .lp-card:hover .lp-card-btn {
