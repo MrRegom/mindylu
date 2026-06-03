@@ -469,14 +469,18 @@
 
 .lp-card-status {
   position: absolute;
-  top: 12px;
-  left: 12px;
+  top: 8px;
+  left: 8px;
   font-size: 0.65rem;
   font-weight: 600;
-  letter-spacing: 1.5px;
+  letter-spacing: 1px;
   text-transform: uppercase;
-  padding: 4px 12px;
+  padding: 4px 10px;
   border-radius: 999px;
+  max-width: 85%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .lp-card-status.disponible {
@@ -533,17 +537,38 @@
   width: 90%;
 }
 
+.lp-card-btn-mobile {
+  display: none;
+}
+
 @media (max-width: 900px) {
   .lp-card-overlay {
-    background: transparent;
-    align-items: flex-end;
-    padding-bottom: 12px;
+    display: none; /* Hide overlay button on mobile */
   }
-  .lp-card-btn {
-    transform: translateY(0);
-    opacity: 1;
-    background: rgba(255,255,255,0.95);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  .lp-card-info {
+    display: flex;
+    flex-direction: column;
+  }
+  .lp-card-btn-mobile {
+    display: flex;
+    background: #25D366;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 6px;
+    font-family: var(--ff-body);
+    font-size: 0.8rem;
+    font-weight: 600;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 10px;
+    cursor: pointer;
+    width: 100%;
+    transition: var(--transition);
+  }
+  .lp-card-btn-mobile:active {
+    transform: scale(0.98);
   }
 }
 

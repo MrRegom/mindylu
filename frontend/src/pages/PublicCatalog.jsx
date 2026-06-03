@@ -39,7 +39,13 @@ const abrirWhatsAppGeneral = () => {
 // ── Tarjeta de Producto ────────────────────────────────────
 const ProductCard = ({ prenda }) => {
   const estado = prenda.estado || 'disponible';
-  const imagen = prenda.imagenes?.[0]?.imagen || prenda.foto_url;
+  
+  let imagen = prenda.imagenes?.[0]?.imagen || prenda.foto_url;
+  if (imagen && !imagen.startsWith('http')) {
+    const baseUrl = API_BASE.replace('/api/v1', '');
+    imagen = `${baseUrl}${imagen.startsWith('/') ? '' : '/'}${imagen}`;
+  }
+  
   const precio = parseInt(prenda.precio || 0).toLocaleString('es-CL');
   const tallas = prenda.variantes?.map(v => v.talla).filter(Boolean).join(' · ');
 
@@ -76,6 +82,14 @@ const ProductCard = ({ prenda }) => {
         <p className="lp-card-name">{prenda.nombre}</p>
         <p className="lp-card-price">${precio}</p>
         {tallas && <p className="lp-card-tallas">{tallas}</p>}
+        {estado !== 'vendida' && (
+          <button
+            className="lp-card-btn-mobile wa"
+            onClick={(e) => { e.stopPropagation(); abrirWhatsApp(prenda); }}
+          >
+            <WaIcon /> Lo quiero
+          </button>
+        )}
       </div>
     </article>
   );
