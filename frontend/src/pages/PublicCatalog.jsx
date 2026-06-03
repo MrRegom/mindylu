@@ -128,10 +128,10 @@ const ProductModal = ({ prenda, onClose, onAddToCart }) => {
   const handleNext = () => setCurrentImgIdx(i => (i === allImages.length - 1 ? 0 : i + 1));
 
   const precio = parseInt(prenda.precio || 0).toLocaleString('es-CL');
-  const tallasArray = prenda.variantes?.map(v => (v.talla || '').toLowerCase()).filter(Boolean) || [];
+  const tallasArray = prenda.variantes?.map(v => String(v.talla || '').toLowerCase()).filter(Boolean) || [];
   const tallasUnicas = [...new Set(tallasArray)].map(t => t.charAt(0).toUpperCase() + t.slice(1));
   
-  const coloresArray = prenda.variantes?.map(v => (v.color || '').toLowerCase()).filter(Boolean) || [];
+  const coloresArray = prenda.variantes?.map(v => String(v.color || '').toLowerCase()).filter(Boolean) || [];
   const coloresUnicos = [...new Set(coloresArray)].map(c => c.charAt(0).toUpperCase() + c.slice(1));
 
   return (
