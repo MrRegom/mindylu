@@ -15,27 +15,27 @@ const Layout = () => {
       <main className="main-content">
         <Outlet />
         <nav className="bottom-nav glass" style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 0, padding: '8px 4px' }}>
-          <a href="/admin" className={`nav-item ${location.pathname === '/admin' ? 'active' : ''}`} style={{ fontSize: '0.65rem' }}>
+          <a href="/panel" className={`nav-item ${location.pathname === '/panel' ? 'active' : ''}`} style={{ fontSize: '0.65rem' }}>
             <Home size={22} />
             <span>Inicio</span>
           </a>
-          <a href="/admin/catalogo" className={`nav-item ${location.pathname.includes('/admin/catalogo') ? 'active' : ''}`} style={{ fontSize: '0.65rem' }}>
+          <a href="/panel/catalogo" className={`nav-item ${location.pathname.includes('/panel/catalogo') ? 'active' : ''}`} style={{ fontSize: '0.65rem' }}>
             <Search size={22} />
             <span>Catálogo</span>
           </a>
-          <a href="/admin/ajustes" className={`nav-item ${location.pathname.includes('/admin/ajustes') ? 'active' : ''}`} style={{ fontSize: '0.65rem' }}>
+          <a href="/panel/ajustes" className={`nav-item ${location.pathname.includes('/panel/ajustes') ? 'active' : ''}`} style={{ fontSize: '0.65rem' }}>
             <Settings size={22} />
             <span>Ajustes</span>
           </a>
-          <a href="/admin/entregas" className={`nav-item ${location.pathname.includes('/admin/entregas') ? 'active' : ''}`} style={{ fontSize: '0.65rem' }}>
+          <a href="/panel/entregas" className={`nav-item ${location.pathname.includes('/panel/entregas') ? 'active' : ''}`} style={{ fontSize: '0.65rem' }}>
             <ShoppingBag size={22} />
             <span>Entregas</span>
           </a>
-          <a href="/admin/clientas" className={`nav-item ${location.pathname.includes('/admin/clientas') ? 'active' : ''}`} style={{ fontSize: '0.65rem' }}>
+          <a href="/panel/clientas" className={`nav-item ${location.pathname.includes('/panel/clientas') ? 'active' : ''}`} style={{ fontSize: '0.65rem' }}>
             <User size={22} />
             <span>Clientes</span>
           </a>
-          <a href="/admin/perfil" className={`nav-item ${location.pathname.includes('/admin/perfil') ? 'active' : ''}`} style={{ fontSize: '0.65rem' }}>
+          <a href="/panel/perfil" className={`nav-item ${location.pathname.includes('/panel/perfil') ? 'active' : ''}`} style={{ fontSize: '0.65rem' }}>
             <CreditCard size={22} />
             <span>Perfil</span>
           </a>

@@ -27,16 +27,16 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/admin/login" element={
-          isAuthenticated ? <Navigate to="/admin" replace /> : <Login />
+        <Route path="/panel/login" element={
+          isAuthenticated ? <Navigate to="/panel" replace /> : <Login />
         } />
         
         {/* Catálogo Público (Sin Login) */}
         <Route path="/" element={<PublicCatalog />} />
         
         {/* Panel de Administración (Con Login) */}
-        <Route path="/admin" element={
-          isAuthenticated ? <Layout /> : <Navigate to="/admin/login" replace />
+        <Route path="/panel" element={
+          isAuthenticated ? <Layout /> : <Navigate to="/panel/login" replace />
         }>
           <Route index element={<Home />} />
           <Route path="catalogo/nueva" element={<PrendaForm />} />
