@@ -30,7 +30,7 @@ class CategoriaSerializer(serializers.ModelSerializer):
 class PrendaImagenSerializer(serializers.ModelSerializer):
     class Meta:
         model = PrendaImagen
-        fields = ['id', 'imagen', 'orden']
+        fields = ['id', 'imagen', 'color', 'orden']
 
 
 class PrendaVarianteSerializer(serializers.ModelSerializer):

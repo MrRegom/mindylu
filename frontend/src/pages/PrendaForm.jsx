@@ -174,7 +174,15 @@ const PrendaForm = () => {
       }));
       payload.append('variantes', JSON.stringify(cleanVariantes));
 
-      // Añadir las imágenes reales
+      // Extraer data de imágenes
+      const imagesData = images.map(imgObj => ({
+        color: imgObj.color || '',
+        orden: parseInt(imgObj.orden, 10) || 0,
+        principal: !!imgObj.principal
+      }));
+      payload.append('imagenes_data', JSON.stringify(imagesData));
+
+      // Añadir las imágenes reales en el mismo orden
       images.forEach((imgObj) => {
         payload.append('imagenes', imgObj.file);
       });
@@ -208,8 +216,9 @@ const PrendaForm = () => {
         
         {/* GALERÍA DE FOTOS */}
         <div className="form-section glass">
-          <h3>Fotos del Producto</h3>
-          <ImageUploader images={images} setImages={setImages} />
+          <h3>Imágenes (por foto elige color y orden)</h3>
+          <p style={{fontSize: '0.85rem', color: '#666', marginBottom: '16px'}}>La que marques "Principal" será la portada.</p>
+          <ImageUploader images={images} setImages={setImages} variantes={variantes} />
         </div>
 
         <div className="form-section glass">

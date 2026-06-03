@@ -77,10 +77,21 @@ class PrendaViewSet(viewsets.ModelViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         self.perform_create(serializer)
         prenda = serializer.instance
+        
+        imagenes_data_str = request.data.get('imagenes_data', '[]')
+        try:
+            imagenes_data = json.loads(imagenes_data_str)
+        except json.JSONDecodeError:
+            imagenes_data = []
+            
         imagenes = request.FILES.getlist('imagenes')
         for i, img in enumerate(imagenes):
             from .models import PrendaImagen
-            PrendaImagen.objects.create(prenda=prenda, imagen=img, orden=i)
+            data = imagenes_data[i] if i < len(imagenes_data) else {}
+            color = data.get('color', '')
+            orden = 0 if data.get('principal') else data.get('orden', i + 1)
+            PrendaImagen.objects.create(prenda=prenda, imagen=img, color=color, orden=orden)
+            
         headers = self.get_success_headers(serializer.data)
         return Response(PrendaSerializer(prenda).data, status=status.HTTP_201_CREATED, headers=headers)
 

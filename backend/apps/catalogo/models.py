@@ -113,6 +113,7 @@ class PrendaImagen(models.Model):
     """
     prenda = models.ForeignKey(Prenda, on_delete=models.CASCADE, related_name='imagenes')
     imagen = models.ImageField(upload_to='prendas/')
+    color = models.CharField(max_length=100, blank=True, null=True, help_text=_('Color asociado a esta foto'))
     orden = models.PositiveIntegerField(default=0)
     fecha_subida = models.DateTimeField(auto_now_add=True)
 

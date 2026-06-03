@@ -113,7 +113,7 @@ const ProductModal = ({ prenda, onClose, onAddToCart }) => {
         const baseUrl = API_BASE.replace('/api/v1', '');
         url = `${baseUrl}${url.startsWith('/') ? '' : '/'}${url}`;
       }
-      return url;
+      return { url, color: img.color || '' };
     });
   } else if (prenda.foto_url) {
     let url = prenda.foto_url;
@@ -121,11 +121,18 @@ const ProductModal = ({ prenda, onClose, onAddToCart }) => {
       const baseUrl = API_BASE.replace('/api/v1', '');
       url = `${baseUrl}${url.startsWith('/') ? '' : '/'}${url}`;
     }
-    allImages = [url];
+    allImages = [{ url, color: '' }];
   }
 
   const handlePrev = () => setCurrentImgIdx(i => (i === 0 ? allImages.length - 1 : i - 1));
   const handleNext = () => setCurrentImgIdx(i => (i === allImages.length - 1 ? 0 : i + 1));
+
+  const handleColorClick = (c) => {
+    const idx = allImages.findIndex(img => img.color && img.color.toLowerCase() === c.toLowerCase());
+    if (idx !== -1) {
+      setCurrentImgIdx(idx);
+    }
+  };
 
   const precio = parseInt(prenda.precio || 0).toLocaleString('es-CL');
   const tallasArray = prenda.variantes?.map(v => String(v.talla || '').toLowerCase()).filter(Boolean) || [];
@@ -142,7 +149,7 @@ const ProductModal = ({ prenda, onClose, onAddToCart }) => {
           <div className="lp-modal-gallery">
             {allImages.length > 0 ? (
               <div className="lp-modal-main-img">
-                <img src={allImages[currentImgIdx]} alt={prenda.nombre} />
+                <img src={allImages[currentImgIdx].url} alt={prenda.nombre} />
                 {allImages.length > 1 && (
                   <>
                     <button className="lp-gallery-btn prev" onClick={handlePrev}>&lsaquo;</button>
@@ -157,7 +164,7 @@ const ProductModal = ({ prenda, onClose, onAddToCart }) => {
               <div className="lp-modal-thumbs">
                 {allImages.map((img, idx) => (
                   <img 
-                    key={idx} src={img} alt="thumb"
+                    key={idx} src={img.url} alt="thumb"
                     className={idx === currentImgIdx ? 'active' : ''} 
                     onClick={() => setCurrentImgIdx(idx)} 
                   />
@@ -174,7 +181,18 @@ const ProductModal = ({ prenda, onClose, onAddToCart }) => {
               <div className="lp-modal-opts">
                 <h4>Color</h4>
                 <div className="lp-modal-chips">
-                  {coloresUnicos.map(c => <span key={c} className="chip">{c}</span>)}
+                  {coloresUnicos.map(c => (
+                    <span 
+                      key={c} 
+                      className="chip clickable-color"
+                      onClick={() => handleColorClick(c)}
+                      style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
+                      onMouseEnter={e => e.target.style.transform = 'scale(1.05)'}
+                      onMouseLeave={e => e.target.style.transform = 'scale(1)'}
+                    >
+                      {c}
+                    </span>
+                  ))}
                 </div>
               </div>
             )}
