@@ -54,15 +54,22 @@ const PrendaForm = () => {
         setTallas(resTallas.data.results || resTallas.data);
         
         // Obtener nombres predefinidos
-        const nombresPred = resNombres.data.results || resNombres.data;
+        const arrNombres = Array.isArray(resNombres.data) ? resNombres.data : (resNombres.data?.results || []);
         
         // Obtener prendas existentes para complementar nombres
-        const resPrendas = await api.get('/catalogo/prendas/');
-        const prendas = resPrendas.data.results || resPrendas.data;
+        let arrPrendas = [];
+        try {
+          const resPrendas = await api.get('/catalogo/prendas/');
+          arrPrendas = Array.isArray(resPrendas.data) ? resPrendas.data : (resPrendas.data?.results || []);
+        } catch (errPrendas) {
+          console.error("Error cargando prendas para nombres:", errPrendas);
+        }
+        
         const nombresUnicos = [...new Set([
-          ...nombresPred.map(n => n.nombre), 
-          ...prendas.map(p => p.nombre)
-        ])];
+          ...arrNombres.map(n => n?.nombre), 
+          ...arrPrendas.map(p => p?.nombre)
+        ])].filter(n => typeof n === 'string' && n.trim() !== '').sort();
+        
         setNombresExistentes(nombresUnicos);
       } catch (error) {
         console.error("Error cargando datos iniciales:", error);

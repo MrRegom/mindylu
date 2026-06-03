@@ -65,14 +65,20 @@ const SubidaMasiva = () => {
         setTallas(resTallas.data.results || resTallas.data);
         setColores(resColores.data.results || resColores.data);
         
-        const nombresPred = resNombres.data.results || resNombres.data;
-        const resCatPrendas = await api.get('/catalogo/prendas/');
-        const prendas = resCatPrendas.data.results || resCatPrendas.data;
+        const arrNombres = Array.isArray(resNombres.data) ? resNombres.data : (resNombres.data?.results || []);
+        
+        let arrPrendas = [];
+        try {
+          const resCatPrendas = await api.get('/catalogo/prendas/');
+          arrPrendas = Array.isArray(resCatPrendas.data) ? resCatPrendas.data : (resCatPrendas.data?.results || []);
+        } catch (errPrendas) {
+          console.error("Error cargando prendas para nombres:", errPrendas);
+        }
         
         const nombresUnicos = [...new Set([
-          ...nombresPred.map(n => n.nombre), 
-          ...prendas.map(p => p.nombre)
-        ])].filter(n => n && n.trim() !== '').sort();
+          ...arrNombres.map(n => n?.nombre), 
+          ...arrPrendas.map(p => p?.nombre)
+        ])].filter(n => typeof n === 'string' && n.trim() !== '').sort();
         
         setNombresExistentes(nombresUnicos);
       } catch (error) {
