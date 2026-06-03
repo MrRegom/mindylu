@@ -77,3 +77,12 @@ class EntregaDiariaSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data['tenant'] = self.context['request'].user.tenant
         return super().create(validated_data)
+
+class EntregaDiariaPublicaSerializer(serializers.ModelSerializer):
+    punto_entrega_detalle = PuntoEntregaSerializer(source='punto_entrega', read_only=True)
+    
+    class Meta:
+        model = EntregaDiaria
+        fields = [
+            'id', 'fecha', 'punto_entrega_detalle', 'hora_estimada'
+        ]

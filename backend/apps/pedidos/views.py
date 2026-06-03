@@ -13,8 +13,11 @@ from apps.clientas.models import Clienta
 from .models import PuntoEntrega, Pedido, ItemPedido, EntregaDiaria
 from .serializers import (
     PuntoEntregaSerializer, PedidoSerializer, 
-    EntregaDiariaSerializer, PedidoCreateDesdeCatalogoSerializer
+    EntregaDiariaSerializer, PedidoCreateDesdeCatalogoSerializer,
+    EntregaDiariaPublicaSerializer
 )
+from rest_framework.permissions import AllowAny
+from apps.core.models import Tenant
 
 
 class PuntoEntregaViewSet(viewsets.ModelViewSet):
@@ -252,3 +255,23 @@ class EntregaDiariaViewSet(viewsets.ModelViewSet):
             
         serializer = self.get_serializer(entrega)
         return Response(serializer.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
+
+class EntregaDiariaPublicaView(viewsets.ReadOnlyModelViewSet):
+    """
+    Vista pública para mostrar el itinerario de entregas en el catálogo.
+    Solo expone información segura.
+    """
+    serializer_class = EntregaDiariaPublicaSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        hoy = timezone.localdate()
+        # Asumiendo tenant_id = 1 para la vista pública inicial.
+        tenant = Tenant.objects.first()
+        if not tenant:
+            return EntregaDiaria.objects.none()
+        
+        return EntregaDiaria.objects.filter(
+            tenant=tenant,
+            fecha__gte=hoy
+        ).order_by('fecha', 'hora_estimada')

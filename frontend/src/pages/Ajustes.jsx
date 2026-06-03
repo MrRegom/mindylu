@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Settings, Plus, Trash2, Tag, Palette, Type, Pencil, Check, X, Ruler, Terminal, ChevronRight } from 'lucide-react';
+import { Settings, Plus, Trash2, Tag, Palette, Type, Pencil, Check, X, Ruler, Terminal, ChevronRight, Upload, Phone, LayoutTemplate } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import './Ajustes.css';
@@ -165,6 +165,174 @@ const MantenedorList = ({ titulo, icono, endpoint, placeholder }) => {
   );
 };
 
+const ConfiguracionTiendaForm = () => {
+  const [config, setConfig] = useState({
+    marquesina_texto: '',
+    banner_titulo: '',
+    banner_subtitulo: '',
+    whatsapp_numero: '',
+  });
+  const [bannerFile, setBannerFile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    const loadConfig = async () => {
+      try {
+        const res = await api.get('/core/configuracion/privado/');
+        setConfig(res.data);
+      } catch (error) {
+        console.error('Error al cargar config:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadConfig();
+  }, []);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setConfig(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setBannerFile(e.target.files[0]);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      const formData = new FormData();
+      formData.append('marquesina_texto', config.marquesina_texto || '');
+      formData.append('banner_titulo', config.banner_titulo || '');
+      formData.append('banner_subtitulo', config.banner_subtitulo || '');
+      formData.append('whatsapp_numero', config.whatsapp_numero || '');
+      
+      if (bannerFile) {
+        formData.append('banner_imagen', bannerFile);
+      }
+
+      const res = await api.patch('/core/configuracion/privado/', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      setConfig(res.data);
+      setBannerFile(null);
+      showToast('success', 'Configuración de tienda guardada exitosamente');
+    } catch (error) {
+      console.error(error);
+      showAlert('Error al guardar la configuración de la tienda');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) return <p className="text-muted text-center py-4">Cargando configuración...</p>;
+
+  return (
+    <div className="card glass configuracion-tienda-card" style={{ marginBottom: '24px' }}>
+      <div className="card-header border-b pb-4 mb-4" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <LayoutTemplate size={24} className="icon-primary" />
+        <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--color-text-strong)' }}>Apariencia de la Tienda</h2>
+      </div>
+      
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div className="form-group">
+          <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 500, marginBottom: '8px' }}>
+            <Type size={16} /> Texto de Marquesina (Scroll Superior)
+          </label>
+          <input 
+            type="text" 
+            name="marquesina_texto"
+            className="input-field" 
+            value={config.marquesina_texto || ''}
+            onChange={handleChange}
+            placeholder="Ej: NUEVA COLECCIÓN 2025 • ENVÍOS A TODO EL PAÍS"
+          />
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+          <div className="form-group">
+            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 500, marginBottom: '8px' }}>
+              <Type size={16} /> Título del Banner Principal
+            </label>
+            <input 
+              type="text" 
+              name="banner_titulo"
+              className="input-field" 
+              value={config.banner_titulo || ''}
+              onChange={handleChange}
+              placeholder="Ej: Moda femenina seleccionada..."
+            />
+          </div>
+
+          <div className="form-group">
+            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 500, marginBottom: '8px' }}>
+              <Type size={16} /> Subtítulo del Banner
+            </label>
+            <input 
+              type="text" 
+              name="banner_subtitulo"
+              className="input-field" 
+              value={config.banner_subtitulo || ''}
+              onChange={handleChange}
+              placeholder="Ej: Prendas únicas, elegantes..."
+            />
+          </div>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+          <div className="form-group">
+            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 500, marginBottom: '8px' }}>
+              <Upload size={16} /> Imagen del Banner Principal
+            </label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <input 
+                type="file" 
+                accept="image/*"
+                onChange={handleFileChange}
+                className="input-field"
+                style={{ flex: 1, padding: '8px' }}
+              />
+              {config.banner_imagen && !bannerFile && (
+                <img 
+                  src={config.banner_imagen} 
+                  alt="Banner actual" 
+                  style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '8px', border: '1px solid var(--color-border)' }} 
+                />
+              )}
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 500, marginBottom: '8px' }}>
+              <Phone size={16} /> Número de WhatsApp para Pedidos
+            </label>
+            <input 
+              type="text" 
+              name="whatsapp_numero"
+              className="input-field" 
+              value={config.whatsapp_numero || ''}
+              onChange={handleChange}
+              placeholder="Ej: 56912345678 (Incluir código de país sin +)"
+            />
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
+          <button type="submit" className="btn btn-primary" disabled={saving}>
+            {saving ? 'Guardando...' : 'Guardar Apariencia'}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+};
+
 const Ajustes = () => {
   return (
     <div className="page-container page-ajustes animate-fade-in">
@@ -173,9 +341,12 @@ const Ajustes = () => {
           <Settings size={28} />
           Ajustes
         </h1>
-        <p className="subtitle">Configura los valores por defecto de la aplicación.</p>
+        <p className="subtitle">Configura los valores por defecto y la apariencia de la tienda pública.</p>
       </div>
 
+      <ConfiguracionTiendaForm />
+
+      <h3 style={{ marginBottom: '16px', color: 'var(--color-text-strong)' }}>Mantenedores de Catálogo</h3>
       <div className="ajustes-grid">
         <MantenedorList
           titulo="Categorías"

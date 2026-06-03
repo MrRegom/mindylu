@@ -131,3 +131,38 @@ class ErrorLog(models.Model):
 
     def __str__(self):
         return f"[{self.tipo}] {self.fecha.strftime('%Y-%m-%d %H:%M:%S')} - {self.mensaje[:50]}"
+
+class ConfiguracionTienda(models.Model):
+    tenant = models.OneToOneField(Tenant, on_delete=models.CASCADE, related_name='configuracion')
+    marquesina_texto = models.CharField(
+        max_length=255, 
+        default='NUEVA COLECCIÓN 2025 • NUEVA COLECCIÓN 2025 • NUEVA COLECCIÓN 2025',
+        verbose_name=_('Texto de la marquesina')
+    )
+    banner_imagen = models.ImageField(
+        upload_to='banners/', 
+        null=True, blank=True,
+        verbose_name=_('Imagen del Banner')
+    )
+    banner_titulo = models.CharField(
+        max_length=255, 
+        default='Moda femenina seleccionada especialmente para ti',
+        verbose_name=_('Título del Banner')
+    )
+    banner_subtitulo = models.TextField(
+        default='Prendas únicas, elegantes y exclusivas.\nCada pieza seleccionada con amor y estilo.',
+        verbose_name=_('Subtítulo del Banner')
+    )
+    whatsapp_numero = models.CharField(
+        max_length=20, 
+        default='', 
+        blank=True,
+        verbose_name=_('Número de WhatsApp')
+    )
+
+    class Meta:
+        verbose_name = _('Configuración de Tienda')
+        verbose_name_plural = _('Configuraciones de Tienda')
+
+    def __str__(self):
+        return f'Configuración de {self.tenant.nombre}'

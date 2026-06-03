@@ -11,9 +11,6 @@ import './PublicCatalog.css';
 // URL base del API (VITE_API_URL ya tiene el formato http://host/api/v1/)
 const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1/').replace(/\/$/, '');
 
-// Número de WhatsApp de la tienda (configurable)
-const WA_NUMBER = '56900000000';
-
 // ── Icono WhatsApp SVG ─────────────────────────────────────
 const WaIcon = ({ size = 16 }) => (
   <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} fill="currentColor" viewBox="0 0 16 16">
@@ -21,23 +18,20 @@ const WaIcon = ({ size = 16 }) => (
   </svg>
 );
 
-// ── Helper: abrir WhatsApp ─────────────────────────────────
-const abrirWhatsApp = (prenda) => {
-  const nombre = prenda?.nombre || 'una prenda';
-  const precio = prenda?.precio ? ` - $${parseInt(prenda.precio).toLocaleString('es-CL')}` : '';
-  const msg = encodeURIComponent(
-    `¡Hola LuPrenditas! 👗\nMe interesa: *${nombre}*${precio}.\n¿Está disponible?`
-  );
-  window.open(`https://wa.me/${WA_NUMBER}?text=${msg}`, '_blank');
-};
+const CartIcon = ({ size = 20 }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+    <circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+  </svg>
+);
 
-const abrirWhatsAppGeneral = () => {
-  const msg = encodeURIComponent('¡Hola LuPrenditas! Me gustaría ver el catálogo 💕');
-  window.open(`https://wa.me/${WA_NUMBER}?text=${msg}`, '_blank');
-};
+const TrashIcon = ({ size = 16 }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+    <polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+  </svg>
+);
 
 // ── Tarjeta de Producto ────────────────────────────────────
-const ProductCard = ({ prenda }) => {
+const ProductCard = ({ prenda, onAddToCart }) => {
   const [imgError, setImgError] = useState(false);
   const estado = prenda.estado || 'disponible';
   
@@ -79,10 +73,10 @@ const ProductCard = ({ prenda }) => {
         {estado !== 'vendida' && (
           <div className="lp-card-overlay">
             <button
-              className="lp-card-btn wa"
-              onClick={(e) => { e.stopPropagation(); abrirWhatsApp(prenda); }}
+              className="lp-card-btn"
+              onClick={(e) => { e.stopPropagation(); onAddToCart(prenda); }}
             >
-              <WaIcon /> Me Interesa
+              <CartIcon /> Agregar al carrito
             </button>
           </div>
         )}
@@ -93,10 +87,10 @@ const ProductCard = ({ prenda }) => {
         {tallas && <p className="lp-card-tallas">{tallas}</p>}
         {estado !== 'vendida' && (
           <button
-            className="lp-card-btn-mobile wa"
-            onClick={(e) => { e.stopPropagation(); abrirWhatsApp(prenda); }}
+            className="lp-card-btn-mobile"
+            onClick={(e) => { e.stopPropagation(); onAddToCart(prenda); }}
           >
-            <WaIcon /> Lo quiero
+            <CartIcon /> Añadir al carrito
           </button>
         )}
       </div>
@@ -106,11 +100,15 @@ const ProductCard = ({ prenda }) => {
 
 // ── Componente Principal ───────────────────────────────────
 const PublicCatalog = () => {
+  const [config, setConfig]         = useState(null);
   const [prendas, setPrendas]       = useState([]);
   const [categorias, setCategorias] = useState([]);
+  const [entregas, setEntregas]     = useState([]);
   const [catSel, setCatSel]         = useState('');
   const [loading, setLoading]       = useState(true);
   const [menuOpen, setMenuOpen]     = useState(false);
+  const [cart, setCart]             = useState([]);
+  const [cartOpen, setCartOpen]     = useState(false);
 
   const catalogRef  = useRef(null);
   const catRef      = useRef(null);
@@ -118,12 +116,32 @@ const PublicCatalog = () => {
   const entregasRef = useRef(null);
 
   useEffect(() => {
+    fetchConfig();
     fetchCategorias();
+    fetchEntregas();
   }, []);
 
   useEffect(() => {
     fetchPrendas();
   }, [catSel]);
+
+  const fetchConfig = async () => {
+    try {
+      const res = await axios.get(`${API_BASE}/core/configuracion/publico/`);
+      setConfig(res.data);
+    } catch (e) {
+      console.error('Error config:', e);
+    }
+  };
+
+  const fetchEntregas = async () => {
+    try {
+      const res = await axios.get(`${API_BASE}/pedidos/publico/entregas/`);
+      setEntregas(Array.isArray(res.data) ? res.data : (res.data.results || []));
+    } catch (e) {
+      console.error('Error entregas:', e);
+    }
+  };
 
   const fetchCategorias = async () => {
     try {
@@ -164,6 +182,45 @@ const PublicCatalog = () => {
     return catEmojis[Object.keys(catEmojis).find(k => lower.includes(k))] || catEmojis.default;
   };
 
+  const addToCart = (prenda) => {
+    if (!cart.find(p => p.id === prenda.id)) {
+      setCart([...cart, prenda]);
+      setCartOpen(true);
+    }
+  };
+
+  const removeFromCart = (id) => {
+    setCart(cart.filter(p => p.id !== id));
+  };
+
+  const abrirWhatsAppCart = () => {
+    const waNumber = config?.whatsapp_numero || '56900000000';
+    if (cart.length === 0) {
+      const msg = encodeURIComponent('¡Hola LuPrenditas! Me gustaría ver el catálogo 💕');
+      window.open(`https://wa.me/${waNumber}?text=${msg}`, '_blank');
+      return;
+    }
+    
+    let msg = '¡Hola LuPrenditas! 👗\nMe interesan las siguientes prendas:\n\n';
+    cart.forEach(p => {
+      let url = p.imagenes?.[0]?.imagen || p.foto_url || '';
+      if (url && !url.startsWith('http')) {
+        const baseUrl = API_BASE.replace('/api/v1', '');
+        url = `${baseUrl}${url.startsWith('/') ? '' : '/'}${url}`;
+      }
+      msg += `- ${p.nombre} ($${parseInt(p.precio).toLocaleString('es-CL')})\n  Ver foto: ${url}\n\n`;
+    });
+    msg += '¿Están disponibles?';
+    
+    window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`, '_blank');
+  };
+
+  const abrirWhatsAppGeneral = () => {
+    const waNumber = config?.whatsapp_numero || '56900000000';
+    const msg = encodeURIComponent('¡Hola LuPrenditas! Me gustaría ver el catálogo 💕');
+    window.open(`https://wa.me/${waNumber}?text=${msg}`, '_blank');
+  };
+
   return (
     <div className="lp-root">
 
@@ -178,9 +235,19 @@ const PublicCatalog = () => {
           <li><a onClick={() => scrollTo(entregasRef)}>Entregas</a></li>
         </ul>
 
-        <button className="lp-nav-wa" onClick={abrirWhatsAppGeneral}>
-          <WaIcon /> WhatsApp
-        </button>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <button className="lp-nav-cart" onClick={() => setCartOpen(true)} style={{ position: 'relative', background: 'none', border: 'none', cursor: 'pointer', padding: '8px' }}>
+            <CartIcon size={24} />
+            {cart.length > 0 && (
+              <span style={{ position: 'absolute', top: 0, right: 0, background: 'var(--color-primary)', color: 'white', fontSize: '10px', fontWeight: 'bold', width: '16px', height: '16px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {cart.length}
+              </span>
+            )}
+          </button>
+          <button className="lp-nav-wa" onClick={abrirWhatsAppGeneral}>
+            <WaIcon /> WhatsApp
+          </button>
+        </div>
 
         <button className="lp-hamburger" onClick={() => setMenuOpen(!menuOpen)} aria-label="Menú">
           <span /><span /><span />
@@ -218,25 +285,32 @@ const PublicCatalog = () => {
       {/* ── Banner rotante ── */}
       <div className="lp-banner" style={{ marginTop: 70 }}>
         {Array.from({ length: 6 }).map((_, i) => (
-          <>
-            <span key={`t${i}`} className="lp-banner-text">Nueva Colección 2025</span>
-            <span key={`d${i}`} className="lp-banner-dot" />
-          </>
+          <div key={i} style={{ display: 'contents' }}>
+            <span className="lp-banner-text">{config?.marquesina_texto || 'Nueva Colección 2025'}</span>
+            <span className="lp-banner-dot" />
+          </div>
         ))}
       </div>
 
       {/* ── Hero ── */}
       <section className="lp-hero">
-        <img src="/images/hero.jpg" alt="LuPrenditas - Moda Femenina" className="lp-hero-img" />
+        <img src={config?.banner_imagen || "/images/hero.jpg"} alt={config?.banner_titulo || "LuPrenditas - Moda Femenina"} className="lp-hero-img" />
         <div className="lp-hero-overlay" />
         <div className="lp-hero-content">
-          <div className="lp-hero-tag">✦ Nueva Colección</div>
+          <div className="lp-hero-tag">✦ {config?.tienda_nombre || 'LuPrenditas'}</div>
           <h1 className="lp-hero-title">
-            Moda femenina<br /><em>seleccionada</em><br />especialmente para ti
+            {config?.banner_titulo ? (
+              <div dangerouslySetInnerHTML={{ __html: config.banner_titulo.replace(/\n/g, '<br />') }} />
+            ) : (
+              <>Moda femenina<br /><em>seleccionada</em><br />especialmente para ti</>
+            )}
           </h1>
           <p className="lp-hero-sub">
-            Prendas únicas, elegantes y exclusivas.<br />
-            Cada pieza seleccionada con amor y estilo.
+            {config?.banner_subtitulo ? (
+              config.banner_subtitulo.split('\n').map((line, i) => <span key={i}>{line}<br /></span>)
+            ) : (
+              <>Prendas únicas, elegantes y exclusivas.<br />Cada pieza seleccionada con amor y estilo.</>
+            )}
           </p>
           <div className="lp-hero-ctas">
             <button className="lp-btn-primary" onClick={() => scrollTo(catalogRef)}>
@@ -291,7 +365,7 @@ const PublicCatalog = () => {
             {prendas.length === 0 ? (
               <p className="lp-empty">No hay prendas en esta categoría por ahora.</p>
             ) : (
-              prendas.map(p => <ProductCard key={p.id} prenda={p} />)
+              prendas.map(p => <ProductCard key={p.id} prenda={p} onAddToCart={addToCart} />)
             )}
           </div>
         )}
@@ -356,21 +430,99 @@ const PublicCatalog = () => {
         <p className="lp-section-label">✦ Agenda de despachos</p>
         <h2 className="lp-section-title">Próximas <em>Entregas</em></h2>
         <div className="lp-entregas-grid">
-          {[
-            { icon: '📍', lugar: 'Centro de Viña del Mar', horario: 'Lunes y Miércoles · 10:00–13:00' },
-            { icon: '📍', lugar: 'Estación Limache', horario: 'Martes · 14:00–17:00' },
-            { icon: '🚚', lugar: 'Despacho a domicilio', horario: 'Coordinar por WhatsApp' },
-          ].map((e, i) => (
-            <div key={i} className="lp-entrega-card">
-              <div className="lp-entrega-icon">{e.icon}</div>
+          {entregas.length > 0 ? (
+            entregas.map((e) => (
+              <div key={e.id} className="lp-entrega-card">
+                <div className="lp-entrega-icon">📍</div>
+                <div className="lp-entrega-info">
+                  <strong>{e.punto_entrega_detalle?.nombre || 'Punto de Entrega'}</strong>
+                  <p>{e.fecha} · {e.hora_estimada || 'Hora a convenir'}</p>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="lp-entrega-card" style={{ gridColumn: '1 / -1', textAlign: 'center', justifyContent: 'center' }}>
               <div className="lp-entrega-info">
-                <strong>{e.lugar}</strong>
-                <p>{e.horario}</p>
+                <strong>No hay rutas programadas por ahora</strong>
+                <p>Consulte por WhatsApp para coordinar despachos.</p>
               </div>
             </div>
-          ))}
+          )}
+          <div className="lp-entrega-card">
+            <div className="lp-entrega-icon">🚚</div>
+            <div className="lp-entrega-info">
+              <strong>Despacho a domicilio</strong>
+              <p>Coordinar por WhatsApp</p>
+            </div>
+          </div>
         </div>
       </section>
+
+      {/* ── Carrito Flotante Modal ── */}
+      {cartOpen && (
+        <div style={{
+          position: 'fixed', top: 0, right: 0, bottom: 0, width: '100%', maxWidth: '400px',
+          background: '#fff', zIndex: 1000, boxShadow: '-4px 0 24px rgba(0,0,0,0.1)',
+          display: 'flex', flexDirection: 'column',
+          transform: cartOpen ? 'translateX(0)' : 'translateX(100%)',
+          transition: 'transform 0.3s ease'
+        }}>
+          <div style={{ padding: '24px', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h3 style={{ margin: 0, fontFamily: "'Playfair Display', serif", fontSize: '1.5rem', fontWeight: 600 }}>Mi Consulta</h3>
+            <button onClick={() => setCartOpen(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer' }}>&times;</button>
+          </div>
+          
+          <div style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
+            {cart.length === 0 ? (
+              <p style={{ textAlign: 'center', color: '#666', marginTop: '40px' }}>Tu lista está vacía.</p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {cart.map(p => (
+                  <div key={p.id} style={{ display: 'flex', gap: '12px', alignItems: 'center', borderBottom: '1px solid #f5f5f5', paddingBottom: '16px' }}>
+                    <img 
+                      src={p.imagenes?.[0]?.imagen || p.foto_url || ''} 
+                      alt={p.nombre} 
+                      style={{ width: '60px', height: '80px', objectFit: 'cover', borderRadius: '4px' }} 
+                      onError={(e) => { e.target.style.display = 'none'; }}
+                    />
+                    <div style={{ flex: 1 }}>
+                      <p style={{ margin: '0 0 4px 0', fontWeight: 500 }}>{p.nombre}</p>
+                      <p style={{ margin: 0, color: 'var(--color-primary)', fontWeight: 600 }}>${parseInt(p.precio || 0).toLocaleString('es-CL')}</p>
+                    </div>
+                    <button onClick={() => removeFromCart(p.id)} style={{ background: 'none', border: 'none', color: '#dc2626', cursor: 'pointer', padding: '8px' }}>
+                      <TrashIcon />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          
+          <div style={{ padding: '24px', borderTop: '1px solid #eee', background: '#fafafa' }}>
+            <button 
+              onClick={abrirWhatsAppCart}
+              disabled={cart.length === 0}
+              style={{
+                width: '100%', padding: '16px', background: 'var(--color-primary)', color: 'white',
+                border: 'none', borderRadius: '8px', fontSize: '1.1rem', fontWeight: 600,
+                display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px',
+                cursor: cart.length === 0 ? 'not-allowed' : 'pointer',
+                opacity: cart.length === 0 ? 0.7 : 1
+              }}
+            >
+              <WaIcon size={20} /> Enviar consulta por WhatsApp
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Overlay del carrito */}
+      {cartOpen && (
+        <div 
+          onClick={() => setCartOpen(false)}
+          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', zIndex: 999 }}
+        />
+      )}
 
       {/* ── Footer ── */}
       <footer className="lp-footer">

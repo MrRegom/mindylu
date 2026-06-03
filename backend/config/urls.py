@@ -23,6 +23,7 @@ urlpatterns = [
     path('api/v1/integraciones/', include('apps.integraciones.urls')),
     path('api/v1/reportes/', include('apps.reportes.urls')),
     path('api/v1/logs/', include('apps.core.urls.logs')),
+    path('api/v1/core/configuracion/', include('apps.core.urls.config')),
 ]
 
 # Servir archivos media en desarrollo
