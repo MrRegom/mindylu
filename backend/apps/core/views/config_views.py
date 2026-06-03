@@ -45,7 +45,7 @@ class ConfiguracionTiendaPublicaView(views.APIView):
         config, created = ConfiguracionTienda.objects.get_or_create(tenant=tenant)
         serializer = ConfiguracionTiendaSerializer(config)
         
-        # También vamos a devolver el nombre de la tienda y su plan por si acaso.
+        # También vamos a devolver el nombre de la tienda y su plan por si acaso en otras variables.
         data = serializer.data
-        data['tienda_nombre'] = tenant.nombre
+        data['tenant_nombre'] = tenant.nombre
         return Response(data)

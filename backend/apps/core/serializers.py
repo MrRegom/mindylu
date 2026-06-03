@@ -102,7 +102,7 @@ class ConfiguracionTiendaSerializer(serializers.ModelSerializer):
     class Meta:
         model = ConfiguracionTienda
         fields = [
-            'marquesina_texto', 'banner_imagen', 
-            'banner_titulo', 'banner_subtitulo', 'whatsapp_numero'
+            'marquesina_texto', 'marquesina_velocidad', 'banner_imagen', 
+            'banner_titulo', 'banner_subtitulo', 'whatsapp_numero', 'tienda_nombre'
         ]
 

@@ -139,6 +139,10 @@ class ConfiguracionTienda(models.Model):
         default='NUEVA COLECCIÓN 2025 • NUEVA COLECCIÓN 2025 • NUEVA COLECCIÓN 2025',
         verbose_name=_('Texto de la marquesina')
     )
+    marquesina_velocidad = models.IntegerField(
+        default=25,
+        verbose_name=_('Velocidad de Marquesina (segundos)')
+    )
     banner_imagen = models.ImageField(
         upload_to='banners/', 
         null=True, blank=True,
@@ -155,9 +159,14 @@ class ConfiguracionTienda(models.Model):
     )
     whatsapp_numero = models.CharField(
         max_length=20, 
-        default='', 
+        default='56972677820', 
         blank=True,
         verbose_name=_('Número de WhatsApp')
+    )
+    tienda_nombre = models.CharField(
+        max_length=100,
+        default='MindyLu',
+        verbose_name=_('Nombre de la Tienda (UI)')
     )
 
     class Meta:
