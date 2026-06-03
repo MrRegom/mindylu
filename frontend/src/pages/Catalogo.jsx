@@ -297,7 +297,36 @@ const Catalogo = () => {
                       </div>
                     )}
                   </div>
-                  <div className="precio" style={{ marginTop: 4 }}>${Number(prenda.precio || 0).toLocaleString('es-CL')}</div>
+                  <div className="precio" style={{ marginTop: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>${Number(prenda.precio || 0).toLocaleString('es-CL')}</span>
+                    {!modoPublicar && (
+                      <select
+                        value={prenda.estado}
+                        onChange={async (e) => {
+                          e.stopPropagation();
+                          const nuevoEstado = e.target.value;
+                          try {
+                            await api.patch(`/catalogo/prendas/${prenda.id}/`, { estado: nuevoEstado });
+                            fetchCatalogo();
+                          } catch(err) {
+                            console.error(err);
+                          }
+                        }}
+                        style={{
+                          fontSize: '0.75rem',
+                          padding: '2px 4px',
+                          borderRadius: 4,
+                          border: '1px solid #ccc',
+                          background: prenda.estado === 'reservada' ? '#fef08a' : prenda.estado === 'vendida' ? '#fecaca' : '#dcfce7',
+                          color: '#374151'
+                        }}
+                      >
+                        <option value="disponible">Disponible</option>
+                        <option value="reservada">Reservada</option>
+                        <option value="vendida">Vendida</option>
+                      </select>
+                    )}
+                  </div>
 
                   {!modoPublicar && (
                     <div className="variantes-list" style={{ marginTop: 12 }}>
@@ -311,6 +340,7 @@ const Catalogo = () => {
                             </div>
                             <div className="variante-stock">
                               <span className="stock-num">{variante.cantidad} disp.</span>
+                              {/* 
                               <button
                                 className="btn-vender"
                                 disabled={agotado}
@@ -319,6 +349,7 @@ const Catalogo = () => {
                               >
                                 <Check size={16} />
                               </button>
+                              */}
                             </div>
                           </div>
                         );

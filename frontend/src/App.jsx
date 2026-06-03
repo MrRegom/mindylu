@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import PublicCatalog from './pages/PublicCatalog';
 import Layout from './components/Layout';
 import Login from './pages/Login';
 import Home from './pages/Home';
@@ -26,29 +27,33 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/login" element={
-          isAuthenticated ? <Navigate to="/" replace /> : <Login />
+        <Route path="/admin/login" element={
+          isAuthenticated ? <Navigate to="/admin" replace /> : <Login />
         } />
         
-        <Route element={
-          isAuthenticated ? <Layout /> : <Navigate to="/login" replace />
+        {/* Catálogo Público (Sin Login) */}
+        <Route path="/" element={<PublicCatalog />} />
+        
+        {/* Panel de Administración (Con Login) */}
+        <Route path="/admin" element={
+          isAuthenticated ? <Layout /> : <Navigate to="/admin/login" replace />
         }>
-          <Route path="/" element={<Home />} />
-          <Route path="/catalogo/nueva" element={<PrendaForm />} />
-          <Route path="/catalogo/subida-masiva" element={<SubidaMasiva />} />
-          <Route path="/catalogo/carga-masiva" element={<CargaMasiva />} />
-          <Route path="/catalogo/lotes" element={<LotesProgramados />} />
-          <Route path="/catalogo/lotes/:id/editar" element={<LoteAddFotos />} />
-          <Route path="/catalogo" element={<Catalogo />} />
-          <Route path="/entregas" element={<Entregas />} />
-          <Route path="/clientas/nueva" element={<ClientaForm />} />
-          <Route path="/clientas/:id/editar" element={<ClientaForm />} />
-          <Route path="/clientas/:id" element={<ClientaDetail />} />
-          <Route path="/clientas" element={<Clientas />} />
-          <Route path="/cuentas" element={<Cuentas />} />
-          <Route path="/ajustes" element={<Ajustes />} />
-          <Route path="/ajustes/logs" element={<Logs />} />
-          <Route path="/perfil" element={<Perfil />} />
+          <Route index element={<Home />} />
+          <Route path="catalogo/nueva" element={<PrendaForm />} />
+          <Route path="catalogo/subida-masiva" element={<SubidaMasiva />} />
+          <Route path="catalogo/carga-masiva" element={<CargaMasiva />} />
+          <Route path="catalogo/lotes" element={<LotesProgramados />} />
+          <Route path="catalogo/lotes/:id/editar" element={<LoteAddFotos />} />
+          <Route path="catalogo" element={<Catalogo />} />
+          <Route path="entregas" element={<Entregas />} />
+          <Route path="clientas/nueva" element={<ClientaForm />} />
+          <Route path="clientas/:id/editar" element={<ClientaForm />} />
+          <Route path="clientas/:id" element={<ClientaDetail />} />
+          <Route path="clientas" element={<Clientas />} />
+          <Route path="cuentas" element={<Cuentas />} />
+          <Route path="ajustes" element={<Ajustes />} />
+          <Route path="ajustes/logs" element={<Logs />} />
+          <Route path="perfil" element={<Perfil />} />
         </Route>
       </Routes>
     </Router>

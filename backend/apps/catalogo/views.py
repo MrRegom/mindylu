@@ -277,7 +277,6 @@ class PrendaViewSet(viewsets.ModelViewSet):
                     if imagen_file:
                         PrendaImagen.objects.create(prenda=prenda, imagen=imagen_file, orden=0)
                     creadas_ids.append(prenda.id)
-
                 if fecha_programada_str:
                     from apps.integraciones.scheduler import schedule_publicacion_lote
                     schedule_publicacion_lote(ciclo.id, ciclo.fecha_programada)
@@ -463,3 +462,50 @@ class NombrePrendaPredefinidoViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(tenant=self.request.user.tenant)
+
+
+class PublicoCategoriaViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Endpoint público para leer las categorías. No requiere autenticación.
+    """
+    serializer_class = CategoriaSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def get_queryset(self):
+        from apps.core.models import Tenant
+        tenant = Tenant.objects.first() # Para el MVP, asumimos un solo tenant activo
+        if tenant:
+            return Categoria.objects.filter(tenant=tenant)
+        return Categoria.objects.none()
+
+
+class PublicoPrendaViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Endpoint público para el catálogo. No requiere autenticación.
+    """
+    serializer_class = PrendaSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def get_queryset(self):
+        from apps.core.models import Tenant
+        tenant = Tenant.objects.first()
+        if not tenant:
+            return Prenda.objects.none()
+            
+        qs = Prenda.objects.filter(tenant=tenant).prefetch_related('variantes', 'imagenes').select_related('categoria')
+        
+        # Filtro de prendas visibles públicamente (DISPONIBLE y RESERVADA, no VENDIDA)
+        qs = qs.filter(estado__in=[Prenda.Estado.DISPONIBLE, Prenda.Estado.RESERVADA])
+        
+        categoria_id = self.request.query_params.get('categoria', None)
+        if categoria_id:
+            qs = qs.filter(categoria_id=categoria_id)
+            
+        solo_hoy = self.request.query_params.get('solo_hoy', 'false').lower() == 'true'
+        if solo_hoy:
+            from django.utils import timezone
+            from datetime import timedelta
+            hoy_inicio = timezone.now() - timedelta(hours=24)
+            qs = qs.filter(fecha_ultima_carga__gte=hoy_inicio)
+            
+        return qs

@@ -62,8 +62,8 @@ class Prenda(models.Model):
 
     class Estado(models.TextChoices):
         DISPONIBLE = 'disponible', _('Disponible')
-        AGOTADA = 'agotada', _('Agotada')
-        ARCHIVADA = 'archivada', _('Archivada')
+        RESERVADA = 'reservada', _('Reservada')
+        VENDIDA = 'vendida', _('Vendida')
 
     tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name='prendas')
     ciclo = models.ForeignKey(CicloVenta, on_delete=models.SET_NULL, null=True, blank=True, related_name='prendas')
@@ -97,16 +97,12 @@ class Prenda(models.Model):
         return f"{self.nombre} (${self.precio})"
 
     def actualizar_estado(self):
-        """Regla de negocio (SRP): Si no queda stock, pasa a agotada. Si recupera stock, vuelve a disponible."""
-        total_stock = sum(v.cantidad for v in self.variantes.all())
-        if total_stock <= 0:
-            if self.estado == self.Estado.DISPONIBLE:
-                self.estado = self.Estado.AGOTADA
-                self.save()
-        else:
-            if self.estado in [self.Estado.AGOTADA, self.Estado.ARCHIVADA]:
-                self.estado = self.Estado.DISPONIBLE
-                self.save()
+        """
+        Regla de negocio social commerce:
+        NO se cambia el estado automáticamente. 
+        La dueña decide manualmente si está reservada o vendida.
+        """
+        pass
 
 
 class PrendaImagen(models.Model):
