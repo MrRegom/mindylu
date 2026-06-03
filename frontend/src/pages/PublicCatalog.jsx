@@ -55,7 +55,7 @@ const ProductCard = ({ prenda, onAddToCart }) => {
   }[estado] || 'Disponible';
 
   return (
-    <article className="lp-card">
+    <article className="lp-card" onClick={() => onAddToCart(prenda, 0, true)}>
       <div className="lp-card-img-wrap">
         {imagen && !imgError ? (
           <img 
@@ -76,7 +76,7 @@ const ProductCard = ({ prenda, onAddToCart }) => {
               className="lp-card-btn"
               onClick={(e) => { e.stopPropagation(); onAddToCart(prenda); }}
             >
-              <CartIcon /> Agregar al carrito
+              <CartIcon /> Agregar al carrito de consultas
             </button>
           </div>
         )}
@@ -98,6 +98,118 @@ const ProductCard = ({ prenda, onAddToCart }) => {
   );
 };
 
+// ── Modal de Producto Avanzado ─────────────────────────────
+const ProductModal = ({ prenda, onClose, onAddToCart }) => {
+  const [currentImgIdx, setCurrentImgIdx] = useState(0);
+  const [qty, setQty] = useState(1);
+
+  if (!prenda) return null;
+
+  let allImages = [];
+  if (prenda.imagenes && prenda.imagenes.length > 0) {
+    allImages = prenda.imagenes.map(img => {
+      let url = img.imagen;
+      if (url && !url.startsWith('http')) {
+        const baseUrl = API_BASE.replace('/api/v1', '');
+        url = `${baseUrl}${url.startsWith('/') ? '' : '/'}${url}`;
+      }
+      return url;
+    });
+  } else if (prenda.foto_url) {
+    let url = prenda.foto_url;
+    if (url && !url.startsWith('http')) {
+      const baseUrl = API_BASE.replace('/api/v1', '');
+      url = `${baseUrl}${url.startsWith('/') ? '' : '/'}${url}`;
+    }
+    allImages = [url];
+  }
+
+  const handlePrev = () => setCurrentImgIdx(i => (i === 0 ? allImages.length - 1 : i - 1));
+  const handleNext = () => setCurrentImgIdx(i => (i === allImages.length - 1 ? 0 : i + 1));
+
+  const precio = parseInt(prenda.precio || 0).toLocaleString('es-CL');
+  const tallasArray = prenda.variantes?.map(v => (v.talla || '').toLowerCase()).filter(Boolean) || [];
+  const tallasUnicas = [...new Set(tallasArray)].map(t => t.charAt(0).toUpperCase() + t.slice(1));
+  
+  const coloresArray = prenda.variantes?.map(v => (v.color || '').toLowerCase()).filter(Boolean) || [];
+  const coloresUnicos = [...new Set(coloresArray)].map(c => c.charAt(0).toUpperCase() + c.slice(1));
+
+  return (
+    <div className="lp-modal-overlay" onClick={onClose}>
+      <div className="lp-modal-content" onClick={e => e.stopPropagation()}>
+        <button className="lp-modal-close" onClick={onClose}>&times;</button>
+        <div className="lp-modal-grid">
+          <div className="lp-modal-gallery">
+            {allImages.length > 0 ? (
+              <div className="lp-modal-main-img">
+                <img src={allImages[currentImgIdx]} alt={prenda.nombre} />
+                {allImages.length > 1 && (
+                  <>
+                    <button className="lp-gallery-btn prev" onClick={handlePrev}>&lsaquo;</button>
+                    <button className="lp-gallery-btn next" onClick={handleNext}>&rsaquo;</button>
+                  </>
+                )}
+              </div>
+            ) : (
+              <div className="lp-modal-main-img no-img">👗</div>
+            )}
+            {allImages.length > 1 && (
+              <div className="lp-modal-thumbs">
+                {allImages.map((img, idx) => (
+                  <img 
+                    key={idx} src={img} alt="thumb"
+                    className={idx === currentImgIdx ? 'active' : ''} 
+                    onClick={() => setCurrentImgIdx(idx)} 
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+          <div className="lp-modal-info">
+            <h2>{prenda.nombre}</h2>
+            <p className="price">${precio}</p>
+            <p className="desc">{prenda.descripcion || 'Sin descripción adicional.'}</p>
+
+            {coloresUnicos.length > 0 && (
+              <div className="lp-modal-opts">
+                <h4>Color</h4>
+                <div className="lp-modal-chips">
+                  {coloresUnicos.map(c => <span key={c} className="chip">{c}</span>)}
+                </div>
+              </div>
+            )}
+            {tallasUnicas.length > 0 && (
+              <div className="lp-modal-opts">
+                <h4>Tallas</h4>
+                <div className="lp-modal-chips">
+                  {tallasUnicas.map(t => <span key={t} className="chip">{t}</span>)}
+                </div>
+              </div>
+            )}
+
+            <div className="lp-modal-qty-add">
+              <div className="lp-qty-selector">
+                <button onClick={() => setQty(q => Math.max(1, q - 1))}>-</button>
+                <span>{qty}</span>
+                <button onClick={() => setQty(q => q + 1)}>+</button>
+              </div>
+              <button 
+                className="lp-modal-add-btn"
+                onClick={() => {
+                  onAddToCart(prenda, qty);
+                  onClose();
+                }}
+              >
+                Añadir al carrito
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // ── Componente Principal ───────────────────────────────────
 const PublicCatalog = () => {
   const [config, setConfig]         = useState(null);
@@ -109,6 +221,7 @@ const PublicCatalog = () => {
   const [menuOpen, setMenuOpen]     = useState(false);
   const [cart, setCart]             = useState([]);
   const [cartOpen, setCartOpen]     = useState(false);
+  const [selectedPrenda, setSelectedPrenda] = useState(null);
 
   const catalogRef  = useRef(null);
   const catRef      = useRef(null);
@@ -182,15 +295,33 @@ const PublicCatalog = () => {
     return catEmojis[Object.keys(catEmojis).find(k => lower.includes(k))] || catEmojis.default;
   };
 
-  const addToCart = (prenda) => {
-    if (!cart.find(p => p.id === prenda.id)) {
-      setCart([...cart, prenda]);
-      setCartOpen(true);
+  const addToCart = (prenda, qty = 1, isDirect = false) => {
+    if (isDirect) {
+      setSelectedPrenda(prenda);
+      return;
     }
+    
+    const existing = cart.find(p => p.id === prenda.id);
+    if (existing) {
+      setCart(cart.map(p => p.id === prenda.id ? { ...p, qty: p.qty + qty } : p));
+    } else {
+      setCart([...cart, { ...prenda, qty }]);
+    }
+    setCartOpen(true);
   };
 
   const removeFromCart = (id) => {
     setCart(cart.filter(p => p.id !== id));
+  };
+
+  const updateCartQty = (id, delta) => {
+    setCart(cart.map(p => {
+      if (p.id === id) {
+        const newQty = p.qty + delta;
+        return newQty > 0 ? { ...p, qty: newQty } : null;
+      }
+      return p;
+    }).filter(Boolean));
   };
 
   const abrirWhatsAppCart = () => {
@@ -208,7 +339,7 @@ const PublicCatalog = () => {
         const baseUrl = API_BASE.replace('/api/v1', '');
         url = `${baseUrl}${url.startsWith('/') ? '' : '/'}${url}`;
       }
-      msg += `- ${p.nombre} ($${parseInt(p.precio).toLocaleString('es-CL')})\n  Ver foto: ${url}\n\n`;
+      msg += `- ${p.qty}x ${p.nombre} ($${parseInt(p.precio).toLocaleString('es-CL')} c/u)\n  Ver foto: ${url}\n\n`;
     });
     msg += '¿Están disponibles?';
     
@@ -226,7 +357,13 @@ const PublicCatalog = () => {
 
       {/* ── Navbar ── */}
       <nav className="lp-nav">
-        <a className="lp-nav-brand" href="/">{config?.tienda_nombre || 'MindyLu'}</a>
+        <a className="lp-nav-brand" href="/">
+          {(config?.tienda_nombre || 'MindyLu').toLowerCase() === 'mindylu' ? (
+            <><span style={{ color: '#d9777f' }}>Mindy</span><span style={{ color: '#111' }}>Lu</span></>
+          ) : (
+            config?.tienda_nombre || 'MindyLu'
+          )}
+        </a>
 
         <ul className="lp-nav-links">
           <li><a onClick={() => scrollTo(catalogRef)}>Catálogo</a></li>
@@ -244,8 +381,8 @@ const PublicCatalog = () => {
               </span>
             )}
           </button>
-          <button className="lp-nav-wa" onClick={abrirWhatsAppGeneral}>
-            <WaIcon /> WhatsApp
+          <button className="lp-nav-wa" onClick={abrirWhatsAppGeneral} title="WhatsApp">
+            <WaIcon size={20} />
           </button>
         </div>
 
@@ -474,6 +611,15 @@ const PublicCatalog = () => {
         </div>
       </section>
 
+      {/* Renderizar modal si hay prenda seleccionada */}
+      {selectedPrenda && (
+        <ProductModal 
+          prenda={selectedPrenda} 
+          onClose={() => setSelectedPrenda(null)} 
+          onAddToCart={addToCart} 
+        />
+      )}
+
       {/* ── Carrito Flotante Modal ── */}
       {cartOpen && (
         <div style={{
@@ -502,8 +648,15 @@ const PublicCatalog = () => {
                       onError={(e) => { e.target.style.display = 'none'; }}
                     />
                     <div style={{ flex: 1 }}>
-                      <p style={{ margin: '0 0 4px 0', fontWeight: 500 }}>{p.nombre}</p>
-                      <p style={{ margin: 0, color: 'var(--color-primary)', fontWeight: 600 }}>${parseInt(p.precio || 0).toLocaleString('es-CL')}</p>
+                      <p style={{ margin: '0 0 4px 0', fontWeight: 500, fontSize: '0.9rem' }}>{p.nombre}</p>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+                        <div style={{ display: 'flex', border: '1px solid #ddd', borderRadius: '4px', overflow: 'hidden' }}>
+                          <button onClick={() => updateCartQty(p.id, -1)} style={{ padding: '2px 8px', background: '#f5f5f5', border: 'none', cursor: 'pointer' }}>-</button>
+                          <span style={{ padding: '2px 8px', fontSize: '0.85rem' }}>{p.qty}</span>
+                          <button onClick={() => updateCartQty(p.id, 1)} style={{ padding: '2px 8px', background: '#f5f5f5', border: 'none', cursor: 'pointer' }}>+</button>
+                        </div>
+                        <p style={{ margin: 0, color: 'var(--color-primary)', fontWeight: 600, fontSize: '0.9rem' }}>${(parseInt(p.precio || 0) * p.qty).toLocaleString('es-CL')}</p>
+                      </div>
                     </div>
                     <button onClick={() => removeFromCart(p.id)} style={{ background: 'none', border: 'none', color: '#dc2626', cursor: 'pointer', padding: '8px' }}>
                       <TrashIcon />

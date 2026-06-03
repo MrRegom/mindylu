@@ -574,9 +574,9 @@
   }
   .lp-card-btn-mobile {
     display: flex;
-    background: #25D366;
-    color: white;
-    border: none;
+    background: transparent;
+    color: var(--color-black);
+    border: 1px solid var(--color-black);
     padding: 10px;
     border-radius: 6px;
     font-family: var(--ff-body);
@@ -641,7 +641,13 @@
   display: flex;
   gap: 8px;
   margin-bottom: 40px;
-  flex-wrap: wrap;
+  overflow-x: auto;
+  white-space: nowrap;
+  padding-bottom: 8px;
+  scrollbar-width: none; /* Firefox */
+}
+.lp-filters::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
 }
 
 .lp-filter-btn {
