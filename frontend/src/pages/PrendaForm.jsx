@@ -216,7 +216,7 @@ const PrendaForm = () => {
         <div className="form-section glass">
           <h3>Detalles Base</h3>
           
-          <div className="input-group" style={{ position: 'relative' }}>
+          <div className="input-group" style={{ position: 'relative', zIndex: activeDropdown === 'nombre' ? 10 : 1 }}>
             <label>Nombre de la prenda</label>
             <div
               className={`custom-select-trigger ${formData.nombre ? 'has-value' : ''}`}
@@ -280,7 +280,7 @@ const PrendaForm = () => {
             />
           </div>
 
-          <div className="input-group" style={{ position: 'relative' }}>
+          <div className="input-group" style={{ position: 'relative', zIndex: activeDropdown === 'categoria' ? 10 : 1 }}>
             <label>Categoría</label>
             <div
               className={`custom-select-trigger ${formData.categoria ? 'has-value' : ''}`}
@@ -318,7 +318,7 @@ const PrendaForm = () => {
             )}
           </div>
 
-          <div className="input-group" style={{ position: 'relative' }}>
+          <div className="input-group" style={{ position: 'relative', zIndex: activeDropdown === 'talla_tipo' ? 10 : 1 }}>
             <label>Tipo de Talla</label>
             <div
               className={`custom-select-trigger ${formData.talla_tipo ? 'has-value' : ''}`}
@@ -366,7 +366,7 @@ const PrendaForm = () => {
             {variantes.map((variante) => (
               <div key={variante.id} className="variante-edit-card animate-slide-up">
                 <div className="variante-row">
-                  <div className="input-group mini" style={{ position: 'relative' }}>
+                  <div className="input-group mini" style={{ position: 'relative', zIndex: activeDropdown === `color-${variante.id}` ? 10 : 1 }}>
                     <label>Color</label>
                     <div
                       className={`custom-select-trigger ${variante.color ? 'has-value' : ''}`}
@@ -396,7 +396,7 @@ const PrendaForm = () => {
                     <input type="text" value={variante.color} required readOnly style={{ position: 'absolute', opacity: 0, height: 0, pointerEvents: 'none' }} />
                   </div>
                   
-                  <div className="input-group mini" style={{ position: 'relative' }}>
+                  <div className="input-group mini" style={{ position: 'relative', zIndex: activeDropdown === `talla-${variante.id}` ? 10 : 1 }}>
                     <label>Talla</label>
                     <div
                       className={`custom-select-trigger ${variante.talla ? 'has-value' : ''}`}
