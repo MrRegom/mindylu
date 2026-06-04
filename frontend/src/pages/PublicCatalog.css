@@ -573,26 +573,44 @@
     display: flex;
     flex-direction: column;
   }
-  .lp-card-btn-mobile {
-    display: flex;
-    background: transparent;
-    color: var(--color-black);
-    border: 1px solid var(--color-black);
-    padding: 10px;
-    border-radius: 6px;
-    font-family: var(--ff-body);
-    font-size: 0.8rem;
+  
+  .lp-link-elegant {
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    border-bottom: 1px solid #EAEAEA;
+    cursor: pointer;
+    transition: var(--transition);
+    padding-bottom: 2px;
+  }
+  .lp-link-elegant:hover {
+    color: var(--color-primary);
+    border-bottom-color: var(--color-primary-light);
+  }
+  
+  .lp-btn-elegant {
+    background: var(--color-primary-light);
+    color: var(--color-primary-dark);
+    padding: 8px 16px;
+    font-size: 0.78rem;
     font-weight: 600;
+    border-radius: 20px; /* Pill shape */
+    border: none;
+    display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    margin-top: 10px;
+    gap: 6px;
     cursor: pointer;
-    width: 100%;
     transition: var(--transition);
+    box-shadow: 0 2px 8px rgba(255,117,140,0.08);
   }
-  .lp-card-btn-mobile:active {
+  .lp-btn-elegant:hover, .lp-btn-elegant:active {
+    background: var(--color-primary);
+    color: var(--color-white);
     transform: scale(0.98);
+    box-shadow: 0 4px 12px rgba(255,117,140,0.2);
   }
 }
 
