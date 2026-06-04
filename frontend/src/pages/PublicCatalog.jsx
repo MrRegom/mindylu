@@ -55,7 +55,7 @@ const ProductCard = ({ prenda, onAddToCart }) => {
   }[estado] || 'Disponible';
 
   return (
-    <article className="lp-card" onClick={() => onAddToCart(prenda, 0, true)}>
+    <article className="lp-card" onClick={() => onAddToCart(prenda, 1, '', '', true)}>
       <div className="lp-card-img-wrap">
         {imagen && !imgError ? (
           <img 
