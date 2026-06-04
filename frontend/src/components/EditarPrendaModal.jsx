@@ -3,6 +3,7 @@ import { X, Plus, Trash2, Save, Package } from 'lucide-react';
 import api from '../services/api';
 import './EditarPrendaModal.css';
 import { showAlert, showConfirm, showToast } from '../utils/alerts';
+import ImageUploader from './ImageUploader';
 
 const TALLAS_DISPONIBLES = ['S', 'M', 'L', 'XL', 'estándar', '34', '36', '38', '40', '42', '44', '34/36', '36/38', '38/40'];
 const COLORES_DISPONIBLES = ['Negro', 'Blanco', 'Rojo', 'Azul', 'Verde', 'Amarillo', 'Gris', 'Beige', 'Café', 'Rosado', 'Morado', 'Naranjo', 'Multicolor', 'Por defecto'];
@@ -15,6 +16,7 @@ const EditarPrendaModal = ({ isOpen, onClose, prenda, onSuccess }) => {
     precio: '',
   });
   const [variantes, setVariantes] = useState([]);
+  const [images, setImages] = useState([]);
 
   // Cargar datos cuando se abre el modal
   useEffect(() => {
@@ -27,6 +29,17 @@ const EditarPrendaModal = ({ isOpen, onClose, prenda, onSuccess }) => {
       // Clonar las variantes para no modificar el estado original hasta guardar
       setVariantes(
         (prenda.variantes || []).map(v => ({ ...v, _tempId: v.id || Date.now() + Math.random() }))
+      );
+      // Clonar imágenes
+      setImages(
+        (prenda.imagenes || []).map(img => ({
+          id: img.id,
+          file: null,
+          preview: img.imagen,
+          color: img.color || '',
+          orden: img.orden || 0,
+          principal: img.orden === 0
+        }))
       );
     }
   }, [isOpen, prenda]);
@@ -71,21 +84,37 @@ const EditarPrendaModal = ({ isOpen, onClose, prenda, onSuccess }) => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Preparar el payload
     const precioLimpio = formData.precio.toString().replace(/\./g, '');
-    const payload = {
-      nombre: formData.nombre,
-      precio: parseInt(precioLimpio, 10),
-      precio_compra: formData.precio_compra ? parseInt(formData.precio_compra.toString().replace(/\./g, ''), 10) : null,
-      variantes: variantes.map(v => {
-        const item = { color: v.color, talla: v.talla, cantidad: parseInt(v.cantidad, 10) || 0 };
-        if (v.id) item.id = v.id;
-        return item;
-      })
-    };
+    const formPayload = new FormData();
+    formPayload.append('nombre', formData.nombre);
+    formPayload.append('precio', parseInt(precioLimpio, 10));
+    if (formData.precio_compra) {
+      formPayload.append('precio_compra', parseInt(formData.precio_compra.toString().replace(/\./g, ''), 10));
+    }
+    formPayload.append('variantes', JSON.stringify(variantes.map(v => {
+      const item = { color: v.color, talla: v.talla, cantidad: parseInt(v.cantidad, 10) || 0 };
+      if (v.id) item.id = v.id;
+      return item;
+    })));
+
+    const imagesData = images.map(imgObj => ({
+      id: imgObj.file ? null : imgObj.id,
+      color: imgObj.color || '',
+      orden: parseInt(imgObj.orden, 10) || 0,
+      principal: !!imgObj.principal
+    }));
+    formPayload.append('imagenes_data', JSON.stringify(imagesData));
+
+    images.forEach((imgObj) => {
+      if (imgObj.file) {
+        formPayload.append('imagenes', imgObj.file);
+      }
+    });
 
     try {
-      await api.patch(`/catalogo/prendas/${prenda.id}/`, payload);
+      await api.patch(`/catalogo/prendas/${prenda.id}/`, formPayload, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
       onSuccess();
     } catch (error) {
       console.error("Error al actualizar la prenda:", error);
@@ -109,15 +138,9 @@ const EditarPrendaModal = ({ isOpen, onClose, prenda, onSuccess }) => {
         </div>
 
         <form onSubmit={handleSubmit} className="editar-form">
-          {/* FOTO MINIATURA (Opcional visual) */}
-          <div className="editar-preview">
-            {prenda.imagenes && prenda.imagenes.length > 0 ? (
-               <img src={prenda.imagenes[0].imagen} alt="Preview" className="preview-img" />
-            ) : prenda.foto_url ? (
-               <img src={prenda.foto_url} alt="Preview" className="preview-img" />
-            ) : (
-               <div className="preview-placeholder"><Package size={40} /></div>
-            )}
+          <div className="editar-preview" style={{ marginBottom: '24px' }}>
+            <h3>Imágenes de la Prenda</h3>
+            <ImageUploader images={images} setImages={setImages} variantes={variantes} />
           </div>
 
           <div className="form-group">
