@@ -152,9 +152,9 @@ const ProductModal = ({ prenda, onClose, onAddToCart }) => {
     setCurrentImgIdx(newIdx);
     const c = allImages[newIdx]?.color;
     if (c) {
-      const formattedColor = c.charAt(0).toUpperCase() + c.slice(1);
-      if (coloresUnicos.includes(formattedColor)) {
-        setSelectedColor(formattedColor);
+      const match = coloresUnicos.find(cu => cu.trim().toLowerCase() === c.trim().toLowerCase());
+      if (match) {
+        setSelectedColor(match);
       }
     }
   };
@@ -164,7 +164,7 @@ const ProductModal = ({ prenda, onClose, onAddToCart }) => {
 
   const handleColorClick = (c) => {
     setSelectedColor(c);
-    const idx = allImages.findIndex(img => img.color && img.color.toLowerCase() === c.toLowerCase());
+    const idx = allImages.findIndex(img => img.color && img.color.trim().toLowerCase() === c.trim().toLowerCase());
     if (idx !== -1) {
       setCurrentImgIdx(idx);
     }
@@ -410,10 +410,12 @@ const PublicCatalog = () => {
     }
     
     let msg = '¡Hola MindyLu! 👗\nMe interesan las siguientes prendas:\n\n';
+    let totalSuma = 0;
+    
     cart.forEach(p => {
       let url = p.imagenes?.[0]?.imagen || p.foto_url || '';
       if (p.color && p.imagenes?.length > 0) {
-        const colorImg = p.imagenes.find(i => i.color && i.color.toLowerCase() === p.color.toLowerCase());
+        const colorImg = p.imagenes.find(i => i.color && i.color.trim().toLowerCase() === p.color.trim().toLowerCase());
         if (colorImg) url = colorImg.imagen;
       }
       
@@ -422,11 +424,17 @@ const PublicCatalog = () => {
         url = `${baseUrl}${url.startsWith('/') ? '' : '/'}${url}`;
       }
       
+      const pPrecio = parseInt(p.precio) || 0;
+      const subtotal = p.qty * pPrecio;
+      totalSuma += subtotal;
+      
       msg += `- ${p.qty}x ${p.nombre}`;
       if (p.color) msg += ` (Color: ${p.color})`;
       if (p.talla) msg += ` (Talla: ${p.talla})`;
-      msg += ` ($${parseInt(p.precio).toLocaleString('es-CL')} c/u)\n  Ver foto: ${url}\n\n`;
+      msg += ` ($${pPrecio.toLocaleString('es-CL')} c/u = $${subtotal.toLocaleString('es-CL')})\n  Ver foto: ${url}\n\n`;
     });
+    
+    msg += `💰 *Total Estimado: $${totalSuma.toLocaleString('es-CL')}*\n\n`;
     msg += '¿Están disponibles?';
     
     window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`, '_blank');
