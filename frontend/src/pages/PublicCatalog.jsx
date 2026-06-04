@@ -409,21 +409,10 @@ const PublicCatalog = () => {
       return;
     }
     
-    let msg = '¡Hola MindyLu! 👗\nMe interesan las siguientes prendas:\n\n';
+    let msg = '¡Hola MindyLu!\nMe interesan las siguientes prendas:\n\n';
     let totalSuma = 0;
     
     cart.forEach(p => {
-      let url = p.imagenes?.[0]?.imagen || p.foto_url || '';
-      if (p.color && p.imagenes?.length > 0) {
-        const colorImg = p.imagenes.find(i => i.color && i.color.trim().toLowerCase() === p.color.trim().toLowerCase());
-        if (colorImg) url = colorImg.imagen;
-      }
-      
-      if (url && !url.startsWith('http')) {
-        const baseUrl = API_BASE.replace('/api/v1', '');
-        url = `${baseUrl}${url.startsWith('/') ? '' : '/'}${url}`;
-      }
-      
       const pPrecio = parseInt(p.precio) || 0;
       const subtotal = p.qty * pPrecio;
       totalSuma += subtotal;
@@ -431,10 +420,10 @@ const PublicCatalog = () => {
       msg += `- ${p.qty}x ${p.nombre}`;
       if (p.color) msg += ` (Color: ${p.color})`;
       if (p.talla) msg += ` (Talla: ${p.talla})`;
-      msg += ` ($${pPrecio.toLocaleString('es-CL')} c/u = $${subtotal.toLocaleString('es-CL')})\n  Ver foto: ${url}\n\n`;
+      msg += ` ($${pPrecio.toLocaleString('es-CL')} c/u = $${subtotal.toLocaleString('es-CL')})\n`;
     });
     
-    msg += `💰 *Total Estimado: $${totalSuma.toLocaleString('es-CL')}*\n\n`;
+    msg += `\n*Total Estimado: $${totalSuma.toLocaleString('es-CL')}*\n\n`;
     msg += '¿Están disponibles?';
     
     window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`, '_blank');
