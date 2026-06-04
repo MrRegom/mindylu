@@ -103,13 +103,19 @@ const ProductModal = ({ prenda, onClose, onAddToCart }) => {
   const [currentImgIdx, setCurrentImgIdx] = useState(0);
   const [qty, setQty] = useState(1);
 
-  const tallasArray = prenda?.variantes?.map(v => String(v.talla || '').toLowerCase()).filter(Boolean) || [];
-  const tallasUnicas = [...new Set(tallasArray)].map(t => t.charAt(0).toUpperCase() + t.slice(1));
   const coloresArray = prenda?.variantes?.map(v => String(v.color || '').toLowerCase()).filter(Boolean) || [];
   const coloresUnicos = [...new Set(coloresArray)].map(c => c.charAt(0).toUpperCase() + c.slice(1));
 
   const [selectedColor, setSelectedColor] = useState(coloresUnicos.length > 0 ? coloresUnicos[0] : '');
-  const [selectedTalla, setSelectedTalla] = useState(tallasUnicas.length > 0 ? tallasUnicas[0] : '');
+  const [selectedTallaState, setSelectedTallaState] = useState('');
+
+  const variantesColor = prenda?.variantes?.filter(v => String(v.color || '').toLowerCase() === selectedColor.toLowerCase()) || [];
+  const primeraTalla = variantesColor.length > 0 ? variantesColor[0].talla : '';
+  const isTallaValida = variantesColor.some(v => v.talla === selectedTallaState);
+  const activeTalla = isTallaValida ? selectedTallaState : primeraTalla;
+  
+  const selectedVariante = variantesColor.find(v => v.talla === activeTalla) || null;
+  const maxStock = selectedVariante ? parseInt(selectedVariante.cantidad, 10) : 0;
 
   if (!prenda) return null;
 
@@ -206,27 +212,29 @@ const ProductModal = ({ prenda, onClose, onAddToCart }) => {
                 </div>
               </div>
             )}
-            {tallasUnicas.length > 0 && (
+            {variantesColor.length > 0 && (
               <div className="lp-modal-opts">
                 <h4>Tallas</h4>
                 <div className="lp-modal-chips">
-                  {tallasUnicas.map(t => (
+                  {variantesColor.map(v => (
                     <span 
-                      key={t} 
-                      className={`chip clickable-color ${selectedTalla === t ? 'selected-chip' : ''}`}
-                      onClick={() => setSelectedTalla(t)}
+                      key={v.talla} 
+                      className={`chip clickable-color ${activeTalla === v.talla ? 'selected-chip' : ''}`}
+                      onClick={() => setSelectedTallaState(v.talla)}
                       style={{ 
                         cursor: 'pointer', 
                         transition: 'all 0.2s',
-                        background: selectedTalla === t ? 'var(--color-primary)' : 'var(--color-bg-alt)',
-                        color: selectedTalla === t ? '#fff' : 'inherit',
-                        border: selectedTalla === t ? '1px solid var(--color-primary)' : '1px solid transparent'
+                        background: activeTalla === v.talla ? 'var(--color-primary)' : 'var(--color-bg-alt)',
+                        color: activeTalla === v.talla ? '#fff' : 'inherit',
+                        border: activeTalla === v.talla ? '1px solid var(--color-primary)' : '1px solid transparent',
+                        opacity: parseInt(v.cantidad, 10) === 0 ? 0.5 : 1
                       }}
                     >
-                      {t}
+                      {v.talla} <span style={{ fontSize: '0.75rem', opacity: 0.8, marginLeft: '4px' }}>({v.cantidad} disp.)</span>
                     </span>
                   ))}
                 </div>
+                {maxStock === 0 && <p style={{ color: '#dc2626', fontSize: '0.85rem', marginTop: '8px' }}>⚠️ Producto sin stock disponible</p>}
               </div>
             )}
 
@@ -234,13 +242,17 @@ const ProductModal = ({ prenda, onClose, onAddToCart }) => {
               <div className="lp-qty-selector">
                 <button onClick={() => setQty(q => Math.max(1, q - 1))}>-</button>
                 <span>{qty}</span>
-                <button onClick={() => setQty(q => q + 1)}>+</button>
+                <button onClick={() => setQty(q => Math.min(maxStock > 0 ? maxStock : 1, q + 1))}>+</button>
               </div>
               <button 
                 className="lp-modal-add-btn"
+                disabled={maxStock === 0}
+                style={{ opacity: maxStock === 0 ? 0.5 : 1, cursor: maxStock === 0 ? 'not-allowed' : 'pointer' }}
                 onClick={() => {
-                  onAddToCart(prenda, qty, selectedColor, selectedTalla);
-                  onClose();
+                  if (maxStock > 0) {
+                    onAddToCart(prenda, qty, selectedColor, activeTalla);
+                    onClose();
+                  }
                 }}
               >
                 Añadir al carrito
