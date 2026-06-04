@@ -86,12 +86,22 @@ const ProductCard = ({ prenda, onAddToCart }) => {
         <p className="lp-card-price">${precio}</p>
         {tallas && <p className="lp-card-tallas">{tallas}</p>}
         {estado !== 'vendida' && (
-          <button
-            className="lp-card-btn-mobile"
-            onClick={(e) => { e.stopPropagation(); onAddToCart(prenda); }}
-          >
-            <CartIcon /> Añadir al carrito
-          </button>
+          <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+            <button
+              className="lp-btn-outline"
+              style={{ flex: 1, padding: '8px 4px', fontSize: '0.85rem', borderColor: 'var(--color-primary)', color: 'var(--color-primary)' }}
+              onClick={(e) => { e.stopPropagation(); onAddToCart(prenda, 1, '', '', true); }}
+            >
+              Ver detalles
+            </button>
+            <button
+              className="lp-card-btn-mobile"
+              style={{ flex: 1, marginTop: 0, background: 'var(--color-primary)', color: 'white', padding: '8px 4px' }}
+              onClick={(e) => { e.stopPropagation(); onAddToCart(prenda); }}
+            >
+              <CartIcon size={16} /> Añadir
+            </button>
+          </div>
         )}
       </div>
     </article>
