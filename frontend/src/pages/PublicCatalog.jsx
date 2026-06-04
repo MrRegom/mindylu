@@ -103,6 +103,14 @@ const ProductModal = ({ prenda, onClose, onAddToCart }) => {
   const [currentImgIdx, setCurrentImgIdx] = useState(0);
   const [qty, setQty] = useState(1);
 
+  const tallasArray = prenda?.variantes?.map(v => String(v.talla || '').toLowerCase()).filter(Boolean) || [];
+  const tallasUnicas = [...new Set(tallasArray)].map(t => t.charAt(0).toUpperCase() + t.slice(1));
+  const coloresArray = prenda?.variantes?.map(v => String(v.color || '').toLowerCase()).filter(Boolean) || [];
+  const coloresUnicos = [...new Set(coloresArray)].map(c => c.charAt(0).toUpperCase() + c.slice(1));
+
+  const [selectedColor, setSelectedColor] = useState(coloresUnicos.length > 0 ? coloresUnicos[0] : '');
+  const [selectedTalla, setSelectedTalla] = useState(tallasUnicas.length > 0 ? tallasUnicas[0] : '');
+
   if (!prenda) return null;
 
   let allImages = [];
@@ -128,6 +136,7 @@ const ProductModal = ({ prenda, onClose, onAddToCart }) => {
   const handleNext = () => setCurrentImgIdx(i => (i === allImages.length - 1 ? 0 : i + 1));
 
   const handleColorClick = (c) => {
+    setSelectedColor(c);
     const idx = allImages.findIndex(img => img.color && img.color.toLowerCase() === c.toLowerCase());
     if (idx !== -1) {
       setCurrentImgIdx(idx);
@@ -135,11 +144,6 @@ const ProductModal = ({ prenda, onClose, onAddToCart }) => {
   };
 
   const precio = parseInt(prenda.precio || 0).toLocaleString('es-CL');
-  const tallasArray = prenda.variantes?.map(v => String(v.talla || '').toLowerCase()).filter(Boolean) || [];
-  const tallasUnicas = [...new Set(tallasArray)].map(t => t.charAt(0).toUpperCase() + t.slice(1));
-  
-  const coloresArray = prenda.variantes?.map(v => String(v.color || '').toLowerCase()).filter(Boolean) || [];
-  const coloresUnicos = [...new Set(coloresArray)].map(c => c.charAt(0).toUpperCase() + c.slice(1));
 
   return (
     <div className="lp-modal-overlay" onClick={onClose}>
@@ -184,11 +188,17 @@ const ProductModal = ({ prenda, onClose, onAddToCart }) => {
                   {coloresUnicos.map(c => (
                     <span 
                       key={c} 
-                      className="chip clickable-color"
+                      className={`chip clickable-color ${selectedColor === c ? 'selected-chip' : ''}`}
                       onClick={() => handleColorClick(c)}
-                      style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
-                      onMouseEnter={e => e.target.style.transform = 'scale(1.05)'}
-                      onMouseLeave={e => e.target.style.transform = 'scale(1)'}
+                      style={{ 
+                        cursor: 'pointer', 
+                        transition: 'all 0.2s',
+                        background: selectedColor === c ? 'var(--color-primary)' : 'var(--color-bg-alt)',
+                        color: selectedColor === c ? '#fff' : 'inherit',
+                        border: selectedColor === c ? '1px solid var(--color-primary)' : '1px solid transparent'
+                      }}
+                      onMouseEnter={e => { if (selectedColor !== c) e.target.style.transform = 'scale(1.05)' }}
+                      onMouseLeave={e => { if (selectedColor !== c) e.target.style.transform = 'scale(1)' }}
                     >
                       {c}
                     </span>
@@ -200,7 +210,22 @@ const ProductModal = ({ prenda, onClose, onAddToCart }) => {
               <div className="lp-modal-opts">
                 <h4>Tallas</h4>
                 <div className="lp-modal-chips">
-                  {tallasUnicas.map(t => <span key={t} className="chip">{t}</span>)}
+                  {tallasUnicas.map(t => (
+                    <span 
+                      key={t} 
+                      className={`chip clickable-color ${selectedTalla === t ? 'selected-chip' : ''}`}
+                      onClick={() => setSelectedTalla(t)}
+                      style={{ 
+                        cursor: 'pointer', 
+                        transition: 'all 0.2s',
+                        background: selectedTalla === t ? 'var(--color-primary)' : 'var(--color-bg-alt)',
+                        color: selectedTalla === t ? '#fff' : 'inherit',
+                        border: selectedTalla === t ? '1px solid var(--color-primary)' : '1px solid transparent'
+                      }}
+                    >
+                      {t}
+                    </span>
+                  ))}
                 </div>
               </div>
             )}
@@ -214,7 +239,7 @@ const ProductModal = ({ prenda, onClose, onAddToCart }) => {
               <button 
                 className="lp-modal-add-btn"
                 onClick={() => {
-                  onAddToCart(prenda, qty);
+                  onAddToCart(prenda, qty, selectedColor, selectedTalla);
                   onClose();
                 }}
               >
@@ -313,28 +338,29 @@ const PublicCatalog = () => {
     return catEmojis[Object.keys(catEmojis).find(k => lower.includes(k))] || catEmojis.default;
   };
 
-  const addToCart = (prenda, qty = 1, isDirect = false) => {
+  const addToCart = (prenda, qty = 1, color = '', talla = '', isDirect = false) => {
     if (isDirect) {
       setSelectedPrenda(prenda);
       return;
     }
     
-    const existing = cart.find(p => p.id === prenda.id);
+    const cartItemId = `${prenda.id}-${color}-${talla}`;
+    const existing = cart.find(p => p.cartItemId === cartItemId);
     if (existing) {
-      setCart(cart.map(p => p.id === prenda.id ? { ...p, qty: p.qty + qty } : p));
+      setCart(cart.map(p => p.cartItemId === cartItemId ? { ...p, qty: p.qty + qty } : p));
     } else {
-      setCart([...cart, { ...prenda, qty }]);
+      setCart([...cart, { ...prenda, qty, color, talla, cartItemId }]);
     }
     setCartOpen(true);
   };
 
-  const removeFromCart = (id) => {
-    setCart(cart.filter(p => p.id !== id));
+  const removeFromCart = (cartItemId) => {
+    setCart(cart.filter(p => p.cartItemId !== cartItemId));
   };
 
-  const updateCartQty = (id, delta) => {
+  const updateCartQty = (cartItemId, delta) => {
     setCart(cart.map(p => {
-      if (p.id === id) {
+      if (p.cartItemId === cartItemId) {
         const newQty = p.qty + delta;
         return newQty > 0 ? { ...p, qty: newQty } : null;
       }
@@ -350,14 +376,23 @@ const PublicCatalog = () => {
       return;
     }
     
-    let msg = '¡Hola LuPrenditas! 👗\nMe interesan las siguientes prendas:\n\n';
+    let msg = '¡Hola MindyLu! 👗\nMe interesan las siguientes prendas:\n\n';
     cart.forEach(p => {
       let url = p.imagenes?.[0]?.imagen || p.foto_url || '';
+      if (p.color && p.imagenes?.length > 0) {
+        const colorImg = p.imagenes.find(i => i.color && i.color.toLowerCase() === p.color.toLowerCase());
+        if (colorImg) url = colorImg.imagen;
+      }
+      
       if (url && !url.startsWith('http')) {
         const baseUrl = API_BASE.replace('/api/v1', '');
         url = `${baseUrl}${url.startsWith('/') ? '' : '/'}${url}`;
       }
-      msg += `- ${p.qty}x ${p.nombre} ($${parseInt(p.precio).toLocaleString('es-CL')} c/u)\n  Ver foto: ${url}\n\n`;
+      
+      msg += `- ${p.qty}x ${p.nombre}`;
+      if (p.color) msg += ` (Color: ${p.color})`;
+      if (p.talla) msg += ` (Talla: ${p.talla})`;
+      msg += ` ($${parseInt(p.precio).toLocaleString('es-CL')} c/u)\n  Ver foto: ${url}\n\n`;
     });
     msg += '¿Están disponibles?';
     
@@ -657,30 +692,37 @@ const PublicCatalog = () => {
               <p style={{ textAlign: 'center', color: '#666', marginTop: '40px' }}>Tu lista está vacía.</p>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                {cart.map(p => (
-                  <div key={p.id} style={{ display: 'flex', gap: '12px', alignItems: 'center', borderBottom: '1px solid #f5f5f5', paddingBottom: '16px' }}>
+                {cart.map(p => {
+                  const cartImgUrl = (p.color && p.imagenes?.find(i => i.color?.toLowerCase() === p.color.toLowerCase())?.imagen) || p.imagenes?.[0]?.imagen || p.foto_url || '';
+                  return (
+                  <div key={p.cartItemId || p.id} style={{ display: 'flex', gap: '12px', alignItems: 'center', borderBottom: '1px solid #f5f5f5', paddingBottom: '16px' }}>
                     <img 
-                      src={p.imagenes?.[0]?.imagen || p.foto_url || ''} 
+                      src={cartImgUrl} 
                       alt={p.nombre} 
                       style={{ width: '60px', height: '80px', objectFit: 'cover', borderRadius: '4px' }} 
                       onError={(e) => { e.target.style.display = 'none'; }}
                     />
                     <div style={{ flex: 1 }}>
-                      <p style={{ margin: '0 0 4px 0', fontWeight: 500, fontSize: '0.9rem' }}>{p.nombre}</p>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+                      <p style={{ margin: '0 0 2px 0', fontWeight: 500, fontSize: '0.9rem' }}>{p.nombre}</p>
+                      <div style={{ display: 'flex', gap: '8px', marginBottom: '6px' }}>
+                        {p.color && <span style={{ fontSize: '0.75rem', padding: '2px 6px', background: '#f0f0f0', borderRadius: '4px', color: '#555' }}>Color: {p.color}</span>}
+                        {p.talla && <span style={{ fontSize: '0.75rem', padding: '2px 6px', background: '#f0f0f0', borderRadius: '4px', color: '#555' }}>Talla: {p.talla}</span>}
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <div style={{ display: 'flex', border: '1px solid #ddd', borderRadius: '4px', overflow: 'hidden' }}>
-                          <button onClick={() => updateCartQty(p.id, -1)} style={{ padding: '2px 8px', background: '#f5f5f5', border: 'none', cursor: 'pointer' }}>-</button>
+                          <button onClick={() => updateCartQty(p.cartItemId || p.id, -1)} style={{ padding: '2px 8px', background: '#f5f5f5', border: 'none', cursor: 'pointer' }}>-</button>
                           <span style={{ padding: '2px 8px', fontSize: '0.85rem' }}>{p.qty}</span>
-                          <button onClick={() => updateCartQty(p.id, 1)} style={{ padding: '2px 8px', background: '#f5f5f5', border: 'none', cursor: 'pointer' }}>+</button>
+                          <button onClick={() => updateCartQty(p.cartItemId || p.id, 1)} style={{ padding: '2px 8px', background: '#f5f5f5', border: 'none', cursor: 'pointer' }}>+</button>
                         </div>
                         <p style={{ margin: 0, color: 'var(--color-primary)', fontWeight: 600, fontSize: '0.9rem' }}>${(parseInt(p.precio || 0) * p.qty).toLocaleString('es-CL')}</p>
                       </div>
                     </div>
-                    <button onClick={() => removeFromCart(p.id)} style={{ background: 'none', border: 'none', color: '#dc2626', cursor: 'pointer', padding: '8px' }}>
+                    <button onClick={() => removeFromCart(p.cartItemId || p.id)} style={{ background: 'none', border: 'none', color: '#dc2626', cursor: 'pointer', padding: '8px' }}>
                       <TrashIcon />
                     </button>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
