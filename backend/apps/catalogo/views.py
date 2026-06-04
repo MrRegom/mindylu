@@ -72,28 +72,45 @@ class PrendaViewSet(viewsets.ModelViewSet):
             else:
                 data[key] = request.data.get(key)
 
-        serializer = self.get_serializer(data=data)
+        serializer = self.get_serializer(instance, data=data, partial=partial)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        self.perform_create(serializer)
-        prenda = serializer.instance
-        
-        imagenes_data_str = request.data.get('imagenes_data', '[]')
-        try:
-            imagenes_data = json.loads(imagenes_data_str)
-        except json.JSONDecodeError:
-            imagenes_data = []
-            
-        imagenes = request.FILES.getlist('imagenes')
-        for i, img in enumerate(imagenes):
+        self.perform_update(serializer)
+
+        # Procesar imágenes si se enviaron (sincronizar existentes, añadir nuevas)
+        imagenes_data_str = request.data.get('imagenes_data', None)
+        if imagenes_data_str is not None:
+            try:
+                imagenes_data = json.loads(imagenes_data_str)
+            except json.JSONDecodeError:
+                imagenes_data = []
+                
             from .models import PrendaImagen
-            data = imagenes_data[i] if i < len(imagenes_data) else {}
-            color = data.get('color', '')
-            orden = 0 if data.get('principal') else data.get('orden', i + 1)
-            PrendaImagen.objects.create(prenda=prenda, imagen=img, color=color, orden=orden)
+            existing_ids = []
+            new_data = []
+            for d in imagenes_data:
+                if d.get('id'):
+                    try:
+                        img_obj = PrendaImagen.objects.get(id=d['id'], prenda=instance)
+                        img_obj.color = d.get('color', '')
+                        img_obj.orden = 0 if d.get('principal') else d.get('orden', img_obj.orden)
+                        img_obj.save()
+                        existing_ids.append(img_obj.id)
+                    except PrendaImagen.DoesNotExist:
+                        pass
+                else:
+                    new_data.append(d)
+                    
+            PrendaImagen.objects.filter(prenda=instance).exclude(id__in=existing_ids).delete()
             
-        headers = self.get_success_headers(serializer.data)
-        return Response(PrendaSerializer(prenda).data, status=status.HTTP_201_CREATED, headers=headers)
+            imagenes = request.FILES.getlist('imagenes')
+            for i, img in enumerate(imagenes):
+                data_img = new_data[i] if i < len(new_data) else {}
+                color = data_img.get('color', '')
+                orden = 0 if data_img.get('principal') else data_img.get('orden', i + 1)
+                PrendaImagen.objects.create(prenda=instance, imagen=img, color=color, orden=orden)
+
+        return Response(PrendaSerializer(instance).data)
 
     @action(detail=False, methods=['post'])
     def subir_foto(self, request):
