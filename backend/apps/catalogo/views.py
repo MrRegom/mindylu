@@ -72,6 +72,48 @@ class PrendaViewSet(viewsets.ModelViewSet):
             else:
                 data[key] = request.data.get(key)
 
+        serializer = self.get_serializer(data=data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        self.perform_create(serializer)
+        prenda = serializer.instance
+        
+        imagenes_data_str = request.data.get('imagenes_data', '[]')
+        try:
+            imagenes_data = json.loads(imagenes_data_str)
+        except json.JSONDecodeError:
+            imagenes_data = []
+            
+        imagenes = request.FILES.getlist('imagenes')
+        for i, img in enumerate(imagenes):
+            from .models import PrendaImagen
+            data_img = imagenes_data[i] if i < len(imagenes_data) else {}
+            color = data_img.get('color', '')
+            orden = 0 if data_img.get('principal') else data_img.get('orden', i + 1)
+            PrendaImagen.objects.create(prenda=prenda, imagen=img, color=color, orden=orden)
+            
+        headers = self.get_success_headers(serializer.data)
+        return Response(PrendaSerializer(prenda).data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def update(self, request, *args, **kwargs):
+        import json
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+
+        data = {}
+        for key in request.data.keys():
+            if key == 'variantes':
+                val = request.data.get(key)
+                if isinstance(val, str):
+                    try:
+                        data['variantes'] = json.loads(val)
+                    except json.JSONDecodeError:
+                        return Response({'error': 'Variantes inválidas'}, status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    data['variantes'] = val
+            else:
+                data[key] = request.data.get(key)
+
         serializer = self.get_serializer(instance, data=data, partial=partial)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

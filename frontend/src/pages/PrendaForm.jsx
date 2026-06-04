@@ -213,14 +213,6 @@ const PrendaForm = () => {
       </div>
 
       <form className="prenda-form" onSubmit={handleSubmit}>
-        
-        {/* GALERÍA DE FOTOS */}
-        <div className="form-section glass">
-          <h3>Imágenes (por foto elige color y orden)</h3>
-          <p style={{fontSize: '0.85rem', color: '#666', marginBottom: '16px'}}>La que marques "Principal" será la portada.</p>
-          <ImageUploader images={images} setImages={setImages} variantes={variantes} />
-        </div>
-
         <div className="form-section glass">
           <h3>Detalles Base</h3>
           
@@ -465,8 +457,15 @@ const PrendaForm = () => {
           </div>
         </div>
 
+        {/* GALERÍA DE FOTOS MOVIDA ABAJO DE VARIANTES */}
+        <div className="form-section glass">
+          <h3>Imágenes (por foto elige color y orden)</h3>
+          <p style={{fontSize: '0.85rem', color: '#666', marginBottom: '16px'}}>La que marques "Principal" será la portada.</p>
+          <ImageUploader images={images} setImages={setImages} variantes={variantes} />
+        </div>
+
         <div className="form-actions">
-          <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+          <button type="submit" className="btn btn-primary submit-btn" disabled={isSubmitting}>
             <Save size={20} />
             {isSubmitting ? 'Procesando...' : 'Guardar Prenda'}
           </button>
