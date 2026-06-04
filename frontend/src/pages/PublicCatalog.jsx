@@ -89,14 +89,14 @@ const ProductCard = ({ prenda, onAddToCart }) => {
           <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
             <button
               className="lp-btn-outline"
-              style={{ flex: 1, padding: '8px 4px', fontSize: '0.85rem', borderColor: 'var(--color-primary)', color: 'var(--color-primary)' }}
+              style={{ flex: 1, padding: '8px 4px', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase', borderColor: 'var(--color-primary)', color: 'var(--color-primary)', background: '#fff' }}
               onClick={(e) => { e.stopPropagation(); onAddToCart(prenda, 1, '', '', true); }}
             >
               Ver detalles
             </button>
             <button
               className="lp-card-btn-mobile"
-              style={{ flex: 1, marginTop: 0, background: 'var(--color-primary)', color: 'white', padding: '8px 4px' }}
+              style={{ flex: 1, marginTop: 0, background: 'var(--color-primary)', color: 'white', padding: '8px 4px', fontSize: '0.85rem', fontWeight: 600 }}
               onClick={(e) => { e.stopPropagation(); onAddToCart(prenda); }}
             >
               <CartIcon size={16} /> Añadir
@@ -148,8 +148,19 @@ const ProductModal = ({ prenda, onClose, onAddToCart }) => {
     allImages = [{ url, color: '' }];
   }
 
-  const handlePrev = () => setCurrentImgIdx(i => (i === 0 ? allImages.length - 1 : i - 1));
-  const handleNext = () => setCurrentImgIdx(i => (i === allImages.length - 1 ? 0 : i + 1));
+  const changeImg = (newIdx) => {
+    setCurrentImgIdx(newIdx);
+    const c = allImages[newIdx]?.color;
+    if (c) {
+      const formattedColor = c.charAt(0).toUpperCase() + c.slice(1);
+      if (coloresUnicos.includes(formattedColor)) {
+        setSelectedColor(formattedColor);
+      }
+    }
+  };
+
+  const handlePrev = () => changeImg(currentImgIdx === 0 ? allImages.length - 1 : currentImgIdx - 1);
+  const handleNext = () => changeImg(currentImgIdx === allImages.length - 1 ? 0 : currentImgIdx + 1);
 
   const handleColorClick = (c) => {
     setSelectedColor(c);
@@ -186,7 +197,7 @@ const ProductModal = ({ prenda, onClose, onAddToCart }) => {
                   <img 
                     key={idx} src={img.url} alt="thumb"
                     className={idx === currentImgIdx ? 'active' : ''} 
-                    onClick={() => setCurrentImgIdx(idx)} 
+                    onClick={() => changeImg(idx)} 
                   />
                 ))}
               </div>
