@@ -86,6 +86,7 @@ const ImageUploader = ({ images, setImages, variantes }) => {
               onChange={e => updateImage(img.id, 'color', e.target.value)}
               className="row-select"
             >
+              <option value="">-- Asignar --</option>
               {coloresUnicos.map(c => (
                 <option key={c} value={c}>{c}</option>
               ))}
