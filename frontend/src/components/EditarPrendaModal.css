@@ -1,4 +1,4 @@
-/* -- Dise�o Moderno Admin: Editar Prenda Modal -- */
+﻿/* -- Diseño Moderno Admin: Editar Prenda Modal -- */
 .editar-modal {
   width: 90%;
   max-width: 600px;
@@ -175,3 +175,4 @@
   .variante-row { flex-wrap: wrap; }
   .var-col { min-width: 45%; }
 }
+

@@ -1,4 +1,4 @@
-/* -- Dise�o Moderno: Image Uploader -- */
+﻿/* -- Diseño Moderno: Image Uploader -- */
 .image-uploader-list-container {
   display: flex;
   flex-direction: column;
@@ -154,3 +154,4 @@
   .col-actions { grid-area: actions; justify-content: flex-end; }
   .add-file-row { padding: 20px; }
 }
+

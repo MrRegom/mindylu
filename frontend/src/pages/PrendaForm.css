@@ -1,9 +1,9 @@
-/* -- Diseño Moderno Admin: Formulario de Prenda -- */
+ï»¿/* -- DiseÃ±o Moderno Admin: Formulario de Prenda -- */
 .prenda-form-container {
   min-height: 100vh;
   min-height: 100dvh;
   background-color: #f7f9fa; /* Fondo elegante y suave */
-  padding-bottom: 120px; /* Evita conflicto con el menú móvil */
+  padding-bottom: 120px; /* Evita conflicto con el menÃº mÃ³vil */
   font-family: 'Inter', system-ui, sans-serif;
 }
 
@@ -259,3 +259,4 @@
 /* Facebook */
 .facebook-push-section { background: #f0f7ff; border: 1px solid #cce4ff; }
 .facebook-toggle-info h4 { font-size: 1rem; color: #1a56db; }
+
