@@ -1085,24 +1085,26 @@
   position: absolute;
   top: 15px;
   right: 15px;
-  background: transparent;
+  background: rgba(255, 255, 255, 0.95);
   border: none;
-  font-size: 24px;
+  font-size: 28px;
   cursor: pointer;
-  color: var(--color-text-muted);
-  z-index: 10;
-  width: 32px;
-  height: 32px;
+  color: #111;
+  z-index: 100;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   transition: all 0.2s;
 }
 
 .lp-modal-close:hover {
-  background: #eee;
-  color: var(--color-text);
+  background: #fff;
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.2);
 }
 
 .lp-modal-grid {

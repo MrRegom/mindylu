@@ -219,11 +219,7 @@ const ConfiguracionTiendaForm = () => {
         formData.append('banner_imagen', bannerFile);
       }
 
-      const res = await api.patch('/core/configuracion/privado/', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      const res = await api.patch('/core/configuracion/privado/', formData);
       setConfig(res.data);
       setBannerFile(null);
       showToast('success', 'Configuración de tienda guardada exitosamente');

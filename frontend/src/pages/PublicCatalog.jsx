@@ -407,7 +407,7 @@ const PublicCatalog = () => {
       return;
     }
     
-    let msg = '¡Hola MindyLu!\nMe interesan las siguientes prendas:\n\n';
+    let msg = '🌸 *¡Hola LuPrenditas!* 🌸\n\nMe gustaría consultar la disponibilidad de este pedido:\n\n';
     let totalSuma = 0;
     
     cart.forEach(p => {
@@ -415,14 +415,32 @@ const PublicCatalog = () => {
       const subtotal = p.qty * pPrecio;
       totalSuma += subtotal;
       
-      msg += `- ${p.qty}x ${p.nombre}`;
-      if (p.color) msg += ` (Color: ${p.color})`;
-      if (p.talla) msg += ` (Talla: ${p.talla})`;
-      msg += ` ($${pPrecio.toLocaleString('es-CL')} c/u = $${subtotal.toLocaleString('es-CL')})\n`;
+      msg += `✨ *${p.nombre}*\n`;
+      msg += `   🛍️ Cantidad: ${p.qty}\n`;
+      if (p.color) msg += `   🎨 Color: ${p.color}\n`;
+      if (p.talla) msg += `   📏 Talla: ${p.talla}\n`;
+      msg += `   💰 Subtotal: $${subtotal.toLocaleString('es-CL')}\n`;
+      
+      let imgUrl = '';
+      if (p.imagenes && p.imagenes.length > 0) {
+        const matchingImg = p.imagenes.find(img => img.color && img.color.toLowerCase() === (p.color || '').toLowerCase());
+        imgUrl = matchingImg ? matchingImg.imagen : p.imagenes[0].imagen;
+      } else if (p.foto_url) {
+        imgUrl = p.foto_url;
+      }
+      
+      if (imgUrl) {
+        if (!imgUrl.startsWith('http')) {
+          const baseUrl = API_BASE.replace('/api/v1', '');
+          imgUrl = `${baseUrl}${imgUrl.startsWith('/') ? '' : '/'}${imgUrl}`;
+        }
+        msg += `   📸 Ver Foto: ${imgUrl}\n`;
+      }
+      msg += `\n`;
     });
     
-    msg += `\n*Total Estimado: $${totalSuma.toLocaleString('es-CL')}*\n\n`;
-    msg += '¿Están disponibles?';
+    msg += `💳 *Total Estimado: $${totalSuma.toLocaleString('es-CL')}*\n\n`;
+    msg += '¡Muchas gracias! 💕';
     
     window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`, '_blank');
   };
