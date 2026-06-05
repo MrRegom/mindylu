@@ -526,39 +526,52 @@
 .lp-card-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0);
+  background: linear-gradient(to top, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 50%);
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  padding-bottom: 20px;
-  transition: background var(--transition);
+  padding-bottom: 24px;
+  opacity: 0;
+  transition: opacity var(--transition);
 }
 
 .lp-card:hover .lp-card-overlay {
-  background: rgba(0,0,0,0.15);
+  opacity: 1;
 }
 
 .lp-card-btn {
-  background: var(--color-white);
-  color: var(--color-black);
-  border: none;
-  padding: 12px 16px;
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--color-text);
+  border: 1px solid rgba(255,255,255,0.2);
+  padding: 14px 24px;
+  border-radius: var(--radius-full);
   font-family: var(--ff-body);
   font-size: 0.75rem;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: 1px;
   text-transform: uppercase;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  transform: translateY(10px);
+  gap: 10px;
+  transform: translateY(20px);
   opacity: 0;
-  transition: all var(--transition);
-  white-space: nowrap;
-  width: 90%;
+  transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.lp-card:hover .lp-card-btn {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.lp-card-btn:hover {
+  background: var(--color-white);
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
 }
 
 .lp-card-btn-mobile {
@@ -1065,15 +1078,18 @@
 }
 
 .lp-modal-content {
-  background: var(--color-bg);
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   width: 100%;
-  max-width: 900px;
+  max-width: 1000px;
   max-height: 90vh;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255,255,255,0.4);
   position: relative;
   overflow-y: auto;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-  animation: slideUp 0.3s ease;
+  box-shadow: var(--shadow-xl);
+  animation: slideUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 @keyframes slideUp {

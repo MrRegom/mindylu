@@ -1,7 +1,18 @@
 import { useState, useEffect } from 'react';
 import { Sparkles, DollarSign, Package, CreditCard, TrendingUp, RefreshCw, User, ShoppingBag } from 'lucide-react';
+import { AreaChart, Area, ResponsiveContainer, Tooltip } from 'recharts';
 import api from '../services/api';
 import './Home.css';
+
+const chartData = [
+  { name: 'Lun', sales: 4000 },
+  { name: 'Mar', sales: 3000 },
+  { name: 'Mie', sales: 5000 },
+  { name: 'Jue', sales: 2780 },
+  { name: 'Vie', sales: 8900 },
+  { name: 'Sab', sales: 12000 },
+  { name: 'Dom', sales: 9000 },
+];
 
 const formatCurrency = (amount) => {
   return new Intl.NumberFormat('es-CL', {
@@ -60,19 +71,22 @@ const Home = () => {
           <h2 style={{ fontSize: '2.5rem', margin: 0 }}>{isLoading ? '...' : formatCurrency(stats.ventas_hoy)}</h2>
           <span style={{ color: 'var(--color-success)', fontSize: '0.85rem', fontWeight: 600, background: 'var(--color-success-bg)', padding: '2px 8px', borderRadius: '12px' }}>+12% <span style={{ color: 'var(--color-text-muted)', fontWeight: 400 }}>vs ayer</span></span>
         </div>
-        {/* Placeholder para el gráfico de líneas (SVG simple para simular el mockup) */}
-        <div style={{ height: '60px', marginTop: '16px', position: 'relative' }}>
-          <svg viewBox="0 0 100 30" preserveAspectRatio="none" style={{ width: '100%', height: '100%' }}>
-            <path d="M0,25 Q10,15 20,20 T40,10 T60,18 T80,5 T100,0" fill="none" stroke="var(--color-primary)" strokeWidth="2" />
-            <path d="M0,25 Q10,15 20,20 T40,10 T60,18 T80,5 T100,0 L100,30 L0,30 Z" fill="url(#grad)" opacity="0.3" />
-            <defs>
-              <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="var(--color-primary)" stopOpacity="1" />
-                <stop offset="100%" stopColor="var(--color-primary)" stopOpacity="0" />
-              </linearGradient>
-            </defs>
-            <circle cx="80" cy="5" r="3" fill="white" stroke="var(--color-primary)" strokeWidth="1.5" />
-          </svg>
+        <div style={{ height: '140px', marginTop: '24px', position: 'relative' }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={chartData} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
+              <defs>
+                <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="var(--color-primary)" stopOpacity={0.4}/>
+                  <stop offset="95%" stopColor="var(--color-primary)" stopOpacity={0}/>
+                </linearGradient>
+              </defs>
+              <Tooltip 
+                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: 'var(--shadow-md)' }}
+                itemStyle={{ color: 'var(--color-text)', fontWeight: 600 }}
+              />
+              <Area type="monotone" dataKey="sales" stroke="var(--color-primary)" strokeWidth={3} fillOpacity={1} fill="url(#colorSales)" />
+            </AreaChart>
+          </ResponsiveContainer>
         </div>
       </div>
 
