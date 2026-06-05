@@ -17,7 +17,7 @@ const ImageUploader = ({ images, setImages, variantes }) => {
       file,
       preview: URL.createObjectURL(file),
       id: Math.random().toString(36).substring(7),
-      color: coloresUnicos[0],
+      color: '', // Forzar a que diga "-- Asignar --" por defecto
       orden: images.length + i + 1,
       principal: images.length === 0 && i === 0 // El primero por defecto es principal
     }));
