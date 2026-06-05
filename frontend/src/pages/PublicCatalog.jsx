@@ -111,13 +111,13 @@ const ProductModal = ({ prenda, onClose, onAddToCart }) => {
   const [currentImgIdx, setCurrentImgIdx] = useState(0);
   const [qty, setQty] = useState(1);
 
-  const coloresArray = prenda?.variantes?.map(v => String(v.color || '').toLowerCase()).filter(Boolean) || [];
+  const coloresArray = prenda?.variantes?.map(v => String(v.color || 'único').toLowerCase()) || [];
   const coloresUnicos = [...new Set(coloresArray)].map(c => c.charAt(0).toUpperCase() + c.slice(1));
 
   const [selectedColor, setSelectedColor] = useState(coloresUnicos.length > 0 ? coloresUnicos[0] : '');
   const [selectedTallaState, setSelectedTallaState] = useState('');
 
-  const variantesColor = prenda?.variantes?.filter(v => String(v.color || '').toLowerCase() === selectedColor.toLowerCase()) || [];
+  const variantesColor = prenda?.variantes?.filter(v => String(v.color || 'único').toLowerCase() === selectedColor.toLowerCase()) || [];
   const primeraTalla = variantesColor.length > 0 ? variantesColor[0].talla : '';
   const isTallaValida = variantesColor.some(v => v.talla === selectedTallaState);
   const activeTalla = isTallaValida ? selectedTallaState : primeraTalla;
