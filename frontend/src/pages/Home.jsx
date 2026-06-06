@@ -4,16 +4,6 @@ import { AreaChart, Area, ResponsiveContainer, Tooltip } from 'recharts';
 import api from '../services/api';
 import './Home.css';
 
-const chartData = [
-  { name: 'Lun', sales: 4000 },
-  { name: 'Mar', sales: 3000 },
-  { name: 'Mie', sales: 5000 },
-  { name: 'Jue', sales: 2780 },
-  { name: 'Vie', sales: 8900 },
-  { name: 'Sab', sales: 12000 },
-  { name: 'Dom', sales: 9000 },
-];
-
 const formatCurrency = (amount) => {
   return new Intl.NumberFormat('es-CL', {
     style: 'currency',
@@ -29,7 +19,10 @@ const Home = () => {
     saldos_pendientes: 0,
     prendas_activas: 0,
     usuario_nombre: '',
-    usuario_avatar: null
+    usuario_avatar: null,
+    ventas_semana: [],
+    top_productos: [],
+    pedidos_recientes: []
   });
   const [isLoading, setIsLoading] = useState(true);
 
@@ -75,7 +68,7 @@ const Home = () => {
         </div>
         <div style={{ height: '140px', marginTop: '24px', position: 'relative' }}>
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={chartData} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
+            <AreaChart data={stats.ventas_semana || []} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="var(--color-primary)" stopOpacity={0.4}/>
@@ -86,7 +79,7 @@ const Home = () => {
                 contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: 'var(--shadow-md)' }}
                 itemStyle={{ color: 'var(--color-text)', fontWeight: 600 }}
               />
-              <Area type="monotone" dataKey="sales" stroke="var(--color-primary)" strokeWidth={3} fillOpacity={1} fill="url(#colorSales)" />
+              <Area type="monotone" dataKey="ventas" stroke="var(--color-primary)" strokeWidth={3} fillOpacity={1} fill="url(#colorSales)" />
             </AreaChart>
           </ResponsiveContainer>
         </div>
@@ -132,19 +125,55 @@ const Home = () => {
         <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=400" alt="Otoño 2024" style={{ position: 'absolute', right: 0, top: 0, height: '100%', width: '50%', objectFit: 'cover', clipPath: 'polygon(20% 0, 100% 0, 100% 100%, 0% 100%)' }} />
       </div>
 
-      <div style={{ marginTop: '32px' }}>
-        <h3 style={{ fontSize: '1.1rem', marginBottom: '16px' }}>Actividad reciente</h3>
-        <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px' }}>
-          <div style={{ background: 'var(--color-danger-bg)', color: 'var(--color-danger)', width: 40, height: 40, borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <ShoppingBag size={20} />
+      <div className="advanced-metrics-grid" style={{ marginTop: '32px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
+        
+        {/* Top Productos */}
+        <div>
+          <h3 style={{ fontSize: '1.1rem', marginBottom: '16px' }}>Top Prendas</h3>
+          <div className="card" style={{ padding: '16px' }}>
+            {stats.top_productos && stats.top_productos.length > 0 ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {stats.top_productos.map((prod, idx) => (
+                  <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <div style={{ background: 'var(--color-primary-light)', color: 'var(--color-primary)', width: 28, height: 28, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 'bold' }}>
+                        {idx + 1}
+                      </div>
+                      <span style={{ fontWeight: 500, fontSize: '0.95rem' }}>{prod.nombre}</span>
+                    </div>
+                    <span style={{ fontWeight: 600, color: 'var(--color-text-muted)' }}>{prod.total_vendido} uds</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-muted" style={{ fontSize: '0.9rem', textAlign: 'center' }}>Sin ventas registradas aún</p>
+            )}
           </div>
-          <div style={{ flex: 1 }}>
-            <p style={{ margin: 0, fontWeight: 600, fontSize: '0.95rem' }}>Nueva orden recibida</p>
-            <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.8rem' }}>#0008 Paula Romero</p>
-          </div>
-          <div style={{ textAlign: 'right' }}>
-            <p style={{ margin: 0, color: 'var(--color-success)', fontWeight: 600, fontSize: '0.95rem' }}>$5.990</p>
-            <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.75rem' }}>Hace 5 min</p>
+        </div>
+
+        {/* Actividad Reciente */}
+        <div>
+          <h3 style={{ fontSize: '1.1rem', marginBottom: '16px' }}>Últimos Pedidos</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {stats.pedidos_recientes && stats.pedidos_recientes.length > 0 ? (
+              stats.pedidos_recientes.map((pedido) => (
+                <div key={pedido.id} className="card" style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px' }}>
+                  <div style={{ background: 'var(--color-success-bg)', color: 'var(--color-success)', width: 40, height: 40, borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <ShoppingBag size={20} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <p style={{ margin: 0, fontWeight: 600, fontSize: '0.95rem' }}>{pedido.cliente}</p>
+                    <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.8rem', textTransform: 'capitalize' }}>{pedido.estado}</p>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <p style={{ margin: 0, color: 'var(--color-text)', fontWeight: 600, fontSize: '0.95rem' }}>{formatCurrency(pedido.total)}</p>
+                    <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.75rem' }}>{pedido.fecha}</p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="text-muted" style={{ fontSize: '0.9rem', textAlign: 'center' }}>No hay pedidos recientes</p>
+            )}
           </div>
         </div>
       </div>

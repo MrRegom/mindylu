@@ -3,7 +3,7 @@
 // ─────────────────────────────────────────────────────────────
 
 import { useState, useEffect } from 'react';
-import { Calendar, MapPin, MessageCircle, Package, Clock, Edit2, Copy, XCircle, CheckCircle, RefreshCcw } from 'lucide-react';
+import { Plus, Calendar, MapPin, MessageCircle, Package, Clock, Edit2, Copy, XCircle, CheckCircle, RefreshCcw } from 'lucide-react';
 import api from '../services/api';
 import './Entregas.css';
 import { showAlert, showConfirm, showToast } from '../utils/alerts';
@@ -345,9 +345,16 @@ const Entregas = () => {
           <h1>Rutas de Entrega</h1>
           <p>Organiza tus despachos diarios</p>
         </div>
-        <button className="btn btn-primary" onClick={handleOpenCrearModal} style={{ display: 'flex', alignItems: 'center', gap: '8px', borderRadius: 'var(--radius-full)', width: 'fit-content', whiteSpace: 'nowrap' }}>
-          <Calendar size={18} />
-          <span>Nueva Ruta</span>
+        <button 
+          className="btn btn-primary" 
+          onClick={handleOpenCrearModal} 
+          style={{ 
+            display: 'flex', alignItems: 'center', justifyContent: 'center', 
+            width: '40px', height: '40px', borderRadius: '50%', padding: 0, flexShrink: 0 
+          }}
+          title="Nueva Ruta"
+        >
+          <Plus size={24} />
         </button>
       </div>
 
