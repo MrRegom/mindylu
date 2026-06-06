@@ -19,11 +19,10 @@ const PrendaForm = () => {
     precio_compra: '',
     precio: '',
     categoria: '',
-    talla_tipo: 'unica',
   });
 
   const [variantes, setVariantes] = useState([
-    { id: Date.now(), color: 'Negro', talla: 'Única', cantidad: 1 }
+    { id: Date.now(), color: 'Negro', talla: '', cantidad: 1 }
   ]);
 
   const [nombresExistentes, setNombresExistentes] = useState([]);
@@ -124,7 +123,7 @@ const PrendaForm = () => {
   const handleAddVariante = () => {
     setVariantes(prev => [
       ...prev, 
-      { id: Date.now(), color: 'Negro', talla: formData.talla_tipo === 'unica' ? 'Única' : 'M', cantidad: 1 }
+      { id: Date.now(), color: 'Negro', talla: '', cantidad: 1 }
     ]);
   };
 
@@ -138,15 +137,6 @@ const PrendaForm = () => {
       v.id === id ? { ...v, [field]: value } : v
     ));
   };
-
-  const handleTallaTipoChange = (e) => {
-    const newTipo = e.target.value;
-    setFormData(prev => ({ ...prev, talla_tipo: newTipo }));
-    // Actualizar las variantes existentes con el nuevo tipo
-    setVariantes(prev => prev.map(v => ({
-      ...v,
-      talla: newTipo === 'unica' ? 'Única' : (v.talla === 'Única' ? 'M' : v.talla)
-    })));
   };
 
   const handleSubmit = async (e) => {
@@ -162,7 +152,6 @@ const PrendaForm = () => {
         const precioCompraLimpio = formData.precio_compra.toString().replace(/\./g, '');
         payload.append('precio_compra', precioCompraLimpio);
       }
-      payload.append('talla_tipo', formData.talla_tipo);
       if (formData.categoria) {
         payload.append('categoria_id', formData.categoria);
       }
