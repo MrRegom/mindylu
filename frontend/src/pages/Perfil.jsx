@@ -1,17 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Camera, Save, Lock, Mail, User } from 'lucide-react';
 import './Perfil.css';
 import { showAlert, showConfirm, showToast } from '../utils/alerts';
+import api from '../services/api';
 
 const Perfil = () => {
   const [perfil, setPerfil] = useState({
-    nombre: 'MindyLu',
-    email: 'contacto@mindylu.cl',
-    telefono: '+56 9 1234 5678',
+    nombre: '',
+    email: '',
+    telefono: '',
     password: '',
     confirmPassword: ''
   });
   const [foto, setFoto] = useState("https://i.pravatar.cc/150?img=5");
+  const [fileToUpload, setFileToUpload] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchPerfil();
+  }, []);
+
+  const fetchPerfil = async () => {
+    setIsLoading(true);
+    try {
+      const res = await api.get('/auth/perfil/');
+      setPerfil(prev => ({
+        ...prev,
+        nombre: res.data.nombre || '',
+        email: res.data.email || '',
+        telefono: res.data.telefono || ''
+      }));
+      if (res.data.avatar) {
+        setFoto(res.data.avatar);
+      }
+    } catch (error) {
+      console.error(error);
+      showToast('Error al cargar el perfil', 'error');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleChange = (e) => {
     setPerfil({ ...perfil, [e.target.name]: e.target.value });
@@ -20,13 +48,44 @@ const Perfil = () => {
   const handleFotoChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      setFileToUpload(file);
       setFoto(URL.createObjectURL(file));
     }
   };
 
-  const handleGuardar = (e) => {
+  const handleGuardar = async (e) => {
     e.preventDefault();
-    showAlert('¡Perfil actualizado con éxito!');
+    if (perfil.password && perfil.password !== perfil.confirmPassword) {
+      return showToast('Las contraseñas no coinciden', 'error');
+    }
+    
+    const formData = new FormData();
+    formData.append('nombre', perfil.nombre);
+    formData.append('email', perfil.email);
+    formData.append('telefono', perfil.telefono);
+    
+    if (perfil.password) {
+      formData.append('password', perfil.password);
+    }
+    
+    if (fileToUpload) {
+      formData.append('avatar', fileToUpload);
+    }
+
+    try {
+      await api.patch('/auth/perfil/', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
+      });
+      showToast('¡Perfil actualizado con éxito!', 'success');
+      setPerfil(prev => ({ ...prev, password: '', confirmPassword: '' }));
+      setFileToUpload(null);
+    } catch (error) {
+      console.error(error);
+      const errorMsg = error.response?.data?.email ? 'Ese correo ya está en uso' : 'Error al guardar el perfil';
+      showToast(errorMsg, 'error');
+    }
   };
 
   return (

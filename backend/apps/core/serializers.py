@@ -79,19 +79,29 @@ class LoginSerializer(serializers.Serializer):
 
 
 class UsuarioSerializer(serializers.ModelSerializer):
-    """Serializer de lectura para el perfil del usuario autenticado."""
+    """Serializer de lectura y actualización para el perfil del usuario."""
     tenant_nombre = serializers.CharField(source='tenant.nombre', read_only=True)
     tenant_slug = serializers.CharField(source='tenant.slug', read_only=True)
     tenant_plan = serializers.CharField(source='tenant.plan', read_only=True)
+    password = serializers.CharField(write_only=True, required=False, allow_blank=True)
 
     class Meta:
         model = Usuario
         fields = [
-            'id', 'email', 'nombre', 'rol',
+            'id', 'email', 'nombre', 'rol', 'telefono', 'avatar',
             'tenant_nombre', 'tenant_slug', 'tenant_plan',
-            'fecha_registro',
+            'fecha_registro', 'password'
         ]
-        read_only_fields = fields
+        read_only_fields = [
+            'id', 'email', 'rol', 'tenant_nombre', 
+            'tenant_slug', 'tenant_plan', 'fecha_registro'
+        ]
+
+    def update(self, instance, validated_data):
+        password = validated_data.pop('password', None)
+        if password:
+            instance.set_password(password)
+        return super().update(instance, validated_data)
 
 class ErrorLogSerializer(serializers.ModelSerializer):
     class Meta:

@@ -62,12 +62,23 @@ def login_view(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['GET'])
+@api_view(['GET', 'PATCH'])
 @permission_classes([IsAuthenticated])
 def perfil_view(request):
     """
     GET /api/v1/auth/perfil/
     Devuelve el perfil del usuario autenticado.
+    
+    PATCH /api/v1/auth/perfil/
+    Actualiza el perfil del usuario (acepta multipart/form-data para imagen).
     """
-    serializer = UsuarioSerializer(request.user)
-    return Response(serializer.data)
+    if request.method == 'GET':
+        serializer = UsuarioSerializer(request.user)
+        return Response(serializer.data)
+        
+    elif request.method == 'PATCH':
+        serializer = UsuarioSerializer(request.user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
