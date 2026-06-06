@@ -47,9 +47,8 @@
   justify-content: space-between;
   padding: 0 40px;
   height: 70px;
-  background: rgba(255,255,255,0.92);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(0,0,0,0.06);
+  background: rgba(255,255,255,0.98);
+  border-bottom: 1px solid rgba(0,0,0,0.05);
   transition: var(--transition);
 }
 
@@ -92,21 +91,23 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #25D366;
+  background: #000000;
   color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 999px;
+  border: 1px solid #000000;
+  padding: 8px 18px;
+  border-radius: 0px;
   font-family: var(--ff-body);
-  font-size: 0.82rem;
-  font-weight: 600;
+  font-size: 0.75rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 1px;
   cursor: pointer;
   transition: var(--transition);
 }
 
 .lp-nav-wa:hover {
-  background: #128C7E;
-  transform: translateY(-1px);
+  background: #ffffff;
+  color: #000000;
 }
 
 .lp-hamburger {
@@ -178,25 +179,24 @@
 
 .lp-hero-tag {
   display: inline-block;
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 3px;
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 2px;
   text-transform: uppercase;
-  color: var(--color-rose);
-  border: 1px solid var(--color-rose);
-  padding: 6px 16px;
-  border-radius: 999px;
-  margin-bottom: 24px;
+  color: #ffffff;
+  border-bottom: 1px solid #ffffff;
+  padding: 0 0 4px 0;
+  margin-bottom: 30px;
 }
 
 .lp-hero-title {
   font-family: var(--ff-title);
-  font-size: clamp(2.8rem, 5vw, 5rem);
-  font-weight: 700;
+  font-size: clamp(2.5rem, 5vw, 4.5rem);
+  font-weight: 300;
   color: var(--color-white);
   line-height: 1.1;
-  margin-bottom: 20px;
-  letter-spacing: -0.5px;
+  margin-bottom: 24px;
+  letter-spacing: 0px;
 }
 
 .lp-hero-title em {
@@ -219,14 +219,14 @@
 }
 
 .lp-btn-primary {
-  background: var(--color-white);
-  color: var(--color-black);
-  border: none;
-  padding: 16px 40px;
-  border-radius: 4px;
+  background: var(--color-black);
+  color: var(--color-white);
+  border: 1px solid var(--color-black);
+  padding: 14px 40px;
+  border-radius: 0;
   font-family: var(--ff-body);
-  font-size: 0.85rem;
-  font-weight: 500;
+  font-size: 0.75rem;
+  font-weight: 400;
   letter-spacing: 2px;
   text-transform: uppercase;
   cursor: pointer;
@@ -234,19 +234,18 @@
 }
 
 .lp-btn-primary:hover {
-  background: var(--color-beige);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  background: var(--color-white);
+  color: var(--color-black);
 }
 
 .lp-btn-outline {
-  background: transparent;
+  background: rgba(255,255,255,0.1);
   color: var(--color-white);
-  border: 1px solid rgba(255,255,255,0.8);
-  padding: 16px 40px;
-  border-radius: 4px;
+  border: 1px solid var(--color-white);
+  padding: 14px 40px;
+  border-radius: 0;
   font-family: var(--ff-body);
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   font-weight: 400;
   letter-spacing: 2px;
   text-transform: uppercase;
@@ -458,7 +457,7 @@
   aspect-ratio: 3/4;
   background: var(--color-beige);
   overflow: hidden;
-  border-radius: 6px;
+  border-radius: 0;
   margin-bottom: 12px;
   display: block;
 }
@@ -495,11 +494,11 @@
   top: 8px;
   left: 8px;
   font-size: 0.65rem;
-  font-weight: 600;
+  font-weight: 400;
   letter-spacing: 1px;
   text-transform: uppercase;
   padding: 4px 10px;
-  border-radius: 999px;
+  border-radius: 0;
   max-width: 85%;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -540,17 +539,15 @@
 }
 
 .lp-card-btn {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  color: var(--color-text);
-  border: 1px solid rgba(255,255,255,0.2);
+  background: #000000;
+  color: #ffffff;
+  border: none;
   padding: 14px 24px;
-  border-radius: var(--radius-full);
+  border-radius: 0;
   font-family: var(--ff-body);
   font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 1px;
+  font-weight: 400;
+  letter-spacing: 2px;
   text-transform: uppercase;
   cursor: pointer;
   display: flex;
@@ -560,7 +557,6 @@
   transform: translateY(20px);
   opacity: 0;
   transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
 .lp-card:hover .lp-card-btn {
@@ -569,9 +565,8 @@
 }
 
 .lp-card-btn:hover {
-  background: var(--color-white);
-  transform: translateY(-2px) !important;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  background: rgba(0,0,0,0.8);
+  transform: translateY(0) !important;
 }
 
 .lp-card-btn-mobile {
@@ -605,27 +600,29 @@
 }
 
 .lp-btn-elegant {
-  background: var(--color-bg);
-  color: var(--color-text);
-  padding: 8px 18px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  border-radius: var(--radius-full);
-  border: 1px solid var(--color-border);
+  background: transparent;
+  color: #000000;
+  padding: 8px 0px;
+  font-size: 0.75rem;
+  font-weight: 400;
+  border-radius: 0;
+  border: none;
+  border-bottom: 1px solid transparent;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
   cursor: pointer;
   transition: var(--transition);
-  box-shadow: var(--shadow-sm);
+  box-shadow: none;
+  text-transform: uppercase;
 }
 .lp-btn-elegant:hover, .lp-btn-elegant:active {
-  background: var(--color-primary-gradient);
-  color: var(--color-surface);
-  border-color: transparent;
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  background: transparent;
+  color: var(--color-primary);
+  border-bottom: 1px solid var(--color-primary);
+  transform: none;
+  box-shadow: none;
 }
 
 .lp-card:hover .lp-card-btn {
@@ -644,8 +641,10 @@
 
 .lp-card-name {
   font-family: var(--ff-body);
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-size: 0.75rem;
+  font-weight: 300;
+  letter-spacing: 1px;
+  text-transform: uppercase;
   color: var(--color-black);
   margin-bottom: 4px;
   display: -webkit-box;
@@ -653,13 +652,13 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  min-height: 2.7rem; /* Aproximadamente 2 líneas */
-  line-height: 1.35rem;
+  min-height: 2.2rem;
+  line-height: 1.1rem;
 }
 
 .lp-card-price {
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: 0.8rem;
+  font-weight: 400;
   color: var(--color-black);
 }
 
