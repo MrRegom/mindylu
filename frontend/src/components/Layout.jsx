@@ -1,14 +1,22 @@
 import { Outlet, useLocation } from 'react-router-dom';
-import { Home, Search, ShoppingBag, User, CreditCard, Settings } from 'lucide-react';
+import { Home, Search, ShoppingBag, User, CreditCard, Settings, LogOut } from 'lucide-react';
 import './Layout.css';
 
 const Layout = () => {
   const location = useLocation();
   
   // No mostrar navegación en la pantalla de login
-  if (location.pathname === '/login') {
+  if (location.pathname === '/panel/login' || location.pathname === '/login') {
     return <Outlet />;
   }
+
+  const handleLogout = (e) => {
+    if (e) e.preventDefault();
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('user');
+    window.location.replace('/panel/login');
+  };
 
   return (
     <div className="layout-container">
@@ -42,6 +50,10 @@ const Layout = () => {
             <CreditCard size={20} />
             <span>Perfil</span>
           </a>
+          <button onClick={handleLogout} className="nav-item" style={{ background: 'none', border: 'none', width: '100%', color: 'var(--color-danger)', marginTop: 'auto', cursor: 'pointer' }}>
+            <LogOut size={20} />
+            <span>Salir</span>
+          </button>
         </nav>
       </aside>
 
@@ -76,6 +88,10 @@ const Layout = () => {
             <CreditCard size={22} />
             <span>Perfil</span>
           </a>
+          <button onClick={handleLogout} className="nav-item" style={{ background: 'none', border: 'none', color: 'var(--color-danger)', padding: '8px', cursor: 'pointer' }}>
+            <LogOut size={22} />
+            <span>Salir</span>
+          </button>
         </nav>
       </main>
     </div>

@@ -35,6 +35,17 @@ function App() {
   // Leemos el token real para ver si está logueado
   const isAuthenticated = !!localStorage.getItem('access_token');
 
+  useEffect(() => {
+    // Escuchar cambios de historial (flecha atrás) para evitar vistas cacheadas
+    const handlePopState = () => {
+      if (!localStorage.getItem('access_token') && window.location.pathname.startsWith('/panel') && window.location.pathname !== '/panel/login') {
+        window.location.replace('/panel/login');
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   return (
     <Router>
       <BodyClassManager />
