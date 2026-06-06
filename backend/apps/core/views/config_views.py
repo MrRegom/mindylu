@@ -48,4 +48,10 @@ class ConfiguracionTiendaPublicaView(views.APIView):
         # También vamos a devolver el nombre de la tienda y su plan por si acaso en otras variables.
         data = serializer.data
         data['tenant_nombre'] = tenant.nombre
+        
+        from apps.core.models import Usuario
+        user = Usuario.objects.filter(tenant=tenant).first()
+        if user and user.avatar:
+            data['tienda_avatar'] = user.avatar.url
+            
         return Response(data)

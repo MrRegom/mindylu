@@ -345,9 +345,9 @@ const Entregas = () => {
           <h1>Rutas de Entrega</h1>
           <p>Organiza tus despachos diarios</p>
         </div>
-        <button className="btn btn-primary btn-icon" onClick={handleOpenCrearModal} title="Programar nueva ruta">
-          <Calendar size={20} />
-          <span className="sr-only">Nueva Ruta</span>
+        <button className="btn btn-primary" onClick={handleOpenCrearModal} style={{ display: 'flex', alignItems: 'center', gap: '8px', borderRadius: 'var(--radius-full)' }}>
+          <Calendar size={18} />
+          <span>Nueva Ruta</span>
         </button>
       </div>
 

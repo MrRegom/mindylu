@@ -137,6 +137,17 @@ const ProductModal = ({ prenda, onClose, onAddToCart }) => {
       }
       return { url, color: img.color || '' };
     });
+    if (prenda.foto_url) {
+      let url = prenda.foto_url;
+      if (url && !url.startsWith('http')) {
+        const baseUrl = API_BASE.replace('/api/v1', '');
+        url = `${baseUrl}${url.startsWith('/') ? '' : '/'}${url}`;
+      }
+      // Evitar duplicar si por alguna razón ya estuviera
+      if (!allImages.find(i => i.url === url)) {
+        allImages.unshift({ url, color: '' });
+      }
+    }
   } else if (prenda.foto_url) {
     let url = prenda.foto_url;
     if (url && !url.startsWith('http')) {
@@ -543,6 +554,8 @@ const PublicCatalog = () => {
         <img 
           src={config?.banner_imagen ? (
             config.banner_imagen.startsWith('http') ? config.banner_imagen : `${API_BASE.replace('/api/v1', '')}${config.banner_imagen}`
+          ) : config?.tienda_avatar ? (
+            config.tienda_avatar.startsWith('http') ? config.tienda_avatar : `${API_BASE.replace('/api/v1', '')}${config.tienda_avatar}`
           ) : "/images/hero.jpg"} 
           alt={config?.banner_titulo || `${config?.tienda_nombre || 'MindyLu'} - Moda Femenina`} 
           className="lp-hero-img" 

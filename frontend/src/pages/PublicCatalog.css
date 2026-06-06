@@ -64,7 +64,7 @@
 }
 
 .lp-nav-brand span {
-  color: var(--color-rose2);
+  color: var(--color-primary);
 }
 
 .lp-nav-links {
@@ -85,7 +85,7 @@
 }
 
 .lp-nav-links a:hover {
-  color: var(--color-rose2);
+  color: var(--color-primary);
 }
 
 .lp-nav-wa {
