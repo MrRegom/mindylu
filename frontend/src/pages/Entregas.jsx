@@ -352,70 +352,64 @@ const Entregas = () => {
       </div>
 
       {isCrearModalOpen && (
-        <div className="modal-overlay animate-fade-in" style={{ paddingBottom: '90px' }}>
-          <div className="modal-content animate-slide-up glass" style={{ maxWidth: '500px' }}>
-            <div className="modal-header">
+        <div className="entregas-modal-overlay animate-fade-in">
+          <div className="entregas-modal-content animate-slide-up">
+            <div className="entregas-modal-header">
               <h3>Programar Viaje</h3>
-              <button className="btn-icon-simple" onClick={() => setIsCrearModalOpen(false)}>×</button>
+              <button className="btn-icon-simple" onClick={() => setIsCrearModalOpen(false)}>
+                <XCircle size={24} />
+              </button>
             </div>
-            <div className="modal-body" style={{ padding: '20px 0' }}>
+            <div className="entregas-modal-body">
               <div className="form-group">
-                <label>¿Qué día viajarás?</label>
+                <label style={{ fontWeight: 600, color: '#333', marginBottom: '8px', display: 'block' }}>¿Qué día viajarás?</label>
                 <input 
                   type="date" 
                   value={nuevaRutaData.fecha} 
                   onChange={e => setNuevaRutaData({...nuevaRutaData, fecha: e.target.value})} 
-                  style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.2)', backgroundColor: 'rgba(0,0,0,0.3)', color: 'white' }}
+                  style={{ width: '100%', padding: '12px', borderRadius: '12px', border: '1px solid #eaeaea', backgroundColor: '#fafafa', color: '#333', fontSize: '1rem', outline: 'none' }}
                 />
               </div>
               
-              <div className="form-group" style={{ marginTop: '20px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                  <label style={{ margin: 0 }}>¿Qué lugares visitarás ese día?</label>
-                  <button onClick={handleCrearLugarRapido} style={{ background: 'transparent', border: 'none', color: 'var(--color-primary)', cursor: 'pointer', fontSize: '0.85rem' }}>+ Nuevo Lugar</button>
+              <div className="form-group">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                  <label style={{ margin: 0, fontWeight: 600, color: '#333' }}>¿Qué lugares visitarás ese día?</label>
+                  <button onClick={handleCrearLugarRapido} className="btn-nuevo-lugar">
+                    + Nuevo Lugar
+                  </button>
                 </div>
-                
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxHeight: '300px', overflowY: 'auto' }}>
+                <div className="puntos-list-container">
                   {puntosEntrega.map(punto => {
                     const isSelected = nuevaRutaData.puntosSeleccionados[punto.id] !== undefined;
                     return (
-                      <div key={punto.id} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px', backgroundColor: isSelected ? 'rgba(212, 175, 55, 0.1)' : 'rgba(0,0,0,0.2)', borderRadius: '8px', border: isSelected ? '1px solid var(--color-primary)' : '1px solid transparent' }}>
-                        <input 
-                          type="checkbox" 
-                          checked={isSelected}
-                          onChange={() => togglePunto(punto.id)}
-                          style={{ width: '18px', height: '18px', accentColor: 'var(--color-primary)' }}
-                        />
-                        <span style={{ flex: 1, fontWeight: isSelected ? 'bold' : 'normal', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                          {punto.nombre}
+                      <div key={punto.id} className={`punto-item ${isSelected ? 'selected' : ''}`} onClick={() => togglePunto(punto.id)}>
+                        <div className="punto-item-checkbox">
+                          {isSelected && <CheckCircle size={14} />}
+                        </div>
+                        <div className="punto-item-nombre">
+                          <span>{punto.nombre}</span>
                           <button 
-                            type="button" 
-                            onClick={(e) => { e.stopPropagation(); handleEditarLugar(punto.id, punto.nombre); }}
-                            style={{ background: 'transparent', border: 'none', padding: 4, cursor: 'pointer', color: 'var(--color-primary)' }}
-                            title="Editar nombre de este lugar"
+                            className="btn-icon-simple" 
+                            style={{ opacity: 0.5 }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEditarLugar(punto.id, punto.nombre);
+                            }}
+                            title="Editar nombre"
                           >
-                            <Edit2 size={13} />
+                            <Edit2 size={14} />
                           </button>
-                        </span>
-                        {isSelected && (
-                          <input 
-                            type="time" 
-                            value={nuevaRutaData.puntosSeleccionados[punto.id]}
-                            onChange={e => handleHoraChange(punto.id, e.target.value)}
-                            style={{ padding: '6px', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.2)', backgroundColor: 'rgba(0,0,0,0.5)', color: 'white' }}
-                            title="Hora estimada (opcional)"
-                          />
-                        )}
+                        </div>
                       </div>
                     );
                   })}
-                  {puntosEntrega.length === 0 && <p className="text-muted" style={{ fontSize: '0.9rem' }}>No hay lugares guardados.</p>}
+                  {puntosEntrega.length === 0 && <p className="text-muted" style={{ fontSize: '0.9rem', textAlign: 'center', padding: '20px 0' }}>No hay lugares guardados.</p>}
                 </div>
               </div>
             </div>
-            <div className="modal-actions" style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '20px' }}>
-              <button className="btn btn-secondary" onClick={() => setIsCrearModalOpen(false)}>Cancelar</button>
-              <button className="btn btn-primary" onClick={guardarNuevasRutas}>Programar Rutas</button>
+            <div className="entregas-modal-actions">
+              <button className="btn btn-secondary" onClick={() => setIsCrearModalOpen(false)} style={{ borderRadius: '12px' }}>Cancelar</button>
+              <button className="btn btn-primary" onClick={guardarNuevasRutas} style={{ borderRadius: '12px', padding: '10px 20px', fontWeight: 600 }}>Programar Rutas</button>
             </div>
           </div>
         </div>
