@@ -137,7 +137,6 @@ const PrendaForm = () => {
       v.id === id ? { ...v, [field]: value } : v
     ));
   };
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
