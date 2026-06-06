@@ -623,30 +623,7 @@ const PublicCatalog = () => {
         )}
       </section>
 
-      {/* ── Categorías ── */}
-      <section className="lp-section" style={{ background: '#f8f5f2' }} ref={catRef}>
-        <p className="lp-section-label lp-text-center">✦ Explora por estilo</p>
-        <h2 className="lp-section-title lp-text-center" style={{ marginBottom: 48 }}>
-          Nuestras <em>Categorías</em>
-        </h2>
-        <div className="lp-cats-grid">
-          {categorias.length > 0 ? categorias.map(c => (
-            <div key={c.id} className="lp-cat-card" onClick={() => { setCatSel(c.id); scrollTo(catalogRef); }}>
-              <div className="lp-cat-card-placeholder">{getEmoji(c.nombre)}</div>
-              <div className="lp-cat-card-overlay">
-                <span className="lp-cat-name">{c.nombre}</span>
-              </div>
-            </div>
-          )) : ['Vestidos', 'Blusas', 'Jeans', 'Chaquetas', 'Accesorios'].map((cat, i) => (
-            <div key={i} className="lp-cat-card">
-              <div className="lp-cat-card-placeholder">{['👗','👚','👖','🧥','👜'][i]}</div>
-              <div className="lp-cat-card-overlay">
-                <span className="lp-cat-name">{cat}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+
 
       {/* ── Quote central ── */}
       <div className="lp-splash">

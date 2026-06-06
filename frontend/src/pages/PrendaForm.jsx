@@ -318,40 +318,7 @@ const PrendaForm = () => {
             )}
           </div>
 
-          <div className="input-group" style={{ position: 'relative', zIndex: activeDropdown === 'talla_tipo' ? 10 : 1 }}>
-            <label>Tipo de Talla</label>
-            <div
-              className={`custom-select-trigger ${formData.talla_tipo ? 'has-value' : ''}`}
-              onClick={() => setActiveDropdown(prev => prev === 'talla_tipo' ? null : 'talla_tipo')}
-            >
-              <span>{formData.talla_tipo === 'unica' ? 'Talla Única' : 'Varias Tallas (S, M, L...)'}</span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polyline points="6 9 12 15 18 9" />
-              </svg>
-            </div>
-            {activeDropdown === 'talla_tipo' && (
-              <div className="custom-select-dropdown">
-                <div
-                  className={`custom-select-option ${formData.talla_tipo === 'unica' ? 'selected' : ''}`}
-                  onClick={() => {
-                    handleTallaTipoChange({ target: { name: 'talla_tipo', value: 'unica' } });
-                    setActiveDropdown(null);
-                  }}
-                >
-                  Talla Única
-                </div>
-                <div
-                  className={`custom-select-option ${formData.talla_tipo === 'por_talla' ? 'selected' : ''}`}
-                  onClick={() => {
-                    handleTallaTipoChange({ target: { name: 'talla_tipo', value: 'por_talla' } });
-                    setActiveDropdown(null);
-                  }}
-                >
-                  Varias Tallas (S, M, L...)
-                </div>
-              </div>
-            )}
-          </div>
+
         </div>
 
         <div className="form-section glass">
