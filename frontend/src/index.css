@@ -1,46 +1,49 @@
 :root {
   /* Brand Colors - High-End Boutique Aesthetic */
-  --color-primary: #D1A3A4; /* Dusty Rose / Muted Pink */
-  --color-primary-dark: #A97A7B;
-  --color-primary-light: #F7EBEB; 
-  --color-primary-gradient: linear-gradient(135deg, #D1A3A4 0%, #E3C1C2 100%);
-  --color-primary-rgb: 209, 163, 164;
+  --color-primary: #D4A3A4; /* Blush Pink */
+  --color-primary-dark: #B98788;
+  --color-primary-light: #F9EBEB;
+  --color-primary-gradient: linear-gradient(135deg, #D4A3A4 0%, #E3C1C2 100%);
+  --color-primary-rgb: 212, 163, 164;
   
+  --color-accent: #D4AF37; /* Champagne Gold */
+  --color-accent-light: #F7EFC8;
+
   /* Neutral Colors - Enterprise SaaS */
-  --color-bg: #FAFAFA; /* Ultra clean white-ish */
-  --color-bg-alt: #F3F4F6;
+  --color-bg: #FCFBFB; /* Ultra clean off-white */
+  --color-bg-alt: #F3EFEF; /* Soft beige/grey for contrast */
   --color-surface: #FFFFFF;
   --color-surface-rgb: 255, 255, 255;
-  --color-text: #1F2937; /* Very dark slate for readability */
-  --color-text-muted: #6B7280;
-  --color-border: #E5E7EB;
+  --color-text: #2D2A2A; /* Very dark brownish grey for readable elegance */
+  --color-text-muted: #8E8585;
+  --color-border: #E8E2E2;
   
   /* Status Colors */
-  --color-success: #10B981; 
-  --color-success-bg: rgba(16, 185, 129, 0.1);
-  --color-warning: #F59E0B; 
-  --color-warning-bg: rgba(245, 158, 11, 0.1);
-  --color-danger: #EF4444; 
-  --color-danger-bg: rgba(239, 68, 68, 0.1);
+  --color-success: #2E7D32; 
+  --color-success-bg: rgba(46, 125, 50, 0.1);
+  --color-warning: #B7870A; 
+  --color-warning-bg: rgba(183, 135, 10, 0.1);
+  --color-danger: #D32F2F; 
+  --color-danger-bg: rgba(211, 47, 47, 0.1);
   
   /* UI Elements */
-  --radius-sm: 8px;
-  --radius-md: 16px;
-  --radius-lg: 24px;
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
   --radius-full: 9999px;
   
   /* Sombras ultra suaves tipo Apple/SaaS */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
-  --shadow-glow: 0 8px 24px rgba(209, 163, 164, 0.4);
+  --shadow-sm: 0 2px 4px rgba(45, 42, 42, 0.04);
+  --shadow-md: 0 4px 12px rgba(45, 42, 42, 0.06);
+  --shadow-lg: 0 12px 24px rgba(45, 42, 42, 0.08);
+  --shadow-xl: 0 24px 48px rgba(45, 42, 42, 0.1);
+  --shadow-glow: 0 8px 24px rgba(212, 163, 164, 0.25);
   
   /* Transición fluida */
-  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   
   /* Typographic Scale */
-  --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-main: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
   --font-heading: 'Playfair Display', Georgia, serif;
 }
 

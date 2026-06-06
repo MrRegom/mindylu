@@ -32,7 +32,7 @@ const ClientaDetail = () => {
       setIsDeleting(true);
       try {
         await api.delete(`/clientas/${id}/`);
-        navigate('/clientas');
+        navigate('/panel/clientas');
       } catch (error) {
         showAlert("Error al eliminar clienta.");
         setIsDeleting(false);
@@ -50,7 +50,7 @@ const ClientaDetail = () => {
   return (
     <div className="clienta-detail-container animate-fade-in">
       <div className="form-header glass">
-        <button className="btn-back" onClick={() => navigate('/clientas')} type="button">
+        <button className="btn-back" onClick={() => navigate('/panel/clientas')} type="button">
           <ArrowLeft size={24} />
         </button>
         <h2>Perfil de Clienta</h2>
@@ -66,7 +66,7 @@ const ClientaDetail = () => {
           <button 
             className="btn-icon-simple" 
             style={{ color: 'var(--color-primary)' }}
-            onClick={() => navigate(`/clientas/${id}/editar`)}
+            onClick={() => navigate(`/panel/clientas/${id}/editar`)}
           >
             <Edit size={20} />
           </button>

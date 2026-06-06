@@ -30,7 +30,7 @@ const ClientaForm = () => {
         } catch (error) {
           console.error("Error cargando clienta:", error);
           showAlert("Error cargando datos.");
-          navigate('/clientas');
+          navigate('/panel/clientas');
         }
       };
       fetchClienta();
@@ -49,10 +49,10 @@ const ClientaForm = () => {
     try {
       if (isEditing) {
         await api.put(`/clientas/${id}/`, formData);
-        navigate(`/clientas/${id}`);
+        navigate(`/panel/clientas`);
       } else {
         await api.post('/clientas/', formData);
-        navigate('/clientas');
+        navigate('/panel/clientas');
       }
     } catch (error) {
       console.error("Error guardando clienta:", error);
@@ -69,7 +69,7 @@ const ClientaForm = () => {
   return (
     <div className="clienta-form-container animate-fade-in">
       <div className="form-header glass">
-        <button className="btn-back" onClick={() => isEditing ? navigate(`/clientas/${id}`) : navigate('/clientas')} type="button">
+        <button className="btn-back" onClick={() => navigate('/panel/clientas')} type="button">
           <ArrowLeft size={24} />
         </button>
         <h2>{isEditing ? 'Editar Clienta' : 'Nueva Clienta'}</h2>

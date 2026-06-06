@@ -128,7 +128,7 @@ const VenderModal = ({ isOpen, onClose, ventaActiva, setVentaActiva, onSuccess }
       prenda_id: prendaObj.id,
       variante_id: varianteObj.id,
       nombre: prendaObj.nombre,
-      foto_url: prendaObj.foto_url,
+      foto_url: prendaObj.imagenes?.find(img => img.color === varianteObj.color)?.imagen || prendaObj.imagenes?.[0]?.imagen || prendaObj.foto_url,
       color: varianteObj.color,
       talla: varianteObj.talla,
       cantidad: 1,

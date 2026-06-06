@@ -39,7 +39,7 @@ const Clientas = () => {
           <h1 style={{ fontSize: '1.8rem', fontFamily: 'Playfair Display', margin: '0 0 2px 0' }}>Mis Clientes</h1>
           <p style={{ color: 'var(--color-text-muted)', margin: 0, fontSize: '0.9rem' }}>Directorio y contactos</p>
         </div>
-        <button className="btn-icon-simple" onClick={() => navigate('/clientas/nueva')} title="Añadir" style={{ background: 'var(--color-primary-gradient)', color: '#FFF', border: 'none', width: '40px', height: '40px' }}>
+        <button className="btn-icon-simple" onClick={() => navigate('/panel/clientas/nueva')} title="Añadir" style={{ background: 'var(--color-primary-gradient)', color: '#FFF', border: 'none', width: '40px', height: '40px' }}>
           <UserPlus size={20} />
         </button>
       </div>
@@ -68,7 +68,7 @@ const Clientas = () => {
             <div 
               key={clienta.id} 
               className="clienta-card glass animate-slide-up"
-              onClick={() => navigate(`/clientas/${clienta.id}`)}
+              onClick={() => navigate(`/panel/clientas/${clienta.id}`)}
               style={{ cursor: 'pointer', padding: '16px', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '12px', border: 'none' }}
             >
               <div className="clienta-avatar" style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--color-primary-light)', color: 'var(--color-primary-dark)', display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: '1.3rem', fontWeight: 600, flexShrink: 0 }}>
