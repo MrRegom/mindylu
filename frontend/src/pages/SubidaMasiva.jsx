@@ -359,7 +359,7 @@ const SubidaMasiva = () => {
               </div>
               
               <div className="item-fields">
-                <div className="field-group input-group" style={{ position: 'relative' }}>
+                <div className="field-group input-group" style={{ position: 'relative', zIndex: activeDropdown === `nombre-${item.id}` ? 100 : 1 }}>
                   <label>Nombre de la prenda</label>
                   <div
                     className={`custom-select-trigger ${item.nombre ? 'has-value' : ''}`}
@@ -420,7 +420,7 @@ const SubidaMasiva = () => {
                   </div>
                 </div>
 
-                <div className="field-group input-group" style={{ position: 'relative' }}>
+                <div className="field-group input-group" style={{ position: 'relative', zIndex: activeDropdown === `categoria-${item.id}` ? 100 : 1 }}>
                   <label>Categoría</label>
                   <div
                     className={`custom-select-trigger ${item.categoria_id ? 'has-value' : ''}`}
@@ -479,7 +479,7 @@ const SubidaMasiva = () => {
                   <div className="variantes-list">
                     {item.variantes.map(variante => (
                       <div key={variante.id} className="variante-row">
-                        <div className="input-group mini" style={{ position: 'relative' }}>
+                        <div className="input-group mini" style={{ position: 'relative', zIndex: activeDropdown === `color-${item.id}-${variante.id}` ? 100 : 1 }}>
                           <label>Color</label>
                           <div
                             className={`custom-select-trigger ${variante.color ? 'has-value' : ''}`}
@@ -508,7 +508,7 @@ const SubidaMasiva = () => {
                           )}
                         </div>
                         
-                        <div className="input-group mini" style={{ position: 'relative' }}>
+                        <div className="input-group mini" style={{ position: 'relative', zIndex: activeDropdown === `talla-${item.id}-${variante.id}` ? 100 : 1 }}>
                           <label>Talla</label>
                           <div
                             className={`custom-select-trigger ${variante.talla ? 'has-value' : ''}`}

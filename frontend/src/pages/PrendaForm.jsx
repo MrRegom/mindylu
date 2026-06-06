@@ -319,9 +319,13 @@ const PrendaForm = () => {
 
           <div className="variantes-list-edit">
             {variantes.map((variante) => (
-              <div key={variante.id} className="variante-edit-card animate-slide-up">
+              <div 
+                key={variante.id} 
+                className="variante-edit-card animate-slide-up"
+                style={{ zIndex: activeDropdown && String(activeDropdown).includes(variante.id) ? 100 : 1, position: 'relative' }}
+              >
                 <div className="variante-row">
-                  <div className="input-group mini" style={{ position: 'relative', zIndex: activeDropdown === `color-${variante.id}` ? 10 : 1 }}>
+                  <div className="input-group mini" style={{ position: 'relative', zIndex: activeDropdown === `color-${variante.id}` ? 100 : 1 }}>
                     <label>Color</label>
                     <div
                       className={`custom-select-trigger ${variante.color ? 'has-value' : ''}`}
@@ -351,7 +355,7 @@ const PrendaForm = () => {
                     <input type="text" value={variante.color} required readOnly style={{ position: 'absolute', opacity: 0, height: 0, pointerEvents: 'none' }} />
                   </div>
                   
-                  <div className="input-group mini" style={{ position: 'relative', zIndex: activeDropdown === `talla-${variante.id}` ? 10 : 1 }}>
+                  <div className="input-group mini" style={{ position: 'relative', zIndex: activeDropdown === `talla-${variante.id}` ? 100 : 1 }}>
                     <label>Talla</label>
                     <div
                       className={`custom-select-trigger ${variante.talla ? 'has-value' : ''}`}

@@ -234,153 +234,105 @@ const ConfiguracionTiendaForm = () => {
   if (loading) return <p className="text-muted text-center py-4">Cargando configuración...</p>;
 
   return (
-    <div className="card glass configuracion-tienda-card" style={{ marginBottom: '24px' }}>
+    <div className="card glass configuracion-tienda-card" style={{ marginBottom: '24px', overflow: 'hidden' }}>
       <div className="card-header border-b pb-4 mb-4" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
         <LayoutTemplate size={24} className="icon-primary" />
         <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--color-text-strong)' }}>Apariencia de la Tienda</h2>
       </div>
       
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-        
-        {/* ROW 1: Nombre de tienda y WhatsApp */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-          <div className="form-group">
-            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600, marginBottom: '8px', color: 'var(--color-text-strong)' }}>
-              <Type size={16} /> Nombre de la Tienda (UI)
-            </label>
-            <input 
-              type="text" 
-              name="tienda_nombre"
-              className="input-field" 
-              value={config.tienda_nombre || ''}
-              onChange={handleChange}
-              placeholder="Ej: MindyLu"
-              style={{ padding: '12px', borderRadius: '8px', border: '1px solid #e5e7eb', width: '100%' }}
-            />
+      <div className="apariencia-split-layout">
+        <form onSubmit={handleSubmit} className="apariencia-form-col">
+          
+          <div className="form-group-row">
+            <div className="form-group">
+              <label><Type size={16} /> Nombre de la Tienda</label>
+              <input type="text" name="tienda_nombre" className="input-field" value={config.tienda_nombre || ''} onChange={handleChange} placeholder="Ej: MindyLu" />
+            </div>
+            <div className="form-group">
+              <label><Phone size={16} /> WhatsApp Pedidos</label>
+              <input type="text" name="whatsapp_numero" className="input-field" value={config.whatsapp_numero || ''} onChange={handleChange} placeholder="Ej: 56912345678" />
+            </div>
+          </div>
+
+          <div className="form-group-row" style={{ gridTemplateColumns: '3fr 1fr' }}>
+            <div className="form-group">
+              <label><Type size={16} /> Texto Marquesina</label>
+              <input type="text" name="marquesina_texto" className="input-field" value={config.marquesina_texto || ''} onChange={handleChange} placeholder="NUEVA COLECCIÓN..." />
+            </div>
+            <div className="form-group">
+              <label><Clock size={16} /> Vel. (s)</label>
+              <input type="number" name="marquesina_velocidad" className="input-field" value={config.marquesina_velocidad || 25} onChange={handleChange} min="5" max="100" />
+            </div>
           </div>
 
           <div className="form-group">
-            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600, marginBottom: '8px', color: 'var(--color-text-strong)' }}>
-              <Phone size={16} /> Número de WhatsApp para Pedidos
-            </label>
-            <input 
-              type="text" 
-              name="whatsapp_numero"
-              className="input-field" 
-              value={config.whatsapp_numero || ''}
-              onChange={handleChange}
-              placeholder="Ej: 56912345678"
-              style={{ padding: '12px', borderRadius: '8px', border: '1px solid #e5e7eb', width: '100%' }}
-            />
-          </div>
-        </div>
-
-        {/* ROW 2: Marquesina */}
-        <div style={{ display: 'grid', gridTemplateColumns: '3fr 1fr', gap: '20px' }}>
-          <div className="form-group">
-            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600, marginBottom: '8px', color: 'var(--color-text-strong)' }}>
-              <Type size={16} /> Texto de Marquesina (Scroll Superior)
-            </label>
-            <input 
-              type="text" 
-              name="marquesina_texto"
-              className="input-field" 
-              value={config.marquesina_texto || ''}
-              onChange={handleChange}
-              placeholder="Ej: NUEVA COLECCIÓN 2025 • ENVÍOS A TODO EL PAÍS"
-              style={{ padding: '12px', borderRadius: '8px', border: '1px solid #e5e7eb', width: '100%' }}
-            />
-          </div>
-          <div className="form-group">
-            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600, marginBottom: '8px', color: 'var(--color-text-strong)' }}>
-              <Clock size={16} /> Vel. Marquesina (s)
-            </label>
-            <input 
-              type="number" 
-              name="marquesina_velocidad"
-              className="input-field" 
-              value={config.marquesina_velocidad || 25}
-              onChange={handleChange}
-              min="5" max="100"
-              style={{ padding: '12px', borderRadius: '8px', border: '1px solid #e5e7eb', width: '100%' }}
-            />
-          </div>
-        </div>
-
-        {/* ROW 3: Banner Titulo y Subtitulo */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-          <div className="form-group">
-            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600, marginBottom: '8px', color: 'var(--color-text-strong)' }}>
-              <Type size={16} /> Título del Banner Principal
-            </label>
-            <textarea 
-              name="banner_titulo"
-              className="input-field" 
-              value={config.banner_titulo || ''}
-              onChange={handleChange}
-              rows="3"
-              placeholder="Ej: Moda femenina seleccionada..."
-              style={{ padding: '12px', borderRadius: '8px', border: '1px solid #e5e7eb', width: '100%', resize: 'none' }}
-            />
+            <label><Type size={16} /> Título del Banner</label>
+            <textarea name="banner_titulo" className="input-field" value={config.banner_titulo || ''} onChange={handleChange} rows="2" placeholder="Moda femenina seleccionada..." />
           </div>
 
           <div className="form-group">
-            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600, marginBottom: '8px', color: 'var(--color-text-strong)' }}>
-              <Type size={16} /> Subtítulo del Banner
-            </label>
-            <textarea 
-              name="banner_subtitulo"
-              className="input-field" 
-              value={config.banner_subtitulo || ''}
-              onChange={handleChange}
-              rows="3"
-              placeholder="Ej: Prendas únicas, elegantes..."
-              style={{ padding: '12px', borderRadius: '8px', border: '1px solid #e5e7eb', width: '100%', resize: 'none' }}
-            />
+            <label><Type size={16} /> Subtítulo del Banner</label>
+            <textarea name="banner_subtitulo" className="input-field" value={config.banner_subtitulo || ''} onChange={handleChange} rows="2" placeholder="Prendas únicas, elegantes..." />
           </div>
-        </div>
 
-        {/* ROW 4: Imagen Banner */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px' }}>
           <div className="form-group">
-            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600, marginBottom: '8px', color: 'var(--color-text-strong)' }}>
-              <Upload size={16} /> Imagen del Banner Principal
-            </label>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              {config.banner_imagen && !bannerFile && (
-                <img 
-                  src={config.banner_imagen} 
-                  alt="Banner actual" 
-                  style={{ width: '80px', height: '60px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #eee' }} 
-                />
-              )}
-              {bannerFile && (
-                <img 
-                  src={URL.createObjectURL(bannerFile)} 
-                  alt="Nuevo banner" 
-                  style={{ width: '80px', height: '60px', objectFit: 'cover', borderRadius: '4px', border: '2px solid var(--color-black)' }} 
-                />
-              )}
-              <input 
-                type="file" 
-                accept="image/*"
-                onChange={handleFileChange}
-                className="input-field"
-                style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px dashed #cbd5e1', background: '#f8fafc' }}
-              />
+            <label><Upload size={16} /> Imagen del Banner Principal</label>
+            <div className="banner-upload-wrapper">
+              <input type="file" accept="image/*" onChange={handleFileChange} className="input-field" />
+            </div>
+          </div>
+
+          <button type="submit" disabled={saving} className="btn-primary" style={{ marginTop: 'auto', padding: '14px', borderRadius: '8px', fontSize: '1rem', fontWeight: 600 }}>
+            {saving ? 'Guardando...' : 'Guardar Apariencia'}
+          </button>
+        </form>
+
+        <div className="apariencia-preview-col">
+          <h3 className="preview-title">Previsualización en Vivo</h3>
+          
+          <div className="preview-device">
+            <div className="preview-screen">
+              {/* Marquesina */}
+              <div className="preview-marquesina">
+                <div className="preview-marquesina-track" style={{ animationDuration: `${config.marquesina_velocidad || 25}s` }}>
+                  <span>{config.marquesina_texto || 'Texto Marquesina ✦ Envíos a todo el país'}</span>
+                </div>
+              </div>
+              
+              {/* Header */}
+              <div className="preview-header">
+                <div className="preview-logo">{config.tienda_nombre || 'MindyLu'}</div>
+                <div className="preview-icons">
+                  <div className="preview-icon-mock"></div>
+                  <div className="preview-icon-mock"></div>
+                </div>
+              </div>
+
+              {/* Hero Banner */}
+              <div className="preview-hero" style={{ 
+                backgroundImage: bannerFile ? `url(${URL.createObjectURL(bannerFile)})` : (config.banner_imagen ? `url(${config.banner_imagen})` : 'none'),
+                backgroundColor: '#f4f4f4'
+              }}>
+                <div className="preview-hero-overlay"></div>
+                <div className="preview-hero-content">
+                  <h1 className="preview-hero-title">{config.banner_titulo || 'Título Principal'}</h1>
+                  <p className="preview-hero-subtitle">{config.banner_subtitulo || 'Subtítulo del banner'}</p>
+                  <div className="preview-hero-btn">Ver Colección</div>
+                </div>
+              </div>
+
+              {/* Faux Content */}
+              <div className="preview-content-mock">
+                <div className="mock-title"></div>
+                <div className="mock-grid">
+                  <div className="mock-card"></div>
+                  <div className="mock-card"></div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-
-        <button 
-          type="submit" 
-          disabled={saving}
-          className="btn-primary"
-          style={{ padding: '14px', borderRadius: '8px', fontSize: '1rem', fontWeight: 600, marginTop: '8px' }}
-        >
-          {saving ? 'Guardando...' : 'Guardar Apariencia'}
-        </button>
-      </form>
+      </div>
     </div>
   );
 };
