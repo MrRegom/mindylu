@@ -10,14 +10,6 @@ import subprocess
 
 def main():
     """Run administrative tasks."""
-    try:
-        print("=== SERVER FILES ===")
-        print(subprocess.check_output(['ls', '-la', '/var/www/mindylu/backend/']).decode('utf-8'))
-        print("=== BACKUP SEARCH ===")
-        print(subprocess.check_output(['find', '/var/www', '/tmp', '/var/repo', '-name', '*sqlite*bak*', '-o', '-name', '*sqlite*backup*', '-o', '-name', '*media*bak*']).decode('utf-8'))
-    except Exception as e:
-        print(f"Error inspecting: {e}")
-
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.local')
     try:
         from django.core.management import execute_from_command_line
