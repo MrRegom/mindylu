@@ -41,6 +41,9 @@ class DashboardAPIView(APIView):
         # 4. Prendas activas
         prendas_activas = Prenda.objects.filter(tenant=tenant).count()
 
+        # 4b. Clientes
+        clientes_activos = Clienta.objects.filter(tenant=tenant).count()
+
         # 5. Ventas de los últimos 7 días (Para gráfico)
         ventas_semana = []
         for i in range(6, -1, -1):
@@ -80,6 +83,7 @@ class DashboardAPIView(APIView):
             'entregas_pendientes': entregas_pendientes,
             'saldos_pendientes': saldos,
             'prendas_activas': prendas_activas,
+            'clientes_activos': clientes_activos,
             'ventas_semana': ventas_semana,
             'top_productos': list(top_productos),
             'pedidos_recientes': pedidos_data,

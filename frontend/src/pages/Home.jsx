@@ -18,6 +18,7 @@ const Home = () => {
     entregas_pendientes: 0,
     saldos_pendientes: 0,
     prendas_activas: 0,
+    clientes_activos: 0,
     usuario_nombre: '',
     usuario_avatar: null,
     ventas_semana: [],
@@ -111,7 +112,7 @@ const Home = () => {
         <div className="card animate-slide-up" style={{ animationDelay: '0.5s', padding: '16px' }}>
           <div style={{ color: 'var(--color-success)', marginBottom: '12px' }}><User size={24} /></div>
           <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: '0 0 4px 0' }}>Clientes</p>
-          <h2 style={{ fontSize: '1.8rem', margin: 0 }}>124</h2>
+          <h2 style={{ fontSize: '1.8rem', margin: 0 }}>{isLoading ? '...' : stats.clientes_activos}</h2>
         </div>
       </div>
 
