@@ -368,18 +368,16 @@ const PrendaForm = () => {
                     <div
                       className={`custom-select-trigger ${variante.talla ? 'has-value' : ''}`}
                       onClick={() => {
-                        if (formData.talla_tipo !== 'unica') {
-                          setActiveDropdown(prev => prev === `talla-${variante.id}` ? null : `talla-${variante.id}`);
-                        }
+                        setActiveDropdown(prev => prev === `talla-${variante.id}` ? null : `talla-${variante.id}`);
                       }}
-                      style={{ opacity: formData.talla_tipo === 'unica' ? 0.6 : 1, cursor: formData.talla_tipo === 'unica' ? 'not-allowed' : 'pointer' }}
+                      style={{ cursor: 'pointer' }}
                     >
                       <span>{variante.talla || 'Elegir talla...'}</span>
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <polyline points="6 9 12 15 18 9" />
                       </svg>
                     </div>
-                    {activeDropdown === `talla-${variante.id}` && formData.talla_tipo !== 'unica' && (
+                    {activeDropdown === `talla-${variante.id}` && (
                       <div className="custom-select-dropdown">
                         {tallas.map(t => (
                           <div

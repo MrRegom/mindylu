@@ -340,16 +340,17 @@ const Catalogo = () => {
                             </div>
                             <div className="variante-stock">
                               <span className="stock-num">{variante.cantidad} disp.</span>
-                              {/* 
                               <button
                                 className="btn-vender"
                                 disabled={agotado}
-                                onClick={() => openVenderModal(prenda, variante)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  openVenderModal(prenda, variante);
+                                }}
                                 title={agotado ? 'Agotado' : 'Apartar'}
                               >
                                 <Check size={16} />
                               </button>
-                              */}
                             </div>
                           </div>
                         );
