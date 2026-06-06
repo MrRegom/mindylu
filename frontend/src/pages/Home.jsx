@@ -27,7 +27,9 @@ const Home = () => {
     ventas_hoy: 0,
     entregas_pendientes: 0,
     saldos_pendientes: 0,
-    prendas_activas: 0
+    prendas_activas: 0,
+    usuario_nombre: '',
+    usuario_avatar: null
   });
   const [isLoading, setIsLoading] = useState(true);
 
@@ -52,12 +54,12 @@ const Home = () => {
       <div className="home-header" style={{ marginBottom: '24px' }}>
         <div>
           <h1 style={{ fontSize: '2rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            ¡Hola, MindyLu! <span style={{ color: 'var(--color-warning)' }}>✨</span>
+            ¡Hola, {stats.usuario_nombre ? stats.usuario_nombre.split(' ')[0] : 'MindyLu'}! <span style={{ color: 'var(--color-warning)' }}>✨</span>
           </h1>
           <p>Aquí tienes el resumen de tu negocio</p>
         </div>
         <div className="header-avatar" style={{ width: 48, height: 48, borderRadius: '50%', overflow: 'hidden', marginLeft: 'auto', border: '2px solid white', boxShadow: 'var(--shadow-sm)' }}>
-          <img src="https://i.pravatar.cc/150?img=5" alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          <img src={stats.usuario_avatar ? (stats.usuario_avatar.startsWith('http') ? stats.usuario_avatar : `${(import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1/').replace('/api/v1/', '')}${stats.usuario_avatar}`) : "https://i.pravatar.cc/150?img=5"} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         </div>
       </div>
       

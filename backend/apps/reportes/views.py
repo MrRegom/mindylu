@@ -44,5 +44,7 @@ class DashboardAPIView(APIView):
             'ventas_hoy': ventas_hoy,
             'entregas_pendientes': entregas_pendientes,
             'saldos_pendientes': saldos,
-            'prendas_activas': prendas_activas
+            'prendas_activas': prendas_activas,
+            'usuario_nombre': request.user.nombre or request.user.username,
+            'usuario_avatar': request.user.avatar.url if request.user.avatar else None
         })
