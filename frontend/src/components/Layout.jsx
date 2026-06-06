@@ -12,30 +12,67 @@ const Layout = () => {
 
   return (
     <div className="layout-container">
+      {/* Sidebar para Desktop */}
+      <aside className="sidebar desktop-only glass">
+        <div className="sidebar-logo">
+          MindyLu
+        </div>
+        <nav className="sidebar-nav">
+          <a href="/panel" className={`nav-item ${location.pathname === '/panel' ? 'active' : ''}`}>
+            <Home size={20} />
+            <span>Inicio</span>
+          </a>
+          <a href="/panel/catalogo" className={`nav-item ${location.pathname.includes('/panel/catalogo') ? 'active' : ''}`}>
+            <Search size={20} />
+            <span>Catálogo</span>
+          </a>
+          <a href="/panel/ajustes" className={`nav-item ${location.pathname.includes('/panel/ajustes') ? 'active' : ''}`}>
+            <Settings size={20} />
+            <span>Ajustes</span>
+          </a>
+          <a href="/panel/entregas" className={`nav-item ${location.pathname.includes('/panel/entregas') ? 'active' : ''}`}>
+            <ShoppingBag size={20} />
+            <span>Entregas</span>
+          </a>
+          <a href="/panel/clientas" className={`nav-item ${location.pathname.includes('/panel/clientas') ? 'active' : ''}`}>
+            <User size={20} />
+            <span>Clientes</span>
+          </a>
+          <a href="/panel/perfil" className={`nav-item ${location.pathname.includes('/panel/perfil') ? 'active' : ''}`}>
+            <CreditCard size={20} />
+            <span>Perfil</span>
+          </a>
+        </nav>
+      </aside>
+
       <main className="main-content">
-        <Outlet />
-        <nav className="bottom-nav glass" style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 0, padding: '8px 4px' }}>
-          <a href="/panel" className={`nav-item ${location.pathname === '/panel' ? 'active' : ''}`} style={{ fontSize: '0.65rem' }}>
+        <div className="content-wrapper">
+          <Outlet />
+        </div>
+
+        {/* Bottom Nav para Móvil */}
+        <nav className="bottom-nav mobile-only glass">
+          <a href="/panel" className={`nav-item ${location.pathname === '/panel' ? 'active' : ''}`}>
             <Home size={22} />
             <span>Inicio</span>
           </a>
-          <a href="/panel/catalogo" className={`nav-item ${location.pathname.includes('/panel/catalogo') ? 'active' : ''}`} style={{ fontSize: '0.65rem' }}>
+          <a href="/panel/catalogo" className={`nav-item ${location.pathname.includes('/panel/catalogo') ? 'active' : ''}`}>
             <Search size={22} />
             <span>Catálogo</span>
           </a>
-          <a href="/panel/ajustes" className={`nav-item ${location.pathname.includes('/panel/ajustes') ? 'active' : ''}`} style={{ fontSize: '0.65rem' }}>
+          <a href="/panel/ajustes" className={`nav-item ${location.pathname.includes('/panel/ajustes') ? 'active' : ''}`}>
             <Settings size={22} />
             <span>Ajustes</span>
           </a>
-          <a href="/panel/entregas" className={`nav-item ${location.pathname.includes('/panel/entregas') ? 'active' : ''}`} style={{ fontSize: '0.65rem' }}>
+          <a href="/panel/entregas" className={`nav-item ${location.pathname.includes('/panel/entregas') ? 'active' : ''}`}>
             <ShoppingBag size={22} />
             <span>Entregas</span>
           </a>
-          <a href="/panel/clientas" className={`nav-item ${location.pathname.includes('/panel/clientas') ? 'active' : ''}`} style={{ fontSize: '0.65rem' }}>
+          <a href="/panel/clientas" className={`nav-item ${location.pathname.includes('/panel/clientas') ? 'active' : ''}`}>
             <User size={22} />
             <span>Clientes</span>
           </a>
-          <a href="/panel/perfil" className={`nav-item ${location.pathname.includes('/panel/perfil') ? 'active' : ''}`} style={{ fontSize: '0.65rem' }}>
+          <a href="/panel/perfil" className={`nav-item ${location.pathname.includes('/panel/perfil') ? 'active' : ''}`}>
             <CreditCard size={22} />
             <span>Perfil</span>
           </a>

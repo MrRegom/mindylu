@@ -48,7 +48,7 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="home-container animate-fade-in" style={{ paddingBottom: '100px' }}>
+    <div className="home-container animate-fade-in">
       <div className="home-header" style={{ marginBottom: '24px' }}>
         <div>
           <h1 style={{ fontSize: '2rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -90,7 +90,7 @@ const Home = () => {
         </div>
       </div>
 
-      <div className="dashboard-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
+      <div className="dashboard-grid" style={{ marginBottom: '24px' }}>
         {/* Tarjeta: Entregas */}
         <div className="card animate-slide-up" style={{ animationDelay: '0.2s', padding: '16px' }}>
           <div style={{ color: 'var(--color-warning)', marginBottom: '12px' }}><Package size={24} /></div>

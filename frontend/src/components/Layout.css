@@ -1,19 +1,17 @@
 .layout-container {
   display: flex;
-  flex-direction: column;
-  height: 100%;
-  width: 100%;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background-color: var(--color-bg);
 }
 
-.main-content {
-  flex: 1;
-  padding-bottom: 100px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  position: relative;
+/* ── Sidebar (Desktop) ───────────────────────── */
+.sidebar {
+  display: none; /* Hidden on mobile by default */
 }
 
-/* Isla Flotante Glassmorphism Premium */
+/* ── Bottom Nav (Mobile) ─────────────────────── */
 .bottom-nav {
   position: fixed;
   bottom: 30px;
@@ -22,7 +20,10 @@
   width: calc(100% - 40px);
   max-width: 440px;
   height: 68px;
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0;
+  padding: 8px 4px;
   justify-content: space-around;
   align-items: center;
   z-index: 90;
@@ -34,7 +35,7 @@
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05), 0 5px 15px rgba(212, 163, 163, 0.15);
 }
 
-.nav-item {
+.bottom-nav .nav-item {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -42,15 +43,14 @@
   gap: 4px;
   color: var(--color-text-muted);
   text-decoration: none;
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   font-weight: 500;
   transition: var(--transition);
-  flex: 1;
   height: 100%;
   position: relative;
 }
 
-.nav-item::before {
+.bottom-nav .nav-item::before {
   content: '';
   position: absolute;
   top: 10px;
@@ -65,20 +65,120 @@
   filter: blur(8px);
 }
 
-.nav-item.active {
+.bottom-nav .nav-item.active {
   color: var(--color-primary);
 }
 
-.nav-item.active::before {
+.bottom-nav .nav-item.active::before {
   opacity: 0.4;
   transform: scale(1);
 }
 
-.nav-item svg {
+.bottom-nav .nav-item svg {
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.nav-item.active svg {
+.bottom-nav .nav-item.active svg {
   transform: scale(1.15) translateY(-2px);
   color: var(--color-primary);
+}
+
+/* ── Main Content ────────────────────────────────── */
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  padding-bottom: 120px; /* Space for bottom nav */
+}
+
+.content-wrapper {
+  width: 100%;
+  padding: 0;
+  margin: 0 auto;
+}
+
+/* ── Responsive Layout (Desktop) ─────────────────── */
+@media (min-width: 1024px) {
+  .layout-container {
+    flex-direction: row;
+  }
+
+  /* Ocultar Bottom Nav */
+  .mobile-only {
+    display: none !important;
+  }
+
+  /* Mostrar Sidebar */
+  .sidebar.desktop-only {
+    display: flex;
+    flex-direction: column;
+    width: 250px;
+    min-width: 250px;
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.95);
+    border-right: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 2px 0 15px rgba(0, 0, 0, 0.02);
+    padding: 30px 20px;
+    z-index: 100;
+  }
+
+  .sidebar-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 40px;
+    padding-left: 10px;
+  }
+
+  .sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .sidebar-nav .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 15px;
+    border-radius: var(--radius-md);
+    color: var(--color-text-muted);
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .sidebar-nav .nav-item:hover {
+    background: var(--color-beige2);
+    color: var(--color-text);
+  }
+
+  .sidebar-nav .nav-item.active {
+    background: var(--color-primary-light);
+    color: var(--color-primary-dark);
+    font-weight: 600;
+  }
+
+  .sidebar-nav .nav-item svg {
+    transition: transform 0.2s ease;
+  }
+
+  .sidebar-nav .nav-item.active svg {
+    color: var(--color-primary-dark);
+  }
+
+  /* Ajustar Main Content para Desktop */
+  .main-content {
+    padding-bottom: 0; /* Remove bottom nav space */
+    padding-top: 40px;
+    background: #FAFAFA; /* Ultra clean SaaS background */
+  }
+
+  .content-wrapper {
+    max-width: 1200px;
+    padding: 0 40px;
+  }
 }
