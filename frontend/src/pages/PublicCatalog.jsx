@@ -572,9 +572,9 @@ const PublicCatalog = () => {
         {/* ── Hero Split Asimétrico ── */}
         <section className="lp-hero-split fade-up-element">
           <div className="lp-hero-text-area">
-            <h1 className="lp-hero-title-main">
+            <h1 className="lp-hero-title-main" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
               {(config?.tienda_nombre || 'MindyLu').toLowerCase() === 'mindylu' ? (
-                <>Mindy<br/><span className="script-text">Lu</span></>
+                <>Mindy <span className="script-text" style={{ marginTop: '0', top: '0', marginLeft: '0' }}>Lu</span></>
               ) : (
                 config?.tienda_nombre || 'MindyLu'
               )}

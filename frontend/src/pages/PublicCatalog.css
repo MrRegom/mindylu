@@ -484,6 +484,114 @@
      transform: translateY(0);
    }
 
+   /* ── Catálogo (Grid de productos real) ── */
+   .lp-section {
+     padding: 100px 5%;
+     max-width: 1400px;
+     margin: 0 auto;
+     background: var(--color-bg-base);
+   }
+   
+   .lp-section-title {
+     text-align: center;
+     font-family: var(--ff-title);
+     font-size: 3rem;
+     font-weight: 400;
+     margin-bottom: 60px;
+     color: var(--color-primary);
+   }
+
+   .lp-filters {
+     display: flex;
+     justify-content: center;
+     gap: 15px;
+     margin-bottom: 60px;
+     flex-wrap: wrap;
+   }
+   
+   .lp-filter-btn {
+     background: transparent;
+     border: 1px solid var(--color-border);
+     border-radius: var(--radius-pill);
+     padding: 8px 20px;
+     font-family: var(--ff-body);
+     font-size: 0.7rem;
+     font-weight: 600;
+     cursor: pointer;
+     transition: all 0.3s;
+     color: var(--color-text-muted);
+     text-transform: uppercase;
+     letter-spacing: 2px;
+   }
+   
+   .lp-filter-btn:hover, .lp-filter-btn.active {
+     background: var(--color-primary);
+     color: #fff;
+     border-color: var(--color-primary);
+   }
+
+   .lp-grid {
+     display: grid;
+     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+     gap: 50px 30px;
+   }
+   
+   .lp-card {
+     background: transparent;
+     overflow: hidden;
+     transition: transform 0.4s ease;
+     display: flex;
+     flex-direction: column;
+   }
+   
+   .lp-card:hover {
+     transform: translateY(-5px);
+   }
+   
+   .lp-card-img-wrap {
+     width: 100%;
+     aspect-ratio: 3/4;
+     overflow: hidden;
+     background: var(--color-bg-alt);
+     position: relative;
+   }
+   
+   .lp-card-img {
+     width: 100%;
+     height: 100%;
+     object-fit: cover;
+     transition: transform 0.8s ease;
+   }
+   
+   .lp-card:hover .lp-card-img {
+     transform: scale(1.03);
+   }
+   
+   .lp-card-info {
+     padding: 20px 0 0 0;
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+     text-align: center;
+   }
+   
+   .lp-card-title {
+     font-family: var(--ff-body);
+     font-size: 0.8rem;
+     font-weight: 400;
+     color: var(--color-primary);
+     margin-bottom: 6px;
+     text-transform: uppercase;
+     letter-spacing: 1px;
+   }
+   
+   .lp-card-price {
+     font-family: var(--ff-body);
+     font-weight: 600;
+     color: var(--color-text-muted);
+     font-size: 0.8rem;
+   }
+
    /* ── Mobile Responsive ── */
    @media (max-width: 1024px) {
      .lp-root { display: block; }
@@ -518,27 +626,55 @@
        height: auto;
        min-height: 0;
      }
-     .lp-hero-text-area { padding: 40px 5%; }
+     .lp-hero-text-area { padding: 50px 5%; }
      .lp-hero-img-area { height: 60vh; }
      
-     .lp-hero-stamp { display: none; /* Ocultar sello en móvil si estorba */ }
+     .lp-hero-stamp { display: none; }
 
      .lp-section-actitud {
        flex-direction: column;
-       padding: 60px 5%;
+       padding: 80px 5%;
      }
-     .actitud-collage { height: 350px; margin: 40px 0; }
-     .polaroid img { width: 160px; height: 200px; }
+     .actitud-text { width: 100%; }
+     .actitud-text h2 { font-size: 2.5rem; }
+     .actitud-text h2 .script-text { font-size: 3.5rem; }
+     
+     .actitud-collage { 
+       height: 250px; 
+       margin: 40px 0 20px 0; 
+       width: 100%;
+       display: flex;
+     }
+     /* Achicar drásticamente las polaroids en celular */
+     .polaroid img { width: 130px; height: 160px; }
+     .polaroid:nth-child(1) { transform: rotate(-5deg) translateX(-20px); }
+     .polaroid:nth-child(2) { transform: rotate(8deg) translateX(20px); }
 
-     .lp-categories-row { flex-direction: column; height: auto; }
-     .category-box { height: 150px; border-right: none; border-bottom: 1px solid var(--color-bg-base); }
+     .actitud-desc { padding-left: 0; text-align: center; }
+
+     /* Arreglar grid monstruosa */
+     .lp-categories-row { 
+       display: grid; 
+       grid-template-columns: 1fr 1fr; 
+       height: auto; 
+     }
+     .category-box { 
+       height: 200px; 
+       border-right: 1px solid var(--color-bg-base); 
+       border-bottom: 1px solid var(--color-bg-base); 
+     }
 
      .lp-summer-edit { flex-direction: column; padding: 60px 5%; }
-     .summer-collage { width: 100%; height: 350px; margin-top: 30px; }
+     .summer-collage { width: 100%; height: 280px; margin-top: 30px; }
      .img-main { width: 60%; }
      .img-sub { width: 40%; }
-     .ripped-paper { padding: 20px; right: 0; bottom: 0; }
-     .ripped-paper p { font-size: 1.5rem; }
+     .ripped-paper { padding: 15px; right: 0; bottom: 0; }
+     .ripped-paper p { font-size: 1.2rem; }
 
      .lp-footer-min { flex-direction: column; gap: 30px; align-items: flex-start; }
+     
+     .lp-section { padding: 60px 5%; }
+     .lp-filters { gap: 8px; }
+     .lp-filter-btn { padding: 6px 12px; font-size: 0.6rem; }
+     .lp-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 30px 15px; }
    }
