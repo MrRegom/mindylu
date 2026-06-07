@@ -483,134 +483,195 @@ const PublicCatalog = () => {
   return (
     <div className="lp-root">
 
-      {/* ── Navbar Dynamic Pink ── */}
-      <div className="lp-nav-wrapper">
-        <nav className="lp-nav">
-          <div className="lp-nav-top">
-            {/* Left side empty or icons on mobile */}
-            <div style={{ flex: 1 }} className="mobile-hidden"></div>
-            
-            <a className="lp-nav-brand" href="/">
-              {config?.tienda_nombre || 'MINDYLU'}
-            </a>
-            
-            <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
-              <button className="lp-btn-icon" onClick={() => setCartOpen(true)} style={{ position: 'relative' }}>
-                <CartIcon size={22} />
-                {cart.length > 0 && (
-                  <span style={{ position: 'absolute', top: -5, right: -5, background: 'var(--color-accent)', color: 'white', fontSize: '9px', fontWeight: 'bold', width: '16px', height: '16px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    {cart.length}
-                  </span>
-                )}
-              </button>
-              <button className="lp-hamburger" onClick={() => setMenuOpen(!menuOpen)} aria-label="Menú">
-                <span /><span /><span />
-              </button>
-            </div>
-          </div>
+      {/* ── Navbar Mobile ── */}
+      <nav className="lp-nav-mobile">
+        <button className="lp-hamburger-desktop" onClick={() => setMenuOpen(!menuOpen)}>
+          <span /><span /><span />
+        </button>
+        <a className="mobile-brand" href="/">
+          {(config?.tienda_nombre || 'MindyLu').toLowerCase() === 'mindylu' ? (
+            <>Mindy<span className="script-text">Lu</span></>
+          ) : (
+            config?.tienda_nombre || 'MindyLu'
+          )}
+        </a>
+        <button className="lp-btn-icon" onClick={() => setCartOpen(true)} style={{ position: 'relative' }}>
+          <CartIcon size={24} />
+          {cart.length > 0 && (
+            <span style={{ position: 'absolute', top: -5, right: -5, background: 'var(--color-accent)', color: 'white', fontSize: '10px', width: '16px', height: '16px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              {cart.length}
+            </span>
+          )}
+        </button>
+      </nav>
 
-          <ul className="lp-nav-links">
-            <li><a onClick={() => scrollTo(catalogRef)}>Colección</a></li>
-            <li><a onClick={() => scrollTo(howtoRef)}>Nosotros</a></li>
-            <li><a onClick={() => scrollTo(entregasRef)}>Despachos</a></li>
-            <li><a onClick={abrirWhatsAppGeneral}>Contacto</a></li>
-          </ul>
-        </nav>
-      </div>
-
-      {/* Menú mobile */}
+      {/* Menú mobile Dropdown */}
       {menuOpen && (
         <div style={{
           position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-          background: 'var(--color-bg-base)', zIndex: 999,
+          background: 'var(--color-bg-alt)', zIndex: 9999,
           display: 'flex', flexDirection: 'column', alignItems: 'center',
           justifyContent: 'center', gap: 32
         }}>
           <button onClick={() => setMenuOpen(false)} style={{ position: 'absolute', top: 30, right: 30, background: 'none', border: 'none', fontSize: '2rem', cursor: 'pointer', color: 'var(--color-primary)' }}>&times;</button>
           
-          <a className="lp-nav-brand" href="/" style={{ marginBottom: '20px' }}>
-            {config?.tienda_nombre || 'MINDYLU'}
+          <a className="mobile-brand" href="/" style={{ marginBottom: '20px' }}>
+            Mindy<span className="script-text">Lu</span>
           </a>
 
           {[
-            ['Colección', catalogRef],
-            ['Nosotros', howtoRef],
-            ['Despachos', entregasRef],
+            ['NUEVO', catalogRef],
+            ['ROPA', catalogRef],
+            ['BEST SELLERS', catalogRef],
+            ['ACCESORIOS', catalogRef],
+            ['SALE', catalogRef]
           ].map(([label, ref]) => (
             <button key={label} onClick={() => { scrollTo(ref); setMenuOpen(false); }} style={{
               background: 'none', border: 'none', cursor: 'pointer',
-              fontFamily: "var(--ff-title)", textTransform: 'uppercase', letterSpacing: '2px',
-              fontSize: '1.2rem', fontWeight: 700, color: 'var(--color-primary)'
+              fontFamily: "var(--ff-body)", textTransform: 'uppercase', letterSpacing: '3px',
+              fontSize: '0.8rem', fontWeight: 600, color: label === 'SALE' ? 'var(--color-accent)' : 'var(--color-text-muted)'
             }}>
               {label}
             </button>
           ))}
           <button onClick={abrirWhatsAppGeneral} style={{
               background: 'none', border: 'none', cursor: 'pointer',
-              fontFamily: "var(--ff-title)", textTransform: 'uppercase', letterSpacing: '2px',
-              fontSize: '1.2rem', fontWeight: 700, fontStyle: 'italic', color: 'var(--color-accent)', marginTop: '20px'
+              fontFamily: "var(--ff-script)", fontSize: '2rem', color: 'var(--color-primary)', marginTop: '20px'
             }}>
-            Contacto WhatsApp
+            Contacto
           </button>
         </div>
       )}
 
-      {/* ── Hero Edge-to-Edge Animado ── */}
-      <section className="lp-hero">
-        <div className="lp-hero-img-container">
-          <img 
-            src={config?.banner_imagen ? (
-              config.banner_imagen.startsWith('http') ? config.banner_imagen : `${API_BASE.replace('/api/v1', '')}${config.banner_imagen}`
-            ) : config?.tienda_avatar ? (
-              config.tienda_avatar.startsWith('http') ? config.tienda_avatar : `${API_BASE.replace('/api/v1', '')}${config.tienda_avatar}`
-            ) : "/images/hero.jpg"} 
-            alt={config?.banner_titulo || `${config?.tienda_nombre || 'MindyLu'} - Moda`} 
-            className="lp-hero-img" 
-            onError={(e) => {
-              e.target.style.display = 'none';
-              e.target.parentElement.style.background = 'var(--color-accent-light)';
-            }}
-          />
-          <div className="lp-hero-overlay" />
-        </div>
-        
-        <div className="lp-hero-content">
-          <h1 className="lp-hero-title">
-            {config?.banner_titulo ? (
-              <div dangerouslySetInnerHTML={{ __html: config.banner_titulo.replace(/\n/g, '<br />') }} />
-            ) : (
-              <>
-                The Signature 
-                <br />
-                <span>Collection</span>
-              </>
-            )}
-          </h1>
-          <button className="lp-btn-primary" onClick={() => scrollTo(catalogRef)}>
-            Ver Catálogo
-          </button>
-        </div>
-      </section>
+      {/* ── Sidebar Desktop ── */}
+      <aside className="lp-sidebar">
+        <button className="lp-hamburger-desktop" onClick={() => setMenuOpen(!menuOpen)}>
+          <span /><span /><span />
+        </button>
 
-      {/* ── Marquesina Infinita WOW ── */}
-      <div className="lp-banner-wow">
-        <div className="lp-marquee-content">
-          {Array.from({ length: 10 }).map((_, i) => (
-            <div key={i} style={{ display: 'inline-flex', alignItems: 'center' }}>
-              <span className="lp-marquee-item">{config?.marquesina_texto || 'MODA FEMENINA PREMIUM'}</span>
-              <span className="lp-marquee-dot" />
-              <span className="lp-marquee-item">NUEVA COLECCIÓN</span>
-              <span className="lp-marquee-dot" />
+        <nav className="lp-sidebar-links">
+          <a onClick={() => scrollTo(catalogRef)}>NUEVO</a>
+          <a onClick={() => scrollTo(catalogRef)}>ROPA</a>
+          <a onClick={() => scrollTo(catalogRef)}>BEST SELLERS</a>
+          <a onClick={() => scrollTo(catalogRef)}>ACCESORIOS</a>
+          <a onClick={() => scrollTo(catalogRef)} style={{ color: 'var(--color-accent)' }}>SALE</a>
+        </nav>
+
+        <a className="lp-sidebar-brand" href="/">
+          {(config?.tienda_nombre || 'MindyLu').toLowerCase() === 'mindylu' ? (
+            <>Mindy<span className="script-text">Lu</span></>
+          ) : (
+            config?.tienda_nombre || 'MindyLu'
+          )}
+        </a>
+      </aside>
+
+      {/* ── Contenedor Principal ── */}
+      <main className="lp-main-content">
+
+        {/* ── Hero Split Asimétrico ── */}
+        <section className="lp-hero-split fade-up-element">
+          <div className="lp-hero-text-area">
+            <h1 className="lp-hero-title-main">
+              {(config?.tienda_nombre || 'MindyLu').toLowerCase() === 'mindylu' ? (
+                <>Mindy<br/><span className="script-text">Lu</span></>
+              ) : (
+                config?.tienda_nombre || 'MindyLu'
+              )}
+            </h1>
+            <p className="lp-hero-subtitle">B O U T I Q U E</p>
+            <p className="lp-hero-desc">Moda que te representa.</p>
+            <button className="lp-btn-blush" onClick={() => scrollTo(catalogRef)}>
+              DESCUBRIR NUEVO
+            </button>
+            
+            {/* Sello Flotante (SVG) */}
+            <div className="lp-hero-stamp mobile-hidden">
+              <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <path id="circlePath" d="M 50, 50 m -35, 0 a 35,35 0 1,1 70,0 a 35,35 0 1,1 -70,0" fill="transparent" />
+                <text fontSize="10" fontWeight="600" letterSpacing="2px" fill="var(--color-primary)" textTransform="uppercase">
+                  <textPath href="#circlePath">
+                    POR MUJERES REALES • PARA MUJERES REALES •
+                  </textPath>
+                </text>
+              </svg>
+              <div className="heart">♥</div>
             </div>
-          ))}
-        </div>
-      </div>
+          </div>
+          <div className="lp-hero-img-area">
+            <img 
+              src={config?.banner_imagen ? (
+                config.banner_imagen.startsWith('http') ? config.banner_imagen : `${API_BASE.replace('/api/v1', '')}${config.banner_imagen}`
+              ) : config?.tienda_avatar ? (
+                config.tienda_avatar.startsWith('http') ? config.tienda_avatar : `${API_BASE.replace('/api/v1', '')}${config.tienda_avatar}`
+              ) : "/images/hero.jpg"} 
+              alt={config?.banner_titulo || `${config?.tienda_nombre || 'MindyLu'} - Moda`} 
+            />
+          </div>
+        </section>
 
-      {/* ── Catálogo ── */}
-      <section className="lp-section fade-up-element" ref={catalogRef}>
-        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-          <h2 className="lp-section-title" style={{ margin: 0 }}>Colección</h2>
-        </div>
+        {/* ── Sección Actitud (Collage) ── */}
+        <section className="lp-section-actitud fade-up-element">
+          <div className="actitud-text">
+            <h2>
+              No es solo<br/>ropa, es tu<br/>
+              <span className="script-text">Actitud.</span>
+            </h2>
+            {/* Trazos SVG simulados con div/background para simplificar */}
+            <div style={{ position: 'absolute', top: '70%', left: '-10%', width: '150%', height: '2px', background: 'var(--color-accent)', opacity: 0.3, zIndex: -1, transform: 'rotate(-5deg)' }}></div>
+          </div>
+          
+          <div className="actitud-collage mobile-hidden">
+            {/* Polaroids usando las fotos de las primeras prendas si existen */}
+            <div className="polaroid">
+              <img src={prendas[0]?.foto_url || "/images/placeholder1.jpg"} alt="Moda 1" onError={(e) => { e.target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="220" height="280"><rect width="220" height="280" fill="%23eee"/></svg>'; }} />
+            </div>
+            <div className="polaroid">
+              <img src={prendas[1]?.foto_url || "/images/placeholder2.jpg"} alt="Moda 2" onError={(e) => { e.target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="220" height="280"><rect width="220" height="280" fill="%23ddd"/></svg>'; }} />
+            </div>
+          </div>
+
+          <div className="actitud-desc">
+            <p>DISEÑOS EXCLUSIVOS<br/>PARA MUJERES QUE<br/>ROMPEN REGLAS.</p>
+            <a href="#" onClick={(e) => { e.preventDefault(); scrollTo(howtoRef); }} className="actitud-link">CONÓCENOS</a>
+          </div>
+        </section>
+
+        {/* ── Grid de Categorías Row ── */}
+        <section className="lp-categories-row fade-up-element" ref={catalogRef}>
+          {['VESTIDOS', 'TOPS', 'PANTALONES', 'ACCESORIOS', 'SETS'].map((cat, i) => (
+             <div className="category-box" key={cat} onClick={() => setCatSel(catSel === cat ? 'Todas' : cat)}>
+               <img src={prendas[i]?.foto_url || "/images/placeholder1.jpg"} alt={cat} onError={(e) => { e.target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"><rect width="100%" height="100%" fill="%23'+(555+i*10)+'"/></svg>'; }} />
+               <div className="category-box-overlay">
+                 <h3>{cat} <span>→</span></h3>
+               </div>
+             </div>
+          ))}
+        </section>
+
+        {/* ── Summer Edit Collage ── */}
+        <section className="lp-summer-edit fade-up-element" ref={howtoRef}>
+          <div className="summer-title">
+            <p style={{ fontFamily: 'var(--ff-body)', fontSize: '0.65rem', letterSpacing: '2px', color: 'var(--color-text-muted)', marginBottom: '10px' }}>MINDYLU</p>
+            <h2>SUMMER<br/>'25<br/>EDIT</h2>
+            <a href="#" onClick={(e) => { e.preventDefault(); scrollTo(catalogRef); }} className="actitud-link" style={{ marginTop: '30px' }}>VER EDITORIAL</a>
+          </div>
+          
+          <div className="summer-collage">
+            <img src={prendas[2]?.foto_url || "/images/placeholder1.jpg"} alt="Summer" className="img-main" onError={(e) => { e.target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" fill="%23eee"/></svg>'; }} />
+            <img src={prendas[3]?.foto_url || "/images/placeholder2.jpg"} alt="Detail" className="img-sub" onError={(e) => { e.target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" fill="%23ddd"/></svg>'; }} />
+            
+            <div className="ripped-paper mobile-hidden">
+              <p>collect<br/>moments<br/>not<br/>things <span style={{fontSize: '1rem'}}>♥</span></p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── Catálogo (Grid de productos real) ── */}
+        <section className="lp-section fade-up-element" style={{ background: 'var(--color-bg-alt)' }}>
+          <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+            <h2 style={{ fontFamily: 'var(--ff-title)', fontSize: '2rem', fontWeight: 400, color: 'var(--color-primary)' }}>Nuestros Diseños</h2>
+          </div>
 
         {/* Filtros por categoría */}
         <div className="lp-filters">
@@ -797,63 +858,31 @@ const PublicCatalog = () => {
         />
       )}
 
-      {/* ── Footer ── */}
-      <footer className="lp-footer">
-        <div className="lp-footer-top">
+      {/* ── Footer Minimalista ── */}
+      <footer className="lp-footer-min">
+        <div className="footer-feature">
+          <svg viewBox="0 0 24 24"><path d="M1 3h15v13H1zM16 8h4l3 3v5h-7V8zM1 18h22M5 16v4M19 16v4" strokeWidth="2"/></svg>
           <div>
-            <span className="lp-footer-brand">{config?.tienda_nombre || 'MindyLu'}</span>
-            <p className="lp-footer-desc">
-              Boutique de moda femenina exclusiva.<br />
-              Moda seleccionada especialmente para ti,<br />
-              con atención personalizada.
-            </p>
-            <div className="lp-footer-socials">
-              <a href="https://instagram.com" target="_blank" rel="noreferrer" className="lp-social-btn" title="Instagram">
-                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
-              </a>
-              <a href="https://facebook.com" target="_blank" rel="noreferrer" className="lp-social-btn" title="Facebook">
-                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-              </a>
-              <button className="lp-social-btn" title="WhatsApp" onClick={abrirWhatsAppGeneral}>
-                <WaIcon />
-              </button>
-            </div>
-          </div>
-
-          <div className="lp-footer-col">
-            <h5>Catálogo</h5>
-            <ul>
-              {['Vestidos', 'Blusas', 'Jeans', 'Chaquetas', 'Accesorios'].map(c => (
-                <li key={c}><span onClick={() => scrollTo(catalogRef)}>{c}</span></li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="lp-footer-col">
-            <h5>Información</h5>
-            <ul>
-              <li><span onClick={() => scrollTo(howtoRef)}>Cómo Comprar</span></li>
-              <li><span onClick={() => scrollTo(entregasRef)}>Próximas Entregas</span></li>
-              <li><span onClick={abrirWhatsAppGeneral}>Contacto</span></li>
-            </ul>
-          </div>
-
-          <div className="lp-footer-col">
-            <h5>Contacto</h5>
-            <ul>
-              <li><span>WhatsApp directo</span></li>
-              <li><span>Lunes a Sábado</span></li>
-              <li><span>10:00 – 20:00 hrs</span></li>
-            </ul>
+            <strong>ENVÍOS A TODO CHILE</strong>
+            <span>por compras sobre $40.000</span>
           </div>
         </div>
-
-        <div className="lp-footer-bottom">
-          <span>© 2026 {config?.tienda_nombre || 'MindyLu'} · Boutique Femenina</span>
-          <span>Hecho con 💕 para ti</span>
+        <div className="footer-feature">
+          <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" strokeWidth="2"/><path d="M7 11V7a5 5 0 0110 0v4" strokeWidth="2"/></svg>
+          <div>
+            <strong>COMPRA SEGURA</strong>
+            <span>Paga como más te acomode</span>
+          </div>
+        </div>
+        <div className="footer-feature" onClick={abrirWhatsAppGeneral} style={{ cursor: 'pointer' }}>
+          <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z" strokeWidth="2"/></svg>
+          <div>
+            <strong>¿NECESITAS AYUDA?</strong>
+            <span>Escríbenos por WhatsApp</span>
+          </div>
         </div>
       </footer>
-
+      </main> {/* Cierre del contenedor principal */}
     </div>
   );
 };
