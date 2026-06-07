@@ -18,9 +18,10 @@ const PublicCatalog = () => {
   const fetchDatos = async () => {
     try {
       const { data } = await api.get('/catalogo/publico/prendas/');
+      const items = data.results || data; // Manejar paginación
       // Asegurar que solo usamos prendas activas
-      const activas = data.filter(p => p.estado !== 'VENDIDO');
-      setPrendas(activas.length > 0 ? activas : data);
+      const activas = items.filter(p => p.estado !== 'VENDIDO');
+      setPrendas(activas.length > 0 ? activas : items);
       
       const confRes = await api.get('/core/configuracion/publico/');
       setConfig(confRes.data);
