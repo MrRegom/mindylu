@@ -160,6 +160,21 @@ class ConfiguracionTienda(models.Model):
         null=True, blank=True,
         verbose_name=_('Imagen del Banner')
     )
+    polaroid_1_imagen = models.ImageField(
+        upload_to='banners/', 
+        null=True, blank=True,
+        verbose_name=_('Imagen Polaroid 1')
+    )
+    polaroid_2_imagen = models.ImageField(
+        upload_to='banners/', 
+        null=True, blank=True,
+        verbose_name=_('Imagen Polaroid 2')
+    )
+    polaroid_3_imagen = models.ImageField(
+        upload_to='banners/', 
+        null=True, blank=True,
+        verbose_name=_('Imagen Polaroid 3')
+    )
     banner_titulo = models.CharField(
         max_length=255, 
         default='Moda femenina seleccionada especialmente para ti',

@@ -175,6 +175,9 @@ const ConfiguracionTiendaForm = () => {
     tienda_nombre: 'MindyLu',
   });
   const [bannerFile, setBannerFile] = useState(null);
+  const [polaroid1File, setPolaroid1File] = useState(null);
+  const [polaroid2File, setPolaroid2File] = useState(null);
+  const [polaroid3File, setPolaroid3File] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -197,9 +200,9 @@ const ConfiguracionTiendaForm = () => {
     setConfig(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleFileChange = (e) => {
+  const handleFileChange = (e, setter) => {
     if (e.target.files && e.target.files[0]) {
-      setBannerFile(e.target.files[0]);
+      setter(e.target.files[0]);
     }
   };
 
@@ -215,13 +218,17 @@ const ConfiguracionTiendaForm = () => {
       formData.append('whatsapp_numero', config.whatsapp_numero || '');
       formData.append('tienda_nombre', config.tienda_nombre || 'MindyLu');
       
-      if (bannerFile) {
-        formData.append('banner_imagen', bannerFile);
-      }
+      if (bannerFile) formData.append('banner_imagen', bannerFile);
+      if (polaroid1File) formData.append('polaroid_1_imagen', polaroid1File);
+      if (polaroid2File) formData.append('polaroid_2_imagen', polaroid2File);
+      if (polaroid3File) formData.append('polaroid_3_imagen', polaroid3File);
 
       const res = await api.patch('/core/configuracion/privado/', formData);
       setConfig(res.data);
       setBannerFile(null);
+      setPolaroid1File(null);
+      setPolaroid2File(null);
+      setPolaroid3File(null);
       showToast('success', 'Configuración de tienda guardada exitosamente');
     } catch (error) {
       console.error(error);
@@ -278,7 +285,22 @@ const ConfiguracionTiendaForm = () => {
           <div className="form-group">
             <label><Upload size={16} /> Imagen del Banner Principal</label>
             <div className="banner-upload-wrapper">
-              <input type="file" accept="image/*" onChange={handleFileChange} className="input-field" />
+              <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, setBannerFile)} className="input-field" />
+            </div>
+          </div>
+
+          <div className="form-group-row" style={{ marginTop: '10px' }}>
+            <div className="form-group">
+              <label><Upload size={14} /> Polaroid 1</label>
+              <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, setPolaroid1File)} className="input-field" style={{fontSize: '0.8rem'}} />
+            </div>
+            <div className="form-group">
+              <label><Upload size={14} /> Polaroid 2</label>
+              <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, setPolaroid2File)} className="input-field" style={{fontSize: '0.8rem'}} />
+            </div>
+            <div className="form-group">
+              <label><Upload size={14} /> Polaroid 3</label>
+              <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, setPolaroid3File)} className="input-field" style={{fontSize: '0.8rem'}} />
             </div>
           </div>
 

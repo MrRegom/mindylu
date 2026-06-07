@@ -113,6 +113,7 @@ class ConfiguracionTiendaSerializer(serializers.ModelSerializer):
         model = ConfiguracionTienda
         fields = [
             'marquesina_texto', 'marquesina_velocidad', 'banner_imagen', 
+            'polaroid_1_imagen', 'polaroid_2_imagen', 'polaroid_3_imagen',
             'banner_titulo', 'banner_subtitulo', 'whatsapp_numero', 'tienda_nombre'
         ]
 

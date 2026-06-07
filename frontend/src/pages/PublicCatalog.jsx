@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { X } from 'lucide-react';
 import api from '../services/api';
 import './PublicCatalog.css';
 
@@ -9,6 +10,7 @@ const HeartIcon = () => <svg viewBox="0 0 24 24" width="16" height="16" stroke="
 const PublicCatalog = () => {
   const [prendas, setPrendas] = useState([]);
   const [config, setConfig] = useState(null);
+  const [prendaSeleccionada, setPrendaSeleccionada] = useState(null);
   
   useEffect(() => {
     document.title = "Mindy Lu - Boutique";
@@ -67,7 +69,7 @@ const PublicCatalog = () => {
         <p className="subtitle">MODA QUE TE REPRESENTA.</p>
         
         <div className="mu-hero-1-img-wrap">
-          <img src={getPrendaImg(0)} alt="Hero" />
+          <img src={config?.banner_imagen || getPrendaImg(0)} alt="Hero" />
           
           <div className="mu-hero-1-overlay">
             <span className="script">new<br/>collection</span>
@@ -101,13 +103,13 @@ const PublicCatalog = () => {
         <div className="mu-collage-wrap">
           <div className="mu-polaroid mu-polaroid-1">
             <div className="washi-tape pink" style={{top: '-10px', left: '20px', width: '60px'}}></div>
-            <img src={getPrendaImg(2)} alt="Polaroid 1" />
+            <img src={config?.polaroid_1_imagen || getPrendaImg(2)} alt="Polaroid 1" />
           </div>
           <div className="mu-polaroid mu-polaroid-2">
-            <img src={getPrendaImg(3)} alt="Polaroid 2" />
+            <img src={config?.polaroid_2_imagen || getPrendaImg(3)} alt="Polaroid 2" />
           </div>
           <div className="mu-polaroid mu-polaroid-3">
-            <img src={getPrendaImg(4)} alt="Polaroid 3" />
+            <img src={config?.polaroid_3_imagen || getPrendaImg(4)} alt="Polaroid 3" />
           </div>
         </div>
         
@@ -149,7 +151,7 @@ const PublicCatalog = () => {
           {bestSellers.map(p => {
             const imgUrl = p.foto_url || (p.imagenes && p.imagenes[0]?.imagen) || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E";
             return (
-              <div key={p.id} className="mu-product-card">
+              <div key={p.id} className="mu-product-card" onClick={() => setPrendaSeleccionada(p)} style={{cursor: 'pointer'}}>
                 <img src={imgUrl} alt={p.nombre} className="mu-product-img" />
                 <div className="mu-product-title">{p.nombre}</div>
                 <div className="mu-product-price">${parseInt(p.precio||0).toLocaleString('es-CL')}</div>
@@ -173,12 +175,12 @@ const PublicCatalog = () => {
           {prendas.map(p => {
             const imgUrl = p.foto_url || (p.imagenes && p.imagenes[0]?.imagen) || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E";
             return (
-              <div key={p.id} className="mu-product-card">
+              <div key={p.id} className="mu-product-card" onClick={() => setPrendaSeleccionada(p)} style={{cursor: 'pointer'}}>
                 <img src={imgUrl} alt={p.nombre} className="mu-product-img" />
                 <div className="mu-product-title">{p.nombre}</div>
                 <div className="mu-product-price">${parseInt(p.precio||0).toLocaleString('es-CL')}</div>
-                <button className="btn-dark" style={{padding: '6px 12px', marginTop: '10px', fontSize: '0.6rem'}} onClick={abrirWhatsAppGeneral}>
-                  ME INTERESA
+                <button className="btn-dark" style={{padding: '6px 12px', marginTop: '10px', fontSize: '0.6rem'}}>
+                  VER DETALLE
                 </button>
               </div>
             );
@@ -280,6 +282,60 @@ const PublicCatalog = () => {
         </div>
       </footer>
       
+      {/* ── Modal de Detalle de Prenda ── */}
+      {prendaSeleccionada && (
+        <div className="mu-modal-overlay" onClick={() => setPrendaSeleccionada(null)}>
+          <div className="mu-modal-content" onClick={e => e.stopPropagation()}>
+            <button className="mu-modal-close" onClick={() => setPrendaSeleccionada(null)}>
+              <X size={24} />
+            </button>
+            <div className="mu-modal-grid">
+              <div className="mu-modal-img-col">
+                <img 
+                  src={prendaSeleccionada.foto_url || (prendaSeleccionada.imagenes && prendaSeleccionada.imagenes[0]?.imagen) || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E"} 
+                  alt={prendaSeleccionada.nombre} 
+                />
+              </div>
+              <div className="mu-modal-info-col">
+                <div className="brand-small" style={{textAlign: 'left', marginBottom: '10px'}}>MINDY LU</div>
+                <h2>{prendaSeleccionada.nombre}</h2>
+                <div className="mu-product-price" style={{fontSize: '1.5rem', margin: '15px 0'}}>${parseInt(prendaSeleccionada.precio||0).toLocaleString('es-CL')}</div>
+                
+                <div className="mu-modal-variants">
+                  <h4>Opciones Disponibles:</h4>
+                  {prendaSeleccionada.variantes && prendaSeleccionada.variantes.length > 0 ? (
+                    <ul>
+                      {prendaSeleccionada.variantes.map(v => (
+                        <li key={v.id}>• {v.color} - {v.talla}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p>Talla y color único.</p>
+                  )}
+                </div>
+
+                <p className="mu-modal-desc">
+                  Prenda sujeta a disponibilidad de stock. Contáctanos para solicitar la tuya o preguntar por más detalles.
+                </p>
+
+                <button 
+                  className="btn-primary" 
+                  style={{width: '100%', marginTop: 'auto', padding: '15px'}}
+                  onClick={() => {
+                    const num = config?.whatsapp_numero || '56912345678';
+                    const msg = encodeURIComponent(`Hola, me interesa la prenda: *${prendaSeleccionada.nombre}* a $${parseInt(prendaSeleccionada.precio||0).toLocaleString('es-CL')}. ¿Tienen disponibilidad?`);
+                    window.open(`https://wa.me/${num}?text=${msg}`, '_blank');
+                  }}
+                >
+                  <svg viewBox="0 0 24 24" width="20" height="20" style={{marginRight: '8px'}}><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z" stroke="currentColor" fill="none" strokeWidth="2"/></svg>
+                  ME INTERESA
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };
