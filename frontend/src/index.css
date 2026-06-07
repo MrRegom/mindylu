@@ -1,19 +1,20 @@
 :root {
   /* =========================================
-     PALETA CLASSIC PINK BOUTIQUE
+     PALETA DYNAMIC PINK BOUTIQUE
      ========================================= */
-  --color-bg-base: #FAF5F5; /* Un blanco roto rosado (blush) muy acogedor */
+  --color-bg-base: #FFF5F7; /* Fondo súper suave y juvenil */
   --color-bg-alt: #FFFFFF;
   
-  --color-primary: #1A1A1A; /* Gris grafito oscuro, más cálido que el negro puro */
-  --color-primary-light: #4A4A4A;
+  --color-primary: #5A1E31; /* Un granate o burdeos súper elegante y femenino en vez de negro */
+  --color-primary-light: #7D2A44;
   
-  --color-accent: #d9777f; /* El rosado corporativo */
-  --color-accent-light: #f5e4e6;
+  --color-accent: #E03E6D; /* Un Hot Pink vibrante y jovial */
+  --color-accent-light: #FDE8ED;
+  --color-accent-dark: #C22F59;
   
-  --color-text-main: #2C2C2C;
-  --color-text-muted: #8A8A8A;
-  --color-border: #E8DCDC;
+  --color-text-main: #4A1A27;
+  --color-text-muted: #9E6476;
+  --color-border: #F7E0E5;
   
   --color-danger: #ef4444;
   --color-success: #10b981;
@@ -22,15 +23,15 @@
   --ff-body: 'Lato', -apple-system, sans-serif;
   --ff-heading: 'Playfair Display', serif;
 
-  --radius-sm: 0px;
-  --radius-md: 2px;
-  --radius-lg: 4px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
   --radius-pill: 9999px;
   
   --glass-blur: blur(16px);
   
   /* Sombras ultra suaves tipo Apple/SaaS */
-  --shadow-sm: 0 4px 15px rgba(217,119,127,0.08);
+  --shadow-sm: 0 8px 24px rgba(224, 62, 109, 0.15);
   --shadow-md: 0 4px 12px rgba(45, 42, 42, 0.06);
   --shadow-lg: 0 12px 24px rgba(45, 42, 42, 0.08);
   --shadow-xl: 0 24px 48px rgba(45, 42, 42, 0.1);

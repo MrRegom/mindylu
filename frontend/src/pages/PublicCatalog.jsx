@@ -483,7 +483,7 @@ const PublicCatalog = () => {
   return (
     <div className="lp-root">
 
-      {/* ── Navbar Classic Boutique ── */}
+      {/* ── Navbar Dynamic Pink ── */}
       <div className="lp-nav-wrapper">
         <nav className="lp-nav">
           <div className="lp-nav-top">
@@ -540,7 +540,7 @@ const PublicCatalog = () => {
             <button key={label} onClick={() => { scrollTo(ref); setMenuOpen(false); }} style={{
               background: 'none', border: 'none', cursor: 'pointer',
               fontFamily: "var(--ff-title)", textTransform: 'uppercase', letterSpacing: '2px',
-              fontSize: '1.2rem', fontWeight: 400, color: 'var(--color-primary)'
+              fontSize: '1.2rem', fontWeight: 700, color: 'var(--color-primary)'
             }}>
               {label}
             </button>
@@ -548,16 +548,16 @@ const PublicCatalog = () => {
           <button onClick={abrirWhatsAppGeneral} style={{
               background: 'none', border: 'none', cursor: 'pointer',
               fontFamily: "var(--ff-title)", textTransform: 'uppercase', letterSpacing: '2px',
-              fontSize: '1.2rem', fontWeight: 400, color: 'var(--color-accent)', marginTop: '20px'
+              fontSize: '1.2rem', fontWeight: 700, fontStyle: 'italic', color: 'var(--color-accent)', marginTop: '20px'
             }}>
             Contacto WhatsApp
           </button>
         </div>
       )}
 
-      {/* ── Hero Edge-to-Edge ── */}
+      {/* ── Hero Edge-to-Edge Animado ── */}
       <section className="lp-hero">
-        <div className="lp-hero-img-container fade-up-element">
+        <div className="lp-hero-img-container">
           <img 
             src={config?.banner_imagen ? (
               config.banner_imagen.startsWith('http') ? config.banner_imagen : `${API_BASE.replace('/api/v1', '')}${config.banner_imagen}`
@@ -574,25 +574,36 @@ const PublicCatalog = () => {
           <div className="lp-hero-overlay" />
         </div>
         
-        <div className="lp-hero-content fade-up-element" style={{ animationDelay: '0.3s' }}>
+        <div className="lp-hero-content">
           <h1 className="lp-hero-title">
             {config?.banner_titulo ? (
               <div dangerouslySetInnerHTML={{ __html: config.banner_titulo.replace(/\n/g, '<br />') }} />
             ) : (
-              <>THE SIGNATURE COLLECTION</>
+              <>
+                The Signature 
+                <br />
+                <span>Collection</span>
+              </>
             )}
           </h1>
           <button className="lp-btn-primary" onClick={() => scrollTo(catalogRef)}>
-            Shop Now
+            Ver Catálogo
           </button>
         </div>
       </section>
 
-      {/* ── Banner Oscuro Elegante ── */}
-      <div className="lp-banner">
-        <h3 className="lp-banner-title">Conecta con Nosotras</h3>
-        <p className="lp-banner-text">{config?.marquesina_texto || 'Únete y mantente al día con nuestras últimas tendencias y colecciones exclusivas.'}</p>
-        <button onClick={abrirWhatsAppGeneral} style={{ marginTop: '20px', background: 'transparent', border: '1px solid rgba(255,255,255,0.5)', color: 'white', padding: '10px 30px', fontFamily: 'var(--ff-body)', letterSpacing: '2px', textTransform: 'uppercase', fontSize: '0.8rem', cursor: 'pointer' }}>Escríbenos</button>
+      {/* ── Marquesina Infinita WOW ── */}
+      <div className="lp-banner-wow">
+        <div className="lp-marquee-content">
+          {Array.from({ length: 10 }).map((_, i) => (
+            <div key={i} style={{ display: 'inline-flex', alignItems: 'center' }}>
+              <span className="lp-marquee-item">{config?.marquesina_texto || 'MODA FEMENINA PREMIUM'}</span>
+              <span className="lp-marquee-dot" />
+              <span className="lp-marquee-item">NUEVA COLECCIÓN</span>
+              <span className="lp-marquee-dot" />
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* ── Catálogo ── */}
