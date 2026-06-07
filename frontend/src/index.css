@@ -4,33 +4,34 @@
   --color-primary-dark: #B98788;
   --color-primary-light: #F9EBEB;
   --color-primary-gradient: linear-gradient(135deg, #D4A3A4 0%, #E3C1C2 100%);
-  --color-primary-rgb: 212, 163, 164;
+  /* =========================================
+     PALETA ETHEREAL GLASSMORPHISM
+     ========================================= */
+  --color-bg-base: #e0f2fe; /* Light sky blue */
+  --color-bg-gradient: linear-gradient(135deg, #e0f2fe 0%, #f0fdf4 50%, #fce7f3 100%);
+  --color-primary: #0f172a; /* Slate 900 for high contrast text */
+  --color-primary-light: #334155;
+  --color-bg-panel: rgba(255, 255, 255, 0.4);
+  --color-bg-panel-hover: rgba(255, 255, 255, 0.6);
+  --color-border-glass: rgba(255, 255, 255, 0.5);
+  --color-shadow-glass: rgba(0, 0, 0, 0.05);
   
-  --color-accent: #D4AF37; /* Champagne Gold */
-  --color-accent-light: #F7EFC8;
+  --color-text-main: #0f172a;
+  --color-text-muted: #64748b;
+  
+  --color-danger: #ef4444;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
 
-  /* Neutral Colors - Enterprise SaaS */
-  --color-bg: #FCFBFB; /* Ultra clean off-white */
-  --color-bg-alt: #F3EFEF; /* Soft beige/grey for contrast */
-  --color-surface: #FFFFFF;
-  --color-surface-rgb: 255, 255, 255;
-  --color-text: #2D2A2A; /* Very dark brownish grey for readable elegance */
-  --color-text-muted: #8E8585;
-  --color-border: #E8E2E2;
+  --ff-body: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --ff-heading: 'Montserrat', sans-serif;
+
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-pill: 9999px;
   
-  /* Status Colors */
-  --color-success: #2E7D32; 
-  --color-success-bg: rgba(46, 125, 50, 0.1);
-  --color-warning: #B7870A; 
-  --color-warning-bg: rgba(183, 135, 10, 0.1);
-  --color-danger: #D32F2F; 
-  --color-danger-bg: rgba(211, 47, 47, 0.1);
-  
-  /* UI Elements */
-  --radius-sm: 6px;
-  --radius-md: 12px;
-  --radius-lg: 20px;
-  --radius-full: 9999px;
+  --glass-blur: blur(16px);
   
   /* Sombras ultra suaves tipo Apple/SaaS */
   --shadow-sm: 0 2px 4px rgba(45, 42, 42, 0.04);

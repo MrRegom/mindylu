@@ -323,6 +323,24 @@ const PublicCatalog = () => {
     fetchPrendas();
   }, [catSel]);
 
+  useEffect(() => {
+    // Observer para animaciones fade-up
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    const elements = document.querySelectorAll('.fade-up-element');
+    elements.forEach(el => observer.observe(el));
+
+    return () => {
+      elements.forEach(el => observer.unobserve(el));
+    };
+  }, [prendas]);
+
   const fetchConfig = async () => {
     try {
       const res = await axios.get(`${API_BASE}/core/configuracion/publico/`);
@@ -465,140 +483,88 @@ const PublicCatalog = () => {
   return (
     <div className="lp-root">
 
-      {/* ── Navbar ── */}
-      <nav className="lp-nav">
-        <a className="lp-nav-brand" href="/">
-          {(config?.tienda_nombre || 'MindyLu').toLowerCase() === 'mindylu' ? (
-            <><span style={{ color: '#d9777f' }}>Mindy</span><span style={{ color: '#111' }}>Lu</span></>
-          ) : (
-            config?.tienda_nombre || 'MindyLu'
-          )}
-        </a>
+      {/* ── Navbar Flotante ── */}
+      <div className="lp-nav-wrapper">
+        <nav className="lp-nav">
+          <a className="lp-nav-brand" href="/">
+            {config?.tienda_nombre || 'MINDYLU'}
+          </a>
 
-        <ul className="lp-nav-links">
-          <li><a onClick={() => scrollTo(catalogRef)}>Catálogo</a></li>
-          <li><a onClick={() => scrollTo(catRef)}>Categorías</a></li>
-          <li><a onClick={() => scrollTo(howtoRef)}>Cómo Comprar</a></li>
-          <li><a onClick={() => scrollTo(entregasRef)}>Entregas</a></li>
-        </ul>
+          <ul className="lp-nav-links">
+            <li><a onClick={() => scrollTo(catalogRef)}>Colección</a></li>
+            <li><a onClick={() => scrollTo(howtoRef)}>Nosotros</a></li>
+            <li><a onClick={() => scrollTo(entregasRef)}>Despachos</a></li>
+          </ul>
 
-        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-          <button className="lp-nav-cart" onClick={() => setCartOpen(true)} style={{ position: 'relative', background: 'none', border: 'none', cursor: 'pointer', padding: '8px' }}>
-            <CartIcon size={24} />
-            {cart.length > 0 && (
-              <span style={{ position: 'absolute', top: 0, right: 0, background: 'var(--color-primary)', color: 'white', fontSize: '10px', fontWeight: 'bold', width: '16px', height: '16px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                {cart.length}
-              </span>
-            )}
-          </button>
-          <button className="lp-nav-wa" onClick={abrirWhatsAppGeneral} title="WhatsApp">
-            <WaIcon size={20} />
-          </button>
-        </div>
-
-        <button className="lp-hamburger" onClick={() => setMenuOpen(!menuOpen)} aria-label="Menú">
-          <span /><span /><span />
-        </button>
-      </nav>
-
-      {/* Menú mobile */}
-      {menuOpen && (
-        <div style={{
-          position: 'fixed', top: 70, left: 0, right: 0, bottom: 0,
-          background: 'rgba(255,255,255,0.98)', zIndex: 999,
-          display: 'flex', flexDirection: 'column', alignItems: 'center',
-          justifyContent: 'center', gap: 32
-        }}>
-          {[
-            ['Ver Catálogo', catalogRef],
-            ['Categorías', catRef],
-            ['Cómo Comprar', howtoRef],
-            ['Próximas Entregas', entregasRef],
-          ].map(([label, ref]) => (
-            <button key={label} onClick={() => scrollTo(ref)} style={{
-              background: 'none', border: 'none', cursor: 'pointer',
-              fontFamily: "'Playfair Display', serif",
-              fontSize: '1.6rem', fontWeight: 600, color: '#111'
-            }}>
-              {label}
+          <div className="lp-nav-actions">
+            <button className="lp-btn-explore" onClick={abrirWhatsAppGeneral}>
+              EXPLORE
             </button>
-          ))}
-          <button className="lp-nav-wa" style={{ marginTop: 16 }} onClick={abrirWhatsAppGeneral}>
-            <WaIcon size={18} /> Escribir por WhatsApp
-          </button>
-        </div>
-      )}
-
-      {/* ── Banner rotante ── */}
-      <div className="lp-banner" style={{ marginTop: 70 }}>
-        <div className="lp-banner-track" style={{ animationDuration: `${config?.marquesina_velocidad || 25}s` }}>
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="lp-banner-item">
-              <span className="lp-banner-text">{config?.marquesina_texto || 'NUEVA COLECCIÓN 2025'}</span>
-              <span className="lp-banner-dot" />
-            </div>
-          ))}
-        </div>
-        <div className="lp-banner-track" style={{ animationDuration: `${config?.marquesina_velocidad || 25}s` }}>
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={`dup-${i}`} className="lp-banner-item">
-              <span className="lp-banner-text">{config?.marquesina_texto || 'NUEVA COLECCIÓN 2025'}</span>
-              <span className="lp-banner-dot" />
-            </div>
-          ))}
-        </div>
+          </div>
+        </nav>
       </div>
 
-      {/* ── Hero ── */}
+      {/* ── Hero Glassmorphism ── */}
       <section className="lp-hero">
-        <img 
-          src={config?.banner_imagen ? (
-            config.banner_imagen.startsWith('http') ? config.banner_imagen : `${API_BASE.replace('/api/v1', '')}${config.banner_imagen}`
-          ) : config?.tienda_avatar ? (
-            config.tienda_avatar.startsWith('http') ? config.tienda_avatar : `${API_BASE.replace('/api/v1', '')}${config.tienda_avatar}`
-          ) : "/images/hero.jpg"} 
-          alt={config?.banner_titulo || `${config?.tienda_nombre || 'MindyLu'} - Moda Femenina`} 
-          className="lp-hero-img" 
-        />
-        <div className="lp-hero-overlay" />
-        <div className="lp-hero-content">
-          <div className="lp-hero-tag">✦ {config?.tienda_nombre || 'MindyLu'}</div>
-          <h1 className="lp-hero-title">
-            {config?.banner_titulo ? (
-              <div dangerouslySetInnerHTML={{ __html: config.banner_titulo.replace(/\n/g, '<br />') }} />
-            ) : (
-              <>Moda femenina<br /><em>seleccionada</em><br />especialmente para ti</>
-            )}
-          </h1>
-          <p className="lp-hero-sub">
-            {config?.banner_subtitulo ? (
-              config.banner_subtitulo.split('\n').map((line, i) => <span key={i}>{line}<br /></span>)
-            ) : (
-              <>Prendas únicas, elegantes y exclusivas.<br />Cada pieza seleccionada con amor y estilo.</>
-            )}
-          </p>
-          <div className="lp-hero-ctas">
-            <button className="lp-btn-primary" onClick={() => scrollTo(catalogRef)}>
-              Ver Catálogo
-            </button>
-            <button className="lp-btn-outline" onClick={abrirWhatsAppGeneral}>
-              Consultar por WhatsApp
-            </button>
+        <div className="lp-hero-bg-text">
+          {config?.tienda_nombre || 'MINDYLU'}
+        </div>
+        
+        <div className="lp-hero-content-wrapper fade-up-element">
+          {/* Tarjetas Flotantes */}
+          <div className="glass-badge badge-1">
+            <span style={{ fontSize: '1.5rem' }}>✨</span>
+            <div>
+              <p style={{ fontSize: '0.7rem', opacity: 0.8, margin: 0, textTransform: 'uppercase' }}>Descubre la</p>
+              <p style={{ fontSize: '0.9rem', fontWeight: 600, margin: 0 }}>Nueva Colección</p>
+            </div>
+          </div>
+          
+          <div className="glass-badge badge-2">
+            <div>
+              <p style={{ fontSize: '0.9rem', fontWeight: 600, margin: 0 }}>Fashion That Breathes</p>
+              <p style={{ fontSize: '0.75rem', opacity: 0.8, margin: 0 }}>Prendas Exclusivas</p>
+            </div>
+          </div>
+
+          <div className="glass-badge badge-3">
+            <span style={{ fontSize: '1.2rem' }}>💖</span>
+            <div>
+              <p style={{ fontSize: '0.8rem', fontWeight: 600, margin: 0 }}>+1000 Clientas</p>
+              <p style={{ fontSize: '0.7rem', opacity: 0.8, margin: 0 }}>Satisfechas</p>
+            </div>
+          </div>
+
+          <div className="lp-hero-img-container">
+            <img 
+              src={config?.banner_imagen ? (
+                config.banner_imagen.startsWith('http') ? config.banner_imagen : `${API_BASE.replace('/api/v1', '')}${config.banner_imagen}`
+              ) : config?.tienda_avatar ? (
+                config.tienda_avatar.startsWith('http') ? config.tienda_avatar : `${API_BASE.replace('/api/v1', '')}${config.tienda_avatar}`
+              ) : "/images/hero.jpg"} 
+              alt={config?.banner_titulo || `${config?.tienda_nombre || 'MindyLu'} - Moda`} 
+              className="lp-hero-img" 
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.parentElement.innerHTML = '<div style="font-size: 8rem;">🌸</div>';
+              }}
+            />
           </div>
         </div>
-        <div className="lp-hero-scroll">Scroll</div>
       </section>
 
+      {/* ── Banner Rotante Sutil ── */}
+      <div style={{ padding: '20px 0', overflow: 'hidden', whiteSpace: 'nowrap', background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(5px)', borderTop: '1px solid rgba(255,255,255,0.3)', borderBottom: '1px solid rgba(255,255,255,0.3)' }}>
+        <p style={{ margin: 0, textAlign: 'center', fontFamily: 'var(--ff-title)', fontWeight: 300, letterSpacing: '4px', fontSize: '0.9rem' }}>
+          {config?.marquesina_texto || 'ENVÍOS A TODO CHILE • MODA FEMENINA PREMIUM • ATENCIÓN PERSONALIZADA'}
+        </p>
+      </div>
+
       {/* ── Nuevos Ingresos ── */}
-      <section className="lp-section" ref={catalogRef}>
-        <div className="lp-products-header">
-          <div>
-            <p className="lp-section-label">✦ Recién llegadas</p>
-            <h2 className="lp-section-title">Nuevos <em>Ingresos</em></h2>
-          </div>
-          <button className="lp-btn-ghost" onClick={() => setCatSel('')}>
-            Ver Todo
-          </button>
+      <section className="lp-section fade-up-element" ref={catalogRef}>
+        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+          <p style={{ textTransform: 'uppercase', letterSpacing: '2px', fontSize: '0.8rem', color: '#64748b', marginBottom: '8px' }}>Colección Exclusiva</p>
+          <h2 className="lp-section-title" style={{ margin: 0 }}>The Glass Garden</h2>
         </div>
 
         {/* Filtros por categoría */}
@@ -626,7 +592,7 @@ const PublicCatalog = () => {
             Cargando colección...
           </div>
         ) : (
-          <div className="lp-products-grid">
+          <div className="lp-grid">
             {prendas.length === 0 ? (
               <p className="lp-empty">No hay prendas en esta categoría por ahora.</p>
             ) : (
@@ -636,14 +602,12 @@ const PublicCatalog = () => {
         )}
       </section>
 
-
-
       {/* ── Quote central ── */}
-      <div className="lp-splash">
-        <p className="lp-splash-quote">
+      <div className="lp-splash fade-up-element" style={{ padding: '100px 20px', textAlign: 'center', background: 'rgba(255,255,255,0.1)' }}>
+        <p style={{ fontFamily: 'var(--ff-title)', fontSize: '2rem', fontStyle: 'italic', maxWidth: '800px', margin: '0 auto 20px', color: '#0f172a' }}>
           "Cada prenda tiene una historia. La tuya comienza aquí."
         </p>
-        <p className="lp-splash-author">{config?.tienda_nombre || 'MindyLu'} · Boutique Exclusiva</p>
+        <p style={{ fontSize: '0.9rem', letterSpacing: '2px', textTransform: 'uppercase', color: '#64748b' }}>{config?.tienda_nombre || 'MindyLu'} · The Ethereal Collection</p>
       </div>
 
       {/* ── Cómo Comprar ── */}
