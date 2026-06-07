@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import api from '../services/api';
 import './PublicCatalog.css';
 
@@ -18,7 +18,10 @@ const PublicCatalog = () => {
   const fetchDatos = async () => {
     try {
       const { data } = await api.get('/catalogo/publico/');
-      setPrendas(data);
+      // Asegurar que solo usamos prendas activas
+      const activas = data.filter(p => p.estado !== 'VENDIDO');
+      setPrendas(activas.length > 0 ? activas : data);
+      
       const confRes = await api.get('/configuracion/publica/');
       setConfig(confRes.data);
     } catch (error) {
@@ -34,7 +37,14 @@ const PublicCatalog = () => {
   const getCategorias = () => [...new Set(prendas.map(p => p.categoria).filter(Boolean))];
   const categorias = getCategorias();
   
-  // Extraer algunos productos para best sellers
+  // Helpers para extraer imágenes de las prendas reales
+  const getPrendaImg = (index) => {
+    if (!prendas || !prendas[index]) return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E";
+    const p = prendas[index];
+    return p.foto_url || (p.imagenes && p.imagenes[0]?.imagen) || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E";
+  };
+
+  // Best sellers: tomamos las 4 primeras
   const bestSellers = prendas.slice(0, 4);
 
   return (
@@ -56,15 +66,14 @@ const PublicCatalog = () => {
         <p className="subtitle">MODA QUE TE REPRESENTA.</p>
         
         <div className="mu-hero-1-img-wrap">
-          {/* Imagen Hero (fallback temporal de placeholder) */}
-          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" alt="Hero" />
+          <img src={getPrendaImg(0)} alt="Hero" />
           
           <div className="mu-hero-1-overlay">
             <span className="script">new<br/>collection</span>
           </div>
           
           <div className="mu-hero-1-btn-wrap">
-            <button className="btn-primary">DESCUBRIR</button>
+            <button className="btn-primary" onClick={() => document.getElementById('catalogo-completo').scrollIntoView({behavior:'smooth'})}>DESCUBRIR</button>
           </div>
         </div>
         
@@ -75,7 +84,7 @@ const PublicCatalog = () => {
         </div>
         
         <div className="mu-hero-1-bottom-img">
-          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" alt="Detail" />
+          <img src={getPrendaImg(1)} alt="Detail" />
         </div>
       </section>
 
@@ -85,19 +94,19 @@ const PublicCatalog = () => {
           <div className="brand-small">MINDY LU</div>
           <h2>NUEVA<br/>COLECCIÓN</h2>
           <span className="script-title">Verano '24</span>
-          <button className="btn-outline" onClick={abrirWhatsAppGeneral}>VER TODO</button>
+          <button className="btn-outline" onClick={() => document.getElementById('catalogo-completo').scrollIntoView({behavior:'smooth'})}>VER TODO</button>
         </div>
         
         <div className="mu-collage-wrap">
           <div className="mu-polaroid mu-polaroid-1">
             <div className="washi-tape pink" style={{top: '-10px', left: '20px', width: '60px'}}></div>
-            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" alt="Polaroid 1" />
+            <img src={getPrendaImg(2)} alt="Polaroid 1" />
           </div>
           <div className="mu-polaroid mu-polaroid-2">
-            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" alt="Polaroid 2" />
+            <img src={getPrendaImg(3)} alt="Polaroid 2" />
           </div>
           <div className="mu-polaroid mu-polaroid-3">
-            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" alt="Polaroid 3" />
+            <img src={getPrendaImg(4)} alt="Polaroid 3" />
           </div>
         </div>
         
@@ -112,12 +121,19 @@ const PublicCatalog = () => {
         <h2>CATEGORÍAS</h2>
         
         <div className="mu-cat-list">
-          {['VESTIDOS', 'TOPS', 'PANTALONES', 'ACCESORIOS', 'SETS'].map((cat, idx) => (
-            <a href={`#`} key={idx} className="mu-cat-item">
-              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" alt={cat} />
-              <span>{cat}<br/><small style={{fontSize:'0.5rem', opacity:0.8}}>VER MÁS →</small></span>
-            </a>
-          ))}
+          {categorias.length > 0 ? categorias.map((cat, idx) => {
+            // Buscar la primera prenda de esta categoría para usarla de fondo
+            const pCat = prendas.find(p => p.categoria === cat);
+            const bgImg = pCat ? (pCat.foto_url || (pCat.imagenes && pCat.imagenes[0]?.imagen)) : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E";
+            return (
+              <a href={`#catalogo-completo`} key={idx} className="mu-cat-item">
+                <img src={bgImg} alt={cat} />
+                <span>{cat}<br/><small style={{fontSize:'0.5rem', opacity:0.8}}>VER MÁS →</small></span>
+              </a>
+            );
+          }) : (
+            <p style={{color: '#888', fontSize: '0.8rem'}}>No hay categorías aún.</p>
+          )}
         </div>
         <div style={{marginTop: '40px', textAlign: 'right'}}><HeartIcon /></div>
         <div className="torn-edge-pink"></div>
@@ -130,7 +146,7 @@ const PublicCatalog = () => {
         
         <div className="mu-grid-products">
           {bestSellers.map(p => {
-            const imgUrl = p.foto_url || (p.imagenes && p.imagenes[0]?.imagen) || 'https://via.placeholder.com/300x400';
+            const imgUrl = p.foto_url || (p.imagenes && p.imagenes[0]?.imagen) || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E";
             return (
               <div key={p.id} className="mu-product-card">
                 <img src={imgUrl} alt={p.nombre} className="mu-product-img" />
@@ -141,19 +157,40 @@ const PublicCatalog = () => {
           })}
         </div>
         
-        <button className="btn-outline">VER TODOS</button>
-        
         <div style={{marginTop: '40px', textAlign: 'center'}} className="script" style={{fontSize: '2rem'}}>
           you glow different <HeartIcon />
         </div>
         <div className="torn-edge-pink"></div>
       </section>
 
-      {/* ── Screen 5: Actitud ── */}
+      {/* ── Screen 5: Catálogo Completo (NUEVO) ── */}
+      <section id="catalogo-completo" className="mu-best-sellers" style={{background: '#FDFBF7', padding: '60px 5% 100px 5%'}}>
+        <div className="brand-small" style={{textAlign:'left', marginBottom:'10px'}}>MINDY LU</div>
+        <h2 style={{fontSize: '1.5rem', marginBottom: '40px'}}>NUESTRO CATÁLOGO</h2>
+        
+        <div className="mu-grid-products">
+          {prendas.map(p => {
+            const imgUrl = p.foto_url || (p.imagenes && p.imagenes[0]?.imagen) || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E";
+            return (
+              <div key={p.id} className="mu-product-card">
+                <img src={imgUrl} alt={p.nombre} className="mu-product-img" />
+                <div className="mu-product-title">{p.nombre}</div>
+                <div className="mu-product-price">${parseInt(p.precio||0).toLocaleString('es-CL')}</div>
+                <button className="btn-dark" style={{padding: '6px 12px', marginTop: '10px', fontSize: '0.6rem'}} onClick={abrirWhatsAppGeneral}>
+                  ME INTERESA
+                </button>
+              </div>
+            );
+          })}
+        </div>
+        <div className="torn-edge-white" style={{backgroundSize: '100% 100%', backgroundImage: 'url("data:image/svg+xml;utf8,<svg viewBox=\\"0 0 1200 50\\" xmlns=\\"http://www.w3.org/2000/svg\\" preserveAspectRatio=\\"none\\"><path d=\\"M0,50 L0,25 C100,10 200,40 300,20 C400,0 500,30 600,15 C700,0 800,40 900,20 C1000,0 1100,30 1200,15 L1200,50 Z\\" fill=\\"%23EBAEB6\\" /></svg>")'}}></div>
+      </section>
+
+      {/* ── Screen 6: Actitud ── */}
       <section className="mu-actitud">
         <div className="mu-actitud-polaroid">
           <div className="washi-tape black" style={{top: '-15px', left: '50%', transform: 'translateX(-50%) rotate(-2deg)'}}></div>
-          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" alt="Actitud" />
+          <img src={getPrendaImg(Math.min(5, prendas.length - 1))} alt="Actitud" />
         </div>
         
         <div className="mu-actitud-text">
@@ -168,7 +205,7 @@ const PublicCatalog = () => {
         <div className="torn-edge-white"></div>
       </section>
 
-      {/* ── Screen 6: Reseñas ── */}
+      {/* ── Screen 7: Reseñas ── */}
       <section className="mu-reviews">
         <div className="brand-small">MINDY LU</div>
         <h2>LO QUE DICEN <HeartIcon /><br/><span className="script">nuestras clientas</span></h2>
@@ -188,17 +225,17 @@ const PublicCatalog = () => {
         <div className="torn-edge-pink"></div>
       </section>
 
-      {/* ── Screen 7: Summer Edit ── */}
+      {/* ── Screen 8: Summer Edit ── */}
       <section className="mu-summer">
         <div className="brand-small" style={{marginBottom: '20px'}}>MINDY LU</div>
         <div className="mu-summer-header">
           <h2>SUMMER<br/>'24<br/>EDIT</h2>
           <p>UN VERANO PARA<br/>EXPRESAR QUIÉN ERES.</p>
-          <button className="btn-dark" style={{marginTop: '15px'}}>VER EDITORIAL</button>
+          <button className="btn-dark" style={{marginTop: '15px'}} onClick={() => document.getElementById('catalogo-completo').scrollIntoView({behavior:'smooth'})}>VER EDITORIAL</button>
         </div>
         
         <div className="mu-summer-img-wrap">
-          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" alt="Summer Edit" />
+          <img src={getPrendaImg(Math.min(6, prendas.length - 1))} alt="Summer Edit" />
           
           <div className="mu-summer-note">
             <div className="washi-tape pink" style={{top: '-15px', right: '-10px', transform: 'rotate(15deg)', width: '60px'}}></div>
