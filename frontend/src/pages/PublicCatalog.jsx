@@ -17,12 +17,12 @@ const PublicCatalog = () => {
 
   const fetchDatos = async () => {
     try {
-      const { data } = await api.get('/catalogo/publico/');
+      const { data } = await api.get('/catalogo/publico/prendas/');
       // Asegurar que solo usamos prendas activas
       const activas = data.filter(p => p.estado !== 'VENDIDO');
       setPrendas(activas.length > 0 ? activas : data);
       
-      const confRes = await api.get('/configuracion/publica/');
+      const confRes = await api.get('/core/configuracion/publico/');
       setConfig(confRes.data);
     } catch (error) {
       console.error('Error:', error);
