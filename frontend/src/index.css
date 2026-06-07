@@ -1,36 +1,36 @@
 :root {
   /* =========================================
-     PALETA EDITORIAL / ALTA MODA (SPLIT LAYOUT)
+     PALETA CLASSIC PINK BOUTIQUE
      ========================================= */
-  --color-bg-base: #ffffff;
-  --color-bg-alt: #fcfcfc;
+  --color-bg-base: #FAF5F5; /* Un blanco roto rosado (blush) muy acogedor */
+  --color-bg-alt: #FFFFFF;
   
-  --color-primary: #111111; /* Negro profundo para textos gigantes y botones */
-  --color-primary-light: #2a2a2a;
+  --color-primary: #1A1A1A; /* Gris grafito oscuro, más cálido que el negro puro */
+  --color-primary-light: #4A4A4A;
   
-  --color-accent: #d9777f; /* El rosado elegante solicitado */
+  --color-accent: #d9777f; /* El rosado corporativo */
   --color-accent-light: #f5e4e6;
   
-  --color-text-main: #111111;
-  --color-text-muted: #888888;
-  --color-border: #eeeeee;
+  --color-text-main: #2C2C2C;
+  --color-text-muted: #8A8A8A;
+  --color-border: #E8DCDC;
   
   --color-danger: #ef4444;
   --color-success: #10b981;
   --color-warning: #f59e0b;
 
-  --ff-body: 'Inter', -apple-system, sans-serif;
-  --ff-heading: 'Montserrat', sans-serif;
+  --ff-body: 'Lato', -apple-system, sans-serif;
+  --ff-heading: 'Playfair Display', serif;
 
   --radius-sm: 0px;
-  --radius-md: 4px;
-  --radius-lg: 8px;
+  --radius-md: 2px;
+  --radius-lg: 4px;
   --radius-pill: 9999px;
   
   --glass-blur: blur(16px);
   
   /* Sombras ultra suaves tipo Apple/SaaS */
-  --shadow-sm: 0 4px 12px rgba(0,0,0,0.03);
+  --shadow-sm: 0 4px 15px rgba(217,119,127,0.08);
   --shadow-md: 0 4px 12px rgba(45, 42, 42, 0.06);
   --shadow-lg: 0 12px 24px rgba(45, 42, 42, 0.08);
   --shadow-xl: 0 24px 48px rgba(45, 42, 42, 0.1);

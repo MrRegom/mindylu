@@ -1,12 +1,10 @@
 /* =============================================================
-   MindyLu — Editorial Split Layout (Alta Moda)
+   MindyLu — Classic Pink Boutique (Luxury Elegance)
    ============================================================= */
 
-   @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap');
-
    .lp-root {
-     --ff-title: 'Montserrat', sans-serif;
-     --ff-body: 'Inter', sans-serif;
+     --ff-title: 'Playfair Display', serif;
+     --ff-body: 'Lato', sans-serif;
      
      font-family: var(--ff-body);
      color: var(--color-primary);
@@ -17,56 +15,65 @@
    
    /* ── Navbar ── */
    .lp-nav-wrapper {
-     position: fixed;
-     top: 0;
-     left: 0;
+     position: relative; /* Not fixed anymore, like classic boutiques */
      width: 100%;
      z-index: 100;
-     background: rgba(255, 255, 255, 0.98);
+     background: var(--color-bg-base);
      border-bottom: 1px solid var(--color-border);
+     padding: 30px 0;
    }
    
    .lp-nav {
      display: flex;
+     flex-direction: column;
+     align-items: center;
+     justify-content: center;
+     width: 100%;
+     max-width: 1200px;
+     margin: 0 auto;
+     gap: 24px;
+   }
+   
+   .lp-nav-top {
+     display: flex;
      align-items: center;
      justify-content: space-between;
      width: 100%;
-     padding: 20px 5%;
-     max-width: 1600px;
-     margin: 0 auto;
+     padding: 0 5%;
    }
-   
+
    .lp-nav-brand {
      font-family: var(--ff-title);
-     font-size: 1.6rem;
-     font-weight: 800;
-     letter-spacing: -0.5px;
+     font-size: 2.2rem;
+     font-weight: 400;
+     letter-spacing: 4px;
      text-decoration: none;
      color: var(--color-primary);
-   }
-   
-   .lp-nav-brand span.pink {
-     color: var(--color-accent);
+     text-transform: uppercase;
+     text-align: center;
    }
    
    .lp-nav-links {
      display: flex;
      gap: 40px;
      list-style: none;
+     padding: 0;
+     margin: 0;
    }
    
    .lp-nav-links a {
+     font-family: var(--ff-body);
      font-size: 0.85rem;
-     font-weight: 600;
-     text-transform: uppercase;
-     letter-spacing: 1px;
-     color: var(--color-primary-light);
+     font-weight: 400;
+     letter-spacing: 1.5px;
+     color: var(--color-text-muted);
      cursor: pointer;
      text-decoration: none;
      transition: color 0.3s;
+     text-transform: uppercase;
    }
    
-   .lp-nav-links a:hover {
+   .lp-nav-links a:hover, .lp-nav-links a.active {
      color: var(--color-accent);
    }
    
@@ -75,23 +82,20 @@
      align-items: center;
      gap: 20px;
    }
-   
-   .lp-btn-explore {
-     background: var(--color-primary);
-     border: 1px solid var(--color-primary);
-     color: #fff;
-     padding: 12px 28px;
-     font-family: var(--ff-title);
-     font-weight: 600;
-     font-size: 0.8rem;
-     letter-spacing: 1px;
+
+   .lp-btn-icon {
+     background: none;
+     border: none;
      cursor: pointer;
-     transition: all 0.3s ease;
-   }
-   
-   .lp-btn-explore:hover {
-     background: #fff;
      color: var(--color-primary);
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     padding: 8px;
+   }
+
+   .lp-btn-icon:hover {
+     color: var(--color-accent);
    }
    
    /* Hamburguesa Móvil */
@@ -101,129 +105,134 @@
      border: none;
      cursor: pointer;
      flex-direction: column;
-     gap: 5px;
+     gap: 6px;
      padding: 5px;
    }
    
    .lp-hamburger span {
      display: block;
-     width: 24px;
-     height: 2px;
+     width: 28px;
+     height: 1px;
      background: var(--color-primary);
      transition: 0.3s;
    }
    
-   /* ── Hero Split Layout ── */
+   /* ── Hero Edge-to-Edge ── */
    .lp-hero {
-     display: grid;
-     grid-template-columns: 1fr 1fr;
-     height: 100vh;
-     padding-top: 70px; /* Space for nav */
-     background: var(--color-bg-base);
-   }
-   
-   .lp-hero-text-side {
-     display: flex;
-     flex-direction: column;
-     justify-content: center;
-     padding: 0 10%;
-     background: var(--color-bg-alt);
      position: relative;
-   }
-   
-   .lp-hero-text-side::before {
-     content: '';
-     position: absolute;
-     top: 10%;
-     left: 10%;
-     width: 50px;
-     height: 50px;
-     background: radial-gradient(circle, var(--color-accent-light) 0%, transparent 70%);
-     z-index: 0;
-   }
-   
-   .lp-hero-title {
-     font-family: var(--ff-title);
-     font-size: clamp(3rem, 6vw, 6rem);
-     font-weight: 900;
-     line-height: 1.1;
-     color: var(--color-primary);
-     margin-bottom: 24px;
-     letter-spacing: -2px;
-     z-index: 1;
-   }
-   
-   .lp-hero-title span {
-     color: var(--color-accent);
-   }
-   
-   .lp-hero-sub {
-     font-size: 1.1rem;
-     color: var(--color-text-muted);
-     max-width: 400px;
-     line-height: 1.6;
-     margin-bottom: 40px;
-     z-index: 1;
-   }
-   
-   .lp-hero-img-side {
-     position: relative;
-     height: 100%;
      width: 100%;
+     height: 80vh;
+     min-height: 600px;
+     background: var(--color-bg-base);
+     display: flex;
+     align-items: center;
+     justify-content: center;
      overflow: hidden;
    }
    
+   .lp-hero-img-container {
+     position: absolute;
+     top: 0;
+     left: 0;
+     width: 100%;
+     height: 100%;
+     z-index: 1;
+   }
+
    .lp-hero-img {
      width: 100%;
      height: 100%;
      object-fit: cover;
-     object-position: center top;
+     object-position: center 20%;
+   }
+
+   /* Opcional: Oscurecer la imagen un poco para que el texto resalte */
+   .lp-hero-overlay {
+     position: absolute;
+     top: 0;
+     left: 0;
+     width: 100%;
+     height: 100%;
+     background: rgba(0, 0, 0, 0.25);
+     z-index: 2;
    }
    
-   /* Floating Detail on Image */
-   .lp-hero-floating-detail {
-     position: absolute;
-     bottom: 40px;
-     left: -40px;
-     background: rgba(255, 255, 255, 0.95);
-     padding: 20px 30px;
+   .lp-hero-content {
+     position: relative;
+     z-index: 3;
+     text-align: center;
+     color: #fff;
+     max-width: 800px;
+     padding: 0 20px;
+   }
+
+   .lp-hero-title {
+     font-family: var(--ff-title);
+     font-size: clamp(2rem, 5vw, 4rem);
+     font-weight: 400;
+     line-height: 1.2;
+     margin-bottom: 30px;
+     letter-spacing: 6px;
+     text-transform: uppercase;
+     text-shadow: 0 4px 12px rgba(0,0,0,0.3);
+   }
+
+   .lp-hero-sub {
+     font-family: var(--ff-body);
+     font-size: 1rem;
+     letter-spacing: 3px;
+     margin-bottom: 40px;
+     text-transform: uppercase;
+     opacity: 0.9;
+   }
+   
+   .lp-btn-primary {
+     background: var(--color-primary);
+     border: 1px solid var(--color-primary);
+     color: #fff;
+     padding: 16px 40px;
+     font-family: var(--ff-body);
+     font-weight: 400;
+     font-size: 0.85rem;
+     letter-spacing: 2px;
+     cursor: pointer;
+     transition: all 0.4s ease;
+     text-transform: uppercase;
+   }
+   
+   .lp-btn-primary:hover {
+     background: var(--color-accent);
+     border-color: var(--color-accent);
+   }
+   
+   /* ── Banner Oscuro Acogedor (Subscribe-style) ── */
+   .lp-banner {
+     background: var(--color-primary);
+     color: #fff;
+     padding: 60px 20px;
+     text-align: center;
      display: flex;
      flex-direction: column;
-     box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-     border-left: 4px solid var(--color-accent);
+     align-items: center;
+     justify-content: center;
    }
    
-   .lp-hero-floating-detail strong {
+   .lp-banner-title {
      font-family: var(--ff-title);
-     font-size: 1.1rem;
-     color: var(--color-primary);
-   }
-   
-   .lp-hero-floating-detail span {
-     font-size: 0.85rem;
-     color: var(--color-text-muted);
+     font-weight: 400;
+     letter-spacing: 4px;
+     font-size: 1.8rem;
+     margin: 0 0 10px 0;
      text-transform: uppercase;
+   }
+
+   .lp-banner-text {
+     font-family: var(--ff-body);
+     font-weight: 300;
      letter-spacing: 1px;
-     margin-top: 4px;
-   }
-   
-   /* ── Banner Rotante ── */
-   .lp-banner {
-     background: var(--color-accent);
-     color: #fff;
-     padding: 16px 0;
-     overflow: hidden;
-     white-space: nowrap;
-     display: flex;
-   }
-   
-   .lp-banner p {
+     font-size: 0.9rem;
+     color: rgba(255,255,255,0.7);
      margin: 0;
-     font-family: var(--ff-title);
-     font-weight: 600;
-     letter-spacing: 2px;
-     font-size: 0.85rem;
-     text-transform: uppercase;
    }
    
    /* ── Catálogo Grid ── */
@@ -231,37 +240,37 @@
      padding: 100px 5%;
      max-width: 1400px;
      margin: 0 auto;
+     background: var(--color-bg-base);
    }
    
    .lp-section-title {
      text-align: center;
      font-family: var(--ff-title);
-     font-size: 3rem;
-     font-weight: 800;
-     letter-spacing: -1px;
+     font-size: 2.5rem;
+     font-weight: 400;
+     letter-spacing: 4px;
      margin-bottom: 60px;
      color: var(--color-primary);
+     text-transform: uppercase;
    }
    
    .lp-grid {
      display: grid;
      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-     gap: 40px;
+     gap: 50px 30px;
    }
    
    .lp-card {
-     background: #fff;
-     border-radius: 0; /* Bordes rectos */
+     background: transparent;
+     border-radius: 0;
      overflow: hidden;
      transition: transform 0.4s ease;
      display: flex;
      flex-direction: column;
-     border: 1px solid transparent;
    }
    
    .lp-card:hover {
-     transform: translateY(-5px);
-     border-color: var(--color-border);
+     transform: translateY(-8px);
    }
    
    .lp-card-img-wrap {
@@ -270,68 +279,66 @@
      overflow: hidden;
      background: var(--color-bg-alt);
      position: relative;
+     box-shadow: var(--shadow-sm);
    }
    
    .lp-card-img {
      width: 100%;
      height: 100%;
      object-fit: cover;
-     transition: transform 0.6s ease;
+     transition: transform 0.8s ease;
    }
    
    .lp-card:hover .lp-card-img {
-     transform: scale(1.03);
+     transform: scale(1.05);
    }
    
    .lp-card-info {
-     padding: 20px 0;
+     padding: 24px 0 0 0;
      display: flex;
      flex-direction: column;
-   }
-   
-   .lp-card-header {
-     display: flex;
-     justify-content: space-between;
-     align-items: flex-start;
-     margin-bottom: 8px;
+     text-align: center;
    }
    
    .lp-card-title {
      font-family: var(--ff-title);
      font-size: 1.1rem;
-     font-weight: 700;
+     font-weight: 400;
      color: var(--color-primary);
+     margin-bottom: 8px;
+     letter-spacing: 1px;
    }
    
    .lp-card-price {
      font-family: var(--ff-body);
-     font-weight: 600;
+     font-weight: 400;
      color: var(--color-accent);
-     font-size: 1.05rem;
+     font-size: 1rem;
+     letter-spacing: 1px;
    }
    
    /* ── Filters ── */
    .lp-filters {
      display: flex;
      justify-content: center;
-     gap: 24px;
-     margin-bottom: 60px;
+     gap: 30px;
+     margin-bottom: 80px;
      flex-wrap: wrap;
    }
    
    .lp-filter-btn {
      background: none;
      border: none;
-     border-bottom: 2px solid transparent;
-     padding: 8px 4px;
-     font-family: var(--ff-title);
-     font-size: 0.95rem;
-     font-weight: 600;
+     border-bottom: 1px solid transparent;
+     padding: 4px 0;
+     font-family: var(--ff-body);
+     font-size: 0.85rem;
+     font-weight: 400;
      cursor: pointer;
      transition: all 0.3s;
      color: var(--color-text-muted);
      text-transform: uppercase;
-     letter-spacing: 1px;
+     letter-spacing: 2px;
    }
    
    .lp-filter-btn:hover, .lp-filter-btn.active {
@@ -341,29 +348,28 @@
    
    /* ── Splash Quote ── */
    .lp-splash {
-     padding: 120px 20px;
+     padding: 140px 20px;
      text-align: center;
      background: var(--color-bg-alt);
-     border-top: 1px solid var(--color-border);
-     border-bottom: 1px solid var(--color-border);
    }
    
    .lp-splash-quote {
      font-family: var(--ff-title);
-     font-size: clamp(2rem, 4vw, 3.5rem);
-     font-weight: 800;
-     line-height: 1.2;
-     max-width: 900px;
+     font-size: clamp(1.8rem, 4vw, 2.5rem);
+     font-weight: 400;
+     font-style: italic;
+     line-height: 1.5;
+     max-width: 800px;
      margin: 0 auto 30px;
      color: var(--color-primary);
-     letter-spacing: -1px;
+     letter-spacing: 1px;
    }
    
    /* ── Animaciones Scroll ── */
    .fade-up-element {
      opacity: 0;
-     transform: translateY(40px);
-     transition: opacity 0.8s ease, transform 0.8s ease;
+     transform: translateY(30px);
+     transition: opacity 1s ease, transform 1s ease;
    }
    
    .fade-up-element.visible {
@@ -373,37 +379,27 @@
    
    /* ── Mobile adjustments ── */
    @media (max-width: 900px) {
-     .lp-hero {
-       grid-template-columns: 1fr;
-       height: auto;
-       padding-top: 80px;
+     .lp-nav {
+       flex-direction: row;
+       justify-content: space-between;
+       padding: 0 20px;
      }
-     
-     .lp-hero-text-side {
-       padding: 60px 5%;
-       text-align: center;
-       align-items: center;
-     }
-     
-     .lp-hero-sub {
-       margin-bottom: 20px;
-     }
-     
-     .lp-hero-img-side {
-       height: 60vh;
-     }
-     
-     .lp-hero-floating-detail {
-       left: 50%;
-       transform: translateX(-50%);
-       bottom: 20px;
-       width: 80%;
-       border-left: none;
-       border-bottom: 4px solid var(--color-accent);
-       text-align: center;
+
+     .lp-nav-top {
+       width: auto;
+       padding: 0;
      }
      
      .lp-nav-links { display: none; }
-     .lp-nav-actions .lp-btn-explore { display: none; }
      .lp-hamburger { display: flex; }
+
+     .lp-hero {
+       height: 70vh;
+       min-height: 500px;
+     }
+
+     .lp-hero-title {
+       font-size: 2rem;
+       letter-spacing: 4px;
+     }
    }

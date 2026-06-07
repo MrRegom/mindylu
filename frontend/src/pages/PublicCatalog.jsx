@@ -483,86 +483,81 @@ const PublicCatalog = () => {
   return (
     <div className="lp-root">
 
-      {/* ── Navbar Editorial ── */}
+      {/* ── Navbar Classic Boutique ── */}
       <div className="lp-nav-wrapper">
         <nav className="lp-nav">
-          <a className="lp-nav-brand" href="/">
-            {(config?.tienda_nombre || 'MindyLu').toLowerCase() === 'mindylu' ? (
-              <>Mindy<span className="pink">Lu</span></>
-            ) : (
-              config?.tienda_nombre || 'MindyLu'
-            )}
-          </a>
+          <div className="lp-nav-top">
+            {/* Left side empty or icons on mobile */}
+            <div style={{ flex: 1 }} className="mobile-hidden"></div>
+            
+            <a className="lp-nav-brand" href="/">
+              {config?.tienda_nombre || 'MINDYLU'}
+            </a>
+            
+            <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
+              <button className="lp-btn-icon" onClick={() => setCartOpen(true)} style={{ position: 'relative' }}>
+                <CartIcon size={22} />
+                {cart.length > 0 && (
+                  <span style={{ position: 'absolute', top: -5, right: -5, background: 'var(--color-accent)', color: 'white', fontSize: '9px', fontWeight: 'bold', width: '16px', height: '16px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {cart.length}
+                  </span>
+                )}
+              </button>
+              <button className="lp-hamburger" onClick={() => setMenuOpen(!menuOpen)} aria-label="Menú">
+                <span /><span /><span />
+              </button>
+            </div>
+          </div>
 
           <ul className="lp-nav-links">
-            <li><a onClick={() => scrollTo(catalogRef)}>Catálogo</a></li>
+            <li><a onClick={() => scrollTo(catalogRef)}>Colección</a></li>
             <li><a onClick={() => scrollTo(howtoRef)}>Nosotros</a></li>
             <li><a onClick={() => scrollTo(entregasRef)}>Despachos</a></li>
+            <li><a onClick={abrirWhatsAppGeneral}>Contacto</a></li>
           </ul>
-
-          <div className="lp-nav-actions">
-            <button className="lp-btn-explore" onClick={abrirWhatsAppGeneral}>
-              Catálogo Completo
-            </button>
-            <button className="lp-hamburger" onClick={() => setMenuOpen(!menuOpen)} aria-label="Menú">
-              <span /><span /><span />
-            </button>
-          </div>
         </nav>
       </div>
 
       {/* Menú mobile */}
       {menuOpen && (
         <div style={{
-          position: 'fixed', top: 70, left: 0, right: 0, bottom: 0,
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
           background: 'var(--color-bg-base)', zIndex: 999,
           display: 'flex', flexDirection: 'column', alignItems: 'center',
           justifyContent: 'center', gap: 32
         }}>
+          <button onClick={() => setMenuOpen(false)} style={{ position: 'absolute', top: 30, right: 30, background: 'none', border: 'none', fontSize: '2rem', cursor: 'pointer', color: 'var(--color-primary)' }}>&times;</button>
+          
+          <a className="lp-nav-brand" href="/" style={{ marginBottom: '20px' }}>
+            {config?.tienda_nombre || 'MINDYLU'}
+          </a>
+
           {[
-            ['Ver Catálogo', catalogRef],
-            ['Cómo Comprar', howtoRef],
-            ['Próximas Entregas', entregasRef],
+            ['Colección', catalogRef],
+            ['Nosotros', howtoRef],
+            ['Despachos', entregasRef],
           ].map(([label, ref]) => (
             <button key={label} onClick={() => { scrollTo(ref); setMenuOpen(false); }} style={{
               background: 'none', border: 'none', cursor: 'pointer',
-              fontFamily: "var(--ff-title)",
-              fontSize: '1.6rem', fontWeight: 800, color: 'var(--color-primary)'
+              fontFamily: "var(--ff-title)", textTransform: 'uppercase', letterSpacing: '2px',
+              fontSize: '1.2rem', fontWeight: 400, color: 'var(--color-primary)'
             }}>
               {label}
             </button>
           ))}
-          <button className="lp-btn-explore" style={{ marginTop: 16 }} onClick={abrirWhatsAppGeneral}>
-            Escribir por WhatsApp
+          <button onClick={abrirWhatsAppGeneral} style={{
+              background: 'none', border: 'none', cursor: 'pointer',
+              fontFamily: "var(--ff-title)", textTransform: 'uppercase', letterSpacing: '2px',
+              fontSize: '1.2rem', fontWeight: 400, color: 'var(--color-accent)', marginTop: '20px'
+            }}>
+            Contacto WhatsApp
           </button>
         </div>
       )}
 
-      {/* ── Hero Editorial Split ── */}
+      {/* ── Hero Edge-to-Edge ── */}
       <section className="lp-hero">
-        <div className="lp-hero-text-side fade-up-element">
-          <h1 className="lp-hero-title">
-            {config?.banner_titulo ? (
-              <div dangerouslySetInnerHTML={{ __html: config.banner_titulo.replace(/\n/g, '<br />') }} />
-            ) : (
-              <>Fashion<br /><span>collection.</span></>
-            )}
-          </h1>
-          <p className="lp-hero-sub">
-            {config?.banner_subtitulo ? (
-              config.banner_subtitulo.split('\n').map((line, i) => <span key={i}>{line}<br /></span>)
-            ) : (
-              <>Prendas exclusivas, elegantes y seleccionadas especialmente para ti.</>
-            )}
-          </p>
-          <div>
-            <button className="lp-btn-explore" onClick={() => scrollTo(catalogRef)}>
-              Ir al catálogo ↓
-            </button>
-          </div>
-        </div>
-        
-        <div className="lp-hero-img-side fade-up-element" style={{ animationDelay: '0.2s' }}>
+        <div className="lp-hero-img-container fade-up-element">
           <img 
             src={config?.banner_imagen ? (
               config.banner_imagen.startsWith('http') ? config.banner_imagen : `${API_BASE.replace('/api/v1', '')}${config.banner_imagen}`
@@ -576,29 +571,34 @@ const PublicCatalog = () => {
               e.target.parentElement.style.background = 'var(--color-accent-light)';
             }}
           />
-          <div className="lp-hero-floating-detail">
-            <strong>{config?.tienda_nombre || 'MindyLu'}</strong>
-            <span>Boutique Exclusiva</span>
-          </div>
+          <div className="lp-hero-overlay" />
+        </div>
+        
+        <div className="lp-hero-content fade-up-element" style={{ animationDelay: '0.3s' }}>
+          <h1 className="lp-hero-title">
+            {config?.banner_titulo ? (
+              <div dangerouslySetInnerHTML={{ __html: config.banner_titulo.replace(/\n/g, '<br />') }} />
+            ) : (
+              <>THE SIGNATURE COLLECTION</>
+            )}
+          </h1>
+          <button className="lp-btn-primary" onClick={() => scrollTo(catalogRef)}>
+            Shop Now
+          </button>
         </div>
       </section>
 
-      {/* ── Banner Rotante Sutil ── */}
+      {/* ── Banner Oscuro Elegante ── */}
       <div className="lp-banner">
-        <div className="lp-banner-track" style={{ animationDuration: `${config?.marquesina_velocidad || 25}s` }}>
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="lp-banner-item">
-              <span className="lp-banner-text">{config?.marquesina_texto || 'ENVÍOS A TODO CHILE • MODA FEMENINA PREMIUM'}</span>
-              <span className="lp-banner-dot" style={{ margin: '0 20px', display: 'inline-block' }}>•</span>
-            </div>
-          ))}
-        </div>
+        <h3 className="lp-banner-title">Conecta con Nosotras</h3>
+        <p className="lp-banner-text">{config?.marquesina_texto || 'Únete y mantente al día con nuestras últimas tendencias y colecciones exclusivas.'}</p>
+        <button onClick={abrirWhatsAppGeneral} style={{ marginTop: '20px', background: 'transparent', border: '1px solid rgba(255,255,255,0.5)', color: 'white', padding: '10px 30px', fontFamily: 'var(--ff-body)', letterSpacing: '2px', textTransform: 'uppercase', fontSize: '0.8rem', cursor: 'pointer' }}>Escríbenos</button>
       </div>
 
       {/* ── Catálogo ── */}
       <section className="lp-section fade-up-element" ref={catalogRef}>
         <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-          <h2 className="lp-section-title" style={{ margin: 0 }}>Catálogo</h2>
+          <h2 className="lp-section-title" style={{ margin: 0 }}>Colección</h2>
         </div>
 
         {/* Filtros por categoría */}
