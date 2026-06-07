@@ -57,7 +57,7 @@ const PublicCatalog = () => {
         
         <div className="mu-hero-1-img-wrap">
           {/* Imagen Hero (fallback temporal de placeholder) */}
-          <img src="https://images.unsplash.com/photo-1515372039744-b04b67362725?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Hero" />
+          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" alt="Hero" />
           
           <div className="mu-hero-1-overlay">
             <span className="script">new<br/>collection</span>
@@ -75,27 +75,29 @@ const PublicCatalog = () => {
         </div>
         
         <div className="mu-hero-1-bottom-img">
-          <img src="https://images.unsplash.com/photo-1550614000-4b95d4ebf04c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Detail" />
+          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" alt="Detail" />
         </div>
       </section>
 
       {/* ── Screen 2: Nueva Colección ── */}
       <section className="mu-hero-2">
-        <div className="brand-small">MINDY LU</div>
-        <h2>NUEVA<br/>COLECCIÓN</h2>
-        <span className="script-title">Verano '24</span>
-        <button className="btn-outline" onClick={abrirWhatsAppGeneral}>VER TODO</button>
+        <div className="mu-hero-2-text">
+          <div className="brand-small">MINDY LU</div>
+          <h2>NUEVA<br/>COLECCIÓN</h2>
+          <span className="script-title">Verano '24</span>
+          <button className="btn-outline" onClick={abrirWhatsAppGeneral}>VER TODO</button>
+        </div>
         
         <div className="mu-collage-wrap">
           <div className="mu-polaroid mu-polaroid-1">
             <div className="washi-tape pink" style={{top: '-10px', left: '20px', width: '60px'}}></div>
-            <img src="https://images.unsplash.com/photo-1618244972963-dbee1a7edc95?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Polaroid 1" />
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" alt="Polaroid 1" />
           </div>
           <div className="mu-polaroid mu-polaroid-2">
-            <img src="https://images.unsplash.com/photo-1588117260148-b47818741c74?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Polaroid 2" />
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" alt="Polaroid 2" />
           </div>
           <div className="mu-polaroid mu-polaroid-3">
-            <img src="https://images.unsplash.com/photo-1595777457583-95e059d581b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Polaroid 3" />
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" alt="Polaroid 3" />
           </div>
         </div>
         
@@ -112,7 +114,7 @@ const PublicCatalog = () => {
         <div className="mu-cat-list">
           {['VESTIDOS', 'TOPS', 'PANTALONES', 'ACCESORIOS', 'SETS'].map((cat, idx) => (
             <a href={`#`} key={idx} className="mu-cat-item">
-              <img src={`https://images.unsplash.com/photo-1512436991641-6745cdb1723f?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80&sig=${idx}`} alt={cat} />
+              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" alt={cat} />
               <span>{cat}<br/><small style={{fontSize:'0.5rem', opacity:0.8}}>VER MÁS →</small></span>
             </a>
           ))}
@@ -126,7 +128,7 @@ const PublicCatalog = () => {
         <div className="brand-small" style={{textAlign:'left', marginBottom:'10px'}}>MINDY LU</div>
         <h2>BEST<br/>SELLERS <HeartIcon /></h2>
         
-        <div className="mu-grid-2x2">
+        <div className="mu-grid-products">
           {bestSellers.map(p => {
             const imgUrl = p.foto_url || (p.imagenes && p.imagenes[0]?.imagen) || 'https://via.placeholder.com/300x400';
             return (
@@ -151,7 +153,7 @@ const PublicCatalog = () => {
       <section className="mu-actitud">
         <div className="mu-actitud-polaroid">
           <div className="washi-tape black" style={{top: '-15px', left: '50%', transform: 'translateX(-50%) rotate(-2deg)'}}></div>
-          <img src="https://images.unsplash.com/photo-1506525860718-e7c6530aab48?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Actitud" />
+          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" alt="Actitud" />
         </div>
         
         <div className="mu-actitud-text">
@@ -196,7 +198,7 @@ const PublicCatalog = () => {
         </div>
         
         <div className="mu-summer-img-wrap">
-          <img src="https://images.unsplash.com/photo-1513094735237-8f2714d57c13?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Summer Edit" />
+          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" alt="Summer Edit" />
           
           <div className="mu-summer-note">
             <div className="washi-tape pink" style={{top: '-15px', right: '-10px', transform: 'rotate(15deg)', width: '60px'}}></div>
