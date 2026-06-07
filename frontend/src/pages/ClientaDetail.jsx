@@ -123,10 +123,30 @@ const ClientaDetail = () => {
           Historial de Compras
         </h3>
         
-        <div className="empty-history glass">
-          <p>Aún no hay compras registradas para esta clienta.</p>
-          <span className="text-muted">El historial aparecerá aquí cuando activemos el módulo de entregas.</span>
-        </div>
+        {clienta.historial_compras && clienta.historial_compras.length > 0 ? (
+          <div className="history-list" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {clienta.historial_compras.map(pedido => (
+              <div key={pedido.id} className="history-item glass" style={{ padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <h4 style={{ margin: '0 0 4px 0' }}>Pedido #{pedido.id}</h4>
+                  <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>{pedido.fecha}</span>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontWeight: 'bold', color: 'var(--color-primary)', marginBottom: '4px' }}>
+                    ${pedido.total.toLocaleString('es-CL')}
+                  </div>
+                  <span className={`status-badge status-${pedido.estado}`} style={{ fontSize: '0.75rem', padding: '2px 8px', borderRadius: '12px', background: 'var(--color-bg-alt)' }}>
+                    {pedido.estado_display}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="empty-history glass">
+            <p>Aún no hay compras registradas para esta clienta.</p>
+          </div>
+        )}
       </div>
     </div>
   );

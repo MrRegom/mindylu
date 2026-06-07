@@ -90,3 +90,58 @@ class DashboardAPIView(APIView):
             'usuario_nombre': request.user.nombre or request.user.username,
             'usuario_avatar': request.user.avatar.url if request.user.avatar else None
         })
+
+class ReportesAvanzadosAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        tenant = request.user.tenant
+        mes_actual = timezone.now().month
+        anio_actual = timezone.now().year
+
+        # 1. Ingresos del Mes (Pagados + Entregados)
+        ingresos_mes = ItemPedido.objects.filter(
+            pedido__tenant=tenant,
+            pedido__fecha_pedido__year=anio_actual,
+            pedido__fecha_pedido__month=mes_actual,
+            pedido__estado__in=['pagado', 'entregado']
+        ).aggregate(total=Sum(F('cantidad') * F('precio_unitario')))['total'] or 0
+
+        # 2. Dinero "en la calle" (Apartados)
+        dinero_en_calle = ItemPedido.objects.filter(
+            pedido__tenant=tenant,
+            pedido__estado='apartado'
+        ).aggregate(total=Sum(F('cantidad') * F('precio_unitario')))['total'] or 0
+
+        # 3. Clientas VIP (Top 10 por monto gastado)
+        top_clientas = Clienta.objects.filter(
+            tenant=tenant,
+            pedidos__estado__in=['pagado', 'entregado', 'apartado']
+        ).annotate(
+            total_comprado=Sum(F('pedidos__items__cantidad') * F('pedidos__items__precio_unitario')),
+            total_pedidos=Count('pedidos', distinct=True)
+        ).filter(total_comprado__gt=0).order_by('-total_comprado')[:10]
+
+        top_clientas_data = [{
+            'id': c.id,
+            'nombre': c.nombre,
+            'telefono': c.telefono,
+            'total_comprado': c.total_comprado,
+            'total_pedidos': c.total_pedidos
+        } for c in top_clientas]
+
+        # 4. Top Categorias
+        top_categorias = ItemPedido.objects.filter(
+            pedido__tenant=tenant
+        ).values(
+            nombre_cat=F('variante__prenda__categoria__nombre')
+        ).annotate(
+            total_vendido=Sum('cantidad')
+        ).order_by('-total_vendido')[:5]
+
+        return Response({
+            'ingresos_mes': ingresos_mes,
+            'dinero_en_calle': dinero_en_calle,
+            'top_clientas': top_clientas_data,
+            'top_categorias': list(top_categorias)
+        })

@@ -12,6 +12,7 @@ import ClientaForm from './pages/ClientaForm';
 import ClientaDetail from './pages/ClientaDetail';
 import Cuentas from './pages/Cuentas';
 import Ajustes from './pages/Ajustes';
+import Reportes from './pages/Reportes';
 import Logs from './pages/Logs';
 import Sincronizacion from './pages/Sincronizacion';
 import LotesProgramados from './pages/LotesProgramados';
@@ -77,6 +78,7 @@ function App() {
           <Route path="clientas" element={<Clientas />} />
           <Route path="cuentas" element={<Cuentas />} />
           <Route path="ajustes" element={<Ajustes />} />
+          <Route path="reportes" element={<Reportes />} />
           <Route path="ajustes/logs" element={<Logs />} />
           <Route path="perfil" element={<Perfil />} />
         </Route>
