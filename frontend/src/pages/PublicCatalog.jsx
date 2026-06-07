@@ -483,88 +483,122 @@ const PublicCatalog = () => {
   return (
     <div className="lp-root">
 
-      {/* ── Navbar Flotante ── */}
+      {/* ── Navbar Editorial ── */}
       <div className="lp-nav-wrapper">
         <nav className="lp-nav">
           <a className="lp-nav-brand" href="/">
-            {config?.tienda_nombre || 'MINDYLU'}
+            {(config?.tienda_nombre || 'MindyLu').toLowerCase() === 'mindylu' ? (
+              <>Mindy<span className="pink">Lu</span></>
+            ) : (
+              config?.tienda_nombre || 'MindyLu'
+            )}
           </a>
 
           <ul className="lp-nav-links">
-            <li><a onClick={() => scrollTo(catalogRef)}>Colección</a></li>
+            <li><a onClick={() => scrollTo(catalogRef)}>Catálogo</a></li>
             <li><a onClick={() => scrollTo(howtoRef)}>Nosotros</a></li>
             <li><a onClick={() => scrollTo(entregasRef)}>Despachos</a></li>
           </ul>
 
           <div className="lp-nav-actions">
             <button className="lp-btn-explore" onClick={abrirWhatsAppGeneral}>
-              EXPLORE
+              Catálogo Completo
+            </button>
+            <button className="lp-hamburger" onClick={() => setMenuOpen(!menuOpen)} aria-label="Menú">
+              <span /><span /><span />
             </button>
           </div>
         </nav>
       </div>
 
-      {/* ── Hero Glassmorphism ── */}
+      {/* Menú mobile */}
+      {menuOpen && (
+        <div style={{
+          position: 'fixed', top: 70, left: 0, right: 0, bottom: 0,
+          background: 'var(--color-bg-base)', zIndex: 999,
+          display: 'flex', flexDirection: 'column', alignItems: 'center',
+          justifyContent: 'center', gap: 32
+        }}>
+          {[
+            ['Ver Catálogo', catalogRef],
+            ['Cómo Comprar', howtoRef],
+            ['Próximas Entregas', entregasRef],
+          ].map(([label, ref]) => (
+            <button key={label} onClick={() => { scrollTo(ref); setMenuOpen(false); }} style={{
+              background: 'none', border: 'none', cursor: 'pointer',
+              fontFamily: "var(--ff-title)",
+              fontSize: '1.6rem', fontWeight: 800, color: 'var(--color-primary)'
+            }}>
+              {label}
+            </button>
+          ))}
+          <button className="lp-btn-explore" style={{ marginTop: 16 }} onClick={abrirWhatsAppGeneral}>
+            Escribir por WhatsApp
+          </button>
+        </div>
+      )}
+
+      {/* ── Hero Editorial Split ── */}
       <section className="lp-hero">
-        <div className="lp-hero-bg-text">
-          {config?.tienda_nombre || 'MINDYLU'}
+        <div className="lp-hero-text-side fade-up-element">
+          <h1 className="lp-hero-title">
+            {config?.banner_titulo ? (
+              <div dangerouslySetInnerHTML={{ __html: config.banner_titulo.replace(/\n/g, '<br />') }} />
+            ) : (
+              <>Fashion<br /><span>collection.</span></>
+            )}
+          </h1>
+          <p className="lp-hero-sub">
+            {config?.banner_subtitulo ? (
+              config.banner_subtitulo.split('\n').map((line, i) => <span key={i}>{line}<br /></span>)
+            ) : (
+              <>Prendas exclusivas, elegantes y seleccionadas especialmente para ti.</>
+            )}
+          </p>
+          <div>
+            <button className="lp-btn-explore" onClick={() => scrollTo(catalogRef)}>
+              Ir al catálogo ↓
+            </button>
+          </div>
         </div>
         
-        <div className="lp-hero-content-wrapper fade-up-element">
-          {/* Tarjetas Flotantes */}
-          <div className="glass-badge badge-1">
-            <span style={{ fontSize: '1.5rem' }}>✨</span>
-            <div>
-              <p style={{ fontSize: '0.7rem', opacity: 0.8, margin: 0, textTransform: 'uppercase' }}>Descubre la</p>
-              <p style={{ fontSize: '0.9rem', fontWeight: 600, margin: 0 }}>Nueva Colección</p>
-            </div>
-          </div>
-          
-          <div className="glass-badge badge-2">
-            <div>
-              <p style={{ fontSize: '0.9rem', fontWeight: 600, margin: 0 }}>Fashion That Breathes</p>
-              <p style={{ fontSize: '0.75rem', opacity: 0.8, margin: 0 }}>Prendas Exclusivas</p>
-            </div>
-          </div>
-
-          <div className="glass-badge badge-3">
-            <span style={{ fontSize: '1.2rem' }}>💖</span>
-            <div>
-              <p style={{ fontSize: '0.8rem', fontWeight: 600, margin: 0 }}>+1000 Clientas</p>
-              <p style={{ fontSize: '0.7rem', opacity: 0.8, margin: 0 }}>Satisfechas</p>
-            </div>
-          </div>
-
-          <div className="lp-hero-img-container">
-            <img 
-              src={config?.banner_imagen ? (
-                config.banner_imagen.startsWith('http') ? config.banner_imagen : `${API_BASE.replace('/api/v1', '')}${config.banner_imagen}`
-              ) : config?.tienda_avatar ? (
-                config.tienda_avatar.startsWith('http') ? config.tienda_avatar : `${API_BASE.replace('/api/v1', '')}${config.tienda_avatar}`
-              ) : "/images/hero.jpg"} 
-              alt={config?.banner_titulo || `${config?.tienda_nombre || 'MindyLu'} - Moda`} 
-              className="lp-hero-img" 
-              onError={(e) => {
-                e.target.style.display = 'none';
-                e.target.parentElement.innerHTML = '<div style="font-size: 8rem;">🌸</div>';
-              }}
-            />
+        <div className="lp-hero-img-side fade-up-element" style={{ animationDelay: '0.2s' }}>
+          <img 
+            src={config?.banner_imagen ? (
+              config.banner_imagen.startsWith('http') ? config.banner_imagen : `${API_BASE.replace('/api/v1', '')}${config.banner_imagen}`
+            ) : config?.tienda_avatar ? (
+              config.tienda_avatar.startsWith('http') ? config.tienda_avatar : `${API_BASE.replace('/api/v1', '')}${config.tienda_avatar}`
+            ) : "/images/hero.jpg"} 
+            alt={config?.banner_titulo || `${config?.tienda_nombre || 'MindyLu'} - Moda`} 
+            className="lp-hero-img" 
+            onError={(e) => {
+              e.target.style.display = 'none';
+              e.target.parentElement.style.background = 'var(--color-accent-light)';
+            }}
+          />
+          <div className="lp-hero-floating-detail">
+            <strong>{config?.tienda_nombre || 'MindyLu'}</strong>
+            <span>Boutique Exclusiva</span>
           </div>
         </div>
       </section>
 
       {/* ── Banner Rotante Sutil ── */}
-      <div style={{ padding: '20px 0', overflow: 'hidden', whiteSpace: 'nowrap', background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(5px)', borderTop: '1px solid rgba(255,255,255,0.3)', borderBottom: '1px solid rgba(255,255,255,0.3)' }}>
-        <p style={{ margin: 0, textAlign: 'center', fontFamily: 'var(--ff-title)', fontWeight: 300, letterSpacing: '4px', fontSize: '0.9rem' }}>
-          {config?.marquesina_texto || 'ENVÍOS A TODO CHILE • MODA FEMENINA PREMIUM • ATENCIÓN PERSONALIZADA'}
-        </p>
+      <div className="lp-banner">
+        <div className="lp-banner-track" style={{ animationDuration: `${config?.marquesina_velocidad || 25}s` }}>
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="lp-banner-item">
+              <span className="lp-banner-text">{config?.marquesina_texto || 'ENVÍOS A TODO CHILE • MODA FEMENINA PREMIUM'}</span>
+              <span className="lp-banner-dot" style={{ margin: '0 20px', display: 'inline-block' }}>•</span>
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* ── Nuevos Ingresos ── */}
+      {/* ── Catálogo ── */}
       <section className="lp-section fade-up-element" ref={catalogRef}>
         <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-          <p style={{ textTransform: 'uppercase', letterSpacing: '2px', fontSize: '0.8rem', color: '#64748b', marginBottom: '8px' }}>Colección Exclusiva</p>
-          <h2 className="lp-section-title" style={{ margin: 0 }}>The Glass Garden</h2>
+          <h2 className="lp-section-title" style={{ margin: 0 }}>Catálogo</h2>
         </div>
 
         {/* Filtros por categoría */}
@@ -602,12 +636,11 @@ const PublicCatalog = () => {
         )}
       </section>
 
-      {/* ── Quote central ── */}
-      <div className="lp-splash fade-up-element" style={{ padding: '100px 20px', textAlign: 'center', background: 'rgba(255,255,255,0.1)' }}>
-        <p style={{ fontFamily: 'var(--ff-title)', fontSize: '2rem', fontStyle: 'italic', maxWidth: '800px', margin: '0 auto 20px', color: '#0f172a' }}>
-          "Cada prenda tiene una historia. La tuya comienza aquí."
+      {/* ── Splash Editorial ── */}
+      <div className="lp-splash fade-up-element">
+        <p className="lp-splash-quote">
+          "La moda no es algo que existe solo en los vestidos. La moda está en el cielo, en la calle; la moda tiene que ver con ideas, con la forma en que vivimos."
         </p>
-        <p style={{ fontSize: '0.9rem', letterSpacing: '2px', textTransform: 'uppercase', color: '#64748b' }}>{config?.tienda_nombre || 'MindyLu'} · The Ethereal Collection</p>
       </div>
 
       {/* ── Cómo Comprar ── */}
