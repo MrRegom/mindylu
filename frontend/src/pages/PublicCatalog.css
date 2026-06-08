@@ -37,6 +37,29 @@ html, body {
   display: flex;
 }
 
+/* ── Marquee ── */
+.pk-marquee-bar {
+  width: 100%;
+  background: var(--pk-dark);
+  color: var(--pk-white);
+  padding: 8px 0;
+  overflow: hidden;
+  position: relative;
+  z-index: 101;
+}
+.pk-marquee-content {
+  display: inline-block;
+  white-space: nowrap;
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  font-weight: 500;
+  animation: marquee 25s linear infinite;
+}
+@keyframes marquee {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
 /* ── Navbar ── */
 .pk-navbar {
   display: flex;

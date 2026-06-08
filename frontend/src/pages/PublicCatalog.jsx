@@ -46,6 +46,20 @@ const PublicCatalog = () => {
     window.open(`https://wa.me/${num}?text=${encodeURIComponent(text)}`, '_blank');
   };
 
+  const getImageUrl = (path) => {
+    if (!path) return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E";
+    if (path.startsWith('http')) return path;
+    if (path.startsWith('data:')) return path;
+    
+    // Si no tiene host, asumimos que es relativo al origin de la ventana o a la URL base de la API
+    try {
+      const url = new URL(import.meta.env.VITE_API_URL);
+      return `${url.origin}${path.startsWith('/') ? '' : '/'}${path}`;
+    } catch (e) {
+      return path;
+    }
+  };
+
   const addToCart = (prenda) => {
     setCartItems([...cartItems, prenda]);
     setPrendaSeleccionada(null); // Close modal
@@ -76,6 +90,15 @@ const PublicCatalog = () => {
   return (
     <div className="pk-root">
       
+      {/* ── Marquee (Cinta Deslizante) ── */}
+      {config?.texto_marquesina && (
+        <div className="pk-marquee-bar">
+          <div className="pk-marquee-content" style={{ animationDuration: `${config.velocidad_marquesina || 25}s` }}>
+            {config.texto_marquesina} &nbsp; • &nbsp; {config.texto_marquesina} &nbsp; • &nbsp; {config.texto_marquesina}
+          </div>
+        </div>
+      )}
+
       {/* ── Navbar ── */}
       <nav className="pk-navbar">
         <div className="pk-nav-mobile-toggle" onClick={() => setMobileMenuOpen(true)}>
@@ -127,7 +150,7 @@ const PublicCatalog = () => {
       <section className="pk-hero">
         {config?.banner_imagen ? (
           <>
-            <img src={config.banner_imagen} alt="Mindy Lu Banner" className="pk-hero-bg" />
+            <img src={getImageUrl(config.banner_imagen)} alt="Mindy Lu Banner" className="pk-hero-bg" />
             <div className="pk-hero-overlay"></div>
           </>
         ) : (
@@ -243,7 +266,8 @@ const PublicCatalog = () => {
 
         <div className="pk-products-grid">
           {ultimasPrendas.map((p) => {
-            const imgUrl = p.foto_url || (p.imagenes && p.imagenes[0]?.imagen) || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E";
+            const rawUrl = p.foto_url || (p.imagenes && p.imagenes[0]?.imagen) || "";
+            const imgUrl = getImageUrl(rawUrl);
             return (
               <div key={p.id} className="pk-product-card" onClick={() => setPrendaSeleccionada(p)}>
                 <div className="pk-product-img-box">
@@ -296,7 +320,7 @@ const PublicCatalog = () => {
             <div className="pk-modal-grid">
               <div className="pk-modal-img">
                 <img 
-                  src={prendaSeleccionada.foto_url || (prendaSeleccionada.imagenes && prendaSeleccionada.imagenes[0]?.imagen) || ""} 
+                  src={getImageUrl(prendaSeleccionada.foto_url || (prendaSeleccionada.imagenes && prendaSeleccionada.imagenes[0]?.imagen) || "")} 
                   alt={prendaSeleccionada.nombre} 
                 />
               </div>
@@ -353,7 +377,8 @@ const PublicCatalog = () => {
               ) : (
                 <div className="pk-cart-items-list">
                   {cartItems.map((item, idx) => {
-                    const imgUrl = item.foto_url || (item.imagenes && item.imagenes[0]?.imagen) || "";
+                    const rawUrl = item.foto_url || (item.imagenes && item.imagenes[0]?.imagen) || "";
+                    const imgUrl = getImageUrl(rawUrl);
                     return (
                       <div key={idx} className="pk-cart-item">
                         <img src={imgUrl} alt={item.nombre} />
