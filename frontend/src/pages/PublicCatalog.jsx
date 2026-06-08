@@ -89,6 +89,29 @@ const PublicCatalog = () => {
     { name: "ACCESORIOS", img: "https://images.unsplash.com/photo-1584916201218-f4242ceb4809?auto=format&fit=crop&q=80&w=300" }
   ];
 
+  // Carousel Logic
+  const [currentSlide, setCurrentSlide] = useState(0);
+  
+  // Recopilar slides (banner + polaroids)
+  const slides = [];
+  if (config?.banner_imagen) slides.push(getImageUrl(config.banner_imagen));
+  if (config?.polaroid_1_imagen) slides.push(getImageUrl(config.polaroid_1_imagen));
+  if (config?.polaroid_2_imagen) slides.push(getImageUrl(config.polaroid_2_imagen));
+  if (config?.polaroid_3_imagen) slides.push(getImageUrl(config.polaroid_3_imagen));
+  // Si no hay ninguno, usar un placeholder
+  if (slides.length === 0) slides.push("https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&q=80&w=1200");
+
+  useEffect(() => {
+    if (slides.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentSlide(prev => (prev + 1) % slides.length);
+    }, 5000); // 5 segundos por slide
+    return () => clearInterval(interval);
+  }, [slides.length]);
+
+  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % slides.length);
+  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+
   return (
     <div className="pk2-root">
       {/* ── Marquee (Cinta Deslizante) ── */}
@@ -141,24 +164,23 @@ const PublicCatalog = () => {
       </div>
       {mobileMenuOpen && <div className="pk2-overlay" onClick={() => setMobileMenuOpen(false)}></div>}
 
-      {/* ── Hero Banner ── */}
-      <header className="pk2-hero">
-        {/* Background image is dynamic, circular mask is handled via CSS and HTML structure */}
-        <div className="pk2-hero-bg-container">
-          {config?.banner_imagen ? (
-            <img src={getImageUrl(config.banner_imagen)} alt="Banner" className="pk2-hero-img" />
-          ) : (
-            <div className="pk2-hero-placeholder"></div>
-          )}
-          <div className="pk2-hero-stamp">
-            <svg viewBox="0 0 100 100" className="pk2-stamp-text">
-               <path id="curve" d="M 50,50 m -40,0 a 40,40 0 1,1 80,0 a 40,40 0 1,1 -80,0" fill="none"/>
-               <text><textPath href="#curve" startOffset="0" fontSize="12" fill="#d16b7e" letterSpacing="2">PARA MUJERES REALES • QUE ROMPEN REGLAS • </textPath></text>
-            </svg>
-            <div className="pk2-stamp-ml">ML</div>
-          </div>
+      {/* ── Hero Carousel ── */}
+      <header className="pk2-hero-carousel">
+        
+        {/* Slides Container */}
+        <div className="pk2-carousel-slides">
+          {slides.map((slide, idx) => (
+            <div 
+              key={idx} 
+              className={`pk2-carousel-slide ${idx === currentSlide ? 'active' : ''}`}
+              style={{ backgroundImage: `url(${slide})` }}
+            >
+              <div className="pk2-hero-overlay"></div>
+            </div>
+          ))}
         </div>
 
+        {/* Text Content Overlay */}
         <div className="pk2-hero-content">
           <h1>{config?.banner_titulo || 'TU ESTILO.\nTU MOMENTO.'}</h1>
           <h2 className="pk2-hero-cursive">Tu Mindy Lu.</h2>
@@ -167,6 +189,21 @@ const PublicCatalog = () => {
             DESCUBRIR COLECCIÓN →
           </button>
         </div>
+
+        {/* Carousel Controls */}
+        {slides.length > 1 && (
+          <div className="pk2-carousel-controls">
+            <div className="pk2-carousel-dots">
+              {slides.map((_, idx) => (
+                <button 
+                  key={idx} 
+                  className={`pk2-dot ${idx === currentSlide ? 'active' : ''}`}
+                  onClick={() => setCurrentSlide(idx)}
+                ></button>
+              ))}
+            </div>
+          </div>
+        )}
       </header>
 
       {/* ── Feature Strip ── */}
