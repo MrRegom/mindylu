@@ -559,7 +559,13 @@ a {
     flex: 1;
   }
   .eb-logo {
+    flex: 2;
     text-align: center;
+    display: flex;
+    justify-content: center;
+  }
+  .eb-nav-icons {
+    flex: 1;
   }
   
   .eb-hero {
@@ -580,6 +586,11 @@ a {
   .eb-hero-image-wrap {
     height: 450px;
     width: 100%;
+  }
+  .eb-arch-bg {
+    width: 95%;
+    height: 100%;
+    border-radius: 48vw 48vw 0 0;
   }
   .eb-spinning-badge {
     width: 120px;
@@ -639,8 +650,10 @@ a {
     left: 0;
     width: 100%;
     z-index: 900;
-    background: var(--eb-pink-light);
-    box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
+    background: rgba(235, 212, 216, 0.95); /* var(--eb-pink-light) approx */
+    backdrop-filter: blur(10px);
+    box-shadow: 0 -10px 30px rgba(0,0,0,0.08);
+    border-top: 1px solid rgba(255,255,255,0.5);
   }
   .eb-bottom-btn {
     flex: 1;
