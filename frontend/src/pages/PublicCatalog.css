@@ -56,11 +56,14 @@ a {
   justify-content: space-between;
   align-items: center;
   padding: 15px 5%;
-  background: var(--pk-white);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   position: sticky;
   top: 0;
   z-index: 100;
-  border-bottom: 1px solid #F5EAEB;
+  border-bottom: 1px solid rgba(245, 234, 235, 0.5);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02);
 }
 .pk-nav-mobile-toggle {
   display: none;
@@ -71,7 +74,7 @@ a {
 /* Logo */
 .pk-logo-container {
   font-family: var(--font-serif);
-  font-size: 2.4rem;
+  font-size: 2.6rem;
   font-weight: 400;
   color: var(--pk-dark);
   display: flex;
@@ -80,8 +83,8 @@ a {
 }
 .pk-logo-script {
   font-family: var(--font-script);
-  color: var(--pk-pink-text);
-  font-size: 3rem;
+  color: var(--pk-pink-deep);
+  font-size: 3.4rem;
   margin-left: -6px;
   transform: translateY(4px);
 }
@@ -135,6 +138,7 @@ a {
   justify-content: center;
   align-items: center;
   border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(240, 158, 173, 0.4);
 }
 
 /* ── Hero Section ── */
@@ -156,13 +160,8 @@ a {
   object-position: center;
   z-index: 1;
 }
-.pk-hero-placeholder {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: #F8EDEF;
-  color: var(--pk-pink-deep);
-  font-size: 1rem;
+.pk-hero-gradient {
+  background: linear-gradient(135deg, #FFF0F3 0%, #F8C3CD 100%);
 }
 .pk-hero-overlay {
   position: absolute;
@@ -170,7 +169,7 @@ a {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.1) 100%);
+  background: linear-gradient(90deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.1) 100%);
   z-index: 2;
 }
 
@@ -343,6 +342,8 @@ a {
   aspect-ratio: 2/3.5;
   overflow: hidden;
   cursor: pointer;
+  border-radius: 6px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
 .pk-cat-card img {
   width: 100%;
@@ -410,6 +411,7 @@ a {
   margin-bottom: 20px;
   background: var(--pk-pink-bg);
   position: relative;
+  border-radius: 6px;
 }
 .pk-product-img-box img {
   width: 100%;

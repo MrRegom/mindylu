@@ -114,11 +114,13 @@ const PublicCatalog = () => {
       {/* ── Hero Section ── */}
       <section className="pk-hero">
         {config?.banner_imagen ? (
-          <img src={config.banner_imagen} alt="Mindy Lu Banner" className="pk-hero-bg" />
+          <>
+            <img src={config.banner_imagen} alt="Mindy Lu Banner" className="pk-hero-bg" />
+            <div className="pk-hero-overlay"></div>
+          </>
         ) : (
-          <div className="pk-hero-bg pk-hero-placeholder"></div>
+          <div className="pk-hero-bg pk-hero-gradient"></div>
         )}
-        <div className="pk-hero-overlay"></div>
 
         <div className="pk-hero-content">
           <div className="pk-hero-text">
