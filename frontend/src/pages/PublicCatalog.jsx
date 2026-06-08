@@ -1,69 +1,85 @@
 import React, { useEffect, useState } from 'react';
-import { Search, User, Heart, ShoppingBag, Menu, X, ArrowRight, Truck, Lock, CreditCard, RefreshCw, HeadphonesIcon } from 'lucide-react';
+import { Search, User, Heart, ShoppingBag, Menu, X, ArrowRight, Truck, Lock, CreditCard, RefreshCw, Plus } from 'lucide-react';
 import api from '../services/api';
 import './PublicCatalog.css';
 
 const PublicCatalog = () => {
   const [prendas, setPrendas] = useState([]);
   const [config, setConfig] = useState(null);
-  const [prendaSeleccionada, setPrendaSeleccionada] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [prendaSeleccionada, setPrendaSeleccionada] = useState(null);
+  
+  // Cart State
+  const [cartItems, setCartItems] = useState([]);
+  const [cartOpen, setCartOpen] = useState(false);
 
   useEffect(() => {
-    document.title = "Mindy Lu - Boutique Oficial";
-    fetchDatos();
+    fetchCatalogo();
+    fetchConfig();
   }, []);
 
-  const fetchDatos = async () => {
+  const fetchCatalogo = async () => {
     try {
-      const { data } = await api.get('/catalogo/publico/prendas/');
-      const items = data.results || data;
-      const activas = items.filter(p => p.estado !== 'VENDIDO');
-      setPrendas(activas.length > 0 ? activas : items);
-      
-      const confRes = await api.get('/core/configuracion/publico/');
-      setConfig(confRes.data);
-    } catch (error) {
-      console.error('Error:', error);
+      const res = await api.get('/catalogo/prendas/');
+      setPrendas(res.data.filter(p => p.estado !== 'oculta'));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const fetchConfig = async () => {
+    try {
+      const res = await api.get('/core/configuracion/');
+      setConfig(res.data);
+    } catch (err) {
+      console.error(err);
     }
   };
 
   const formatPrice = (price) => {
-    return '$' + parseInt(price || 0).toLocaleString('es-CL');
+    if (!price) return '$0';
+    return `$${Number(price).toLocaleString('es-CL')}`;
   };
 
-  const handleWhatsApp = (prenda = null) => {
-    const num = config?.telefono_whatsapp || '56912345678';
-    let text = "Hola, necesito ayuda con mi compra en Mindy Lu 💖";
-    if (prenda) {
-      text = `Hola! Me encantó la prenda: ${prenda.nombre} a ${formatPrice(prenda.precio)}. ¿Tienen disponibilidad? ✨`;
-    }
+  const handleWhatsApp = (text = 'Hola, necesito ayuda con la tienda') => {
+    const num = config?.whatsapp || '56912345678';
     window.open(`https://wa.me/${num}?text=${encodeURIComponent(text)}`, '_blank');
   };
 
-  // Remove fake categories, we will compute ultimasPrendas below.
+  const addToCart = (prenda) => {
+    setCartItems([...cartItems, prenda]);
+    setPrendaSeleccionada(null); // Close modal
+    setCartOpen(true); // Open cart sidebar
+  };
+
+  const removeFromCart = (index) => {
+    const newCart = [...cartItems];
+    newCart.splice(index, 1);
+    setCartItems(newCart);
+  };
+
+  const checkoutCart = () => {
+    if (cartItems.length === 0) return;
+    let text = 'Hola, quiero comprar los siguientes productos:\n\n';
+    cartItems.forEach((item, idx) => {
+      text += `${idx + 1}. ${item.nombre} - ${formatPrice(item.precio)}\n`;
+    });
+    const total = cartItems.reduce((acc, curr) => acc + Number(curr.precio || 0), 0);
+    text += `\nTotal estimado: ${formatPrice(total)}`;
+    handleWhatsApp(text);
+    setCartOpen(false);
+    setCartItems([]);
+  };
+
   const ultimasPrendas = prendas.slice(0, 4);
 
   return (
     <div className="pk-root">
       
-      {/* ── Top Announcement Bar ── */}
-      <div className="pk-top-bar">
-        <div className="pk-top-bar-item">
-          <Truck size={14} /> ENVÍO GRATIS EN COMPRAS SOBRE $40.000
-        </div>
-        <div className="pk-top-bar-item pk-hide-mobile">
-          <CreditCard size={14} /> 3 CUOTAS SIN INTERÉS
-        </div>
-        <div className="pk-top-bar-item pk-hide-mobile">
-          <RefreshCw size={14} /> CAMBIOS FÁCILES
-        </div>
-      </div>
-
       {/* ── Navbar ── */}
       <nav className="pk-navbar">
         <div className="pk-nav-mobile-toggle" onClick={() => setMobileMenuOpen(true)}>
-          <Menu size={24} strokeWidth={1} />
+          <Menu size={24} strokeWidth={1.5} />
         </div>
         
         {/* Logo Textual Elegante MindyLu */}
@@ -71,7 +87,7 @@ const PublicCatalog = () => {
           Mindy<span className="pk-logo-script">Lu</span>
         </div>
 
-        <ul className="pk-nav-links">
+        <ul className="pk-nav-links pk-hide-mobile">
           <li><a href="#">NUEVO</a></li>
           <li><a href="#catalogo">ROPA</a></li>
           <li><a href="#catalogo">BEST SELLERS</a></li>
@@ -80,12 +96,12 @@ const PublicCatalog = () => {
         </ul>
 
         <div className="pk-nav-icons">
-          <Search size={20} strokeWidth={1.2} className="pk-hide-mobile" />
-          <User size={20} strokeWidth={1.2} className="pk-hide-mobile" />
-          <Heart size={20} strokeWidth={1.2} className="pk-hide-mobile" />
-          <div className="pk-cart-icon">
-            <ShoppingBag size={20} strokeWidth={1.2} />
-            <span className="pk-cart-badge">2</span>
+          <Search size={22} strokeWidth={1.2} className="pk-hide-mobile" />
+          <User size={22} strokeWidth={1.2} className="pk-hide-mobile" />
+          <Heart size={22} strokeWidth={1.2} className="pk-hide-mobile" />
+          <div className="pk-cart-icon" onClick={() => setCartOpen(true)}>
+            <ShoppingBag size={22} strokeWidth={1.2} />
+            {cartItems.length > 0 && <span className="pk-cart-badge">{cartItems.length}</span>}
           </div>
         </div>
       </nav>
@@ -120,15 +136,14 @@ const PublicCatalog = () => {
 
         <div className="pk-hero-content pk-animate-fade-in">
           <div className="pk-hero-text">
-            <div className="pk-hero-subtitle">Nueva colección</div>
+            <div className="pk-hero-subtitle">N U E V A &nbsp;&nbsp;C O L E C C I Ó N</div>
             <h1 className="pk-hero-title">
-              EXPRESA<br/>
-              QUIÉN ERES,<br/>
-              <span className="pk-hero-title-script">sin decir</span><br/>
-              <span className="pk-hero-title-script">una palabra.</span>
+              Expresa<br/>
+              quién eres,<br/>
+              <span className="pk-hero-title-script">sin decir una palabra.</span>
             </h1>
-            <button className="pk-btn-primary" onClick={() => document.getElementById('catalogo').scrollIntoView({behavior:'smooth'})}>
-              DESCUBRIR COLECCIÓN <ArrowRight size={14} strokeWidth={1.5} style={{marginLeft: '10px'}} />
+            <button className="pk-btn-hero" onClick={() => document.getElementById('catalogo').scrollIntoView({behavior:'smooth'})}>
+              DESCUBRIR COLECCIÓN <Plus size={14} strokeWidth={2} style={{marginLeft: '10px'}} />
             </button>
           </div>
 
@@ -138,108 +153,110 @@ const PublicCatalog = () => {
                 <path id="curve" fill="transparent" d="M 50, 50 m -35, 0 a 35,35 0 1,1 70,0 a 35,35 0 1,1 -70,0" />
                 <text>
                   <textPath href="#curve" startOffset="0">
-                    PARA MUJERES REALES • QUE ROMPEN REGLAS •
+                    COLLECT MOMENTS, NOT THINGS •
                   </textPath>
                 </text>
               </svg>
-              <span className="pk-stamp-year">'24</span>
+              <span className="pk-stamp-face">☺</span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── Features Bar ── */}
-      <section className="pk-features-bar pk-animate-slide-up">
-        <div className="pk-feature">
-          <Truck size={24} strokeWidth={1} />
-          <div className="pk-feature-text">
-            <strong>ENVÍO GRATIS</strong>
-            <span>sobre $40.000</span>
+      {/* ── Circular Categories ── */}
+      <section className="pk-circular-categories pk-animate-slide-up">
+        <div className="pk-cats-wrapper">
+          <div className="pk-cat-circle-item">
+            <div className="pk-circle-icon"><img src="https://cdn-icons-png.flaticon.com/512/1785/1785255.png" alt="Vestidos" /></div>
+            <span>VESTIDOS</span>
+          </div>
+          <div className="pk-cat-circle-item">
+            <div className="pk-circle-icon"><img src="https://cdn-icons-png.flaticon.com/512/2806/2806085.png" alt="Tops" /></div>
+            <span>TOPS</span>
+          </div>
+          <div className="pk-cat-circle-item">
+            <div className="pk-circle-icon"><img src="https://cdn-icons-png.flaticon.com/512/2806/2806019.png" alt="Pantalones" /></div>
+            <span>PANTALONES</span>
+          </div>
+          <div className="pk-cat-circle-item">
+            <div className="pk-circle-icon"><img src="https://cdn-icons-png.flaticon.com/512/2806/2806041.png" alt="Sets" /></div>
+            <span>SETS</span>
+          </div>
+          <div className="pk-cat-circle-item pk-hide-mobile">
+            <div className="pk-circle-icon"><img src="https://cdn-icons-png.flaticon.com/512/2806/2806115.png" alt="Accesorios" /></div>
+            <span>ACCESORIOS</span>
           </div>
         </div>
-        <div className="pk-feature">
-          <Lock size={24} strokeWidth={1} />
-          <div className="pk-feature-text">
-            <strong>PAGO SEGURO</strong>
-            <span>100% protegido</span>
-          </div>
+        <div className="pk-cat-ver-todo pk-hide-mobile">
+          VER TODO <ArrowRight size={14} strokeWidth={1} style={{marginLeft: '6px'}}/>
         </div>
-        <div className="pk-feature">
-          <CreditCard size={24} strokeWidth={1} />
-          <div className="pk-feature-text">
-            <strong>3 CUOTAS</strong>
-            <span>sin interés</span>
+      </section>
+
+      {/* ── Features Bar (Soft Rounded Rectangle) ── */}
+      <section className="pk-features-container pk-animate-slide-up">
+        <div className="pk-features-bar-box">
+          <div className="pk-feature">
+            <Truck size={24} strokeWidth={1.2} />
+            <div className="pk-feature-text">
+              <strong>ENVÍO GRATIS</strong>
+              <span>En compras sobre $40.000</span>
+            </div>
           </div>
-        </div>
-        <div className="pk-feature pk-hide-mobile">
-          <RefreshCw size={24} strokeWidth={1} />
-          <div className="pk-feature-text">
-            <strong>CAMBIOS</strong>
-            <span>fáciles</span>
+          <div className="pk-feature">
+            <Lock size={24} strokeWidth={1.2} />
+            <div className="pk-feature-text">
+              <strong>PAGO SEGURO</strong>
+              <span>100% protegido</span>
+            </div>
           </div>
-        </div>
-        <div className="pk-feature pk-hide-mobile">
-          <HeadphonesIcon size={24} strokeWidth={1} />
-          <div className="pk-feature-text">
-            <strong>ATENCIÓN</strong>
-            <span>personalizada</span>
+          <div className="pk-feature pk-hide-mobile">
+            <CreditCard size={24} strokeWidth={1.2} />
+            <div className="pk-feature-text">
+              <strong>3 CUOTAS</strong>
+              <span>Sin interés</span>
+            </div>
+          </div>
+          <div className="pk-feature pk-hide-mobile">
+            <RefreshCw size={24} strokeWidth={1.2} />
+            <div className="pk-feature-text">
+              <strong>CAMBIOS FÁCILES</strong>
+              <span>En todos nuestros productos</span>
+            </div>
           </div>
         </div>
       </section>
 
       {/* ── Lo Nuevo Que Amarás (Latest Real Products) ── */}
-      <section className="pk-lo-nuevo pk-animate-slide-up">
-        <div className="pk-lo-nuevo-sidebar">
-          <span className="pk-new-in">NEW IN</span>
-          <h2>LO NUEVO<br/>QUE AMARÁS</h2>
-          <button className="pk-link-btn" onClick={() => document.getElementById('catalogo').scrollIntoView({behavior:'smooth'})}>
-            Ver todo <ArrowRight size={14} strokeWidth={1} style={{marginLeft: '6px'}}/>
-          </button>
+      <section id="catalogo" className="pk-lo-nuevo pk-animate-slide-up">
+        <div className="pk-lo-nuevo-header">
+          <div className="pk-lo-nuevo-titles">
+            <span className="pk-new-in">L O &nbsp;&nbsp;N U E V O</span>
+            <h2>Lo nuevo<br/>que amarás</h2>
+            <p className="pk-new-subtitle">PIEZAS ÚNICAS PARA<br/>TODA OCASIÓN</p>
+          </div>
+          <div className="pk-lo-nuevo-action pk-hide-mobile">
+            <button className="pk-link-btn" onClick={() => document.getElementById('catalogo').scrollIntoView({behavior:'smooth'})}>
+              VER TODO <ArrowRight size={14} strokeWidth={1} style={{marginLeft: '6px'}}/>
+            </button>
+          </div>
         </div>
 
-        <div className="pk-categories-grid">
+        <div className="pk-products-grid">
           {ultimasPrendas.map((p) => {
             const imgUrl = p.foto_url || (p.imagenes && p.imagenes[0]?.imagen) || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E";
             return (
-              <div key={p.id} className="pk-cat-card" onClick={() => setPrendaSeleccionada(p)}>
-                <img src={imgUrl} alt={p.nombre} />
-                <div className="pk-cat-card-overlay">
-                  <h3>{p.nombre.toUpperCase()}</h3>
-                  <span className="pk-cat-card-link">Ver detalle <ArrowRight size={12} strokeWidth={1} /></span>
+              <div key={p.id} className="pk-product-card" onClick={() => setPrendaSeleccionada(p)}>
+                <div className="pk-product-img-box">
+                  <img src={imgUrl} alt={p.nombre} />
+                  <button className="pk-heart-btn" onClick={(e) => { e.stopPropagation(); }}><Heart size={18} strokeWidth={1} /></button>
+                </div>
+                <div className="pk-product-info">
+                  <h3 className="pk-product-title">{p.nombre.toUpperCase()}</h3>
+                  <p className="pk-product-price">{formatPrice(p.precio)}</p>
                 </div>
               </div>
             );
           })}
-        </div>
-      </section>
-
-      {/* ── Catálogo Real (MindyLu Products) ── */}
-      <section id="catalogo" className="pk-real-products">
-        <div className="pk-section-title-center">
-          <span className="pk-new-in">CATÁLOGO</span>
-          <h2>NUESTRAS PRENDAS</h2>
-        </div>
-
-        <div className="pk-products-grid">
-          {prendas.length > 0 ? (
-            prendas.map((p, idx) => {
-              const imgUrl = p.foto_url || (p.imagenes && p.imagenes[0]?.imagen) || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E";
-              return (
-                <div key={p.id} className="pk-product-card" onClick={() => setPrendaSeleccionada(p)}>
-                  <div className="pk-product-img-box">
-                    <img src={imgUrl} alt={p.nombre} />
-                    <button className="pk-heart-btn" onClick={(e) => { e.stopPropagation(); }}><Heart size={18} strokeWidth={1} /></button>
-                  </div>
-                  <div className="pk-product-info">
-                    <h3 className="pk-product-title">{p.nombre.toUpperCase()}</h3>
-                    <p className="pk-product-price">{formatPrice(p.precio)}</p>
-                  </div>
-                </div>
-              );
-            })
-          ) : (
-            <div className="pk-empty-state">No hay prendas disponibles.</div>
-          )}
         </div>
       </section>
 
@@ -270,30 +287,11 @@ const PublicCatalog = () => {
         </div>
       </footer>
 
-      {/* ── Bottom Mobile Action Bar (Pink) ── */}
-      <div className="pk-bottom-mobile-bar">
-        <div className="pk-bottom-item">
-          <Truck size={20} strokeWidth={1.2}/>
-          <span>ENVÍOS</span>
-          <small>sobre $40.000</small>
-        </div>
-        <div className="pk-bottom-item">
-          <Lock size={20} strokeWidth={1.2}/>
-          <span>PAGO</span>
-          <small>seguro</small>
-        </div>
-        <div className="pk-bottom-item" onClick={() => handleWhatsApp()}>
-          <HeadphonesIcon size={20} strokeWidth={1.2}/>
-          <span>AYUDA</span>
-          <small>WhatsApp</small>
-        </div>
-      </div>
-
-      {/* ── Modal de Detalle (Organic style) ── */}
+      {/* ── Modal de Detalle (FIXED SIZE) ── */}
       {prendaSeleccionada && (
         <div className="pk-modal-overlay" onClick={(e) => { if(e.target === e.currentTarget) setPrendaSeleccionada(null) }}>
           <div className="pk-modal-content">
-            <button className="pk-modal-close" onClick={() => setPrendaSeleccionada(null)}><X size={24} strokeWidth={1}/></button>
+            <button className="pk-modal-close" onClick={() => setPrendaSeleccionada(null)}><X size={24} strokeWidth={1.5}/></button>
             
             <div className="pk-modal-grid">
               <div className="pk-modal-img">
@@ -326,13 +324,65 @@ const PublicCatalog = () => {
                   )}
                 </div>
 
-                <button className="pk-btn-primary pk-btn-full" onClick={() => handleWhatsApp(prendaSeleccionada)}>
-                  LO QUIERO 💖 <ArrowRight size={14} strokeWidth={1} style={{marginLeft: '10px'}} />
+                <button className="pk-btn-hero pk-btn-full" onClick={() => addToCart(prendaSeleccionada)}>
+                  AÑADIR AL CARRITO 🛍️
                 </button>
               </div>
             </div>
           </div>
         </div>
+      )}
+
+      {/* ── Cart Sidebar ── */}
+      {cartOpen && (
+        <>
+          <div className="pk-cart-overlay" onClick={() => setCartOpen(false)}></div>
+          <div className="pk-cart-sidebar">
+            <div className="pk-cart-header">
+              <h3>TU CARRITO</h3>
+              <X size={24} strokeWidth={1.5} onClick={() => setCartOpen(false)} style={{cursor: 'pointer'}} />
+            </div>
+            
+            <div className="pk-cart-body">
+              {cartItems.length === 0 ? (
+                <div className="pk-cart-empty">
+                  <ShoppingBag size={48} strokeWidth={1} />
+                  <p>Tu carrito está vacío</p>
+                  <button className="pk-btn-outline" onClick={() => setCartOpen(false)}>SEGUIR COMPRANDO</button>
+                </div>
+              ) : (
+                <div className="pk-cart-items-list">
+                  {cartItems.map((item, idx) => {
+                    const imgUrl = item.foto_url || (item.imagenes && item.imagenes[0]?.imagen) || "";
+                    return (
+                      <div key={idx} className="pk-cart-item">
+                        <img src={imgUrl} alt={item.nombre} />
+                        <div className="pk-cart-item-info">
+                          <h4>{item.nombre.toUpperCase()}</h4>
+                          <p>{formatPrice(item.precio)}</p>
+                        </div>
+                        <X size={18} strokeWidth={1.5} style={{cursor:'pointer', color:'#999'}} onClick={() => removeFromCart(idx)} />
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {cartItems.length > 0 && (
+              <div className="pk-cart-footer">
+                <div className="pk-cart-total">
+                  <span>Subtotal</span>
+                  <span>{formatPrice(cartItems.reduce((acc, curr) => acc + Number(curr.precio || 0), 0))}</span>
+                </div>
+                <p className="pk-cart-tax-note">Impuestos y envíos calculados al finalizar la compra.</p>
+                <button className="pk-btn-hero pk-btn-full" onClick={checkoutCart}>
+                  COMPRAR POR WHATSAPP 💖
+                </button>
+              </div>
+            )}
+          </div>
+        </>
       )}
 
     </div>
