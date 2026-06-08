@@ -116,9 +116,7 @@ const PublicCatalog = () => {
         {config?.banner_imagen ? (
           <img src={config.banner_imagen} alt="Mindy Lu Banner" className="pk-hero-bg" />
         ) : (
-          <div className="pk-hero-bg pk-hero-placeholder">
-            <span>Sube tu foto de portada en Ajustes &gt; Apariencia</span>
-          </div>
+          <div className="pk-hero-bg pk-hero-placeholder"></div>
         )}
         <div className="pk-hero-overlay"></div>
 
