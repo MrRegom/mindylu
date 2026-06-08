@@ -1,17 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { X } from 'lucide-react';
+import { Search, User, ShoppingBag, Menu, X, Heart } from 'lucide-react';
 import api from '../services/api';
 import './PublicCatalog.css';
-
-// Íconos SVG simples
-const LockIcon = () => <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>;
-const HeartIcon = () => <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2" fill="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>;
 
 const PublicCatalog = () => {
   const [prendas, setPrendas] = useState([]);
   const [config, setConfig] = useState(null);
   const [prendaSeleccionada, setPrendaSeleccionada] = useState(null);
-  
+  const [categoriaActiva, setCategoriaActiva] = useState('Todos');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   useEffect(() => {
     document.title = "Mindy Lu - Boutique";
     fetchDatos();
@@ -20,8 +18,7 @@ const PublicCatalog = () => {
   const fetchDatos = async () => {
     try {
       const { data } = await api.get('/catalogo/publico/prendas/');
-      const items = data.results || data; // Manejar paginación
-      // Asegurar que solo usamos prendas activas
+      const items = data.results || data;
       const activas = items.filter(p => p.estado !== 'VENDIDO');
       setPrendas(activas.length > 0 ? activas : items);
       
@@ -32,222 +29,217 @@ const PublicCatalog = () => {
     }
   };
 
-  const abrirWhatsAppGeneral = () => {
-    const num = config?.telefono_whatsapp || '56912345678';
-    window.open(`https://wa.me/${num}?text=Hola, quiero consultar sobre sus prendas.`, '_blank');
-  };
-
-  const getCategorias = () => [...new Set(prendas.map(p => p.categoria).filter(Boolean))];
-  const categorias = getCategorias();
-  
-  // Helpers para extraer imágenes de las prendas reales
   const getPrendaImg = (index) => {
     if (!prendas || !prendas[index]) return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E";
     const p = prendas[index];
     return p.foto_url || (p.imagenes && p.imagenes[0]?.imagen) || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E";
   };
 
-  // Best sellers: tomamos las 4 primeras
-  const bestSellers = prendas.slice(0, 4);
+  // Get unique categories for pills
+  const allCategorias = ['Todos', ...new Set(prendas.map(p => p.categoria).filter(Boolean))];
+
+  // Filter items
+  const prendasFiltradas = categoriaActiva === 'Todos' 
+    ? prendas 
+    : prendas.filter(p => p.categoria === categoriaActiva);
+
+  const formatPrice = (price) => {
+    return '$' + parseInt(price || 0).toLocaleString('es-CL');
+  };
+
+  const handleWhatsApp = (prenda) => {
+    const num = config?.telefono_whatsapp || '56912345678';
+    const text = `Hola, me interesa la prenda: ${prenda.nombre} a ${formatPrice(prenda.precio)}. ¿Tienen disponibilidad?`;
+    window.open(`https://wa.me/${num}?text=${encodeURIComponent(text)}`, '_blank');
+  };
 
   return (
-    <div className="mu-root">
-      
-      {/* ── Navbar ── */}
-      <nav className="mu-nav">
-        <div style={{width: '20px'}}></div> {/* Placeholder para centrar logo */}
-        <div className="mu-nav-logo">
-          <img src="/images/logomindylu.png" alt="Mindy Lu Logo" onError={(e) => e.target.style.display='none'} />
+    <div className="mc-root">
+      {/* ── Top Navbar ── */}
+      <nav className="mc-navbar">
+        <div className="mc-nav-mobile-toggle" onClick={() => setMobileMenuOpen(true)}>
+          <Menu size={24} />
         </div>
-        <div onClick={abrirWhatsAppGeneral} style={{cursor:'pointer'}}>
-          <LockIcon />
+        
+        <div className="mc-logo">
+          <img src="/images/logomindylu.png" alt="Mindy Lu" onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='block'; }} />
+          <span style={{display: 'none', fontFamily: '"Playfair Display", serif', fontSize: '1.8rem', fontStyle: 'italic', color: '#333'}}>Mindy Lu</span>
+        </div>
+
+        <ul className="mc-nav-links">
+          <li><a href="#">NUEVO</a></li>
+          <li><a href="#catalogo">ROPA</a></li>
+          <li><a href="#catalogo">BEST SELLERS</a></li>
+          <li><a href="#catalogo">ACCESORIOS</a></li>
+          <li><a href="#" className="mc-sale">SALE</a></li>
+        </ul>
+
+        <div className="mc-nav-icons">
+          <Search size={20} />
+          <User size={20} />
+          <div className="mc-cart-icon">
+            <ShoppingBag size={20} />
+            <span className="mc-cart-badge">0</span>
+          </div>
         </div>
       </nav>
 
-      {/* ── Screen 1: Hero ── */}
-      <section className="mu-hero-1">
-        <p className="subtitle">MODA QUE TE REPRESENTA.</p>
-        
-        <div className="mu-hero-1-img-wrap">
-          <img src={config?.banner_imagen || getPrendaImg(0)} alt="Hero" />
-          
-          <div className="mu-hero-1-overlay">
-            <span className="script">new<br/>collection</span>
+      {/* Mobile Menu Overlay */}
+      {mobileMenuOpen && (
+        <div className="mc-mobile-menu">
+          <div className="mc-mobile-menu-header">
+            <span className="mc-logo-text">Mindy Lu</span>
+            <X size={24} onClick={() => setMobileMenuOpen(false)} />
           </div>
-          
-          <div className="mu-hero-1-btn-wrap">
-            <button className="btn-primary" onClick={() => document.getElementById('catalogo-completo').scrollIntoView({behavior:'smooth'})}>DESCUBRIR</button>
-          </div>
+          <ul className="mc-mobile-links">
+            <li onClick={() => setMobileMenuOpen(false)}><a href="#">NUEVO</a></li>
+            <li onClick={() => setMobileMenuOpen(false)}><a href="#catalogo">ROPA</a></li>
+            <li onClick={() => setMobileMenuOpen(false)}><a href="#catalogo">BEST SELLERS</a></li>
+            <li onClick={() => setMobileMenuOpen(false)}><a href="#catalogo">ACCESORIOS</a></li>
+            <li onClick={() => setMobileMenuOpen(false)}><a href="#" className="mc-sale">SALE</a></li>
+          </ul>
+        </div>
+      )}
+
+      {/* ── Hero Section ── */}
+      <section className="mc-hero">
+        <div className="mc-hero-text">
+          <span className="mc-hero-subtitle">Catálogo</span>
+          <h1>MODA QUE<br/>TE REPRESENTA.</h1>
+          <p>Descubre las piezas que<br/>elevarán tu estilo esta temporada.</p>
+          <a href="#catalogo" className="mc-btn-dark">VER COLECCIÓN</a>
         </div>
         
-        <div className="mu-hero-1-pink-block">
-          <strong>PARA MUJERES<br/>REALES QUE<br/>ROMPEN REGLAS.</strong>
-          <span>→</span>
-          <div className="washi-tape pink" style={{top: '-10px', right: '30px', transform: 'rotate(5deg)'}}></div>
-        </div>
-        
-        <div className="mu-hero-1-bottom-img">
-          <img src={getPrendaImg(1)} alt="Detail" />
+        <div className="mc-hero-images">
+          <div className="mc-hero-img-tall">
+            <img src={config?.banner_imagen || getPrendaImg(0)} alt="Hero Main" />
+          </div>
+          <div className="mc-hero-img-stack">
+            <div className="mc-hero-img-small top">
+              <img src={config?.polaroid_1_imagen || getPrendaImg(1)} alt="Hero Secondary 1" />
+            </div>
+            <div className="mc-hero-img-small bottom">
+              <img src={config?.polaroid_2_imagen || getPrendaImg(2)} alt="Hero Secondary 2" />
+            </div>
+          </div>
+          <div className="mc-hero-badge">
+            <svg viewBox="0 0 100 100" width="100" height="100">
+              <path id="curve" fill="transparent" d="M 50,50 m -40,0 a 40,40 0 1,1 80,0 a 40,40 0 1,1 -80,0" />
+              <text fontSize="10.5" letterSpacing="2">
+                <textPath href="#curve">NUEVA COLECCIÓN '24 NUEVA COLECCIÓN '24</textPath>
+              </text>
+            </svg>
+          </div>
         </div>
       </section>
 
-      {/* ── Screen 2: Nueva Colección ── */}
-      <section className="mu-hero-2">
-        <div className="mu-hero-2-text">
-          <div className="brand-small">MINDY LU</div>
-          <h2>NUEVA<br/>COLECCIÓN</h2>
-          <span className="script-title">Verano '24</span>
-          <button className="btn-outline" onClick={() => document.getElementById('catalogo-completo').scrollIntoView({behavior:'smooth'})}>VER TODO</button>
-        </div>
-        
-        <div className="mu-collage-wrap">
-          <div className="mu-polaroid mu-polaroid-1">
-            <div className="washi-tape pink" style={{top: '-10px', left: '20px', width: '60px'}}></div>
-            <img src={config?.polaroid_1_imagen || getPrendaImg(2)} alt="Polaroid 1" />
-          </div>
-          <div className="mu-polaroid mu-polaroid-2">
-            <img src={config?.polaroid_2_imagen || getPrendaImg(3)} alt="Polaroid 2" />
-          </div>
-          <div className="mu-polaroid mu-polaroid-3">
-            <img src={config?.polaroid_3_imagen || getPrendaImg(4)} alt="Polaroid 3" />
+      {/* ── Categories Section ── */}
+      <section id="catalogo" className="mc-categories-section">
+        <div className="mc-cat-header">
+          <h2>TODAS LAS <span>CATEGORÍAS</span></h2>
+          <div className="mc-cat-line"></div>
+          <div className="mc-cat-pills">
+            {allCategorias.map((cat, idx) => (
+              <button 
+                key={idx} 
+                className={`mc-pill ${categoriaActiva === cat ? 'active' : ''}`}
+                onClick={() => setCategoriaActiva(cat)}
+              >
+                {cat.toUpperCase()}
+              </button>
+            ))}
           </div>
         </div>
         
-        <div className="mu-hero-2-footer script">
-          because you<br/>are art. <HeartIcon />
+        {/* Mobile Filter & Sort Headers */}
+        <div className="mc-mobile-filters">
+          <span><Search size={16}/> FILTRAR</span>
+          <span>ORDENAR <span style={{fontSize:'0.8rem'}}>▼</span></span>
         </div>
       </section>
 
-      {/* ── Screen 3: Categorías ── */}
-      <section className="mu-categories">
-        <div className="brand-small" style={{textAlign:'left', marginBottom:'10px'}}>MINDY LU</div>
-        <h2>CATEGORÍAS</h2>
-        
-        <div className="mu-cat-list">
-          {categorias.length > 0 ? categorias.map((cat, idx) => {
-            // Buscar la primera prenda de esta categoría para usarla de fondo
-            const pCat = prendas.find(p => p.categoria === cat);
-            const bgImg = pCat ? (pCat.foto_url || (pCat.imagenes && pCat.imagenes[0]?.imagen)) : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E";
-            return (
-              <a href={`#catalogo-completo`} key={idx} className="mu-cat-item">
-                <img src={bgImg} alt={cat} />
-                <span>{cat}<br/><small style={{fontSize:'0.5rem', opacity:0.8}}>VER MÁS →</small></span>
-              </a>
-            );
-          }) : (
-            <p style={{color: '#888', fontSize: '0.8rem'}}>No hay categorías aún.</p>
-          )}
-        </div>
-        <div style={{marginTop: '40px', textAlign: 'right'}}><HeartIcon /></div>
-        <div className="torn-edge-pink"></div>
-      </section>
-
-      {/* ── Screen 4: Best Sellers ── */}
-      <section className="mu-best-sellers">
-        <div className="brand-small" style={{textAlign:'left', marginBottom:'10px'}}>MINDY LU</div>
-        <h2>BEST<br/>SELLERS <HeartIcon /></h2>
-        
-        <div className="mu-grid-products">
-          {bestSellers.map(p => {
+      {/* ── Product Grid ── */}
+      <section className="mc-products-grid">
+        {prendasFiltradas.length > 0 ? (
+          prendasFiltradas.map(p => {
             const imgUrl = p.foto_url || (p.imagenes && p.imagenes[0]?.imagen) || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E";
             return (
-              <div key={p.id} className="mu-product-card" onClick={() => setPrendaSeleccionada(p)} style={{cursor: 'pointer'}}>
-                <img src={imgUrl} alt={p.nombre} className="mu-product-img" />
-                <div className="mu-product-title">{p.nombre}</div>
-                <div className="mu-product-price">${parseInt(p.precio||0).toLocaleString('es-CL')}</div>
+              <div key={p.id} className="mc-product-card" onClick={() => setPrendaSeleccionada(p)}>
+                <div className="mc-product-img-wrap">
+                  <img src={imgUrl} alt={p.nombre} />
+                  <button className="mc-like-btn"><Heart size={18} /></button>
+                </div>
+                <div className="mc-product-info">
+                  <h3>{p.nombre.toUpperCase()}</h3>
+                  <p>{formatPrice(p.precio)}</p>
+                </div>
               </div>
             );
-          })}
-        </div>
-        
-        <div style={{marginTop: '40px', textAlign: 'center'}} className="script" style={{fontSize: '2rem'}}>
-          you glow different <HeartIcon />
-        </div>
-        <div className="torn-edge-pink"></div>
+          })
+        ) : (
+          <div className="mc-empty-state">
+            <p>No hay prendas en esta categoría.</p>
+          </div>
+        )}
       </section>
 
-      {/* ── Screen 5: Catálogo Completo (NUEVO) ── */}
-      <section id="catalogo-completo" className="mu-best-sellers" style={{background: '#FDFBF7', padding: '60px 5% 100px 5%'}}>
-        <div className="brand-small" style={{textAlign:'left', marginBottom:'10px'}}>MINDY LU</div>
-        <h2 style={{fontSize: '1.5rem', marginBottom: '40px'}}>NUESTRO CATÁLOGO</h2>
-        
-        <div className="mu-grid-products">
-          {prendas.map(p => {
-            const imgUrl = p.foto_url || (p.imagenes && p.imagenes[0]?.imagen) || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E";
-            return (
-              <div key={p.id} className="mu-product-card" onClick={() => setPrendaSeleccionada(p)} style={{cursor: 'pointer'}}>
-                <img src={imgUrl} alt={p.nombre} className="mu-product-img" />
-                <div className="mu-product-title">{p.nombre}</div>
-                <div className="mu-product-price">${parseInt(p.precio||0).toLocaleString('es-CL')}</div>
-                <button className="btn-dark" style={{padding: '6px 12px', marginTop: '10px', fontSize: '0.6rem'}}>
-                  VER DETALLE
+      {/* Mobile Sticky Bottom Bar */}
+      <div className="mc-mobile-sticky-bar">
+        NUEVA COLECCIÓN VERANO '24 <span style={{marginLeft:'10px'}}>›</span>
+      </div>
+
+      {/* ── Modal de Detalle de Prenda ── */}
+      {prendaSeleccionada && (
+        <div className="mc-modal-overlay" onClick={(e) => { if(e.target === e.currentTarget) setPrendaSeleccionada(null) }}>
+          <div className="mc-modal-content">
+            <button className="mc-modal-close" onClick={() => setPrendaSeleccionada(null)}><X size={20} /></button>
+            
+            <div className="mc-modal-grid">
+              <div className="mc-modal-img-col">
+                <img 
+                  src={prendaSeleccionada.foto_url || (prendaSeleccionada.imagenes && prendaSeleccionada.imagenes[0]?.imagen) || ""} 
+                  alt={prendaSeleccionada.nombre} 
+                />
+              </div>
+              <div className="mc-modal-info-col">
+                <h2>{prendaSeleccionada.nombre.toUpperCase()}</h2>
+                <div style={{fontSize: '1.2rem', color: '#666', marginBottom: '15px'}}>{formatPrice(prendaSeleccionada.precio)}</div>
+                
+                <div className="mc-modal-variants">
+                  <h4>OPCIONES DISPONIBLES</h4>
+                  {prendaSeleccionada.variantes && prendaSeleccionada.variantes.length > 0 ? (
+                    <ul>
+                      {prendaSeleccionada.variantes.map(v => (
+                        <li key={v.id}>
+                          • {v.color || 'Único'} {v.talla ? `/ Talla ${v.talla}` : ''} 
+                          <span style={{fontSize:'0.85rem', color:'#888', marginLeft:'10px'}}>({v.cantidad} disp.)</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p style={{fontSize:'0.9rem', color:'#666'}}>Talla única / Color único (Consulta stock)</p>
+                  )}
+                </div>
+
+                <p className="mc-modal-desc">
+                  Esta es una prenda exclusiva de Mindy Lu. Renueva tu clóset con estilo y calidad. 
+                  Resérvala ahora mismo antes de que se agote enviándonos un mensaje directo.
+                </p>
+
+                <button className="mc-btn-dark" style={{width: '100%', marginTop: 'auto', padding: '15px'}} onClick={() => handleWhatsApp(prendaSeleccionada)}>
+                  ME INTERESA (WHATSAPP)
                 </button>
               </div>
-            );
-          })}
-        </div>
-        <div className="torn-edge-white" style={{backgroundSize: '100% 100%', backgroundImage: 'url("data:image/svg+xml;utf8,<svg viewBox=\\"0 0 1200 50\\" xmlns=\\"http://www.w3.org/2000/svg\\" preserveAspectRatio=\\"none\\"><path d=\\"M0,50 L0,25 C100,10 200,40 300,20 C400,0 500,30 600,15 C700,0 800,40 900,20 C1000,0 1100,30 1200,15 L1200,50 Z\\" fill=\\"%23EBAEB6\\" /></svg>")'}}></div>
-      </section>
-
-      {/* ── Screen 6: Actitud ── */}
-      <section className="mu-actitud">
-        <div className="mu-actitud-polaroid">
-          <div className="washi-tape black" style={{top: '-15px', left: '50%', transform: 'translateX(-50%) rotate(-2deg)'}}></div>
-          <img src={getPrendaImg(Math.min(5, prendas.length - 1))} alt="Actitud" />
-        </div>
-        
-        <div className="mu-actitud-text">
-          NO ES SOLO<br/>ROPA, ES TU
-          <span className="script">Actitud.</span>
-        </div>
-        <div style={{position: 'absolute', right: '40px', top: '60%'}}><HeartIcon /></div>
-        
-        <p className="mu-actitud-desc">
-          DISEÑOS EXCLUSIVOS<br/>PARA MUJERES QUE<br/>ELIGEN DESTACAR.
-        </p>
-        <div className="torn-edge-white"></div>
-      </section>
-
-      {/* ── Screen 7: Reseñas ── */}
-      <section className="mu-reviews">
-        <div className="brand-small">MINDY LU</div>
-        <h2>LO QUE DICEN <HeartIcon /><br/><span className="script">nuestras clientas</span></h2>
-        
-        <div className="mu-review-cards">
-          <div className="mu-review-card">
-            <p>La calidad es increíble y los diseños son demasiado lindos. ¡MindyLu se ha vuelto mi tienda favorita! 🤍</p>
-            <span>- Vale R.</span>
-          </div>
-          <div className="mu-review-card">
-            <p>Ropa que realmente te hace sentir segura y poderosa. 100% recomendada.</p>
-            <span>- Cami P.</span>
+            </div>
           </div>
         </div>
-        
-        <button className="btn-dark">VER MÁS RESEÑAS</button>
-        <div className="torn-edge-pink"></div>
-      </section>
+      )}
 
-      {/* ── Screen 8: Summer Edit ── */}
-      <section className="mu-summer">
-        <div className="brand-small" style={{marginBottom: '20px'}}>MINDY LU</div>
-        <div className="mu-summer-header">
-          <h2>SUMMER<br/>'24<br/>EDIT</h2>
-          <p>UN VERANO PARA<br/>EXPRESAR QUIÉN ERES.</p>
-          <button className="btn-dark" style={{marginTop: '15px'}} onClick={() => document.getElementById('catalogo-completo').scrollIntoView({behavior:'smooth'})}>VER EDITORIAL</button>
-        </div>
-        
-        <div className="mu-summer-img-wrap">
-          <img src={getPrendaImg(Math.min(6, prendas.length - 1))} alt="Summer Edit" />
-          
-          <div className="mu-summer-note">
-            <div className="washi-tape pink" style={{top: '-15px', right: '-10px', transform: 'rotate(15deg)', width: '60px'}}></div>
-            <span className="script">collect<br/>moments,<br/>not<br/>things. <HeartIcon /></span>
-          </div>
-        </div>
-      </section>
+    </div>
+  );
+};
 
-      {/* ── Footer ── */}
+export default PublicCatalog;
       <footer className="mu-footer">
         <div className="mu-footer-item">
           <svg viewBox="0 0 24 24"><path d="M1 3h15v13H1zM16 8h4l3 3v5h-7V8zM1 18h22M5 16v4M19 16v4" strokeWidth="2"/></svg>

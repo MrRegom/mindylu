@@ -1,771 +1,632 @@
-/* =============================================================
-   MindyLu — High-End Mockup Layout (Responsive)
-   ============================================================= */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap');
 
-   :root {
-     --color-bg-light: #FDFBF7;  /* Beige crema ultra suave */
-     --color-bg-pink: #EBAEB6;   /* Rosa deslavado del mockup */
-     --color-text-main: #1F1E1E;
-     --color-text-muted: #555555;
-     
-     --ff-title: 'Playfair Display', serif;
-     --ff-body: 'Montserrat', sans-serif;
-     --ff-script: 'Alex Brush', cursive;
-     
-     --radius-soft: 8px;
-   }
-   
-   body {
-     background-color: var(--color-bg-light); 
-     margin: 0;
-   }
-   
-   /* ── Contenedor Base ── */
-   .mu-root {
-     font-family: var(--ff-body);
-     color: var(--color-text-main);
-     max-width: 1400px; /* Expandido para Desktop */
-     margin: 0 auto;
-     background: var(--color-bg-light);
-     box-shadow: 0 0 50px rgba(0,0,0,0.05);
-     min-height: 100vh;
-     position: relative;
-     overflow-x: hidden;
-   }
-   
-   /* ── Tipografía Base ── */
-   h1, h2, h3, h4 {
-     font-family: var(--ff-title);
-     font-weight: 400;
-     margin: 0;
-   }
-   .script {
-     font-family: var(--ff-script);
-   }
-   .btn-primary {
-     background: var(--color-bg-pink);
-     color: #fff;
-     border: none;
-     padding: 12px 24px;
-     font-family: var(--ff-body);
-     font-size: 0.7rem;
-     letter-spacing: 2px;
-     cursor: pointer;
-     transition: 0.3s;
-   }
-   .btn-dark {
-     background: #111;
-     color: #fff;
-     border: none;
-     padding: 12px 24px;
-     font-family: var(--ff-body);
-     font-size: 0.7rem;
-     letter-spacing: 2px;
-     cursor: pointer;
-   }
-   .btn-outline {
-     background: transparent;
-     color: var(--color-text-main);
-     border: 1px solid #ccc;
-     padding: 10px 20px;
-     font-family: var(--ff-body);
-     font-size: 0.7rem;
-     letter-spacing: 2px;
-   }
-   
-   /* ── Navbar ── */
-   .mu-nav {
-     display: flex;
-     justify-content: space-between;
-     align-items: center;
-     padding: 20px 5%;
-     background: var(--color-bg-light);
-     position: sticky;
-     top: 0;
-     z-index: 1000;
-     border-bottom: 1px solid rgba(0,0,0,0.05);
-   }
-   .mu-nav-logo img {
-     height: 35px;
-     object-fit: contain;
-   }
-   
-   /* ── Hero 1 ── */
-   .mu-hero-1 {
-     text-align: center;
-     padding-bottom: 0;
-     padding-top: 10px;
-   }
-   .mu-hero-1 p.subtitle {
-     font-size: 0.65rem;
-     letter-spacing: 2px;
-     margin-bottom: 20px;
-   }
-   .mu-hero-1-img-wrap {
-     position: relative;
-     width: 85%;
-     max-width: 600px;
-     margin: 0 auto;
-     height: 550px;
-   }
-   .mu-hero-1-img-wrap img {
-     width: 100%;
-     height: 100%;
-     object-fit: cover;
-     background: #EAE6E1; /* Fallback gris suave */
-   }
-   .mu-hero-1-overlay {
-     position: absolute;
-     top: 60%;
-     left: 50%;
-     transform: translate(-50%, -50%);
-     width: 100%;
-     z-index: 2;
-   }
-   .mu-hero-1-overlay .script {
-     font-size: 4rem;
-     color: #fff;
-     text-shadow: 0 2px 10px rgba(0,0,0,0.2);
-     transform: rotate(-8deg);
-     display: inline-block;
-   }
-   .mu-hero-1-btn-wrap {
-     position: absolute;
-     bottom: -20px;
-     left: 20px;
-     z-index: 10; /* CORRECCIÓN: Botón sobre la franja rosa */
-   }
-   
-   .mu-hero-1-pink-block {
-     background: var(--color-bg-pink);
-     padding: 60px 5% 40px 5%;
-     margin-top: 0px;
-     text-align: center; /* Centrado en Desktop */
-     color: var(--color-text-main);
-     font-size: 0.8rem;
-     letter-spacing: 1px;
-     position: relative;
-     z-index: 1; /* Debajo del botón */
-   }
-   .mu-hero-1-pink-block span {
-     display: block;
-     margin-top: 15px;
-   }
-   /* Washi tape decorativo */
-   .washi-tape {
-     position: absolute;
-     height: 25px;
-     width: 80px;
-     opacity: 0.85;
-     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-     z-index: 5;
-   }
-   .washi-tape.pink { background: #ECA3B0; }
-   .washi-tape.black { background: #222; }
-   
-   .mu-hero-1-bottom-img {
-     width: 85%;
-     max-width: 600px;
-     height: 150px;
-     margin: 0 auto;
-     margin-top: -20px;
-     position: relative;
-     z-index: 2;
-   }
-   .mu-hero-1-bottom-img img {
-     width: 100%;
-     height: 100%;
-     object-fit: cover;
-     background: #dcdcdc; /* Fallback */
-   }
-   
-   /* ── Hero 2: Nueva Colección Collage ── */
-   .mu-hero-2 {
-     padding: 80px 5%;
-     text-align: center;
-   }
-   .mu-hero-2 .brand-small {
-     font-size: 0.6rem;
-     letter-spacing: 3px;
-     color: var(--color-text-muted);
-   }
-   .mu-hero-2 h2 {
-     font-size: 2.2rem;
-     margin: 10px 0;
-   }
-   .mu-hero-2 .script-title {
-     font-size: 3.5rem;
-     color: var(--color-bg-pink);
-     margin-top: -15px;
-     margin-bottom: 20px;
-     display: block;
-   }
-   
-   .mu-collage-wrap {
-     position: relative;
-     height: 450px;
-     margin: 40px auto;
-     width: 100%;
-     max-width: 500px;
-   }
-   .mu-polaroid {
-     position: absolute;
-     background: #fff;
-     padding: 8px 8px 25px 8px;
-     box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-   }
-   .mu-polaroid img {
-     width: 100%;
-     height: 100%;
-     object-fit: cover;
-     background: #eee;
-   }
-   .mu-polaroid-1 { width: 45%; height: 50%; top: 0; left: 5%; transform: rotate(-4deg); z-index: 2; }
-   .mu-polaroid-2 { width: 40%; height: 45%; top: 10%; right: 5%; transform: rotate(6deg); z-index: 1; }
-   .mu-polaroid-3 { width: 45%; height: 50%; bottom: 0; left: 15%; transform: rotate(2deg); z-index: 3; }
-   
-   .mu-hero-2-footer {
-     font-size: 2.5rem;
-     color: var(--color-text-main);
-     margin-top: 20px;
-   }
-   
-   /* ── Categorías ── */
-   .mu-categories {
-     background: #F7F5F0;
-     padding: 80px 5% 100px 5%;
-     text-align: center;
-     position: relative;
-   }
-   .mu-categories h2 {
-     font-size: 2rem;
-     letter-spacing: 2px;
-     margin-bottom: 30px;
-   }
-   .mu-cat-list {
-     display: flex;
-     flex-direction: column;
-     gap: 15px;
-     max-width: 800px;
-     margin: 0 auto;
-   }
-   .mu-cat-item {
-     position: relative;
-     height: 120px;
-     width: 100%;
-     overflow: hidden;
-     display: flex;
-     align-items: center;
-     justify-content: flex-start;
-     padding-left: 5%;
-     text-decoration: none;
-     background: #333;
-   }
-   .mu-cat-item img {
-     position: absolute;
-     top: 0; left: 0; width: 100%; height: 100%;
-     object-fit: cover;
-     z-index: 1;
-   }
-   .mu-cat-item::after {
-     content: '';
-     position: absolute;
-     top: 0; left: 0; width: 100%; height: 100%;
-     background: rgba(0,0,0,0.5);
-     z-index: 2;
-     transition: background 0.3s;
-   }
-   .mu-cat-item:hover::after {
-     background: rgba(0,0,0,0.3);
-   }
-   .mu-cat-item span {
-     position: relative;
-     z-index: 3;
-     color: #fff;
-     font-family: var(--ff-body);
-     font-size: 1rem;
-     letter-spacing: 2px;
-     text-transform: uppercase;
-   }
-   
-   /* ── Torn Paper Edge (SVG Masks) ── */
-   .torn-edge-pink {
-     position: absolute;
-     bottom: -2px; 
-     left: 0;
-     width: 100%;
-     height: 40px;
-     background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1200 50" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"><path d="M0,50 L0,25 C100,10 200,40 300,20 C400,0 500,30 600,15 C700,0 800,40 900,20 C1000,0 1100,30 1200,15 L1200,50 Z" fill="%23EBAEB6" /></svg>');
-     background-size: 100% 100%;
-     z-index: 10;
-   }
-   .torn-edge-white {
-     position: absolute;
-     bottom: -2px;
-     left: 0;
-     width: 100%;
-     height: 40px;
-     background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1200 50" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"><path d="M0,50 L0,25 C100,10 200,40 300,20 C400,0 500,30 600,15 C700,0 800,40 900,20 C1000,0 1100,30 1200,15 L1200,50 Z" fill="%23FDFBF7" /></svg>');
-     background-size: 100% 100%;
-     z-index: 10;
-   }
+.mc-root {
+  font-family: 'Inter', sans-serif;
+  background-color: #F8F6F4;
+  color: #333;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
 
-   /* ── Best Sellers ── */
-   .mu-best-sellers {
-     background: var(--color-bg-light);
-     padding: 80px 5% 100px 5%;
-     text-align: center;
-     position: relative;
-   }
-   .mu-best-sellers h2 {
-     font-size: 2rem;
-     letter-spacing: 2px;
-     margin-bottom: 40px;
-   }
-   .mu-grid-products {
-     display: grid;
-     grid-template-columns: 1fr 1fr;
-     gap: 20px;
-     max-width: 1000px;
-     margin: 0 auto 40px auto;
-   }
-   .mu-product-card {
-     text-align: left;
-   }
-   .mu-product-img {
-     width: 100%;
-     aspect-ratio: 4/5;
-     object-fit: cover;
-     margin-bottom: 10px;
-     background: #eee;
-   }
-   .mu-product-title {
-     font-size: 0.7rem;
-     text-transform: uppercase;
-     letter-spacing: 1px;
-     margin-bottom: 4px;
-   }
-   .mu-product-price {
-     font-size: 0.75rem;
-     color: var(--color-text-muted);
-   }
-   
-   /* ── Actitud ── */
-   .mu-actitud {
-     background: var(--color-bg-pink);
-     padding: 100px 5% 120px 5%;
-     text-align: center;
-     position: relative;
-   }
-   .mu-actitud-polaroid {
-     background: #fff;
-     padding: 15px 15px 40px 15px;
-     width: 90%;
-     max-width: 500px;
-     margin: 0 auto;
-     box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-     position: relative;
-   }
-   .mu-actitud-polaroid img {
-     width: 100%;
-     aspect-ratio: 4/5;
-     object-fit: cover;
-     filter: grayscale(20%);
-     background: #eee;
-   }
-   .mu-actitud-text {
-     margin-top: 50px;
-     font-family: var(--ff-body);
-     font-size: 1.5rem;
-     letter-spacing: 2px;
-     color: var(--color-text-main);
-   }
-   .mu-actitud-text .script {
-     font-size: 5rem;
-     color: #fff;
-     display: block;
-     margin-top: 0px;
-     margin-bottom: 20px;
-   }
-   .mu-actitud-desc {
-     font-size: 0.8rem;
-     letter-spacing: 1px;
-     line-height: 1.6;
-     max-width: 500px;
-     margin: 0 auto;
-   }
-   
-   /* ── Reseñas ── */
-   .mu-reviews {
-     background: var(--color-bg-light);
-     padding: 80px 5% 100px 5%;
-     text-align: center;
-     position: relative;
-   }
-   .mu-reviews .brand-small {
-     font-size: 0.6rem;
-     letter-spacing: 3px;
-     color: var(--color-text-muted);
-     display: block;
-     margin-bottom: 20px;
-   }
-   .mu-reviews h2 {
-     font-size: 1.5rem;
-     letter-spacing: 1px;
-   }
-   .mu-reviews h2 .script {
-     font-size: 3rem;
-     color: var(--color-bg-pink);
-     display: block;
-   }
-   .mu-review-cards {
-     display: grid;
-     grid-template-columns: 1fr;
-     gap: 20px;
-     margin: 40px auto;
-     max-width: 800px;
-   }
-   .mu-review-card {
-     background: #fff;
-     padding: 40px 30px;
-     box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-     text-align: left;
-     position: relative;
-   }
-   .mu-review-card::before {
-     content: '“';
-     font-family: serif;
-     font-size: 4rem;
-     color: var(--color-bg-pink);
-     position: absolute;
-     top: 10px;
-     left: 20px;
-     line-height: 1;
-   }
-   .mu-review-card p {
-     font-size: 0.85rem;
-     line-height: 1.6;
-     margin-top: 20px;
-     color: var(--color-text-muted);
-   }
-   .mu-review-card span {
-     display: block;
-     margin-top: 15px;
-     font-size: 0.75rem;
-     font-weight: 600;
-   }
-   
-   /* ── Summer Edit ── */
-   .mu-summer {
-     padding: 80px 5% 0 5%;
-     background: var(--color-bg-light);
-   }
-   .mu-summer-header {
-     margin-bottom: 40px;
-     text-align: center;
-   }
-   .mu-summer-header h2 {
-     font-size: 3rem;
-     line-height: 1.1;
-     margin-bottom: 15px;
-   }
-   .mu-summer-header p {
-     font-size: 0.75rem;
-     letter-spacing: 1px;
-   }
-   
-   .mu-summer-img-wrap {
-     width: 100%;
-     max-width: 800px;
-     margin: 0 auto;
-     height: 400px;
-     position: relative;
-   }
-   .mu-summer-img-wrap img {
-     width: 100%;
-     height: 100%;
-     object-fit: cover;
-     background: #eee;
-   }
-   .mu-summer-note {
-     position: absolute;
-     top: 20px;
-     right: -20px;
-     background: #fff;
-     padding: 30px;
-     box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-     transform: rotate(3deg);
-     width: 200px;
-   }
-   .mu-summer-note .script {
-     font-size: 2.5rem;
-     line-height: 1.2;
-     text-align: center;
-     display: block;
-     color: var(--color-text-main);
-   }
+/* ── Typography & Globals ── */
+.mc-root h1, .mc-root h2, .mc-root h3, .mc-root h4 {
+  font-family: 'Playfair Display', serif;
+  font-weight: 400;
+  margin: 0;
+}
 
-   /* ── Footer ── */
-   .mu-footer {
-     background: #111;
-     color: #fff;
-     padding: 60px 5%;
-     display: grid;
-     grid-template-columns: 1fr 1fr;
-     gap: 40px 20px;
-     margin-top: 60px;
-   }
-   .mu-footer-item {
-     display: flex;
-     gap: 15px;
-     align-items: flex-start;
-   }
-   .mu-footer-item svg {
-     width: 24px;
-     height: 24px;
-     stroke: #fff;
-     fill: none;
-     flex-shrink: 0;
-   }
-   .mu-footer-item div {
-     display: flex;
-     flex-direction: column;
-   }
-   .mu-footer-item strong {
-     font-size: 0.7rem;
-     letter-spacing: 1px;
-     text-transform: uppercase;
-     margin-bottom: 6px;
-   }
-   .mu-footer-item span {
-     font-size: 0.65rem;
-     color: rgba(255,255,255,0.6);
-     line-height: 1.4;
-   }
+.mc-root a {
+  text-decoration: none;
+  color: inherit;
+}
 
-   /* =============================================================
-      MEDIA QUERIES (DESKTOP)
-      ============================================================= */
-   @media (min-width: 1024px) {
-     
-     .mu-hero-1-pink-block {
-       text-align: left;
-       padding: 60px 50px 40px 30%;
-       margin-top: -60px; /* Sube para solaparse elegantemente en desktop */
-     }
-     
-     .mu-hero-2 {
-       display: flex;
-       align-items: center;
-       justify-content: space-between;
-       text-align: left;
-       max-width: 1200px;
-       margin: 0 auto;
-     }
-     .mu-hero-2-text {
-       flex: 1;
-       padding-right: 50px;
-     }
-     .mu-collage-wrap {
-       flex: 1;
-       margin: 0;
-     }
-     
-     .mu-cat-list {
-       flex-direction: row;
-       justify-content: center;
-     }
-     .mu-cat-item {
-       flex: 1;
-       height: 300px;
-       flex-direction: column;
-       justify-content: center;
-       padding-left: 0;
-     }
-     
-     .mu-grid-products {
-       grid-template-columns: repeat(4, 1fr); /* 4 Columnas en PC */
-     }
-     
-     .mu-actitud {
-       display: flex;
-       align-items: center;
-       justify-content: center;
-       gap: 60px;
-       text-align: left;
-     }
-     .mu-actitud-polaroid {
-       margin: 0;
-       width: 400px;
-     }
-     .mu-actitud-text {
-       margin-top: 0;
-     }
-     .mu-actitud-text .script {
-       display: inline-block;
-       margin-left: 20px;
-     }
-     
-     .mu-review-cards {
-       grid-template-columns: 1fr 1fr; /* 2 Notas adhesivas lado a lado */
-     }
-     
-     .mu-summer {
-       display: flex;
-       align-items: center;
-       max-width: 1200px;
-       margin: 0 auto;
-     }
-     .mu-summer-header {
-       flex: 1;
-       text-align: left;
-       padding-right: 50px;
-     }
-     .mu-summer-img-wrap {
-       flex: 2;
-     }
-     
-     .mu-footer {
-       grid-template-columns: repeat(4, 1fr); /* 4 columnas lado a lado */
-     }
-   }
+/* ── Navbar ── */
+.mc-navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 5%;
+  background: transparent;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+  box-sizing: border-box;
+}
 
-/* ── Modal de Detalle de Prenda ── */
-.mu-modal-overlay {
+.mc-nav-mobile-toggle {
+  display: none;
+  cursor: pointer;
+}
+
+.mc-logo {
+  flex: 1;
+}
+
+.mc-logo img {
+  height: 40px;
+  object-fit: contain;
+}
+
+.mc-nav-links {
+  list-style: none;
+  display: flex;
+  gap: 30px;
+  margin: 0;
+  padding: 0;
+  flex: 2;
+  justify-content: center;
+}
+
+.mc-nav-links li a {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 1px;
+  color: #555;
+  transition: color 0.3s;
+}
+
+.mc-nav-links li a:hover {
+  color: #000;
+}
+
+.mc-sale {
+  color: #cda29c !important;
+}
+
+.mc-nav-icons {
+  display: flex;
+  gap: 20px;
+  flex: 1;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.mc-cart-icon {
+  position: relative;
+}
+
+.mc-cart-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: #d1a59f;
+  color: white;
+  font-size: 0.6rem;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+}
+
+/* Mobile Menu */
+.mc-mobile-menu {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.6);
+  background: white;
+  z-index: 999;
+  padding: 20px 5%;
+  box-sizing: border-box;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+.mc-mobile-menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 50px;
+}
+
+.mc-logo-text {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  font-style: italic;
+}
+
+.mc-mobile-links {
+  list-style: none;
+  padding: 0;
+}
+
+.mc-mobile-links li {
+  margin-bottom: 25px;
+}
+
+.mc-mobile-links li a {
+  font-size: 1.2rem;
+  letter-spacing: 2px;
+}
+
+/* ── Hero Section ── */
+.mc-hero {
+  display: flex;
+  align-items: center;
+  padding: 120px 5% 60px 5%;
+  min-height: 80vh;
+}
+
+.mc-hero-text {
+  flex: 1;
+  padding-right: 5%;
+}
+
+.mc-hero-subtitle {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 2rem;
+  color: #d1a59f;
+  display: block;
+  margin-bottom: -10px;
+}
+
+.mc-hero-text h1 {
+  font-size: 3.5rem;
+  line-height: 1.1;
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+}
+
+.mc-hero-text p {
+  color: #666;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 40px;
+}
+
+.mc-btn-dark {
+  display: inline-block;
+  background: #111;
+  color: #fff;
+  padding: 15px 35px;
+  font-size: 0.8rem;
+  letter-spacing: 2px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.mc-btn-dark:hover {
+  background: #333;
+}
+
+/* Hero Images Collage */
+.mc-hero-images {
+  flex: 1.2;
+  display: flex;
+  gap: 15px;
+  position: relative;
+}
+
+.mc-hero-img-tall {
+  flex: 1.2;
+  height: 600px;
+}
+
+.mc-hero-img-tall img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mc-hero-img-stack {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.mc-hero-img-small {
+  flex: 1;
+  height: calc(300px - 7.5px);
+}
+
+.mc-hero-img-small img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Rotating Badge */
+.mc-hero-badge {
+  position: absolute;
+  bottom: -40px;
+  right: -40px;
+  width: 150px;
+  height: 150px;
+  animation: spin 15s linear infinite;
+}
+
+.mc-hero-badge text {
+  fill: #333;
+  font-family: 'Inter', sans-serif;
+  text-transform: uppercase;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+/* ── Categories Section ── */
+.mc-categories-section {
+  padding: 60px 5% 40px 5%;
+  background: #e9e5de;
+}
+
+.mc-cat-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.mc-cat-header h2 {
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: 1rem;
+  letter-spacing: 2px;
+  white-space: nowrap;
+}
+
+.mc-cat-header h2 span {
+  color: #d1a59f;
+  font-style: italic;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  text-transform: capitalize;
+}
+
+.mc-cat-line {
+  flex: 1;
+  height: 1px;
+  background: #ccc;
+  margin-right: 20px;
+}
+
+.mc-cat-pills {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 5px;
+}
+
+.mc-cat-pills::-webkit-scrollbar {
+  display: none;
+}
+
+.mc-pill {
+  background: transparent;
+  border: 1px solid #ccc;
+  padding: 8px 24px;
+  border-radius: 30px;
+  font-size: 0.7rem;
+  letter-spacing: 1px;
+  color: #555;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.3s;
+}
+
+.mc-pill.active, .mc-pill:hover {
+  background: #111;
+  color: #fff;
+  border-color: #111;
+}
+
+.mc-mobile-filters {
+  display: none;
+}
+
+/* ── Product Grid ── */
+.mc-products-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 30px;
+  padding: 0 5% 80px 5%;
+  background: #e9e5de;
+}
+
+.mc-product-card {
+  cursor: pointer;
+}
+
+.mc-product-img-wrap {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  margin-bottom: 15px;
+}
+
+.mc-product-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s;
+}
+
+.mc-product-card:hover .mc-product-img-wrap img {
+  transform: scale(1.05);
+}
+
+.mc-like-btn {
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+  background: white;
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.mc-product-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.mc-product-info h3 {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 1px;
+  color: #333;
+}
+
+.mc-product-info p {
+  font-size: 0.75rem;
+  color: #666;
+  margin: 0;
+}
+
+.mc-empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px;
+  color: #666;
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 1.5rem;
+}
+
+.mc-mobile-sticky-bar {
+  display: none;
+}
+
+/* ── Modal de Detalle de Prenda ── */
+.mc-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(5px);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
   padding: 20px;
+  box-sizing: border-box;
 }
 
-.mu-modal-content {
-  background: #ffffff;
+.mc-modal-content {
+  background: #F8F6F4;
   width: 100%;
   max-width: 900px;
-  max-height: 90vh;
-  border-radius: 12px;
+  height: 80vh;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-  animation: modalFadeIn 0.3s ease-out forwards;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  animation: modalFade 0.3s ease-out;
 }
 
-@keyframes modalFadeIn {
+@keyframes modalFade {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-.mu-modal-close {
+.mc-modal-close {
   position: absolute;
   top: 15px;
   right: 15px;
-  background: #f0f0f0;
+  background: transparent;
   border: none;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   cursor: pointer;
   z-index: 10;
   color: #333;
-  transition: background 0.3s;
 }
 
-.mu-modal-close:hover {
-  background: #e0e0e0;
-}
-
-.mu-modal-grid {
+.mc-modal-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   height: 100%;
-  max-height: 90vh;
 }
 
-.mu-modal-img-col {
-  background: #f8f8f8;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  max-height: 90vh;
+.mc-modal-img-col {
+  background: #eee;
+  height: 100%;
 }
 
-.mu-modal-img-col img {
+.mc-modal-img-col img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.mu-modal-info-col {
-  padding: 40px;
+.mc-modal-info-col {
+  padding: 50px;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
 }
 
-.mu-modal-info-col h2 {
-  font-family: 'Playfair Display', serif;
-  font-size: 2rem;
-  color: #111;
-  margin-bottom: 5px;
-}
-
-.mu-modal-variants {
+.mc-modal-variants {
   margin: 20px 0;
-  padding: 15px;
-  background: #fdfbf7;
-  border: 1px solid #eee;
-  border-radius: 8px;
+  padding: 20px;
+  background: #fff;
+  border: 1px solid #eaeaea;
 }
 
-.mu-modal-variants h4 {
+.mc-modal-variants h4 {
   font-family: 'Inter', sans-serif;
-  font-size: 0.9rem;
-  text-transform: uppercase;
+  font-size: 0.7rem;
   letter-spacing: 1px;
   margin-bottom: 10px;
-  color: #666;
+  color: #999;
 }
 
-.mu-modal-variants ul {
+.mc-modal-variants ul {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-.mu-modal-variants li {
-  font-size: 1rem;
-  color: #333;
+.mc-modal-variants li {
+  font-size: 0.9rem;
   padding: 4px 0;
 }
 
-.mu-modal-desc {
-  font-size: 0.95rem;
+.mc-modal-desc {
+  font-size: 0.85rem;
   color: #666;
   line-height: 1.6;
   margin-bottom: 30px;
 }
 
+/* ── Responsive Mobile ── */
 @media (max-width: 768px) {
-  .mu-modal-grid {
+  .mc-navbar {
+    padding: 15px 5%;
+  }
+  
+  .mc-nav-links {
+    display: none;
+  }
+  
+  .mc-nav-mobile-toggle {
+    display: block;
+    flex: 1;
+  }
+  
+  .mc-logo {
+    text-align: center;
+  }
+  
+  .mc-hero {
+    flex-direction: column;
+    padding: 80px 5% 40px 5%;
+    text-align: center;
+  }
+  
+  .mc-hero-text {
+    padding-right: 0;
+    margin-bottom: 40px;
+  }
+  
+  .mc-hero-text h1 {
+    font-size: 2.5rem;
+  }
+  
+  .mc-hero-images {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .mc-hero-img-tall {
+    height: 400px;
+  }
+  
+  .mc-hero-img-stack {
+    flex-direction: row;
+  }
+  
+  .mc-hero-img-small {
+    height: 200px;
+  }
+  
+  .mc-hero-badge {
+    display: none; /* Hide spinning badge on mobile for cleaner look */
+  }
+  
+  .mc-categories-section {
+    padding: 30px 5%;
+    background: #F8F6F4;
+  }
+  
+  .mc-cat-header {
+    display: none; /* Hide pill buttons header on mobile, per mockup */
+  }
+  
+  .mc-mobile-filters {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    padding: 15px 0;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 20px;
+  }
+  
+  .mc-products-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    padding: 0 5% 80px 5%;
+    background: #F8F6F4;
+  }
+  
+  .mc-product-info {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .mc-product-info h3 {
+    margin-bottom: 5px;
+  }
+  
+  .mc-mobile-sticky-bar {
+    display: flex;
+    position: fixed;
+    bottom: 20px;
+    left: 5%;
+    width: 90%;
+    background: #e2b7b2;
+    color: white;
+    padding: 15px;
+    border-radius: 30px;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    z-index: 100;
+    box-shadow: 0 5px 15px rgba(226, 183, 178, 0.4);
+    box-sizing: border-box;
+  }
+  
+  .mc-modal-grid {
     grid-template-columns: 1fr;
     grid-template-rows: 40vh auto;
   }
-  .mu-modal-info-col {
+  
+  .mc-modal-info-col {
     padding: 20px;
-  }
-  .mu-modal-content {
-    max-height: 95vh;
   }
 }
