@@ -1,4 +1,4 @@
-﻿/* -- Diseño Moderno Admin: Catálogo -- */
+/* -- Diseño Moderno Admin: Catálogo -- */
 .catalogo-container {
   padding: 24px 20px 100px; /* Padding extra abajo para móviles */
   background-color: #f7f9fa;
@@ -36,16 +36,16 @@
   height: 48px;
   padding: 0;
   border-radius: 50%;
-  background: var(--color-primary);
+  background: #d16b7e;
   color: #fff;
   border: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(255,107,129,0.3);
+  box-shadow: 0 4px 12px rgba(209,107,126,0.3);
   transition: all 0.2s;
 }
-.btn-icon:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(255,107,129,0.4); }
+.btn-icon:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(209,107,126,0.4); }
 
 .prendas-grid {
   display: flex;
@@ -105,7 +105,7 @@
 }
 .precio {
   font-weight: 700;
-  color: var(--color-primary);
+  color: #1a1a1a;
   margin-bottom: 12px;
   font-size: 1.15rem;
 }
@@ -135,7 +135,7 @@
 .stock-num { color: #888; font-size: 0.75rem; font-weight: 600; }
 
 .btn-vender {
-  background-color: #10b981;
+  background-color: #d16b7e;
   color: white;
   border: none;
   width: 26px;

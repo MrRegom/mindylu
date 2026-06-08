@@ -41,12 +41,8 @@ const PublicCatalog = () => {
     window.open(`https://wa.me/${num}?text=${encodeURIComponent(text)}`, '_blank');
   };
 
-  const categoriasDestacadas = [
-    { nombre: 'VESTIDOS', img: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&q=80&w=600' },
-    { nombre: 'PANTALONES', img: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&q=80&w=600' },
-    { nombre: 'TOPS', img: 'https://images.unsplash.com/photo-1503341455253-b2e723bb3db8?auto=format&fit=crop&q=80&w=600' },
-    { nombre: 'SETS', img: 'https://images.unsplash.com/photo-1539008835657-9e8e9680c956?auto=format&fit=crop&q=80&w=600' }
-  ];
+  // Remove fake categories, we will compute ultimasPrendas below.
+  const ultimasPrendas = prendas.slice(0, 4);
 
   return (
     <div className="pk-root">
@@ -122,7 +118,7 @@ const PublicCatalog = () => {
           <div className="pk-hero-bg pk-hero-gradient"></div>
         )}
 
-        <div className="pk-hero-content">
+        <div className="pk-hero-content pk-animate-fade-in">
           <div className="pk-hero-text">
             <div className="pk-hero-subtitle">Nueva colección</div>
             <h1 className="pk-hero-title">
@@ -153,7 +149,7 @@ const PublicCatalog = () => {
       </section>
 
       {/* ── Features Bar ── */}
-      <section className="pk-features-bar">
+      <section className="pk-features-bar pk-animate-slide-up">
         <div className="pk-feature">
           <Truck size={24} strokeWidth={1} />
           <div className="pk-feature-text">
@@ -191,24 +187,29 @@ const PublicCatalog = () => {
         </div>
       </section>
 
-      {/* ── Lo Nuevo Que Amarás (Categories/Products) ── */}
-      <section className="pk-lo-nuevo">
+      {/* ── Lo Nuevo Que Amarás (Latest Real Products) ── */}
+      <section className="pk-lo-nuevo pk-animate-slide-up">
         <div className="pk-lo-nuevo-sidebar">
           <span className="pk-new-in">NEW IN</span>
           <h2>LO NUEVO<br/>QUE AMARÁS</h2>
-          <button className="pk-link-btn">Ver todo <ArrowRight size={14} strokeWidth={1} /></button>
+          <button className="pk-link-btn" onClick={() => document.getElementById('catalogo').scrollIntoView({behavior:'smooth'})}>
+            Ver todo <ArrowRight size={14} strokeWidth={1} style={{marginLeft: '6px'}}/>
+          </button>
         </div>
 
         <div className="pk-categories-grid">
-          {categoriasDestacadas.map((cat, idx) => (
-            <div key={idx} className="pk-cat-card" onClick={() => document.getElementById('catalogo').scrollIntoView({behavior:'smooth'})}>
-              <img src={cat.img} alt={cat.nombre} />
-              <div className="pk-cat-card-overlay">
-                <h3>{cat.nombre}</h3>
-                <span className="pk-cat-card-link">Ver todo <ArrowRight size={12} strokeWidth={1} /></span>
+          {ultimasPrendas.map((p) => {
+            const imgUrl = p.foto_url || (p.imagenes && p.imagenes[0]?.imagen) || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E";
+            return (
+              <div key={p.id} className="pk-cat-card" onClick={() => setPrendaSeleccionada(p)}>
+                <img src={imgUrl} alt={p.nombre} />
+                <div className="pk-cat-card-overlay">
+                  <h3>{p.nombre.toUpperCase()}</h3>
+                  <span className="pk-cat-card-link">Ver detalle <ArrowRight size={12} strokeWidth={1} /></span>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 

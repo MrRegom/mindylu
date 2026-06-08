@@ -316,9 +316,9 @@ const Catalogo = () => {
                           fontSize: '0.75rem',
                           padding: '2px 4px',
                           borderRadius: 4,
-                          border: '1px solid #ccc',
-                          background: prenda.estado === 'reservada' ? '#fef08a' : prenda.estado === 'vendida' ? '#fecaca' : '#dcfce7',
-                          color: '#374151'
+                          border: '1px solid ' + (prenda.estado === 'reservada' ? '#f8e3e7' : prenda.estado === 'vendida' ? '#eee' : '#bcf0c2'),
+                          background: prenda.estado === 'reservada' ? '#FDF5F6' : prenda.estado === 'vendida' ? '#f5f5f5' : '#eafceb',
+                          color: prenda.estado === 'reservada' ? '#d16b7e' : prenda.estado === 'vendida' ? '#999' : '#3d8f58'
                         }}
                       >
                         <option value="disponible">Disponible</option>

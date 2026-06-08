@@ -553,6 +553,10 @@ a {
   .pk-navbar {
     padding: 15px 5%;
   }
+  .pk-mobile-img-box {
+    height: 40vh;
+    flex: none;
+  }
   .pk-nav-mobile-toggle {
     display: block;
     flex: 1;
