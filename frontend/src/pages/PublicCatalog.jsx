@@ -1,69 +1,62 @@
-import React, { useEffect, useState } from 'react';
-import { Search, User, Heart, ShoppingBag, Menu, X, ArrowRight, Truck, Lock, CreditCard, RefreshCw, Plus } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 import api from '../services/api';
+import { 
+  ShoppingBag, X, Search, User, Heart, 
+  Truck, ShieldCheck, CreditCard, RefreshCcw, MessageCircle, Menu 
+} from 'lucide-react';
 import './PublicCatalog.css';
+
+const getImageUrl = (path) => {
+  if (!path) return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E";
+  if (path.startsWith('http')) return path;
+  if (path.startsWith('data:')) return path;
+  try {
+    const url = new URL(import.meta.env.VITE_API_URL);
+    return `${url.origin}${path.startsWith('/') ? '' : '/'}${path}`;
+  } catch (e) {
+    return path;
+  }
+};
+
+const formatPrice = (price) => {
+  if (!price) return '$0';
+  return `$${Number(price).toLocaleString('es-CL')}`;
+};
 
 const PublicCatalog = () => {
   const [prendas, setPrendas] = useState([]);
   const [config, setConfig] = useState(null);
+  const [cartOpen, setCartOpen] = useState(false);
+  const [cartItems, setCartItems] = useState([]);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [prendaSeleccionada, setPrendaSeleccionada] = useState(null);
-  
-  // Cart State
-  const [cartItems, setCartItems] = useState([]);
-  const [cartOpen, setCartOpen] = useState(false);
 
   useEffect(() => {
-    fetchCatalogo();
-    fetchConfig();
+    fetchData();
   }, []);
 
-  const fetchCatalogo = async () => {
+  const fetchData = async () => {
     try {
-      const res = await api.get('/catalogo/prendas/');
-      setPrendas(res.data.filter(p => p.estado !== 'oculta'));
-    } catch (err) {
-      console.error(err);
+      const [prendasRes, configRes] = await Promise.all([
+        api.get('/catalogo/prendas/'),
+        api.get('/core/configuracion/publico/')
+      ]);
+      setPrendas(prendasRes.data.results || prendasRes.data);
+      setConfig(configRes.data);
+    } catch (error) {
+      console.error('Error fetching data', error);
     }
   };
 
-  const fetchConfig = async () => {
-    try {
-      const res = await api.get('/core/configuracion/');
-      setConfig(res.data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const formatPrice = (price) => {
-    if (!price) return '$0';
-    return `$${Number(price).toLocaleString('es-CL')}`;
-  };
-
-  const handleWhatsApp = (text = 'Hola, necesito ayuda con la tienda') => {
-    const num = config?.whatsapp || '56912345678';
+  const handleWhatsApp = (text = 'Hola, necesito ayuda') => {
+    const num = config?.whatsapp_numero || '56912345678';
     window.open(`https://wa.me/${num}?text=${encodeURIComponent(text)}`, '_blank');
-  };
-
-  const getImageUrl = (path) => {
-    if (!path) return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E";
-    if (path.startsWith('http')) return path;
-    if (path.startsWith('data:')) return path;
-    
-    // Si no tiene host, asumimos que es relativo al origin de la ventana o a la URL base de la API
-    try {
-      const url = new URL(import.meta.env.VITE_API_URL);
-      return `${url.origin}${path.startsWith('/') ? '' : '/'}${path}`;
-    } catch (e) {
-      return path;
-    }
   };
 
   const addToCart = (prenda) => {
     setCartItems([...cartItems, prenda]);
-    setPrendaSeleccionada(null); // Close modal
-    setCartOpen(true); // Open cart sidebar
+    setPrendaSeleccionada(null);
+    setCartOpen(true);
   };
 
   const removeFromCart = (index) => {
@@ -85,272 +78,252 @@ const PublicCatalog = () => {
     setCartItems([]);
   };
 
-  const ultimasPrendas = prendas.slice(0, 4);
+  const ultimasPrendas = prendas.slice(0, 8);
+
+  // Fake categories for layout matching
+  const categoryBubbles = [
+    { name: "VESTIDOS", img: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&q=80&w=300" },
+    { name: "TOPS", img: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&q=80&w=300" },
+    { name: "PANTALONES", img: "https://images.unsplash.com/photo-1584370848010-d7fe6bc767ec?auto=format&fit=crop&q=80&w=300" },
+    { name: "SETS", img: "https://images.unsplash.com/photo-1515347619152-16a7fbc266cb?auto=format&fit=crop&q=80&w=300" },
+    { name: "ACCESORIOS", img: "https://images.unsplash.com/photo-1584916201218-f4242ceb4809?auto=format&fit=crop&q=80&w=300" }
+  ];
 
   return (
-    <div className="pk-root">
-      
+    <div className="pk2-root">
       {/* ── Marquee (Cinta Deslizante) ── */}
-      {config?.texto_marquesina && (
-        <div className="pk-marquee-bar">
-          <div className="pk-marquee-content" style={{ animationDuration: `${config.velocidad_marquesina || 25}s` }}>
-            {config.texto_marquesina} &nbsp; • &nbsp; {config.texto_marquesina} &nbsp; • &nbsp; {config.texto_marquesina}
+      {config?.marquesina_texto && (
+        <div className="pk2-marquee-bar">
+          <div className="pk2-marquee-content" style={{ animationDuration: `${config.marquesina_velocidad || 25}s` }}>
+            {config.marquesina_texto} &nbsp; • &nbsp; {config.marquesina_texto} &nbsp; • &nbsp; {config.marquesina_texto}
           </div>
         </div>
       )}
 
       {/* ── Navbar ── */}
-      <nav className="pk-navbar">
-        <div className="pk-nav-mobile-toggle" onClick={() => setMobileMenuOpen(true)}>
-          <Menu size={24} strokeWidth={1.5} />
-        </div>
-        
-        {/* Logo Textual Elegante MindyLu */}
-        <div className="pk-logo-container">
-          Mindy<span className="pk-logo-script">Lu</span>
+      <nav className="pk2-navbar">
+        <div className="pk2-nav-left">
+          <Menu size={24} className="pk2-mobile-menu-icon" onClick={() => setMobileMenuOpen(true)} />
+          <div className="pk2-logo">{config?.tienda_nombre || 'MindyLu'}<span>*</span></div>
         </div>
 
-        <ul className="pk-nav-links pk-hide-mobile">
-          <li><a href="#">NUEVO</a></li>
-          <li><a href="#catalogo">ROPA</a></li>
-          <li><a href="#catalogo">BEST SELLERS</a></li>
-          <li><a href="#catalogo">ACCESORIOS</a></li>
-          <li><a href="#" className="pk-sale-text">SALE</a></li>
-        </ul>
+        <div className="pk2-nav-center">
+          <a href="#">NUEVO</a>
+          <a href="#">ROPA</a>
+          <a href="#">BEST SELLERS</a>
+          <a href="#">ACCESORIOS</a>
+          <a href="#" className="text-sale">SALE</a>
+        </div>
 
-        <div className="pk-nav-icons">
-          <Search size={22} strokeWidth={1.2} className="pk-hide-mobile" />
-          <User size={22} strokeWidth={1.2} className="pk-hide-mobile" />
-          <Heart size={22} strokeWidth={1.2} className="pk-hide-mobile" />
-          <div className="pk-cart-icon" onClick={() => setCartOpen(true)}>
-            <ShoppingBag size={22} strokeWidth={1.2} />
-            {cartItems.length > 0 && <span className="pk-cart-badge">{cartItems.length}</span>}
-          </div>
+        <div className="pk2-nav-right">
+          <button className="pk2-icon-btn"><Search size={20} strokeWidth={1.5} /></button>
+          <button className="pk2-icon-btn pk2-hide-mobile"><User size={20} strokeWidth={1.5} /></button>
+          <button className="pk2-icon-btn pk2-hide-mobile"><Heart size={20} strokeWidth={1.5} /></button>
+          <button className="pk2-icon-btn pk2-cart-btn" onClick={() => setCartOpen(true)}>
+            <ShoppingBag size={20} strokeWidth={1.5} />
+            {cartItems.length > 0 && <span className="pk2-cart-badge">{cartItems.length}</span>}
+          </button>
         </div>
       </nav>
 
-      {/* Mobile Menu */}
-      {mobileMenuOpen && (
-        <div className="pk-mobile-menu">
-          <div className="pk-mobile-menu-header">
-            <div className="pk-logo-container">Mindy<span className="pk-logo-script">Lu</span></div>
-            <X size={28} strokeWidth={1} onClick={() => setMobileMenuOpen(false)} style={{ cursor: 'pointer' }} />
-          </div>
-          <ul className="pk-mobile-links">
-            <li onClick={() => setMobileMenuOpen(false)}><a href="#">NUEVO</a></li>
-            <li onClick={() => setMobileMenuOpen(false)}><a href="#catalogo">ROPA</a></li>
-            <li onClick={() => setMobileMenuOpen(false)}><a href="#catalogo">BEST SELLERS</a></li>
-            <li onClick={() => setMobileMenuOpen(false)}><a href="#catalogo">ACCESORIOS</a></li>
-            <li onClick={() => setMobileMenuOpen(false)}><a href="#" className="pk-sale-text">SALE</a></li>
-          </ul>
+      {/* ── Mobile Menu Sidebar ── */}
+      <div className={`pk2-mobile-sidebar ${mobileMenuOpen ? 'open' : ''}`}>
+        <div className="pk2-mobile-sidebar-close">
+          <button onClick={() => setMobileMenuOpen(false)}><X size={24} /></button>
         </div>
-      )}
+        <div className="pk2-mobile-links">
+          <a href="#">NUEVO</a>
+          <a href="#">ROPA</a>
+          <a href="#">BEST SELLERS</a>
+          <a href="#">ACCESORIOS</a>
+          <a href="#" className="text-sale">SALE</a>
+        </div>
+      </div>
+      {mobileMenuOpen && <div className="pk2-overlay" onClick={() => setMobileMenuOpen(false)}></div>}
 
-      {/* ── Hero Section ── */}
-      <section className="pk-hero">
-        {config?.banner_imagen ? (
-          <>
-            <img src={getImageUrl(config.banner_imagen)} alt="Mindy Lu Banner" className="pk-hero-bg" />
-            <div className="pk-hero-overlay"></div>
-          </>
-        ) : (
-          <div className="pk-hero-bg pk-hero-gradient"></div>
-        )}
-
-        <div className="pk-hero-content pk-animate-fade-in">
-          <div className="pk-hero-text">
-            <div className="pk-hero-subtitle">N U E V A &nbsp;&nbsp;C O L E C C I Ó N</div>
-            <h1 className="pk-hero-title">
-              Expresa<br/>
-              quién eres,<br/>
-              <span className="pk-hero-title-script">sin decir una palabra.</span>
-            </h1>
-            <button className="pk-btn-hero" onClick={() => document.getElementById('catalogo').scrollIntoView({behavior:'smooth'})}>
-              DESCUBRIR COLECCIÓN <Plus size={14} strokeWidth={2} style={{marginLeft: '10px'}} />
-            </button>
-          </div>
-
-          <div className="pk-hero-stamp pk-hide-mobile">
-            <div className="pk-stamp-circle">
-              <svg viewBox="0 0 100 100">
-                <path id="curve" fill="transparent" d="M 50, 50 m -35, 0 a 35,35 0 1,1 70,0 a 35,35 0 1,1 -70,0" />
-                <text>
-                  <textPath href="#curve" startOffset="0">
-                    COLLECT MOMENTS, NOT THINGS •
-                  </textPath>
-                </text>
-              </svg>
-              <span className="pk-stamp-face">☺</span>
-            </div>
+      {/* ── Hero Banner ── */}
+      <header className="pk2-hero">
+        {/* Background image is dynamic, circular mask is handled via CSS and HTML structure */}
+        <div className="pk2-hero-bg-container">
+          {config?.banner_imagen ? (
+            <img src={getImageUrl(config.banner_imagen)} alt="Banner" className="pk2-hero-img" />
+          ) : (
+            <div className="pk2-hero-placeholder"></div>
+          )}
+          <div className="pk2-hero-stamp">
+            <svg viewBox="0 0 100 100" className="pk2-stamp-text">
+               <path id="curve" d="M 50,50 m -40,0 a 40,40 0 1,1 80,0 a 40,40 0 1,1 -80,0" fill="none"/>
+               <text><textPath href="#curve" startOffset="0" fontSize="12" fill="#d16b7e" letterSpacing="2">PARA MUJERES REALES • QUE ROMPEN REGLAS • </textPath></text>
+            </svg>
+            <div className="pk2-stamp-ml">ML</div>
           </div>
         </div>
-      </section>
 
-      {/* ── Circular Categories ── */}
-      <section className="pk-circular-categories pk-animate-slide-up">
-        <div className="pk-cats-wrapper">
-          <div className="pk-cat-circle-item">
-            <div className="pk-circle-icon"><img src="https://cdn-icons-png.flaticon.com/512/1785/1785255.png" alt="Vestidos" /></div>
-            <span>VESTIDOS</span>
-          </div>
-          <div className="pk-cat-circle-item">
-            <div className="pk-circle-icon"><img src="https://cdn-icons-png.flaticon.com/512/2806/2806085.png" alt="Tops" /></div>
-            <span>TOPS</span>
-          </div>
-          <div className="pk-cat-circle-item">
-            <div className="pk-circle-icon"><img src="https://cdn-icons-png.flaticon.com/512/2806/2806019.png" alt="Pantalones" /></div>
-            <span>PANTALONES</span>
-          </div>
-          <div className="pk-cat-circle-item">
-            <div className="pk-circle-icon"><img src="https://cdn-icons-png.flaticon.com/512/2806/2806041.png" alt="Sets" /></div>
-            <span>SETS</span>
-          </div>
-          <div className="pk-cat-circle-item pk-hide-mobile">
-            <div className="pk-circle-icon"><img src="https://cdn-icons-png.flaticon.com/512/2806/2806115.png" alt="Accesorios" /></div>
-            <span>ACCESORIOS</span>
+        <div className="pk2-hero-content">
+          <h1>{config?.banner_titulo || 'TU ESTILO.\nTU MOMENTO.'}</h1>
+          <h2 className="pk2-hero-cursive">Tu Mindy Lu.</h2>
+          <p>{config?.banner_subtitulo || 'Piezas únicas para mujeres reales\nque inspiran todos los días.'}</p>
+          <button className="pk2-hero-btn" onClick={() => document.getElementById('lo-nuevo').scrollIntoView({behavior: 'smooth'})}>
+            DESCUBRIR COLECCIÓN →
+          </button>
+        </div>
+      </header>
+
+      {/* ── Feature Strip ── */}
+      <section className="pk2-features">
+        <div className="pk2-feature-item">
+          <Truck size={24} strokeWidth={1} />
+          <div>
+            <strong>ENVÍO GRATIS</strong>
+            <span>sobre $40.000</span>
           </div>
         </div>
-        <div className="pk-cat-ver-todo pk-hide-mobile">
-          VER TODO <ArrowRight size={14} strokeWidth={1} style={{marginLeft: '6px'}}/>
+        <div className="pk2-feature-item">
+          <ShieldCheck size={24} strokeWidth={1} />
+          <div>
+            <strong>PAGO SEGURO</strong>
+            <span>100% protegido</span>
+          </div>
         </div>
-      </section>
-
-      {/* ── Features Bar (Soft Rounded Rectangle) ── */}
-      <section className="pk-features-container pk-animate-slide-up">
-        <div className="pk-features-bar-box">
-          <div className="pk-feature">
-            <Truck size={24} strokeWidth={1.2} />
-            <div className="pk-feature-text">
-              <strong>ENVÍO GRATIS</strong>
-              <span>En compras sobre $40.000</span>
-            </div>
+        <div className="pk2-feature-item pk2-hide-mobile">
+          <CreditCard size={24} strokeWidth={1} />
+          <div>
+            <strong>3 CUOTAS</strong>
+            <span>sin interés</span>
           </div>
-          <div className="pk-feature">
-            <Lock size={24} strokeWidth={1.2} />
-            <div className="pk-feature-text">
-              <strong>PAGO SEGURO</strong>
-              <span>100% protegido</span>
-            </div>
+        </div>
+        <div className="pk2-feature-item pk2-hide-mobile">
+          <RefreshCcw size={24} strokeWidth={1} />
+          <div>
+            <strong>CAMBIOS FÁCILES</strong>
+            <span>en todos los productos</span>
           </div>
-          <div className="pk-feature pk-hide-mobile">
-            <CreditCard size={24} strokeWidth={1.2} />
-            <div className="pk-feature-text">
-              <strong>3 CUOTAS</strong>
-              <span>Sin interés</span>
-            </div>
-          </div>
-          <div className="pk-feature pk-hide-mobile">
-            <RefreshCw size={24} strokeWidth={1.2} />
-            <div className="pk-feature-text">
-              <strong>CAMBIOS FÁCILES</strong>
-              <span>En todos nuestros productos</span>
-            </div>
+        </div>
+        <div className="pk2-feature-item pk2-hide-mobile">
+          <MessageCircle size={24} strokeWidth={1} />
+          <div>
+            <strong>ATENCIÓN PERSONALIZADA</strong>
+            <span>escríbenos por WhatsApp</span>
           </div>
         </div>
       </section>
 
-      {/* ── Lo Nuevo Que Amarás (Latest Real Products) ── */}
-      <section id="catalogo" className="pk-lo-nuevo pk-animate-slide-up">
-        <div className="pk-lo-nuevo-header">
-          <div className="pk-lo-nuevo-titles">
-            <span className="pk-new-in">L O &nbsp;&nbsp;N U E V O</span>
-            <h2>Lo nuevo<br/>que amarás</h2>
-            <p className="pk-new-subtitle">PIEZAS ÚNICAS PARA<br/>TODA OCASIÓN</p>
-          </div>
-          <div className="pk-lo-nuevo-action pk-hide-mobile">
-            <button className="pk-link-btn" onClick={() => document.getElementById('catalogo').scrollIntoView({behavior:'smooth'})}>
-              VER TODO <ArrowRight size={14} strokeWidth={1} style={{marginLeft: '6px'}}/>
-            </button>
-          </div>
+      {/* ── Categories Strip ── */}
+      <section className="pk2-categories-strip">
+        <div className="pk2-section-header-inline">
+          <div className="pk2-subtitle">ELIGE TU FAVORITO</div>
+          <h3 className="pk2-title-main">Explora nuestras<br/><em>categorías</em></h3>
+          <a href="#" className="pk2-link">VER TODO →</a>
         </div>
-
-        <div className="pk-products-grid">
-          {ultimasPrendas.map((p) => {
-            const rawUrl = p.foto_url || (p.imagenes && p.imagenes[0]?.imagen) || "";
-            const imgUrl = getImageUrl(rawUrl);
-            return (
-              <div key={p.id} className="pk-product-card" onClick={() => setPrendaSeleccionada(p)}>
-                <div className="pk-product-img-box">
-                  <img src={imgUrl} alt={p.nombre} />
-                  <button className="pk-heart-btn" onClick={(e) => { e.stopPropagation(); }}><Heart size={18} strokeWidth={1} /></button>
-                </div>
-                <div className="pk-product-info">
-                  <h3 className="pk-product-title">{p.nombre.toUpperCase()}</h3>
-                  <p className="pk-product-price">{formatPrice(p.precio)}</p>
-                </div>
+        
+        <div className="pk2-categories-bubbles">
+          {categoryBubbles.map((cat, idx) => (
+            <div className="pk2-bubble-wrap" key={idx}>
+              <div className="pk2-bubble">
+                <img src={cat.img} alt={cat.name} />
               </div>
-            );
-          })}
+              <span className="pk2-bubble-name">{cat.name}</span>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* ── Footer ── */}
-      <footer className="pk-footer">
-        <div className="pk-footer-inner">
-          <div className="pk-footer-col">
-            <div className="pk-logo-container" style={{ fontSize: '2rem', marginBottom: '15px' }}>Mindy<span className="pk-logo-script">Lu</span></div>
-            <p style={{ color: '#666', fontSize: '0.85rem' }}>Expresa quién eres, sin decir una palabra. Tu boutique exclusiva para mujeres reales.</p>
+      {/* ── Recién Llegados ── */}
+      <section className="pk2-latest" id="lo-nuevo">
+        <div className="pk2-section-header">
+          <div>
+            <div className="pk2-subtitle">LO MÁS NUEVO</div>
+            <h3 className="pk2-title-main">Recién llegados</h3>
           </div>
-          <div className="pk-footer-col">
+          <a href="#" className="pk2-link">VER TODO →</a>
+        </div>
+
+        {prendas.length === 0 ? (
+          <div className="pk2-empty">Próximamente nueva colección...</div>
+        ) : (
+          <div className="pk2-grid">
+            {ultimasPrendas.map((p) => {
+              const rawUrl = p.foto_url || (p.imagenes && p.imagenes[0]?.imagen) || "";
+              const imgUrl = getImageUrl(rawUrl);
+              return (
+                <div key={p.id} className="pk2-card" onClick={() => setPrendaSeleccionada(p)}>
+                  <div className="pk2-card-img-wrapper">
+                    <img src={imgUrl} alt={p.nombre} />
+                    <button className="pk2-card-heart" onClick={(e) => { e.stopPropagation(); /* TODO fav */ }}>
+                      <Heart size={18} strokeWidth={1.5} />
+                    </button>
+                    {p.estado !== 'disponible' && (
+                      <div className={`pk2-badge pk2-badge-${p.estado}`}>
+                        {p.estado.toUpperCase()}
+                      </div>
+                    )}
+                  </div>
+                  <div className="pk2-card-info">
+                    <h4>{p.nombre}</h4>
+                    <span className="pk2-card-price">{formatPrice(p.precio)}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </section>
+
+      {/* ── Footer Estilo Revista ── */}
+      <footer className="pk2-footer">
+        <div className="pk2-footer-content">
+          <div className="pk2-footer-brand">
+            <div className="pk2-logo" style={{ fontSize: '2rem' }}>MindyLu<span>*</span></div>
+            <p>Expresa quién eres, sin decir una palabra. Tu boutique exclusiva para mujeres reales.</p>
+          </div>
+          <div className="pk2-footer-links">
             <h4>AYUDA</h4>
-            <ul>
-              <li>Cambios y Devoluciones</li>
-              <li>Envíos y Entregas</li>
-              <li>Términos y Condiciones</li>
-            </ul>
+            <a href="#">Cambios y Devoluciones</a>
+            <a href="#">Envíos y Entregas</a>
+            <a href="#">Términos y Condiciones</a>
           </div>
-          <div className="pk-footer-col">
+          <div className="pk2-footer-links">
             <h4>CONTACTO</h4>
-            <ul>
-              <li onClick={() => handleWhatsApp()} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                WhatsApp Soporte <ArrowRight size={12} strokeWidth={1}/>
-              </li>
-              <li>Instagram: @mindylu.cl</li>
-            </ul>
+            <a href="#" onClick={(e) => { e.preventDefault(); handleWhatsApp(); }}>WhatsApp Soporte →</a>
+            <a href="#">Instagram: @mindylu.cl</a>
           </div>
         </div>
       </footer>
 
-      {/* ── Modal de Detalle (FIXED SIZE) ── */}
+      {/* ── Product Modal ── */}
       {prendaSeleccionada && (
-        <div className="pk-modal-overlay" onClick={(e) => { if(e.target === e.currentTarget) setPrendaSeleccionada(null) }}>
-          <div className="pk-modal-content">
-            <button className="pk-modal-close" onClick={() => setPrendaSeleccionada(null)}><X size={24} strokeWidth={1.5}/></button>
-            
-            <div className="pk-modal-grid">
-              <div className="pk-modal-img">
+        <div className="pk2-modal-overlay" onClick={() => setPrendaSeleccionada(null)}>
+          <div className="pk2-modal-content" onClick={e => e.stopPropagation()}>
+            <button className="pk2-modal-close" onClick={() => setPrendaSeleccionada(null)}>
+              <X size={24} />
+            </button>
+            <div className="pk2-modal-grid">
+              <div className="pk2-modal-img">
                 <img 
                   src={getImageUrl(prendaSeleccionada.foto_url || (prendaSeleccionada.imagenes && prendaSeleccionada.imagenes[0]?.imagen) || "")} 
                   alt={prendaSeleccionada.nombre} 
                 />
               </div>
-              <div className="pk-modal-info">
-                <div className="pk-modal-tag">NEW IN</div>
-                <h2 className="pk-modal-title">{prendaSeleccionada.nombre.toUpperCase()}</h2>
-                <div className="pk-modal-price">{formatPrice(prendaSeleccionada.precio)}</div>
-                
-                <div className="pk-modal-desc-box">
-                  <p>Añade un toque de magia a tu colección. Esta prenda fue elegida pensando en tu comodidad y elegancia. ¡No te quedes sin la tuya!</p>
+              <div className="pk2-modal-info">
+                <h2>{prendaSeleccionada.nombre}</h2>
+                <div className="pk2-modal-price">{formatPrice(prendaSeleccionada.precio)}</div>
+                <p className="pk2-modal-desc">
+                  Prenda seleccionada directamente para realzar tu estilo. Calidad boutique.
+                </p>
+                <div className="pk2-modal-actions">
+                  <button 
+                    className="pk2-btn-black"
+                    onClick={() => addToCart(prendaSeleccionada)}
+                    disabled={prendaSeleccionada.estado !== 'disponible'}
+                  >
+                    <ShoppingBag size={18} />
+                    {prendaSeleccionada.estado === 'disponible' ? 'AGREGAR A LA BOLSA' : 'NO DISPONIBLE'}
+                  </button>
+                  <button className="pk2-btn-outline" onClick={() => handleWhatsApp(`Me interesa el producto: ${prendaSeleccionada.nombre}`)}>
+                    <MessageCircle size={18} />
+                    CONSULTAR
+                  </button>
                 </div>
-
-                <div className="pk-modal-variants">
-                  <h4>Opciones:</h4>
-                  {prendaSeleccionada.variantes && prendaSeleccionada.variantes.length > 0 ? (
-                    <div className="pk-variants-list">
-                      {prendaSeleccionada.variantes.map(v => (
-                        <div key={v.id} className="pk-variant-tag">
-                          {v.color || 'Único'} {v.talla ? `/ ${v.talla}` : ''}
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="pk-variant-tag">Talla estándar única</div>
-                  )}
-                </div>
-
-                <button className="pk-btn-hero pk-btn-full" onClick={() => addToCart(prendaSeleccionada)}>
-                  AÑADIR AL CARRITO 🛍️
-                </button>
               </div>
             </div>
           </div>
@@ -358,57 +331,50 @@ const PublicCatalog = () => {
       )}
 
       {/* ── Cart Sidebar ── */}
-      {cartOpen && (
-        <>
-          <div className="pk-cart-overlay" onClick={() => setCartOpen(false)}></div>
-          <div className="pk-cart-sidebar">
-            <div className="pk-cart-header">
-              <h3>TU CARRITO</h3>
-              <X size={24} strokeWidth={1.5} onClick={() => setCartOpen(false)} style={{cursor: 'pointer'}} />
+      <div className={`pk2-cart-sidebar ${cartOpen ? 'open' : ''}`}>
+        <div className="pk2-cart-header">
+          <h3>Tu Bolsa ({cartItems.length})</h3>
+          <button onClick={() => setCartOpen(false)}><X size={24} /></button>
+        </div>
+        <div className="pk2-cart-body">
+          {cartItems.length === 0 ? (
+            <div className="pk2-cart-empty">
+              <ShoppingBag size={48} strokeWidth={1} style={{ opacity: 0.3 }} />
+              <p>Tu bolsa está vacía</p>
+              <button className="pk2-btn-black" onClick={() => setCartOpen(false)}>SEGUIR COMPRANDO</button>
             </div>
-            
-            <div className="pk-cart-body">
-              {cartItems.length === 0 ? (
-                <div className="pk-cart-empty">
-                  <ShoppingBag size={48} strokeWidth={1} />
-                  <p>Tu carrito está vacío</p>
-                  <button className="pk-btn-outline" onClick={() => setCartOpen(false)}>SEGUIR COMPRANDO</button>
-                </div>
-              ) : (
-                <div className="pk-cart-items-list">
-                  {cartItems.map((item, idx) => {
-                    const rawUrl = item.foto_url || (item.imagenes && item.imagenes[0]?.imagen) || "";
-                    const imgUrl = getImageUrl(rawUrl);
-                    return (
-                      <div key={idx} className="pk-cart-item">
-                        <img src={imgUrl} alt={item.nombre} />
-                        <div className="pk-cart-item-info">
-                          <h4>{item.nombre.toUpperCase()}</h4>
-                          <p>{formatPrice(item.precio)}</p>
-                        </div>
-                        <X size={18} strokeWidth={1.5} style={{cursor:'pointer', color:'#999'}} onClick={() => removeFromCart(idx)} />
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+          ) : (
+            <div className="pk2-cart-items-list">
+              {cartItems.map((item, idx) => {
+                const rawUrl = item.foto_url || (item.imagenes && item.imagenes[0]?.imagen) || "";
+                const imgUrl = getImageUrl(rawUrl);
+                return (
+                  <div key={idx} className="pk2-cart-item">
+                    <img src={imgUrl} alt={item.nombre} />
+                    <div className="pk2-cart-item-info">
+                      <h4>{item.nombre}</h4>
+                      <span className="pk2-cart-item-price">{formatPrice(item.precio)}</span>
+                    </div>
+                    <button className="pk2-cart-item-remove" onClick={() => removeFromCart(idx)}>
+                      <X size={18} />
+                    </button>
+                  </div>
+                );
+              })}
             </div>
-
-            {cartItems.length > 0 && (
-              <div className="pk-cart-footer">
-                <div className="pk-cart-total">
-                  <span>Subtotal</span>
-                  <span>{formatPrice(cartItems.reduce((acc, curr) => acc + Number(curr.precio || 0), 0))}</span>
-                </div>
-                <p className="pk-cart-tax-note">Impuestos y envíos calculados al finalizar la compra.</p>
-                <button className="pk-btn-hero pk-btn-full" onClick={checkoutCart}>
-                  COMPRAR POR WHATSAPP 💖
-                </button>
-              </div>
-            )}
+          )}
+        </div>
+        {cartItems.length > 0 && (
+          <div className="pk2-cart-footer">
+            <div className="pk2-cart-total">
+              <span>TOTAL</span>
+              <span>{formatPrice(cartItems.reduce((acc, curr) => acc + Number(curr.precio || 0), 0))}</span>
+            </div>
+            <button className="pk2-btn-black" onClick={checkoutCart}>IR A PAGAR (WhatsApp)</button>
           </div>
-        </>
-      )}
+        )}
+      </div>
+      {cartOpen && <div className="pk2-overlay" onClick={() => setCartOpen(false)}></div>}
 
     </div>
   );
