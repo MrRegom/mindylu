@@ -245,23 +245,23 @@ const PublicCatalog = () => {
         </div>
       </section>
 
-      {/* ── Categories Strip ── */}
+      {/* ── Categories Strip (Typography Only) ── */}
       <section className="pk2-categories-strip">
         <div className="pk2-section-header-inline">
-          <div className="pk2-subtitle">ELIGE TU FAVORITO</div>
-          <h3 className="pk2-title-main">Explora nuestras<br/><em>categorías</em></h3>
-          <a href="#" className="pk2-link">VER TODO →</a>
+          <div className="pk2-subtitle">COLECCIONES EXCLUSIVAS</div>
+          <h3 className="pk2-title-main">Elige tu<br/><em>estilo</em></h3>
         </div>
         
-        <div className="pk2-categories-bubbles">
-          {categoryBubbles.map((cat, idx) => (
-            <div className="pk2-bubble-wrap" key={idx}>
-              <div className="pk2-bubble">
-                <img src={cat.img} alt={cat.name} />
-              </div>
-              <span className="pk2-bubble-name">{cat.name}</span>
-            </div>
-          ))}
+        <div className="pk2-categories-text-list">
+          <a href="#" className="pk2-category-word">VESTIDOS</a>
+          <span className="pk2-category-divider">/</span>
+          <a href="#" className="pk2-category-word pk2-cursive-word">Tops</a>
+          <span className="pk2-category-divider">/</span>
+          <a href="#" className="pk2-category-word">PANTALONES</a>
+          <span className="pk2-category-divider">/</span>
+          <a href="#" className="pk2-category-word pk2-cursive-word">Sets</a>
+          <span className="pk2-category-divider">/</span>
+          <a href="#" className="pk2-category-word">ACCESORIOS</a>
         </div>
       </section>
 
@@ -306,24 +306,29 @@ const PublicCatalog = () => {
         )}
       </section>
 
-      {/* ── Footer Estilo Revista ── */}
+      {/* ── Footer Estilo Revista (Dark & Elegant) ── */}
       <footer className="pk2-footer">
         <div className="pk2-footer-content">
           <div className="pk2-footer-brand">
-            <div className="pk2-logo" style={{ fontSize: '2rem' }}>MindyLu<span>*</span></div>
+            <div className="pk2-footer-logo">MindyLu<span>*</span></div>
             <p>Expresa quién eres, sin decir una palabra. Tu boutique exclusiva para mujeres reales.</p>
           </div>
-          <div className="pk2-footer-links">
-            <h4>AYUDA</h4>
-            <a href="#">Cambios y Devoluciones</a>
-            <a href="#">Envíos y Entregas</a>
-            <a href="#">Términos y Condiciones</a>
+          <div className="pk2-footer-links-container">
+            <div className="pk2-footer-links">
+              <h4>AYUDA</h4>
+              <a href="#">Cambios y Devoluciones</a>
+              <a href="#">Envíos y Entregas</a>
+              <a href="#">Términos y Condiciones</a>
+            </div>
+            <div className="pk2-footer-links">
+              <h4>CONTACTO</h4>
+              <a href="#" onClick={(e) => { e.preventDefault(); handleWhatsApp(); }}>WhatsApp Soporte →</a>
+              <a href="#">Instagram: @mindylu.cl</a>
+            </div>
           </div>
-          <div className="pk2-footer-links">
-            <h4>CONTACTO</h4>
-            <a href="#" onClick={(e) => { e.preventDefault(); handleWhatsApp(); }}>WhatsApp Soporte →</a>
-            <a href="#">Instagram: @mindylu.cl</a>
-          </div>
+        </div>
+        <div className="pk2-footer-bottom">
+          &copy; {new Date().getFullYear()} MindyLu Boutique. Todos los derechos reservados.
         </div>
       </footer>
 
