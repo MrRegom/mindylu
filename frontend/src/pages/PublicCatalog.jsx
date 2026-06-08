@@ -127,7 +127,9 @@ const PublicCatalog = () => {
       <nav className="pk2-navbar">
         <div className="pk2-nav-left">
           <Menu size={24} className="pk2-mobile-menu-icon" onClick={() => setMobileMenuOpen(true)} />
-          <div className="pk2-logo">{config?.tienda_nombre || 'MindyLu'}<span>*</span></div>
+          <div className="pk2-logo-img-container">
+            <img src="/mindylu-logo.png" alt="MindyLu Logo" className="pk2-logo-img" />
+          </div>
         </div>
 
         <div className="pk2-nav-center">

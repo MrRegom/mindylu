@@ -84,16 +84,16 @@ a {
   cursor: pointer;
 }
 
-.pk2-logo {
-  font-family: var(--font-serif);
-  font-size: 1.8rem;
-  font-weight: 600;
-  letter-spacing: -0.5px;
+.pk2-logo-img-container {
+  height: 40px;
+  display: flex;
+  align-items: center;
 }
-.pk2-logo span {
-  color: var(--pk2-pink);
-  font-size: 1.5rem;
-  vertical-align: super;
+
+.pk2-logo-img {
+  height: 100%;
+  width: auto;
+  object-fit: contain;
 }
 
 .pk2-nav-center {
