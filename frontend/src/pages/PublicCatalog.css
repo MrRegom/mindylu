@@ -2,19 +2,19 @@
 
 /* ── Base ── */
 :root {
-  --pk2-black: #2c2829;  /* Elegant soft black */
-  --pk2-dark: #4a4244;   /* Dark taupe/grey */
+  --pk2-black: #4a3b40;  /* Soft warm plum-brown off-black */
+  --pk2-dark: #635057;   /* Medium warm taupe */
   --pk2-white: #ffffff;
-  --pk2-bg: #faf8f8;     /* Very subtle pearl/blush white */
-  --pk2-pink: #d18d9e;   /* Elegant dusty rose */
-  --pk2-pink-light: #f5eaed;
-  --pk2-pink-bg: #fdfafb;
-  --pk2-gray: #887e81;   /* Warm grey */
-  --pk2-gray-light: #eae3e5;
+  --pk2-bg: #fff5f7;     /* Soft baby pink background */
+  --pk2-pink: #ff6b9e;   /* Beautiful vivid rose pink! */
+  --pk2-pink-light: #ffd1e3;
+  --pk2-pink-bg: #ffebf3;
+  --pk2-gray: #a38c95;   /* Pinkish warm grey */
+  --pk2-gray-light: #f5e4ea;
   
   --font-sans: 'Montserrat', system-ui, sans-serif;
-  --font-serif: 'Cormorant Garamond', serif;
-  --font-cursive: 'Cormorant Garamond', serif; /* Use italic Garamond instead of script */
+  --font-serif: 'Playfair Display', serif;
+  --font-cursive: 'Alex Brush', cursive;
 }
 
 .pk2-root {
@@ -39,9 +39,9 @@ a {
 /* ── Marquee ── */
 .pk2-marquee-bar {
   width: 100%;
-  background: var(--pk2-black);
+  background: var(--pk2-pink);
   color: var(--pk2-white);
-  padding: 8px 0;
+  padding: 10px 0;
   overflow: hidden;
   position: relative;
   z-index: 101;
@@ -49,9 +49,9 @@ a {
 .pk2-marquee-content {
   display: inline-block;
   white-space: nowrap;
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   letter-spacing: 2px;
-  font-weight: 400;
+  font-weight: 500;
   animation: marquee 25s linear infinite;
   text-transform: uppercase;
 }
@@ -70,7 +70,7 @@ a {
   position: sticky;
   top: 0;
   z-index: 100;
-  border-bottom: 1px solid var(--pk2-gray-light);
+  box-shadow: 0 4px 20px rgba(255, 107, 158, 0.08); /* Pink glow shadow */
 }
 
 .pk2-nav-left {
@@ -83,10 +83,11 @@ a {
 .pk2-mobile-menu-icon {
   display: none;
   cursor: pointer;
+  color: var(--pk2-pink);
 }
 
 .pk2-logo-img-container {
-  height: 40px;
+  height: 45px;
   display: flex;
   align-items: center;
 }
@@ -101,19 +102,19 @@ a {
   flex: 2;
   display: flex;
   justify-content: center;
-  gap: 30px;
+  gap: 35px;
 }
 
 .pk2-nav-center a {
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   font-weight: 500;
-  letter-spacing: 1.5px;
+  letter-spacing: 1px;
   color: var(--pk2-black);
   text-transform: uppercase;
   transition: color 0.3s;
 }
 .pk2-nav-center a:hover { color: var(--pk2-pink); }
-.pk2-nav-center a.text-sale { color: var(--pk2-pink); }
+.pk2-nav-center a.text-sale { color: var(--pk2-pink); font-weight: 600; }
 
 .pk2-nav-right {
   flex: 1;
@@ -129,7 +130,7 @@ a {
   color: var(--pk2-black);
   padding: 0;
   position: relative;
-  transition: transform 0.2s;
+  transition: transform 0.2s, color 0.3s;
 }
 .pk2-icon-btn:hover { transform: translateY(-2px); color: var(--pk2-pink); }
 
@@ -140,13 +141,14 @@ a {
   background: var(--pk2-pink);
   color: var(--pk2-white);
   font-size: 0.6rem;
-  font-weight: 500;
-  width: 16px;
-  height: 16px;
+  font-weight: 600;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 2px 5px rgba(255, 107, 158, 0.4);
 }
 
 @media (max-width: 900px) {
@@ -166,7 +168,7 @@ a {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: var(--pk2-black);
+  background: var(--pk2-pink-bg);
 }
 
 .pk2-carousel-slides {
@@ -182,8 +184,8 @@ a {
   background-size: cover;
   background-position: center top;
   opacity: 0;
-  transition: opacity 1s ease-in-out, transform 5s ease-out;
-  transform: scale(1.03);
+  transition: opacity 1.5s ease-in-out, transform 6s ease-out;
+  transform: scale(1.05);
 }
 
 .pk2-carousel-slide.active {
@@ -195,65 +197,69 @@ a {
   position: absolute;
   top: 0; left: 0;
   width: 100%; height: 100%;
-  background: linear-gradient(to bottom, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.7) 80%, rgba(255,255,255,0.9) 100%);
+  background: linear-gradient(to bottom, rgba(255, 245, 247, 0.3) 0%, rgba(255, 245, 247, 0.8) 80%, rgba(255, 245, 247, 1) 100%);
 }
 
 .pk2-hero-content {
   position: relative;
   z-index: 10;
   text-align: center;
-  padding: 20px;
+  padding: 30px;
   max-width: 700px;
   margin-top: 15vh;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 20px;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 10px 40px rgba(255, 107, 158, 0.1);
 }
 
 .pk2-hero-content h1 {
   font-family: var(--font-serif);
-  font-size: 4rem;
-  line-height: 1.1;
-  font-weight: 400;
+  font-size: 3.5rem;
+  line-height: 1.2;
+  font-weight: 500;
   color: var(--pk2-black);
   margin: 0;
   white-space: pre-line;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-}
-
-.pk2-hero-cursive {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: 3.5rem;
-  color: var(--pk2-pink);
-  margin: 10px 0 20px 0;
-  font-weight: 300;
   letter-spacing: 1px;
 }
 
+.pk2-hero-cursive {
+  font-family: var(--font-cursive);
+  font-size: 4rem;
+  color: var(--pk2-pink);
+  margin: -10px 0 15px 0;
+  font-weight: 400;
+  text-shadow: 2px 2px 4px rgba(255, 107, 158, 0.2);
+}
+
 .pk2-hero-content p {
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   color: var(--pk2-dark);
   line-height: 1.8;
   margin-bottom: 30px;
   white-space: pre-line;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
 }
 
 .pk2-hero-btn {
-  background: transparent;
-  color: var(--pk2-black);
-  border: 1px solid var(--pk2-black);
-  padding: 16px 36px;
-  font-size: 0.75rem;
+  background: var(--pk2-pink);
+  color: var(--pk2-white);
+  border: none;
+  padding: 16px 40px;
+  font-size: 0.85rem;
   letter-spacing: 2px;
   text-transform: uppercase;
-  font-weight: 500;
+  font-weight: 600;
+  border-radius: 30px; /* Feminine pill shape */
   cursor: pointer;
   transition: all 0.4s ease;
+  box-shadow: 0 4px 15px rgba(255, 107, 158, 0.3);
 }
 .pk2-hero-btn:hover {
-  background: var(--pk2-black);
-  color: var(--pk2-white);
+  background: #ff4d8a;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 107, 158, 0.4);
 }
 
 /* Dots */
@@ -334,105 +340,103 @@ a {
   margin-top: 2px;
 }
 
-/* ── Categories Strip (Boutique Editorial Style) ── */
+/* ── Categories Strip (Feminine Boutique Style) ── */
 .pk2-categories-strip {
-  padding: 100px 40px;
+  padding: 80px 40px;
   background: var(--pk2-bg);
+  position: relative;
 }
 
 .pk2-section-header-inline {
   display: flex;
   flex-direction: column;
-  margin-bottom: 60px;
+  margin-bottom: 50px;
   text-align: center;
 }
 
 .pk2-subtitle {
-  font-size: 0.7rem;
-  color: var(--pk2-gray);
-  letter-spacing: 3px;
+  font-size: 0.8rem;
+  color: var(--pk2-pink);
+  letter-spacing: 4px;
   text-transform: uppercase;
-  margin-bottom: 20px;
-  font-weight: 500;
+  margin-bottom: 10px;
+  font-weight: 600;
 }
 
 .pk2-title-main {
   font-family: var(--font-serif);
   font-size: 3.5rem;
-  font-weight: 300;
+  font-weight: 500;
   color: var(--pk2-black);
   margin: 0;
-  line-height: 1.1;
-  text-transform: uppercase;
-  letter-spacing: 2px;
+  line-height: 1.2;
 }
 
 .pk2-title-main em {
   color: var(--pk2-pink);
-  font-family: var(--font-serif);
-  font-size: 4rem;
-  font-style: italic;
+  font-family: var(--font-cursive);
+  font-size: 4.5rem;
+  font-style: normal;
   display: block;
   text-transform: none;
-  font-weight: 300;
-  margin-top: 5px;
+  font-weight: 400;
+  margin-top: -10px;
+  text-shadow: 2px 2px 4px rgba(255, 107, 158, 0.15);
 }
 
 .pk2-categories-text-list {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: center;
   align-items: center;
-  gap: 0;
-  max-width: 600px;
+  gap: 30px;
+  max-width: 900px;
   margin: 0 auto;
 }
 
 .pk2-category-word {
   font-family: var(--font-serif);
-  font-size: 2rem;
-  font-weight: 400;
-  letter-spacing: 4px;
+  font-size: 1.8rem;
+  font-weight: 500;
+  letter-spacing: 1px;
   color: var(--pk2-black);
   text-transform: uppercase;
   transition: all 0.4s ease;
-  padding: 20px 0;
-  width: 100%;
-  text-align: center;
-  border-bottom: 1px solid var(--pk2-gray-light);
-  position: relative;
-}
-.pk2-category-word:first-child {
-  border-top: 1px solid var(--pk2-gray-light);
+  padding: 15px 30px;
+  border-radius: 40px;
+  background: var(--pk2-white);
+  box-shadow: 0 4px 15px rgba(255, 107, 158, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .pk2-category-word:hover {
-  color: var(--pk2-pink);
-  letter-spacing: 8px;
+  color: var(--pk2-white);
+  background: var(--pk2-pink);
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(255, 107, 158, 0.3);
 }
 
 .pk2-cursive-word {
-  font-family: var(--font-serif);
+  font-family: var(--font-cursive);
   font-size: 2.2rem;
-  font-weight: 300;
-  font-style: italic;
+  font-weight: 400;
   text-transform: none;
-  color: var(--pk2-gray);
-  letter-spacing: 1px;
-}
-.pk2-category-word:hover .pk2-cursive-word {
   color: var(--pk2-pink);
+  margin-top: -5px;
+  transition: color 0.4s ease;
 }
 
-.pk2-category-divider {
-  display: none; /* Hide slashes for vertical list */
+.pk2-category-word:hover .pk2-cursive-word {
+  color: var(--pk2-pink-light);
 }
 
 @media (max-width: 900px) {
   .pk2-categories-strip { padding: 60px 20px; }
-  .pk2-title-main { font-size: 2.2rem; }
-  .pk2-title-main em { font-size: 2.8rem; }
-  .pk2-category-word { font-size: 1.5rem; letter-spacing: 2px; }
-  .pk2-category-word:hover { letter-spacing: 4px; }
+  .pk2-title-main { font-size: 2.5rem; }
+  .pk2-title-main em { font-size: 3.5rem; }
+  .pk2-category-word { font-size: 1.3rem; padding: 10px 20px; width: 100%; }
   .pk2-cursive-word { font-size: 1.8rem; }
 }
 
@@ -452,9 +456,9 @@ a {
 .pk2-section-header h3.pk2-title-main {
   font-family: var(--font-serif);
   font-size: 3rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: -1px;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0px;
 }
 
 .pk2-grid {
@@ -465,7 +469,6 @@ a {
 
 @media (max-width: 768px) {
   .pk2-latest { padding: 40px 15px 60px 15px; }
-  /* Doble Columna en Celular */
   .pk2-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 15px;
@@ -475,6 +478,13 @@ a {
 .pk2-card {
   cursor: pointer;
   group: product;
+  background: var(--pk2-white);
+  border-radius: 12px;
+  padding: 10px;
+  transition: box-shadow 0.3s ease;
+}
+.pk2-card:hover {
+  box-shadow: 0 10px 30px rgba(255, 107, 158, 0.1);
 }
 
 .pk2-card-img-wrapper {
@@ -482,9 +492,9 @@ a {
   width: 100%;
   aspect-ratio: 3/4;
   overflow: hidden;
-  background: var(--pk2-gray-light);
+  background: var(--pk2-pink-light);
   margin-bottom: 15px;
-  border-radius: 8px;
+  border-radius: 12px;
 }
 
 .pk2-card-img-wrapper img {
@@ -501,52 +511,52 @@ a {
 .pk2-card-heart {
   position: absolute;
   top: 15px; right: 15px;
-  background: var(--pk2-white);
+  background: rgba(255, 255, 255, 0.9);
   border: none;
   width: 32px; height: 32px;
   border-radius: 50%;
   display: flex; justify-content: center; align-items: center;
-  color: var(--pk2-gray);
+  color: var(--pk2-pink);
   cursor: pointer;
   opacity: 0;
   transition: all 0.3s;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 10px rgba(255, 107, 158, 0.2);
 }
 .pk2-card:hover .pk2-card-heart { opacity: 1; }
-.pk2-card-heart:hover { color: var(--pk2-pink); }
+.pk2-card-heart:hover { transform: scale(1.1); }
 
 .pk2-badge {
   position: absolute;
   top: 15px; left: 15px;
   font-size: 0.6rem;
   font-weight: 700;
-  padding: 4px 8px;
-  background: var(--pk2-black);
+  padding: 4px 10px;
+  background: var(--pk2-pink);
   color: var(--pk2-white);
   letter-spacing: 1px;
-  border-radius: 4px;
+  border-radius: 20px;
 }
 
 .pk2-card-info h4 {
   margin: 0 0 5px 0;
   font-weight: 600;
   font-size: 0.95rem;
-  color: var(--pk2-dark);
-  font-family: var(--font-sans);
+  color: var(--pk2-black);
+  font-family: var(--font-serif);
 }
 
 .pk2-card-price {
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: var(--pk2-gray);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--pk2-pink);
 }
 
 /* ── Footer Estilo Revista (Dark Mode) ── */
 .pk2-footer {
-  background: var(--pk2-black);
-  color: var(--pk2-white);
+  background: var(--pk2-bg);
+  color: var(--pk2-black);
   padding: 80px 40px 40px 40px;
-  border-top: 1px solid #333;
+  border-top: 1px solid var(--pk2-pink-light);
 }
 
 .pk2-footer-content {
@@ -566,17 +576,18 @@ a {
 .pk2-footer-logo {
   font-family: var(--font-serif);
   font-size: 3.5rem;
-  font-weight: 800;
-  letter-spacing: -1px;
-  color: var(--pk2-white);
+  font-weight: 600;
+  letter-spacing: 0px;
+  color: var(--pk2-black);
   margin-bottom: 20px;
-  text-transform: uppercase;
 }
 
 .pk2-footer-logo span {
   color: var(--pk2-pink);
-  font-size: 3rem;
-  vertical-align: top;
+  font-family: var(--font-cursive);
+  font-size: 4rem;
+  vertical-align: middle;
+  margin-left: -5px;
 }
 
 .pk2-footer-brand p {
