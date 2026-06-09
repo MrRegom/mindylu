@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Settings, Plus, Trash2, Tag, Palette, Type, Pencil, Check, X, Ruler, Terminal, ChevronRight, Upload, Phone, LayoutTemplate, Clock } from 'lucide-react';
+import { Settings, Plus, Trash2, Tag, Palette, Type, Pencil, Check, X, Ruler, Terminal, ChevronRight, Upload, Phone, LayoutTemplate, Clock, Truck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import './Ajustes.css';
