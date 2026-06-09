@@ -2,19 +2,19 @@
 
 /* ── Base ── */
 :root {
-  --pk2-black: #111111;
-  --pk2-dark: #222222;
+  --pk2-black: #1f1418;  /* Soft off-black for text */
+  --pk2-dark: #3a252c;   /* Dark brownish pink */
   --pk2-white: #ffffff;
-  --pk2-bg: #fafafa;
-  --pk2-pink: #d16b7e;
-  --pk2-pink-light: #f5d7db;
-  --pk2-pink-bg: #f8e5e8;
-  --pk2-gray: #666666;
-  --pk2-gray-light: #eeeeee;
+  --pk2-bg: #fffcfd;     /* Very faint pinkish white */
+  --pk2-pink: #f22e76;   /* Vibrant youthful hot pink! */
+  --pk2-pink-light: #ffebf0;
+  --pk2-pink-bg: #ffe0e9;
+  --pk2-gray: #7a6870;   /* Warm grey */
+  --pk2-gray-light: #f2e8eb;
   
-  --font-sans: 'Inter', system-ui, sans-serif;
-  --font-serif: 'Playfair Display', serif;
-  --font-cursive: 'Great Vibes', cursive;
+  --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-serif: 'Outfit', sans-serif; /* Using Outfit for headings */
+  --font-cursive: 'Outfit', sans-serif;
 }
 
 .pk2-root {
@@ -208,20 +208,25 @@ a {
 
 .pk2-hero-content h1 {
   font-family: var(--font-serif);
-  font-size: 3.5rem;
-  line-height: 1.1;
-  font-weight: 400;
+  font-size: 4.5rem;
+  line-height: 1.05;
+  font-weight: 800;
   color: var(--pk2-black);
   margin: 0;
   white-space: pre-line;
+  letter-spacing: -2px;
+  text-transform: uppercase;
 }
 
 .pk2-hero-cursive {
   font-family: var(--font-cursive);
-  font-size: 3.5rem;
-  color: var(--pk2-pink);
-  margin: 0 0 10px 0;
-  font-weight: 400;
+  font-size: 3rem;
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--pk2-pink);
+  margin: 10px 0 20px 0;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 2px;
 }
 
 .pk2-hero-content p {
@@ -348,18 +353,22 @@ a {
 
 .pk2-title-main {
   font-family: var(--font-serif);
-  font-size: 2.5rem;
-  font-weight: 300;
+  font-size: 3rem;
+  font-weight: 800;
   color: var(--pk2-black);
   margin: 0;
-  line-height: 1.2;
+  line-height: 1.1;
+  text-transform: uppercase;
+  letter-spacing: -1px;
 }
 
 .pk2-title-main em {
-  color: var(--pk2-pink);
-  font-family: var(--font-cursive);
-  font-size: 3.5rem;
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--pk2-pink);
+  font-family: var(--font-serif);
+  font-size: 4rem;
   font-style: normal;
+  display: block;
 }
 
 .pk2-categories-text-list {
@@ -373,30 +382,29 @@ a {
 }
 
 .pk2-category-word {
-  font-size: 1.2rem;
-  font-weight: 300;
-  letter-spacing: 4px;
-  color: var(--pk2-dark);
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: var(--pk2-black);
   text-transform: uppercase;
   transition: all 0.3s;
 }
 .pk2-category-word:hover {
   color: var(--pk2-pink);
-  transform: translateY(-2px);
+  transform: translateY(-4px);
 }
 
 .pk2-cursive-word {
-  font-family: var(--font-cursive);
+  font-family: var(--font-serif);
   font-size: 2.5rem;
-  text-transform: none;
-  letter-spacing: 1px;
-  font-weight: 400;
+  font-weight: 800;
+  text-transform: uppercase;
   color: var(--pk2-pink);
+  letter-spacing: 0px;
 }
 
 .pk2-category-divider {
-  font-family: var(--font-serif);
-  font-style: italic;
+  font-family: var(--font-sans);
   font-size: 1.5rem;
   font-weight: 300;
   color: var(--pk2-gray-light);
@@ -404,20 +412,20 @@ a {
 
 @media (max-width: 900px) {
   .pk2-categories-strip { padding: 60px 20px; }
-  .pk2-title-main { font-size: 2rem; }
-  .pk2-title-main em { font-size: 2.8rem; }
+  .pk2-title-main { font-size: 2.5rem; }
+  .pk2-title-main em { font-size: 3rem; }
   .pk2-categories-text-list {
     flex-direction: column;
-    gap: 15px;
+    gap: 20px;
   }
-  .pk2-category-word { font-size: 1rem; letter-spacing: 3px; }
-  .pk2-cursive-word { font-size: 2.2rem; }
+  .pk2-category-word { font-size: 1.5rem; letter-spacing: 2px; }
+  .pk2-cursive-word { font-size: 2rem; }
   .pk2-category-divider { display: none; }
 }
 
 /* ── Latest Strip (Recién llegados) ── */
 .pk2-latest {
-  padding: 40px 40px 80px 40px;
+  padding: 60px 40px 80px 40px;
   background: var(--pk2-white);
 }
 
@@ -426,6 +434,14 @@ a {
   justify-content: space-between;
   align-items: flex-end;
   margin-bottom: 40px;
+}
+
+.pk2-section-header h3.pk2-title-main {
+  font-family: var(--font-serif);
+  font-size: 3rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -1px;
 }
 
 .pk2-grid {
@@ -455,6 +471,7 @@ a {
   overflow: hidden;
   background: var(--pk2-gray-light);
   margin-bottom: 15px;
+  border-radius: 8px;
 }
 
 .pk2-card-img-wrapper img {
@@ -465,7 +482,7 @@ a {
 }
 
 .pk2-card:hover .pk2-card-img-wrapper img {
-  transform: scale(1.03);
+  transform: scale(1.05);
 }
 
 .pk2-card-heart {
@@ -480,6 +497,7 @@ a {
   cursor: pointer;
   opacity: 0;
   transition: all 0.3s;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 .pk2-card:hover .pk2-card-heart { opacity: 1; }
 .pk2-card-heart:hover { color: var(--pk2-pink); }
@@ -488,21 +506,25 @@ a {
   position: absolute;
   top: 15px; left: 15px;
   font-size: 0.6rem;
+  font-weight: 700;
   padding: 4px 8px;
   background: var(--pk2-black);
   color: var(--pk2-white);
   letter-spacing: 1px;
+  border-radius: 4px;
 }
 
 .pk2-card-info h4 {
   margin: 0 0 5px 0;
-  font-weight: 500;
-  font-size: 0.9rem;
+  font-weight: 600;
+  font-size: 0.95rem;
   color: var(--pk2-dark);
+  font-family: var(--font-sans);
 }
 
 .pk2-card-price {
   font-size: 0.9rem;
+  font-weight: 500;
   color: var(--pk2-gray);
 }
 
@@ -530,17 +552,18 @@ a {
 
 .pk2-footer-logo {
   font-family: var(--font-serif);
-  font-size: 3rem;
-  font-weight: 600;
-  letter-spacing: -0.5px;
+  font-size: 3.5rem;
+  font-weight: 800;
+  letter-spacing: -1px;
   color: var(--pk2-white);
   margin-bottom: 20px;
+  text-transform: uppercase;
 }
 
 .pk2-footer-logo span {
   color: var(--pk2-pink);
-  font-size: 2.5rem;
-  vertical-align: super;
+  font-size: 3rem;
+  vertical-align: top;
 }
 
 .pk2-footer-brand p {
