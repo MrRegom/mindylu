@@ -393,21 +393,21 @@ a {
 }
 
 .pk2-categories-text-list {
-  display: block; /* changed to block */
-  overflow: hidden; /* Hide the scrollbar and overflowing text */
+  display: flex;
+  overflow: hidden;
   white-space: nowrap;
   position: relative;
-  width: 100vw;
-  left: 50%;
-  transform: translateX(-50%); /* Full bleed trick */
+  width: 100%;
   padding: 10px 0;
 }
 
 .pk2-categories-marquee-track {
   display: flex;
+  flex-shrink: 0;
   gap: 15px;
-  width: max-content;
-  animation: scrollMarquee 30s linear infinite;
+  min-width: 100%;
+  animation: scrollMarquee 15s linear infinite;
+  padding: 0 15px;
 }
 
 .pk2-categories-marquee-track:hover {
@@ -416,7 +416,7 @@ a {
 
 @keyframes scrollMarquee {
   0% { transform: translateX(0); }
-  100% { transform: translateX(calc(-33.333333%)); }
+  100% { transform: translateX(calc(-50% - 7.5px)); }
 }
 
 .pk2-category-word {
