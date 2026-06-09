@@ -40,9 +40,9 @@ const PublicCatalog = () => {
     try {
       const t = Date.now();
       const [prendasRes, configRes, catRes] = await Promise.all([
-        api.get(`/catalogo/prendas/?t=${t}`),
+        api.get(`/catalogo/publico/prendas/?t=${t}`),
         api.get(`/core/configuracion/publico/?t=${t}`),
-        api.get(`/catalogo/categorias/?t=${t}`)
+        api.get(`/catalogo/publico/categorias/?t=${t}`)
       ]);
       setPrendas(prendasRes.data.results || prendasRes.data);
       setConfig(configRes.data);

@@ -290,23 +290,53 @@ const ConfiguracionTiendaForm = () => {
 
           <div className="form-group">
             <label><Upload size={16} /> Imagen del Banner Principal</label>
-            <div className="banner-upload-wrapper">
-              <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, setBannerFile)} className="input-field" />
+            <div className="file-upload-wrapper">
+              <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, setBannerFile)} className="file-upload-input" />
+              <div className={`file-upload-box ${bannerFile || config.banner_imagen ? 'has-file' : ''}`}>
+                <div className="file-upload-icon"><Upload size={16} /></div>
+                <span className="file-upload-text">
+                  {bannerFile ? bannerFile.name : (config.banner_imagen ? "Imagen actual seleccionada. Clic para cambiar" : "Haz clic para seleccionar tu foto (JPG, PNG)")}
+                </span>
+              </div>
             </div>
           </div>
 
           <div className="form-group-row" style={{ marginTop: '10px' }}>
             <div className="form-group">
               <label><Upload size={14} /> Polaroid 1</label>
-              <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, setPolaroid1File)} className="input-field" style={{fontSize: '0.8rem'}} />
+              <div className="file-upload-wrapper">
+                <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, setPolaroid1File)} className="file-upload-input" />
+                <div className={`file-upload-box ${polaroid1File || config.polaroid_1_imagen ? 'has-file' : ''}`}>
+                  <div className="file-upload-icon"><Upload size={14} /></div>
+                  <span className="file-upload-text" style={{fontSize:'0.8rem'}}>
+                    {polaroid1File ? polaroid1File.name : (config.polaroid_1_imagen ? "Foto actual" : "Seleccionar foto")}
+                  </span>
+                </div>
+              </div>
             </div>
             <div className="form-group">
               <label><Upload size={14} /> Polaroid 2</label>
-              <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, setPolaroid2File)} className="input-field" style={{fontSize: '0.8rem'}} />
+              <div className="file-upload-wrapper">
+                <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, setPolaroid2File)} className="file-upload-input" />
+                <div className={`file-upload-box ${polaroid2File || config.polaroid_2_imagen ? 'has-file' : ''}`}>
+                  <div className="file-upload-icon"><Upload size={14} /></div>
+                  <span className="file-upload-text" style={{fontSize:'0.8rem'}}>
+                    {polaroid2File ? polaroid2File.name : (config.polaroid_2_imagen ? "Foto actual" : "Seleccionar foto")}
+                  </span>
+                </div>
+              </div>
             </div>
             <div className="form-group">
               <label><Upload size={14} /> Polaroid 3</label>
-              <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, setPolaroid3File)} className="input-field" style={{fontSize: '0.8rem'}} />
+              <div className="file-upload-wrapper">
+                <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, setPolaroid3File)} className="file-upload-input" />
+                <div className={`file-upload-box ${polaroid3File || config.polaroid_3_imagen ? 'has-file' : ''}`}>
+                  <div className="file-upload-icon"><Upload size={14} /></div>
+                  <span className="file-upload-text" style={{fontSize:'0.8rem'}}>
+                    {polaroid3File ? polaroid3File.name : (config.polaroid_3_imagen ? "Foto actual" : "Seleccionar foto")}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
 
