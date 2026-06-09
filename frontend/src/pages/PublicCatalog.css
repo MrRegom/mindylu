@@ -560,10 +560,9 @@ a {
 
 /* ── Footer Estilo Revista (Dark Mode) ── */
 .pk2-footer {
-  background: var(--pk2-bg);
-  color: var(--pk2-black);
+  background: #1f181a; /* Very dark rich plum-black */
+  color: var(--pk2-white);
   padding: 80px 40px 40px 40px;
-  border-top: 1px solid var(--pk2-pink-light);
 }
 
 .pk2-footer-content {
@@ -585,7 +584,7 @@ a {
   font-size: 3.5rem;
   font-weight: 600;
   letter-spacing: 0px;
-  color: var(--pk2-black);
+  color: var(--pk2-white);
   margin-bottom: 20px;
 }
 
@@ -598,8 +597,8 @@ a {
 }
 
 .pk2-footer-brand p {
-  color: #aaaaaa;
-  font-size: 0.9rem;
+  color: #a38c95;
+  font-size: 0.95rem;
   line-height: 1.8;
   max-width: 350px;
 }
@@ -623,12 +622,12 @@ a {
   font-size: 1.1rem;
   margin: 0 0 10px 0;
   letter-spacing: 1px;
-  color: var(--pk2-pink-light);
+  color: var(--pk2-white);
 }
 
 .pk2-footer-links a {
-  font-size: 0.85rem;
-  color: #aaaaaa;
+  font-size: 0.9rem;
+  color: #a38c95;
   transition: color 0.3s;
 }
 .pk2-footer-links a:hover { color: var(--pk2-white); }
@@ -637,10 +636,10 @@ a {
   max-width: 1200px;
   margin: 60px auto 0 auto;
   padding-top: 20px;
-  border-top: 1px solid #333;
+  border-top: 1px solid rgba(255,255,255,0.1);
   text-align: center;
-  font-size: 0.75rem;
-  color: #666;
+  font-size: 0.8rem;
+  color: #7a636c;
   letter-spacing: 1px;
 }
 
