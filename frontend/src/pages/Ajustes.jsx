@@ -10,7 +10,7 @@ import { showAlert, showConfirm, showToast } from '../utils/alerts';
  * Soporta: agregar, editar inline y eliminar ítems.
  * Cumple SRP — solo gestiona una lista de un endpoint dado.
  */
-const MantenedorList = ({ titulo, icono, endpoint, placeholder }) => {
+const MantenedorList = ({ titulo, icono, endpoint, placeholder, forceUppercase = false }) => {
   const [items, setItems] = useState([]);
   const [nuevoItem, setNuevoItem] = useState('');
   const [loading, setLoading] = useState(true);
@@ -33,22 +33,23 @@ const MantenedorList = ({ titulo, icono, endpoint, placeholder }) => {
     fetchItems();
   }, [endpoint]);
 
-  // Foco automático al activar edición
   useEffect(() => {
-    if (editando && editInputRef.current) {
+    if (editando?.id && editInputRef.current) {
       editInputRef.current.focus();
       editInputRef.current.select();
     }
-  }, [editando]);
+  }, [editando?.id]);
 
-  /** Formato Title Case al guardar */
-  const toTitleCase = (str) =>
-    str.trim().toLowerCase().split(/\s+/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+  /** Formato de texto al guardar */
+  const formatText = (str) => {
+    if (forceUppercase) return str.trim().toUpperCase();
+    return str.trim().toLowerCase().split(/\s+/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+  };
 
   const handleAdd = async (e) => {
     e.preventDefault();
     if (!nuevoItem.trim()) return;
-    const nombreFormateado = toTitleCase(nuevoItem);
+    const nombreFormateado = formatText(nuevoItem);
     try {
       await api.post(endpoint, { nombre: nombreFormateado });
       setNuevoItem('');
@@ -69,7 +70,7 @@ const MantenedorList = ({ titulo, icono, endpoint, placeholder }) => {
 
   const handleSaveEdit = async () => {
     if (!editando || !editando.valor.trim()) return;
-    const nombreFormateado = toTitleCase(editando.valor);
+    const nombreFormateado = formatText(editando.valor);
     try {
       await api.patch(`${endpoint}${editando.id}/`, { nombre: nombreFormateado });
       setEditando(null);
@@ -438,11 +439,12 @@ const Ajustes = () => {
           endpoint="/catalogo/colores/"
           placeholder="Nuevo color (ej. Burdeo)"
         />
-        <MantenedorList
-          titulo="Tallas"
-          icono={<Ruler size={20} className="icon-accent" />}
-          endpoint="/catalogo/tallas/"
+        <MantenedorList 
+          titulo="Tallas" 
+          icono={<Ruler size={18} />} 
+          endpoint="/catalogo/tallas/" 
           placeholder="Nueva talla (ej. XXL)"
+          forceUppercase={true}
         />
       </div>
 
