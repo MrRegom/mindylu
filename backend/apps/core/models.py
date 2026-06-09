@@ -201,6 +201,10 @@ class ConfiguracionTienda(models.Model):
         default='MindyLu',
         verbose_name=_('Nombre de la Tienda (UI)')
     )
+    envios_texto = models.TextField(
+        default='Envíos a Viña del Mar $2500\nValparaíso $2500\nCurauma Placilla $2500\nQuilpué Villa Alemana $2500\n\nRegiones envío por Starken por pagar',
+        verbose_name=_('Información de Envíos')
+    )
 
     class Meta:
         verbose_name = _('Configuración de Tienda')

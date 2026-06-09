@@ -216,6 +216,7 @@ const ConfiguracionTiendaForm = () => {
       formData.append('banner_titulo', config.banner_titulo || '');
       formData.append('banner_titulo_cursiva', config.banner_titulo_cursiva || '');
       formData.append('banner_subtitulo', config.banner_subtitulo || '');
+      formData.append('envios_texto', config.envios_texto || '');
       formData.append('whatsapp_numero', config.whatsapp_numero || '');
       formData.append('tienda_nombre', config.tienda_nombre || 'MindyLu');
       
@@ -286,6 +287,11 @@ const ConfiguracionTiendaForm = () => {
           <div className="form-group">
             <label><Type size={16} /> Subtítulo del Banner</label>
             <textarea name="banner_subtitulo" className="input-field" value={config.banner_subtitulo || ''} onChange={handleChange} rows="2" placeholder="Prendas únicas, elegantes..." />
+          </div>
+
+          <div className="form-group">
+            <label><Truck size={16} /> Información de Envíos</label>
+            <textarea name="envios_texto" className="input-field" value={config.envios_texto || ''} onChange={handleChange} rows="5" placeholder="Envíos a todo Chile...\nValparaíso: $2500" />
           </div>
 
           <div className="form-group">

@@ -140,8 +140,8 @@ const PublicCatalog = () => {
 
         <div className="pk2-nav-center">
           <a href="#">CATÁLOGO</a>
-          <a href="#">ENVÍOS</a>
-          <a href="#">ENTREGAS</a>
+          <a href="#envios">ENVÍOS</a>
+          <a href="#envios">ENTREGAS</a>
         </div>
 
         <div className="pk2-nav-right">
@@ -160,9 +160,9 @@ const PublicCatalog = () => {
           <button onClick={() => setMobileMenuOpen(false)}><X size={24} /></button>
         </div>
         <div className="pk2-mobile-links">
-          <a href="#">CATÁLOGO</a>
-          <a href="#">ENVÍOS</a>
-          <a href="#">ENTREGAS</a>
+          <a href="#" onClick={() => setMobileMenuOpen(false)}>CATÁLOGO</a>
+          <a href="#envios" onClick={() => setMobileMenuOpen(false)}>ENVÍOS</a>
+          <a href="#envios" onClick={() => setMobileMenuOpen(false)}>ENTREGAS</a>
         </div>
       </div>
       {mobileMenuOpen && <div className="pk2-overlay" onClick={() => setMobileMenuOpen(false)}></div>}
@@ -293,6 +293,21 @@ const PublicCatalog = () => {
             })}
           </div>
         )}
+      </section>
+
+      {/* ── Envíos y Entregas ── */}
+      <section className="pk2-envios-section" id="envios" style={{ padding: '4rem 1.5rem', backgroundColor: '#fff', textAlign: 'center' }}>
+        <div className="pk2-section-header-inline" style={{ marginBottom: '2rem' }}>
+          <div className="pk2-subtitle">INFORMACIÓN DE</div>
+          <h3 className="pk2-title-main">Envíos y Entregas</h3>
+        </div>
+        <div style={{ maxWidth: '600px', margin: '0 auto', fontSize: '1.05rem', color: '#4a3b40', lineHeight: '1.8' }}>
+          {(config?.envios_texto || "Envíos a Viña del Mar $2500\nValparaíso $2500\nCurauma Placilla $2500\nQuilpué Villa Alemana $2500\n\nRegiones envío por Starken por pagar").split('\n').map((line, i) => (
+            <p key={i} style={{ margin: line.trim() ? '0.5rem 0' : '1.5rem 0' }}>
+              {line}
+            </p>
+          ))}
+        </div>
       </section>
 
       {/* ── Footer Estilo Revista (Dark & Elegant) ── */}
