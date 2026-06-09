@@ -5,6 +5,7 @@ import {
   Truck, ShieldCheck, CreditCard, RefreshCcw, MessageCircle, Menu 
 } from 'lucide-react';
 import './PublicCatalog.css';
+import { showAlert } from '../utils/alerts';
 
 const getImageUrl = (path) => {
   if (!path) return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E";
@@ -478,7 +479,7 @@ const PublicCatalog = () => {
                     onClick={() => {
                       if (prendaSeleccionada.variantes && prendaSeleccionada.variantes.length > 0) {
                         if (!varianteSeleccionada) {
-                          alert("Por favor selecciona una variante (color/talla).");
+                          showAlert("Por favor selecciona una variante (color/talla).");
                           return;
                         }
                         addToCart({...prendaSeleccionada, varianteSeleccionada: varianteSeleccionada});
@@ -493,7 +494,7 @@ const PublicCatalog = () => {
                   </button>
                   <button className="pk2-btn-outline" onClick={() => {
                     if (prendaSeleccionada.variantes && prendaSeleccionada.variantes.length > 0 && !varianteSeleccionada) {
-                      alert("Por favor selecciona una variante (color/talla) para consultar.");
+                      showAlert("Por favor selecciona una variante (color/talla) para consultar.");
                       return;
                     }
                     const varText = varianteSeleccionada ? ` (Opción: ${varianteSeleccionada.color || ''} ${varianteSeleccionada.talla || ''})` : '';
