@@ -25,6 +25,7 @@ const formatPrice = (price) => {
 
 const PublicCatalog = () => {
   const [prendas, setPrendas] = useState([]);
+  const [categorias, setCategorias] = useState([]);
   const [config, setConfig] = useState(null);
   const [cartOpen, setCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState([]);
@@ -37,12 +38,14 @@ const PublicCatalog = () => {
 
   const fetchData = async () => {
     try {
-      const [prendasRes, configRes] = await Promise.all([
+      const [prendasRes, configRes, catRes] = await Promise.all([
         api.get('/catalogo/prendas/'),
-        api.get('/core/configuracion/publico/')
+        api.get('/core/configuracion/publico/'),
+        api.get('/catalogo/categorias/')
       ]);
       setPrendas(prendasRes.data.results || prendasRes.data);
       setConfig(configRes.data);
+      setCategorias(catRes.data.results || catRes.data);
     } catch (error) {
       console.error('Error fetching data', error);
     }
@@ -185,7 +188,7 @@ const PublicCatalog = () => {
         {/* Text Content Overlay */}
         <div className="pk2-hero-content">
           <h1>{config?.banner_titulo || 'TU ESTILO.\nTU MOMENTO.'}</h1>
-          <h2 className="pk2-hero-cursive">Tu Mindy Lu.</h2>
+          <h2 className="pk2-hero-cursive">{config?.banner_titulo_cursiva || 'Tu Mindy Lu.'}</h2>
           <p>{config?.banner_subtitulo || 'Piezas únicas para mujeres reales\nque inspiran todos los días.'}</p>
           <button className="pk2-hero-btn" onClick={() => document.getElementById('lo-nuevo').scrollIntoView({behavior: 'smooth'})}>
             DESCUBRIR COLECCIÓN →
@@ -255,15 +258,15 @@ const PublicCatalog = () => {
         </div>
         
         <div className="pk2-categories-text-list">
-          <a href="#" className="pk2-category-word">Vestidos</a>
-          <a href="#" className="pk2-category-word">
-            <span>Colección</span> <span className="pk2-cursive-word">Tops</span>
-          </a>
-          <a href="#" className="pk2-category-word">Pantalones</a>
-          <a href="#" className="pk2-category-word">
-            <span>Nuevos</span> <span className="pk2-cursive-word">Sets</span>
-          </a>
-          <a href="#" className="pk2-category-word">Accesorios</a>
+          {categorias && categorias.length > 0 ? categorias.map((cat) => (
+            <a href="#" key={cat.id} className="pk2-category-word">
+              <span className="pk2-cursive-word">{cat.nombre}</span>
+            </a>
+          )) : (
+            <div className="pk2-category-word">
+              <span className="pk2-cursive-word">Próximamente...</span>
+            </div>
+          )}
         </div>
       </section>
 
@@ -377,7 +380,9 @@ const PublicCatalog = () => {
                           >
                             <span className="pk2-v-color">{v.color || 'Único'}</span>
                             {v.talla && <span className="pk2-v-divider">|</span>}
-                            {v.talla && <span className="pk2-v-size">Talla {v.talla}</span>}
+                            {v.talla && <span className="pk2-v-size">Talla: {v.talla}</span>}
+                            <span className="pk2-v-divider">|</span>
+                            <span className="pk2-v-stock">Stock: {v.cantidad}</span>
                             {agotada && <span className="pk2-v-out"> (Agotado)</span>}
                           </button>
                         );

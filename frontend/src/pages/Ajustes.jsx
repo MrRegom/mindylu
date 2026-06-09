@@ -214,6 +214,7 @@ const ConfiguracionTiendaForm = () => {
       formData.append('marquesina_texto', config.marquesina_texto || '');
       formData.append('marquesina_velocidad', config.marquesina_velocidad || 25);
       formData.append('banner_titulo', config.banner_titulo || '');
+      formData.append('banner_titulo_cursiva', config.banner_titulo_cursiva || '');
       formData.append('banner_subtitulo', config.banner_subtitulo || '');
       formData.append('whatsapp_numero', config.whatsapp_numero || '');
       formData.append('tienda_nombre', config.tienda_nombre || 'MindyLu');
@@ -275,6 +276,11 @@ const ConfiguracionTiendaForm = () => {
           <div className="form-group">
             <label><Type size={16} /> Título del Banner</label>
             <textarea name="banner_titulo" className="input-field" value={config.banner_titulo || ''} onChange={handleChange} rows="2" placeholder="Moda femenina seleccionada..." />
+          </div>
+
+          <div className="form-group">
+            <label><Type size={16} /> Título Cursiva del Banner</label>
+            <input type="text" name="banner_titulo_cursiva" className="input-field" value={config.banner_titulo_cursiva || ''} onChange={handleChange} placeholder="Tu Mindy Lu." />
           </div>
 
           <div className="form-group">

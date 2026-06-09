@@ -5,10 +5,10 @@
   --pk2-black: #4a3b40;  /* Soft warm plum-brown off-black */
   --pk2-dark: #635057;   /* Medium warm taupe */
   --pk2-white: #ffffff;
-  --pk2-bg: #fff5f7;     /* Soft baby pink background */
-  --pk2-pink: #ff6b9e;   /* Beautiful vivid rose pink! */
-  --pk2-pink-light: #ffd1e3;
-  --pk2-pink-bg: #ffebf3;
+  --pk2-bg: #fdf2f4;     /* Extremely delicate blush background */
+  --pk2-pink: #fba5b5;   /* Delicate boutique blush pink! */
+  --pk2-pink-light: #fce1e6;
+  --pk2-pink-bg: #fdf6f7;
   --pk2-gray: #a38c95;   /* Pinkish warm grey */
   --pk2-gray-light: #f5e4ea;
   
@@ -764,49 +764,54 @@ a {
 .pk2-variants-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 12px;
 }
 
 .pk2-variant-pill {
-  background: transparent;
-  border: 1px solid #e0e0e0;
-  border-radius: 30px;
-  padding: 10px 18px;
-  font-family: 'Montserrat', sans-serif;
-  font-size: 0.85rem;
-  color: var(--pk2-dark);
-  cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 6px;
-  transition: all 0.2s ease;
+  gap: 8px;
+  background: transparent;
+  border: 1px solid var(--pk2-pink-light);
+  color: var(--pk2-dark);
+  padding: 10px 18px;
+  border-radius: 30px;
+  font-size: 0.85rem;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: all 0.3s;
 }
-
 .pk2-variant-pill:hover:not(.agotada) {
-  border-color: var(--pk2-dark);
+  border-color: var(--pk2-pink);
+  background: var(--pk2-pink-bg);
+  transform: translateY(-2px);
 }
-
 .pk2-variant-pill.agotada {
   opacity: 0.5;
   cursor: not-allowed;
-  background: #f9f9f9;
-  text-decoration: line-through;
+  background: var(--pk2-gray-light);
+  border-color: var(--pk2-gray-light);
+  color: var(--pk2-gray);
 }
-
-.pk2-v-color {
+.pk2-v-divider {
+  color: var(--pk2-gray-light);
+  font-weight: 300;
+}
+.pk2-v-stock {
+  font-weight: 600;
+  color: var(--pk2-pink);
+}
+.pk2-v-size {
   font-weight: 500;
 }
-
-.pk2-v-divider {
-  color: #ccc;
+.pk2-v-color {
+  text-transform: capitalize;
 }
-
 .pk2-v-out {
   font-size: 0.75rem;
   color: #e74c3c;
   text-decoration: none !important;
 }
-
 /* ── Actions ── */
 .pk2-modal-actions {
   display: flex;
