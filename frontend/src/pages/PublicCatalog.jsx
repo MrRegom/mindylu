@@ -255,15 +255,15 @@ const PublicCatalog = () => {
         </div>
         
         <div className="pk2-categories-text-list">
-          <a href="#" className="pk2-category-word">VESTIDOS</a>
-          <span className="pk2-category-divider">/</span>
-          <a href="#" className="pk2-category-word pk2-cursive-word">Tops</a>
-          <span className="pk2-category-divider">/</span>
-          <a href="#" className="pk2-category-word">PANTALONES</a>
-          <span className="pk2-category-divider">/</span>
-          <a href="#" className="pk2-category-word pk2-cursive-word">Sets</a>
-          <span className="pk2-category-divider">/</span>
-          <a href="#" className="pk2-category-word">ACCESORIOS</a>
+          <a href="#" className="pk2-category-word">Vestidos</a>
+          <a href="#" className="pk2-category-word">
+            <span>Colección</span> <span className="pk2-cursive-word">Tops</span>
+          </a>
+          <a href="#" className="pk2-category-word">Pantalones</a>
+          <a href="#" className="pk2-category-word">
+            <span>Nuevos</span> <span className="pk2-cursive-word">Sets</span>
+          </a>
+          <a href="#" className="pk2-category-word">Accesorios</a>
         </div>
       </section>
 
