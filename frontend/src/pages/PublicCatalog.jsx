@@ -324,7 +324,7 @@ const PublicCatalog = () => {
                       <Truck size={28} strokeWidth={1.5} />
                     </div>
                     <h4 className="pk2-shipping-title">{title.replace(/Envíos a /i, '')}</h4>
-                    {price && <p className="pk2-shipping-price">{price}</p>}
+                    {price && <p className="pk2-shipping-price">Cargo: {price}</p>}
                   </div>
                 );
             })}
