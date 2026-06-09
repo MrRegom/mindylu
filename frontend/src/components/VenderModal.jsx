@@ -180,43 +180,41 @@ const VenderModal = ({ isOpen, onClose, ventaActiva, setVentaActiva, onSuccess }
 
   return (
     <div className="modal-overlay animate-fade-in">
-      <div className="modal-content animate-slide-up glass" style={{ maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
+      <div className="modal-content animate-slide-up">
         <div className="modal-header">
-          <h3>Apartar Prenda</h3>
-          <button className="btn-close" onClick={onClose}><X size={24} /></button>
+          <h3>Nueva Venta</h3>
+          <button className="btn-close" onClick={onClose}><X size={20} /></button>
         </div>
 
-        <form onSubmit={handleSubmit} className="vender-form" style={{ display: 'flex', flexDirection: 'column', gap: 16, overflowY: 'auto', flexGrow: 1, paddingBottom: 12 }}>
-          
+        <div className="vender-form">
           {/* Campo 1: Seleccionar Clienta */}
           <div className="form-group">
-            <label style={{ fontWeight: 600, fontSize: '0.85rem' }}>¿A quién se lo apartas?</label>
+            <label>¿A quién se lo apartas?</label>
             <div className="search-clienta-box">
-              <Search size={16} className="icon-left" />
+              <Search size={18} className="icon-left" />
               <input 
                 type="text" 
-                placeholder="Buscar o crear clienta rápida..." 
+                placeholder="Buscar o crear clienta..." 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 autoCapitalize="none"
                 autoCorrect="off"
-                className="glass-input"
-                style={{ paddingLeft: 40 }}
               />
             </div>
             
-            <div className="clientas-dropdown" style={{ maxHeight: 110 }}>
+            <div className="clientas-dropdown">
               {filteredClientas.map(c => (
-                <label key={c.id} className={`clienta-option ${formData.clienta_id === c.id.toString() ? 'selected' : ''}`}>
-                  <input 
-                    type="radio" 
-                    name="clienta_id" 
-                    value={c.id} 
-                    checked={formData.clienta_id === c.id.toString()}
-                    onChange={(e) => setFormData({...formData, clienta_id: e.target.value})}
-                  />
-                  <span>{c.nombre} {c.telefono ? `(${c.telefono})` : ''}</span>
-                </label>
+                <div 
+                  key={c.id} 
+                  className={`clienta-option ${formData.clienta_id === c.id.toString() ? 'selected' : ''}`}
+                  onClick={() => setFormData({...formData, clienta_id: c.id.toString()})}
+                >
+                  <div className="clienta-avatar">{c.nombre.charAt(0).toUpperCase()}</div>
+                  <div className="clienta-info">
+                    <span className="clienta-name">{c.nombre}</span>
+                    {c.telefono && <span className="clienta-phone">{c.telefono}</span>}
+                  </div>
+                </div>
               ))}
 
               {searchQuery.trim() !== '' && !clientas.some(c => c.nombre.toLowerCase() === searchQuery.toLowerCase()) && (
@@ -234,55 +232,52 @@ const VenderModal = ({ isOpen, onClose, ventaActiva, setVentaActiva, onSuccess }
                     }
                   }}
                 >
-                  <UserPlus size={16} /> 
-                  Crear y seleccionar "{searchQuery}"
+                  <UserPlus size={18} /> 
+                  Añadir nueva clienta: "{searchQuery}"
                 </button>
               )}
             </div>
           </div>
 
-          {/* Campo 2: CARRITO DE PRENDAS SELECCIONADAS (Caso A - Multiproducto) */}
-          <div className="form-group" style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 14 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-              <label style={{ fontWeight: 600, fontSize: '0.85rem', margin: 0 }}>Prendas a Apartar</label>
+          {/* Campo 2: CARRITO DE PRENDAS SELECCIONADAS */}
+          <div className="form-group" style={{ marginTop: 24 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <label style={{ margin: 0 }}>Prendas Seleccionadas</label>
               <button 
                 type="button" 
-                className="btn btn-secondary" 
                 onClick={() => setShowAddSelector(!showAddSelector)}
-                style={{ padding: '4px 8px', fontSize: '0.75rem', height: 'auto', display: 'flex', alignItems: 'center', gap: 4 }}
+                style={{ padding: '6px 12px', borderRadius: 20, background: 'var(--pk2-pink-light)', color: 'var(--pk2-pink-dark)', border: 'none', fontWeight: 600, fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}
               >
-                <Plus size={12} /> Otra Prenda
+                <Plus size={14} /> Sumar Prenda
               </button>
             </div>
 
             {/* Selector de Producto Adicional */}
             {showAddSelector && (
-              <div className="add-product-dropdown-selector glass animate-fade-in" style={{ padding: 12, borderRadius: 12, marginBottom: 12, background: 'rgba(0,0,0,0.15)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                <div style={{ position: 'relative', marginBottom: 8 }}>
-                  <Search size={14} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)' }} />
+              <div className="add-product-dropdown-selector animate-fade-in">
+                <div style={{ position: 'relative', marginBottom: 12 }}>
+                  <Search size={16} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#999' }} />
                   <input 
                     type="text" 
-                    placeholder="Buscar otra prenda en catálogo..."
+                    placeholder="Buscar en catálogo..."
                     value={addSearchQuery}
                     onChange={(e) => setAddSearchQuery(e.target.value)}
                     className="glass-input"
-                    style={{ padding: '6px 10px 6px 30px', fontSize: '0.85rem' }}
                     autoFocus
                   />
                 </div>
                 
-                <div style={{ maxHeight: 150, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <div style={{ maxHeight: 200, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 12 }}>
                   {filteredCatalogItems.map(p => (
-                    <div key={p.id} style={{ padding: 6, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                      <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-primary-dark)' }}>{p.nombre}</span>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 4 }}>
+                    <div key={p.id} style={{ paddingBottom: 12, borderBottom: '1px solid rgba(0,0,0,0.04)' }}>
+                      <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--pk2-dark)' }}>{p.nombre}</span>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 8 }}>
                         {p.variantes?.map(v => (
                           <button 
                             key={v.id}
                             type="button" 
-                            className="btn btn-secondary"
                             onClick={() => handleAddProductToCart(p, v)}
-                            style={{ padding: '2px 6px', fontSize: '0.75rem', height: 'auto' }}
+                            style={{ padding: '6px 10px', borderRadius: 16, background: 'rgba(0,0,0,0.04)', border: 'none', fontSize: '0.8rem', fontWeight: 500, color: 'var(--pk2-dark)', cursor: v.cantidad > 0 ? 'pointer' : 'not-allowed', opacity: v.cantidad > 0 ? 1 : 0.5 }}
                             disabled={v.cantidad <= 0}
                           >
                             {v.color} - {v.talla} ({v.cantidad} ud)
@@ -292,74 +287,54 @@ const VenderModal = ({ isOpen, onClose, ventaActiva, setVentaActiva, onSuccess }
                     </div>
                   ))}
                   {filteredCatalogItems.length === 0 && (
-                    <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', textAlign: 'center', margin: 4 }}>No se encontraron prendas.</p>
+                    <p style={{ fontSize: '0.85rem', color: '#999', textAlign: 'center', padding: 12 }}>No se encontraron prendas.</p>
                   )}
                 </div>
               </div>
             )}
 
             {/* Listado del Carrito */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
               {cart.map(item => (
-                <div key={item.variante_id} className="modal-prenda-info" style={{ margin: 0, padding: 10, background: 'rgba(255, 255, 255, 0.03)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
-                  <div style={{ display: 'flex', gap: 10, alignItems: 'center', flex: 2 }}>
-                    <img 
-                      src={item.foto_url || 'https://via.placeholder.com/48'} 
-                      alt="Prenda" 
-                      style={{ width: 44, height: 44, borderRadius: 8, objectFit: 'cover' }} 
-                    />
-                    <div style={{ minWidth: 0 }}>
-                      <h4 style={{ fontSize: '0.85rem', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.nombre}</h4>
-                      <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', margin: 0 }}>
-                        {item.color} - {item.talla} (Dispo: {item.maxCantidad})
-                      </p>
-                      <p style={{ fontSize: '0.8rem', fontWeight: 'bold', color: 'var(--color-primary)', margin: 0 }}>${item.precio.toLocaleString('es-CL')}</p>
+                <div key={item.variante_id} className="modal-prenda-info">
+                  <img src={item.foto_url || 'https://via.placeholder.com/65'} alt="Prenda" />
+                  
+                  <div style={{ flexGrow: 1, minWidth: 0 }}>
+                    <div className="cart-item-details">
+                      <h4 style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.nombre}</h4>
+                    </div>
+                    <div className="cart-item-meta">
+                      {item.color} - {item.talla} (Dispo: {item.maxCantidad})
+                    </div>
+                    <div className="cart-item-price">
+                      ${item.precio.toLocaleString('es-CL')}
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'flex-end', flex: 1.2 }}>
-                    <input 
-                      type="number"
-                      min="1"
-                      max={item.maxCantidad}
-                      value={item.cantidad}
-                      onChange={(e) => handleUpdateQuantity(item.variante_id, parseInt(e.target.value) || 1)}
-                      className="glass-input"
-                      style={{ width: 52, padding: 6, fontSize: '0.8rem', textAlign: 'center' }}
-                    />
-                    {cart.length > 1 && (
-                      <button 
-                        type="button" 
-                        className="btn-close" 
-                        onClick={() => handleRemoveFromCart(item.variante_id)}
-                        style={{ color: 'var(--color-error)', padding: 4 }}
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    )}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div className="qty-controls">
+                      <button type="button" className="btn-qty" disabled={item.cantidad <= 1} onClick={() => handleUpdateQuantity(item.variante_id, item.cantidad - 1)}>-</button>
+                      <span className="qty-display">{item.cantidad}</span>
+                      <button type="button" className="btn-qty" disabled={item.cantidad >= item.maxCantidad} onClick={() => handleUpdateQuantity(item.variante_id, item.cantidad + 1)}>+</button>
+                    </div>
+                    <button type="button" className="btn-delete-item" onClick={() => handleRemoveFromCart(item.variante_id)}>
+                      <Trash2 size={16} />
+                    </button>
                   </div>
                 </div>
               ))}
             </div>
-
-            {/* Total General Venta */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10, padding: '6px 8px', borderRadius: 8, background: 'rgba(24, 119, 242, 0.05)', border: '1px solid rgba(24, 119, 242, 0.15)' }}>
-              <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Total Compra:</span>
-              <span style={{ fontSize: '1rem', fontWeight: 'bold', color: 'var(--color-primary-dark)' }}>${totalVenta.toLocaleString('es-CL')}</span>
-            </div>
           </div>
 
           {/* Campo 3: Ruta Programada */}
-          <div className="form-group" style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 14 }}>
-            <label style={{ fontWeight: 600, fontSize: '0.85rem' }}>Selecciona tu ruta programada <span className="opc">(Opcional)</span></label>
+          <div className="form-group" style={{ marginTop: 12 }}>
+            <label>Ruta de Entrega <span className="optional">(Opcional)</span></label>
             <div className="input-with-icon">
-              <Calendar size={16} className="icon-left" />
+              <Calendar size={18} className="icon-left" />
               <select 
                 name="entrega_diaria_id" 
                 value={formData.entrega_diaria_id}
                 onChange={handleInputChange}
-                className="glass-input"
-                style={{ paddingLeft: 36 }}
               >
                 <option value="">Sin ruta por ahora...</option>
                 {rutasProgramadas.map(ruta => {
@@ -377,26 +352,33 @@ const VenderModal = ({ isOpen, onClose, ventaActiva, setVentaActiva, onSuccess }
             </div>
           </div>
 
-          {/* Campo 4: Notas del Pedido (Caso A - Rediseño sin PHP 90) */}
-          <div className="form-group">
-            <label style={{ fontWeight: 600, fontSize: '0.85rem' }}>Notas del Pedido <span className="optional">(Opc)</span></label>
+          {/* Campo 4: Notas del Pedido */}
+          <div className="form-group" style={{ marginTop: 24 }}>
+            <label>Notas Adicionales <span className="optional">(Opcional)</span></label>
             <input 
               type="text" 
               placeholder="Ej: Le falta transferir $5000"
               value={formData.notas}
               onChange={(e) => setFormData({...formData, notas: e.target.value})}
               className="glass-input"
-              style={{ width: '100%', padding: '10px 12px', border: '1px solid var(--color-border)', borderRadius: '10px', fontSize: '0.9rem', color: 'var(--color-text)' }}
             />
           </div>
+        </div>
 
-          <div className="modal-actions" style={{ marginTop: 8 }}>
-            <button type="button" className="btn btn-secondary" onClick={onClose}>Cancelar</button>
-            <button type="submit" className="btn btn-primary" disabled={isSubmitting || !formData.clienta_id || cart.length === 0}>
-              {isSubmitting ? 'Registrando...' : 'Confirmar Venta'}
+        {/* STICKY FOOTER */}
+        <div className="modal-sticky-footer">
+          <div className="total-row">
+            <span>Total Compra</span>
+            <span className="total-amount">${totalVenta.toLocaleString('es-CL')}</span>
+          </div>
+          <div className="modal-actions">
+            <button type="button" className="btn-cancel-sale" onClick={onClose}>Cancelar</button>
+            <button type="button" className="btn-confirm-sale" disabled={isSubmitting || !formData.clienta_id || cart.length === 0} onClick={handleSubmit}>
+              {isSubmitting ? 'Registrando...' : 'Confirmar Pedido'}
             </button>
           </div>
-        </form>
+        </div>
+
       </div>
     </div>
   );
