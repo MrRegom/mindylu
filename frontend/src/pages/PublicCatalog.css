@@ -350,7 +350,7 @@ a {
 
 /* ── Categories Strip (Feminine Boutique Style) ── */
 .pk2-categories-strip {
-  padding: 40px 20px;
+  padding: 30px 20px 20px 20px;
   background: var(--pk2-bg);
   position: relative;
 }
@@ -358,7 +358,7 @@ a {
 .pk2-section-header-inline {
   display: flex;
   flex-direction: column;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
   text-align: center;
 }
 
@@ -393,23 +393,30 @@ a {
 }
 
 .pk2-categories-text-list {
+  display: block; /* changed to block */
+  overflow: hidden; /* Hide the scrollbar and overflowing text */
+  white-space: nowrap;
+  position: relative;
+  width: 100vw;
+  left: 50%;
+  transform: translateX(-50%); /* Full bleed trick */
+  padding: 10px 0;
+}
+
+.pk2-categories-marquee-track {
   display: flex;
-  flex-direction: row;
-  overflow-x: auto;
   gap: 15px;
-  max-width: 100%;
-  padding: 10px 20px;
-  margin: 0 -20px; /* Bleed to edges on mobile */
-  -webkit-overflow-scrolling: touch;
-  scroll-snap-type: x mandatory;
+  width: max-content;
+  animation: scrollMarquee 30s linear infinite;
 }
-/* Hide scrollbar for a cleaner look */
-.pk2-categories-text-list::-webkit-scrollbar {
-  display: none;
+
+.pk2-categories-marquee-track:hover {
+  animation-play-state: paused;
 }
-.pk2-categories-text-list {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+
+@keyframes scrollMarquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(calc(-33.333333%)); }
 }
 
 .pk2-category-word {
@@ -440,7 +447,7 @@ a {
 
 .pk2-cursive-word {
   font-family: var(--font-cursive);
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   font-weight: 400;
   color: var(--pk2-pink);
   margin: 0;

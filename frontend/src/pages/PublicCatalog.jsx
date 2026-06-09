@@ -244,15 +244,17 @@ const PublicCatalog = () => {
         </div>
         
         <div className="pk2-categories-text-list">
-          {categorias && categorias.length > 0 ? categorias.map((cat) => (
-            <a href="#" key={cat.id} className="pk2-category-word">
-              <span className="pk2-cursive-word">{cat.nombre}</span>
-            </a>
-          )) : (
-            <div className="pk2-category-word">
-              <span className="pk2-cursive-word">Próximamente...</span>
-            </div>
-          )}
+          <div className="pk2-categories-marquee-track">
+            {categorias && categorias.length > 0 ? [...categorias, ...categorias, ...categorias].map((cat, idx) => (
+              <a href="#" key={`${cat.id}-${idx}`} className="pk2-category-word">
+                <span className="pk2-cursive-word">{cat.nombre}</span>
+              </a>
+            )) : (
+              <div className="pk2-category-word">
+                <span className="pk2-cursive-word">Próximamente...</span>
+              </div>
+            )}
+          </div>
         </div>
       </section>
 
