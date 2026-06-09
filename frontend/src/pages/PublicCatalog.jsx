@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import api from '../services/api';
 import { 
   ShoppingBag, X, Search, User, Heart, 
-  Truck, ShieldCheck, CreditCard, RefreshCcw, MessageCircle, Menu 
+  Truck, ShieldCheck, CreditCard, RefreshCcw, MessageCircle, Menu,
+  ChevronLeft, ChevronRight
 } from 'lucide-react';
 import './PublicCatalog.css';
 import { showAlert } from '../utils/alerts';
@@ -34,6 +35,13 @@ const PublicCatalog = () => {
   const [prendaSeleccionada, setPrendaSeleccionada] = useState(null);
   const [varianteSeleccionada, setVarianteSeleccionada] = useState(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const categoriesScrollRef = useRef(null);
+
+  const scrollCategories = (dir) => {
+    if (categoriesScrollRef.current) {
+      categoriesScrollRef.current.scrollBy({ left: dir * 200, behavior: 'smooth' });
+    }
+  };
 
   useEffect(() => {
     fetchData();
@@ -243,16 +251,26 @@ const PublicCatalog = () => {
           <h3 className="pk2-title-main">Elige tu<br/><em>estilo</em></h3>
         </div>
         
-        <div className="pk2-categories-horizontal-scroll">
-          {categorias && categorias.length > 0 ? categorias.map((cat) => (
-            <a href="#" key={cat.id} className="pk2-category-word">
-              <span className="pk2-cursive-word">{cat.nombre}</span>
-            </a>
-          )) : (
-            <div className="pk2-category-word">
-              <span className="pk2-cursive-word">Próximamente...</span>
-            </div>
-          )}
+        <div className="pk2-categories-wrapper">
+          <button className="pk2-cat-arrow left" onClick={(e) => { e.preventDefault(); scrollCategories(-1); }}>
+            <ChevronLeft size={20} />
+          </button>
+          
+          <div className="pk2-categories-horizontal-scroll" ref={categoriesScrollRef}>
+            {categorias && categorias.length > 0 ? categorias.map((cat) => (
+              <a href="#" key={cat.id} className="pk2-category-word">
+                <span className="pk2-cursive-word">{cat.nombre}</span>
+              </a>
+            )) : (
+              <div className="pk2-category-word">
+                <span className="pk2-cursive-word">Próximamente...</span>
+              </div>
+            )}
+          </div>
+
+          <button className="pk2-cat-arrow right" onClick={(e) => { e.preventDefault(); scrollCategories(1); }}>
+            <ChevronRight size={20} />
+          </button>
         </div>
       </section>
 
