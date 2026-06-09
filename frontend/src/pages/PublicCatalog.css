@@ -709,8 +709,30 @@ a {
 }
 
 .pk2-modal-close {
-  position: absolute; top: 20px; right: 20px;
-  background: transparent; border: none; cursor: pointer;
+  position: absolute; 
+  top: 15px; 
+  right: 15px;
+  background: rgba(255, 255, 255, 0.85); 
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(251, 165, 181, 0.3);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--pk2-black);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.pk2-modal-close:hover {
+  background: var(--pk2-white);
+  transform: scale(1.05);
+  color: var(--pk2-pink);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
 }
 
 .pk2-modal-grid {
