@@ -145,6 +145,7 @@ const PrendaForm = () => {
     try {
       const payload = new FormData();
       payload.append('nombre', formData.nombre);
+      payload.append('descripcion', formData.descripcion || '');
       const precioLimpio = formData.precio.toString().replace(/\./g, '');
       payload.append('precio', precioLimpio);
       if (formData.precio_compra) {
@@ -241,6 +242,18 @@ const PrendaForm = () => {
               </div>
             )}
             <input type="text" value={formData.nombre} required readOnly style={{ position: 'absolute', opacity: 0, height: 0, pointerEvents: 'none' }} />
+          </div>
+
+          <div className="input-group">
+            <label>Descripción <span style={{fontWeight: 'normal', color: 'var(--color-text-muted)'}}>(Opcional)</span></label>
+            <textarea 
+              name="descripcion"
+              className="glass-input"
+              rows="3"
+              placeholder="Ej: Pieza exclusiva diseñada para realzar tu estilo..." 
+              value={formData.descripcion || ''}
+              onChange={handleInputChange}
+            ></textarea>
           </div>
 
           <div className="input-group">

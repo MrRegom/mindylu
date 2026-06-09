@@ -378,10 +378,12 @@ const PublicCatalog = () => {
                   <div className="pk2-modal-price">{formatPrice(prendaSeleccionada.precio)}</div>
                 </div>
                 
-                <p className="pk2-modal-desc">
-                  {prendaSeleccionada.descripcion || 'Pieza exclusiva diseñada para realzar tu estilo. Calidad boutique inigualable.'}
-                </p>
-
+                {prendaSeleccionada.descripcion && (
+                  <p className="pk2-modal-desc">
+                    {prendaSeleccionada.descripcion}
+                  </p>
+                )}
+                
                 {/* Variantes (Tallas y Colores) */}
                 {prendaSeleccionada.variantes && prendaSeleccionada.variantes.length > 0 && (
                   <div className="pk2-modal-variants">

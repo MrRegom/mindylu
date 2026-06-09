@@ -48,7 +48,7 @@ class PrendaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Prenda
         fields = [
-            'id', 'nombre', 'precio_compra', 'precio', 'foto_url',
+            'id', 'nombre', 'descripcion', 'precio_compra', 'precio', 'foto_url',
             'talla_tipo', 'estado', 'fecha_creacion', 'fecha_ultima_carga',
             'categoria', 'categoria_nombre',
             'variantes', 'imagenes', 'ciclo'
@@ -62,7 +62,7 @@ class PrendaCreateUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Prenda
         fields = [
-            'id', 'nombre', 'precio_compra', 'precio', 'foto_url',
+            'id', 'nombre', 'descripcion', 'precio_compra', 'precio', 'foto_url',
             'talla_tipo', 'ciclo', 'categoria', 'variantes'
         ]
 

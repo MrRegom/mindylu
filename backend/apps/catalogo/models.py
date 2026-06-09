@@ -78,6 +78,7 @@ class Prenda(models.Model):
     )
     
     nombre = models.CharField(max_length=255)
+    descripcion = models.TextField(blank=True, null=True, help_text=_('Descripción de la prenda'))
     precio_compra = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True, verbose_name=_('Precio de Compra/Costo'))
     precio = models.DecimalField(max_digits=10, decimal_places=0, verbose_name=_('Precio de Venta')) # CLP no usa decimales
     foto_url = models.URLField(max_length=1000, blank=True, null=True) # En el MVP inicial puede estar vacío si no jalamos la foto
