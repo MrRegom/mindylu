@@ -12,12 +12,12 @@
   --color-accent-dark: #C67C7A;
   --color-accent-light: #FDE8ED;
   
-  --color-text-main: #1a1a1a;
-  --color-text-muted: #666666;
-  --color-border: #d1d1d1;
+  --color-text-main: #4a3b40;
+  --color-text-muted: #887a7f;
+  --color-border: #fba5b5;
   
-  --color-primary-gradient: linear-gradient(135deg, #2b2b2b 0%, #000000 100%);
-  --color-primary-dark: #000000;
+  --color-primary-gradient: linear-gradient(135deg, #ff8da1 0%, #fba5b5 100%);
+  --color-primary-dark: #e87b90;
   
   --color-danger: #ef4444;
   --color-success: #10b981;
@@ -236,14 +236,14 @@ h1, h2, h3, h4 {
 .card {
   background: #ffffff;
   border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+  box-shadow: 0 10px 30px rgba(251, 165, 181, 0.08);
   padding: 24px;
-  border: 1px solid #f1f5f9;
+  border: 1px solid rgba(251, 165, 181, 0.2);
   transition: var(--transition);
 }
 
 .card:hover {
-  box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+  box-shadow: 0 20px 40px rgba(251, 165, 181, 0.15);
   transform: translateY(-2px);
 }
 
