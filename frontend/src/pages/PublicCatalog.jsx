@@ -31,6 +31,7 @@ const PublicCatalog = () => {
   const [cartItems, setCartItems] = useState([]);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [prendaSeleccionada, setPrendaSeleccionada] = useState(null);
+  const [varianteSeleccionada, setVarianteSeleccionada] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -60,6 +61,7 @@ const PublicCatalog = () => {
   const addToCart = (prenda) => {
     setCartItems([...cartItems, prenda]);
     setPrendaSeleccionada(null);
+    setVarianteSeleccionada(null);
     setCartOpen(true);
   };
 
@@ -137,16 +139,13 @@ const PublicCatalog = () => {
         </div>
 
         <div className="pk2-nav-center">
-          <a href="#">NUEVO</a>
-          <a href="#">ROPA</a>
-          <a href="#">BEST SELLERS</a>
-          <a href="#">ACCESORIOS</a>
-          <a href="#" className="text-sale">SALE</a>
+          <a href="#">CATÁLOGO</a>
+          <a href="#">ENVÍOS</a>
+          <a href="#">ENTREGAS</a>
         </div>
 
         <div className="pk2-nav-right">
           <button className="pk2-icon-btn"><Search size={20} strokeWidth={1.5} /></button>
-          <button className="pk2-icon-btn pk2-hide-mobile"><User size={20} strokeWidth={1.5} /></button>
           <button className="pk2-icon-btn pk2-hide-mobile"><Heart size={20} strokeWidth={1.5} /></button>
           <button className="pk2-icon-btn pk2-cart-btn" onClick={() => setCartOpen(true)}>
             <ShoppingBag size={20} strokeWidth={1.5} />
@@ -161,11 +160,9 @@ const PublicCatalog = () => {
           <button onClick={() => setMobileMenuOpen(false)}><X size={24} /></button>
         </div>
         <div className="pk2-mobile-links">
-          <a href="#">NUEVO</a>
-          <a href="#">ROPA</a>
-          <a href="#">BEST SELLERS</a>
-          <a href="#">ACCESORIOS</a>
-          <a href="#" className="text-sale">SALE</a>
+          <a href="#">CATÁLOGO</a>
+          <a href="#">ENVÍOS</a>
+          <a href="#">ENTREGAS</a>
         </div>
       </div>
       {mobileMenuOpen && <div className="pk2-overlay" onClick={() => setMobileMenuOpen(false)}></div>}
@@ -217,7 +214,7 @@ const PublicCatalog = () => {
         <div className="pk2-feature-item">
           <Truck size={24} strokeWidth={1} />
           <div>
-            <strong>ENVÍO GRATIS</strong>
+            <strong>ENVÍO A DOMICILIO</strong>
             <span>sobre $40.000</span>
           </div>
         </div>
@@ -226,20 +223,6 @@ const PublicCatalog = () => {
           <div>
             <strong>PAGO SEGURO</strong>
             <span>100% protegido</span>
-          </div>
-        </div>
-        <div className="pk2-feature-item pk2-hide-mobile">
-          <CreditCard size={24} strokeWidth={1} />
-          <div>
-            <strong>3 CUOTAS</strong>
-            <span>sin interés</span>
-          </div>
-        </div>
-        <div className="pk2-feature-item pk2-hide-mobile">
-          <RefreshCcw size={24} strokeWidth={1} />
-          <div>
-            <strong>CAMBIOS FÁCILES</strong>
-            <span>en todos los productos</span>
           </div>
         </div>
         <div className="pk2-feature-item pk2-hide-mobile">
@@ -340,9 +323,9 @@ const PublicCatalog = () => {
 
       {/* ── Product Modal (Luxury Redesign) ── */}
       {prendaSeleccionada && (
-        <div className="pk2-modal-overlay" onClick={() => setPrendaSeleccionada(null)}>
+        <div className="pk2-modal-overlay" onClick={() => { setPrendaSeleccionada(null); setVarianteSeleccionada(null); }}>
           <div className="pk2-modal-content" onClick={e => e.stopPropagation()}>
-            <button className="pk2-modal-close" onClick={() => setPrendaSeleccionada(null)}>
+            <button className="pk2-modal-close" onClick={() => { setPrendaSeleccionada(null); setVarianteSeleccionada(null); }}>
               <X size={24} strokeWidth={1.5} />
             </button>
             <div className="pk2-modal-grid">
@@ -369,15 +352,17 @@ const PublicCatalog = () => {
                     <div className="pk2-variants-list">
                       {prendaSeleccionada.variantes.map((v) => {
                         const agotada = v.cantidad === 0;
-                        // Use a dummy state or just add to cart with variant info
+                        const isSelected = varianteSeleccionada?.id === v.id;
                         return (
                           <button 
                             key={v.id} 
                             className={`pk2-variant-pill ${agotada ? 'agotada' : ''}`}
-                            disabled={agotada}
-                            onClick={() => {
-                              addToCart({...prendaSeleccionada, varianteSeleccionada: v});
+                            style={{ 
+                              border: isSelected ? '2px solid var(--color-primary)' : '', 
+                              background: isSelected ? 'rgba(251, 165, 181, 0.1)' : '' 
                             }}
+                            disabled={agotada}
+                            onClick={() => setVarianteSeleccionada(v)}
                           >
                             <span className="pk2-v-color">{v.color || 'Único'}</span>
                             {v.talla && <span className="pk2-v-divider">|</span>}
@@ -393,16 +378,24 @@ const PublicCatalog = () => {
                 )}
 
                 <div className="pk2-modal-actions">
-                  {(!prendaSeleccionada.variantes || prendaSeleccionada.variantes.length === 0) && (
-                    <button 
-                      className="pk2-btn-black"
-                      onClick={() => addToCart(prendaSeleccionada)}
-                      disabled={prendaSeleccionada.estado !== 'disponible'}
-                    >
-                      <ShoppingBag size={18} strokeWidth={1.5} />
-                      {prendaSeleccionada.estado === 'disponible' ? 'AGREGAR A LA BOLSA' : 'NO DISPONIBLE'}
-                    </button>
-                  )}
+                  <button 
+                    className="pk2-btn-black"
+                    onClick={() => {
+                      if (prendaSeleccionada.variantes && prendaSeleccionada.variantes.length > 0) {
+                        if (!varianteSeleccionada) {
+                          alert("Por favor selecciona una variante (color/talla).");
+                          return;
+                        }
+                        addToCart({...prendaSeleccionada, varianteSeleccionada: varianteSeleccionada});
+                      } else {
+                        addToCart(prendaSeleccionada);
+                      }
+                    }}
+                    disabled={prendaSeleccionada.estado !== 'disponible'}
+                  >
+                    <ShoppingBag size={18} strokeWidth={1.5} />
+                    {prendaSeleccionada.estado === 'disponible' ? 'AGREGAR AL CARRITO' : 'NO DISPONIBLE'}
+                  </button>
                   <button className="pk2-btn-outline" onClick={() => handleWhatsApp(`Hola, me encantó esta prenda: ${prendaSeleccionada.nombre}. ¿Me das más detalles?`)}>
                     <MessageCircle size={18} strokeWidth={1.5} />
                     CONSULTAR
