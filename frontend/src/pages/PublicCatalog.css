@@ -392,31 +392,24 @@ a {
   text-shadow: 2px 2px 4px rgba(255, 107, 158, 0.15);
 }
 
-.pk2-categories-text-list {
+.pk2-categories-horizontal-scroll {
   display: flex;
-  overflow: hidden;
-  white-space: nowrap;
-  position: relative;
-  width: 100%;
-  padding: 10px 0;
-}
-
-.pk2-categories-marquee-track {
-  display: flex;
-  flex-shrink: 0;
+  flex-direction: row;
+  overflow-x: auto;
   gap: 15px;
-  min-width: 100%;
-  animation: scrollMarquee 15s linear infinite;
-  padding: 0 15px;
+  padding: 10px 20px 20px 20px;
+  margin: 0 -20px; /* Bleed to edges on mobile */
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
 }
 
-.pk2-categories-marquee-track:hover {
-  animation-play-state: paused;
+.pk2-categories-horizontal-scroll::-webkit-scrollbar {
+  display: none;
 }
 
-@keyframes scrollMarquee {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(calc(-50% - 7.5px)); }
+.pk2-categories-horizontal-scroll {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 .pk2-category-word {
@@ -434,6 +427,7 @@ a {
   transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.2s ease;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  scroll-snap-align: start;
 }
 
 .pk2-category-word:hover {
