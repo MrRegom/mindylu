@@ -52,11 +52,16 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      // Si el token expiró, borramos credenciales y mandamos al login
+      // Si el token expiró, borramos credenciales
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
       localStorage.removeItem('user');
-      window.location.href = '/panel/login';
+      
+      // SOLO redirigir al login si estamos dentro del panel.
+      // Si estamos en la vista pública (/), no queremos forzar el login.
+      if (window.location.pathname.startsWith('/panel')) {
+        window.location.href = '/panel/login';
+      }
     } else {
       // Registrar error en el backend
       sendErrorLog(error);
