@@ -645,15 +645,157 @@ a {
 }
 
 .pk2-modal-grid {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 40px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height: 100%;
+  min-height: 500px;
 }
-.pk2-modal-img img { width: 100%; aspect-ratio: 3/4; object-fit: cover; }
-.pk2-modal-info h2 { font-family: var(--font-serif); font-size: 2rem; margin-top: 0; }
-.pk2-modal-price { font-size: 1.2rem; color: var(--pk2-gray); margin-bottom: 20px; }
-.pk2-modal-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 30px; }
+
+.pk2-modal-img {
+  width: 100%;
+  height: 100%;
+  background: #fdfaf8;
+}
+
+.pk2-modal-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.pk2-modal-info {
+  padding: 50px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.pk2-modal-header {
+  margin-bottom: 24px;
+}
+
+.pk2-modal-info h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2rem;
+  font-weight: 500;
+  color: var(--pk2-dark);
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+
+.pk2-modal-price {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.4rem;
+  color: var(--pk2-dark);
+  font-weight: 300;
+  letter-spacing: 0.5px;
+}
+
+.pk2-modal-desc {
+  color: #666;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 32px;
+  font-weight: 300;
+}
+
+/* ── Variants Selector ── */
+.pk2-modal-variants {
+  margin-bottom: 32px;
+}
+
+.pk2-variants-title {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #888;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.pk2-variants-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.pk2-variant-pill {
+  background: transparent;
+  border: 1px solid #e0e0e0;
+  border-radius: 30px;
+  padding: 10px 18px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.85rem;
+  color: var(--pk2-dark);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.pk2-variant-pill:hover:not(.agotada) {
+  border-color: var(--pk2-dark);
+}
+
+.pk2-variant-pill.agotada {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #f9f9f9;
+  text-decoration: line-through;
+}
+
+.pk2-v-color {
+  font-weight: 500;
+}
+
+.pk2-v-divider {
+  color: #ccc;
+}
+
+.pk2-v-out {
+  font-size: 0.75rem;
+  color: #e74c3c;
+  text-decoration: none !important;
+}
+
+/* ── Actions ── */
+.pk2-modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: auto;
+}
 
 @media (max-width: 768px) {
-  .pk2-modal-grid { grid-template-columns: 1fr; }
+  .pk2-modal-overlay {
+    padding: 12px;
+    align-items: flex-end;
+  }
+  
+  .pk2-modal-content {
+    border-radius: 24px 24px 12px 12px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .pk2-modal-grid {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+  
+  .pk2-modal-img {
+    height: 400px;
+  }
+  
+  .pk2-modal-info {
+    padding: 30px 20px;
+  }
+
+  .pk2-modal-info h2 {
+    font-size: 1.8rem;
+  }
 }
 
 .pk2-cart-sidebar {

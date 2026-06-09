@@ -334,12 +334,12 @@ const PublicCatalog = () => {
         </div>
       </footer>
 
-      {/* ── Product Modal ── */}
+      {/* ── Product Modal (Luxury Redesign) ── */}
       {prendaSeleccionada && (
         <div className="pk2-modal-overlay" onClick={() => setPrendaSeleccionada(null)}>
           <div className="pk2-modal-content" onClick={e => e.stopPropagation()}>
             <button className="pk2-modal-close" onClick={() => setPrendaSeleccionada(null)}>
-              <X size={24} />
+              <X size={24} strokeWidth={1.5} />
             </button>
             <div className="pk2-modal-grid">
               <div className="pk2-modal-img">
@@ -349,22 +349,56 @@ const PublicCatalog = () => {
                 />
               </div>
               <div className="pk2-modal-info">
-                <h2>{prendaSeleccionada.nombre}</h2>
-                <div className="pk2-modal-price">{formatPrice(prendaSeleccionada.precio)}</div>
+                <div className="pk2-modal-header">
+                  <h2>{prendaSeleccionada.nombre}</h2>
+                  <div className="pk2-modal-price">{formatPrice(prendaSeleccionada.precio)}</div>
+                </div>
+                
                 <p className="pk2-modal-desc">
-                  Prenda seleccionada directamente para realzar tu estilo. Calidad boutique.
+                  {prendaSeleccionada.descripcion || 'Pieza exclusiva diseñada para realzar tu estilo. Calidad boutique inigualable.'}
                 </p>
+
+                {/* Variantes (Tallas y Colores) */}
+                {prendaSeleccionada.variantes && prendaSeleccionada.variantes.length > 0 && (
+                  <div className="pk2-modal-variants">
+                    <h4 className="pk2-variants-title">Selecciona tu opción:</h4>
+                    <div className="pk2-variants-list">
+                      {prendaSeleccionada.variantes.map((v) => {
+                        const agotada = v.cantidad === 0;
+                        // Use a dummy state or just add to cart with variant info
+                        return (
+                          <button 
+                            key={v.id} 
+                            className={`pk2-variant-pill ${agotada ? 'agotada' : ''}`}
+                            disabled={agotada}
+                            onClick={() => {
+                              addToCart({...prendaSeleccionada, varianteSeleccionada: v});
+                            }}
+                          >
+                            <span className="pk2-v-color">{v.color || 'Único'}</span>
+                            {v.talla && <span className="pk2-v-divider">|</span>}
+                            {v.talla && <span className="pk2-v-size">Talla {v.talla}</span>}
+                            {agotada && <span className="pk2-v-out"> (Agotado)</span>}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
                 <div className="pk2-modal-actions">
-                  <button 
-                    className="pk2-btn-black"
-                    onClick={() => addToCart(prendaSeleccionada)}
-                    disabled={prendaSeleccionada.estado !== 'disponible'}
-                  >
-                    <ShoppingBag size={18} />
-                    {prendaSeleccionada.estado === 'disponible' ? 'AGREGAR A LA BOLSA' : 'NO DISPONIBLE'}
-                  </button>
-                  <button className="pk2-btn-outline" onClick={() => handleWhatsApp(`Me interesa el producto: ${prendaSeleccionada.nombre}`)}>
-                    <MessageCircle size={18} />
+                  {(!prendaSeleccionada.variantes || prendaSeleccionada.variantes.length === 0) && (
+                    <button 
+                      className="pk2-btn-black"
+                      onClick={() => addToCart(prendaSeleccionada)}
+                      disabled={prendaSeleccionada.estado !== 'disponible'}
+                    >
+                      <ShoppingBag size={18} strokeWidth={1.5} />
+                      {prendaSeleccionada.estado === 'disponible' ? 'AGREGAR A LA BOLSA' : 'NO DISPONIBLE'}
+                    </button>
+                  )}
+                  <button className="pk2-btn-outline" onClick={() => handleWhatsApp(`Hola, me encantó esta prenda: ${prendaSeleccionada.nombre}. ¿Me das más detalles?`)}>
+                    <MessageCircle size={18} strokeWidth={1.5} />
                     CONSULTAR
                   </button>
                 </div>
