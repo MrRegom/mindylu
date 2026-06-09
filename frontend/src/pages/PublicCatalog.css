@@ -912,3 +912,73 @@ a {
 .pk2-mobile-sidebar-close button { background: none; border: none; cursor: pointer; }
 .pk2-mobile-links { display: flex; flex-direction: column; gap: 25px; padding: 20px 40px; }
 .pk2-mobile-links a { font-size: 1.2rem; font-weight: 500; }
+
+/* ── Shipping Carousel ── */
+.pk2-shipping-container {
+  width: 100%;
+  overflow: hidden;
+  padding: 1rem 0 2rem 0;
+}
+
+.pk2-shipping-track {
+  display: flex;
+  gap: 1.5rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 1rem 2rem 2rem 2rem;
+  /* Hide scrollbar */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.pk2-shipping-track::-webkit-scrollbar {
+  display: none;
+}
+
+.pk2-shipping-card {
+  flex: 0 0 260px;
+  scroll-snap-align: center;
+  background: var(--pk2-white);
+  border-radius: 20px;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(251, 165, 181, 0.15);
+  border: 1px solid rgba(251, 165, 181, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.pk2-shipping-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(251, 165, 181, 0.25);
+}
+
+.pk2-shipping-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--pk2-pink-bg);
+  color: var(--pk2-pink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.2rem;
+}
+
+.pk2-shipping-title {
+  font-family: var(--font-serif);
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--pk2-black);
+  margin: 0 0 0.5rem 0;
+  line-height: 1.2;
+}
+
+.pk2-shipping-price {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--pk2-pink);
+  margin: 0;
+}

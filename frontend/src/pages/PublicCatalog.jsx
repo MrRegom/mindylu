@@ -296,17 +296,39 @@ const PublicCatalog = () => {
       </section>
 
       {/* ── Envíos y Entregas ── */}
-      <section className="pk2-envios-section" id="envios" style={{ padding: '4rem 1.5rem', backgroundColor: '#fff', textAlign: 'center' }}>
-        <div className="pk2-section-header-inline" style={{ marginBottom: '2rem' }}>
+      <section className="pk2-envios-section" id="envios" style={{ padding: '4rem 0', backgroundColor: '#fff' }}>
+        <div className="pk2-section-header-inline" style={{ marginBottom: '1rem', textAlign: 'center' }}>
           <div className="pk2-subtitle">INFORMACIÓN DE</div>
           <h3 className="pk2-title-main">Envíos y Entregas</h3>
         </div>
-        <div style={{ maxWidth: '600px', margin: '0 auto', fontSize: '1.05rem', color: '#4a3b40', lineHeight: '1.8' }}>
-          {(config?.envios_texto || "Envíos a Viña del Mar $2500\nValparaíso $2500\nCurauma Placilla $2500\nQuilpué Villa Alemana $2500\n\nRegiones envío por Starken por pagar").split('\n').map((line, i) => (
-            <p key={i} style={{ margin: line.trim() ? '0.5rem 0' : '1.5rem 0' }}>
-              {line}
-            </p>
-          ))}
+        
+        <div className="pk2-shipping-container">
+          <div className="pk2-shipping-track">
+            {(config?.envios_texto || "Envíos a Viña del Mar $2500\nValparaíso $2500\nCurauma Placilla $2500\nQuilpué Villa Alemana $2500\n\nRegiones envío por Starken por pagar")
+              .split('\n')
+              .filter(line => line.trim() !== '')
+              .map((line, i) => {
+                let title = line;
+                let price = '';
+                if (line.includes('$')) {
+                  const parts = line.split('$');
+                  title = parts[0].trim();
+                  price = '$' + parts[1].trim();
+                } else if (line.toLowerCase().includes('por pagar')) {
+                  title = line.replace(/por pagar/i, '').trim();
+                  price = 'Por Pagar';
+                }
+                return (
+                  <div key={i} className="pk2-shipping-card">
+                    <div className="pk2-shipping-icon">
+                      <Truck size={28} strokeWidth={1.5} />
+                    </div>
+                    <h4 className="pk2-shipping-title">{title.replace(/Envíos a /i, '')}</h4>
+                    {price && <p className="pk2-shipping-price">{price}</p>}
+                  </div>
+                );
+            })}
+          </div>
         </div>
       </section>
 
