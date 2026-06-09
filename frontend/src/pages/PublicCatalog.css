@@ -86,16 +86,24 @@ a {
   color: var(--pk2-pink);
 }
 
-.pk2-logo-img-container {
-  height: 45px;
+.pk2-nav-brand-text {
+  font-family: var(--font-serif);
+  font-size: 2.2rem;
+  font-weight: 600;
+  color: var(--pk2-black);
+  letter-spacing: -1px;
+  cursor: pointer;
   display: flex;
-  align-items: center;
+  align-items: baseline;
+  line-height: 1;
 }
 
-.pk2-logo-img {
-  height: 100%;
-  width: auto;
-  object-fit: contain;
+.pk2-nav-brand-text span {
+  color: var(--pk2-pink);
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 2.6rem;
+  margin-left: 2px;
 }
 
 .pk2-nav-center {
