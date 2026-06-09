@@ -201,7 +201,7 @@ const PrendaForm = () => {
       </div>
 
       <form className="prenda-form" onSubmit={handleSubmit}>
-        <div className="form-section glass">
+        <div className="form-section glass" style={{ zIndex: 20, position: 'relative' }}>
           <h3>Detalles Base</h3>
           
           <div className="input-group" style={{ position: 'relative', zIndex: activeDropdown === 'nombre' ? 10 : 1 }}>
@@ -309,7 +309,7 @@ const PrendaForm = () => {
 
         </div>
 
-        <div className="form-section glass">
+        <div className="form-section glass" style={{ zIndex: 10, position: 'relative' }}>
           <div className="section-header-flex">
             <h3>Variantes y Stock</h3>
             <button type="button" className="btn-small-outline" onClick={handleAddVariante}>
@@ -318,11 +318,11 @@ const PrendaForm = () => {
           </div>
 
           <div className="variantes-list-edit">
-            {variantes.map((variante) => (
+            {variantes.map((variante, index) => (
               <div 
                 key={variante.id} 
                 className="variante-edit-card animate-slide-up"
-                style={{ zIndex: activeDropdown && String(activeDropdown).includes(variante.id) ? 100 : 1, position: 'relative' }}
+                style={{ zIndex: activeDropdown && String(activeDropdown).includes(variante.id) ? 100 : (50 - index), position: 'relative' }}
               >
                 <div className="variante-row">
                   <div className="input-group mini" style={{ position: 'relative', zIndex: activeDropdown === `color-${variante.id}` ? 100 : 1 }}>
@@ -415,7 +415,7 @@ const PrendaForm = () => {
         </div>
 
         {/* GALERÍA DE FOTOS MOVIDA ABAJO DE VARIANTES */}
-        <div className="form-section glass">
+        <div className="form-section glass" style={{ zIndex: 5, position: 'relative' }}>
           <h3>Imágenes (por foto elige color y orden)</h3>
           <p style={{fontSize: '0.85rem', color: '#666', marginBottom: '16px'}}>La que marques "Principal" será la portada.</p>
           <ImageUploader images={images} setImages={setImages} variantes={variantes} />
