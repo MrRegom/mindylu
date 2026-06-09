@@ -180,6 +180,12 @@ class ConfiguracionTienda(models.Model):
         default='Moda femenina seleccionada especialmente para ti',
         verbose_name=_('Título del Banner')
     )
+    banner_titulo_cursiva = models.CharField(
+        max_length=255,
+        default='Tu Mindy Lu.',
+        verbose_name=_('Título Cursiva del Banner'),
+        blank=True
+    )
     banner_subtitulo = models.TextField(
         default='Prendas únicas, elegantes y exclusivas.\nCada pieza seleccionada con amor y estilo.',
         verbose_name=_('Subtítulo del Banner')
