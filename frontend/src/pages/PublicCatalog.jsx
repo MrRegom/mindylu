@@ -58,6 +58,7 @@ const PublicCatalog = () => {
   const [successModalOpen, setSuccessModalOpen] = useState(false);
   const [itemAgregadoReciente, setItemAgregadoReciente] = useState(null);
   const [cantidadAComprar, setCantidadAComprar] = useState(1);
+  const [isLoading, setIsLoading] = useState(true);
 
   const categoriesScrollRef = useRef(null);
   const touchStartX = useRef(null);
@@ -74,6 +75,7 @@ const PublicCatalog = () => {
 
   const fetchData = async () => {
     try {
+      setIsLoading(true);
       const t = Date.now();
       const [prendasRes, configRes, catRes] = await Promise.all([
         api.get(`/catalogo/publico/prendas/?t=${t}`),
@@ -85,6 +87,8 @@ const PublicCatalog = () => {
       setCategorias(catRes.data.results || catRes.data);
     } catch (error) {
       console.error('Error fetching data', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
