@@ -50,6 +50,7 @@ const PublicCatalog = () => {
   
   const [prendaSeleccionada, setPrendaSeleccionada] = useState(null);
   const [varianteSeleccionada, setVarianteSeleccionada] = useState(null);
+  const [colorSeleccionado, setColorSeleccionado] = useState(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   
   const [successModalOpen, setSuccessModalOpen] = useState(false);
@@ -293,7 +294,11 @@ const PublicCatalog = () => {
               const uniqueColors = p.variantes ? Array.from(new Set(p.variantes.map(v => v.color))).filter(Boolean) : [];
 
               return (
-                <div key={p.id} className="pk2-card" onClick={() => { setPrendaSeleccionada(p); setActiveImageIndex(0); setVarianteSeleccionada(null); }}>
+                <div key={p.id} className="pk2-card" onClick={() => { 
+                  setPrendaSeleccionada(p); setActiveImageIndex(0); setVarianteSeleccionada(null); 
+                  const uniqueColors = p.variantes ? Array.from(new Set(p.variantes.map(v => v.color))).filter(Boolean) : [];
+                  setColorSeleccionado(uniqueColors.length > 0 ? uniqueColors[0] : null);
+                }}>
                   <div className="pk2-card-img-wrapper">
                     <img src={imgUrl} alt={p.nombre} />
                     <button className="pk2-card-heart" onClick={(e) => { e.stopPropagation(); showAlert('Añadido a favoritos'); }}>
@@ -326,7 +331,11 @@ const PublicCatalog = () => {
                       <span className="pk2-card-price">{formatPrice(p.precio)}</span>
                     </div>
 
-                    <button className="pk2-card-add-btn" onClick={(e) => { e.stopPropagation(); setPrendaSeleccionada(p); setActiveImageIndex(0); setVarianteSeleccionada(null); }}>
+                    <button className="pk2-card-add-btn" onClick={(e) => { 
+                       e.stopPropagation(); setPrendaSeleccionada(p); setActiveImageIndex(0); setVarianteSeleccionada(null); 
+                       const uniqueColors = p.variantes ? Array.from(new Set(p.variantes.map(v => v.color))).filter(Boolean) : [];
+                       setColorSeleccionado(uniqueColors.length > 0 ? uniqueColors[0] : null);
+                    }}>
                        Agregar <ShoppingBag size={16} />
                     </button>
                   </div>
@@ -364,9 +373,9 @@ const PublicCatalog = () => {
 
       {/* ── Product Modal (Select Variant) ── */}
       {prendaSeleccionada && !successModalOpen && (
-        <div className="pk2-modal-overlay" onClick={() => { setPrendaSeleccionada(null); setVarianteSeleccionada(null); setActiveImageIndex(0); }}>
+        <div className="pk2-modal-overlay" onClick={() => { setPrendaSeleccionada(null); setVarianteSeleccionada(null); setColorSeleccionado(null); setActiveImageIndex(0); }}>
           <div className="pk2-modal-content" onClick={e => e.stopPropagation()}>
-            <button className="pk2-modal-close" onClick={() => { setPrendaSeleccionada(null); setVarianteSeleccionada(null); setActiveImageIndex(0); }}>
+            <button className="pk2-modal-close" onClick={() => { setPrendaSeleccionada(null); setVarianteSeleccionada(null); setColorSeleccionado(null); setActiveImageIndex(0); }}>
               <X size={24} strokeWidth={1.5} />
             </button>
             <div className="pk2-modal-grid">
@@ -431,39 +440,65 @@ const PublicCatalog = () => {
                   <div className="pk2-modal-price">{formatPrice(prendaSeleccionada.precio)}</div>
                 </div>
                 
-                {/* Variantes (Tallas y Colores) */}
+                {/* Variantes (Tallas y Colores Estilo Falabella) */}
                 {prendaSeleccionada.variantes && prendaSeleccionada.variantes.length > 0 && (
-                  <div className="pk2-modal-variants">
-                    <h4 className="pk2-variants-title">Selecciona tu opción:</h4>
-                    <div className="pk2-variants-list">
-                      {prendaSeleccionada.variantes.map((v) => {
-                        const agotada = v.cantidad === 0;
-                        const isSelected = varianteSeleccionada?.id === v.id;
-                        return (
-                          <button 
-                            key={v.id} 
-                            className={`pk2-variant-pill ${agotada ? 'agotada' : ''}`}
-                            style={{ 
-                              border: isSelected ? '2px solid var(--color-primary)' : '', 
-                              background: isSelected ? 'var(--color-surface)' : '' 
-                            }}
-                            disabled={agotada}
-                            onClick={() => {
-                              setVarianteSeleccionada(v);
-                              if (prendaSeleccionada.imagenes && prendaSeleccionada.imagenes.length > 0 && v.color) {
-                                const matchingImgIndex = prendaSeleccionada.imagenes.findIndex(img => img.color && img.color.toLowerCase() === v.color.toLowerCase());
-                                if (matchingImgIndex !== -1) setActiveImageIndex(matchingImgIndex);
-                              }
-                            }}
-                          >
-                            <span className="pk2-v-color">{v.color || 'Único'}</span>
-                            {v.talla && <span className="pk2-v-divider">|</span>}
-                            {v.talla && <span className="pk2-v-size">Talla: {v.talla}</span>}
-                            {agotada && <span className="pk2-v-out"> (Agotado)</span>}
-                          </button>
-                        );
-                      })}
+                  <div className="pk2-modal-variants-falabella">
+                    
+                    {/* Selector de Color (Miniaturas) */}
+                    {Array.from(new Set(prendaSeleccionada.variantes.map(v => v.color))).filter(Boolean).length > 0 && (
+                      <div className="pk2-modal-color-selector">
+                        <p className="pk2-modal-label">Color: <strong>{colorSeleccionado || 'Único'}</strong></p>
+                        <div className="pk2-modal-color-thumbnails">
+                          {Array.from(new Set(prendaSeleccionada.variantes.map(v => v.color))).filter(Boolean).map((col, idx) => {
+                             const imgMatch = prendaSeleccionada.imagenes?.find(img => img.color?.toLowerCase() === col.toLowerCase());
+                             const isSelected = colorSeleccionado === col;
+                             return (
+                               <button 
+                                 key={idx} 
+                                 className={`pk2-modal-color-thumb ${isSelected ? 'selected' : ''}`}
+                                 onClick={() => {
+                                    setColorSeleccionado(col);
+                                    setVarianteSeleccionada(null); // Limpiar talla al cambiar color
+                                    if (imgMatch) {
+                                      const imgIndex = prendaSeleccionada.imagenes.findIndex(img => img.color?.toLowerCase() === col.toLowerCase());
+                                      if (imgIndex !== -1) setActiveImageIndex(imgIndex);
+                                    }
+                                 }}
+                                 title={col}
+                               >
+                                 {imgMatch ? (
+                                   <img src={getImageUrl(imgMatch.imagen)} alt={col} />
+                                 ) : (
+                                   <span style={{ backgroundColor: getColorHex(col) }}></span>
+                                 )}
+                               </button>
+                             );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Selector de Tallas */}
+                    <div className="pk2-modal-size-selector">
+                      <p className="pk2-modal-label">Elige una opción:</p>
+                      <div className="pk2-variants-list">
+                        {prendaSeleccionada.variantes.filter(v => v.color === colorSeleccionado || !v.color).map((v) => {
+                          const agotada = v.cantidad === 0;
+                          const isSelected = varianteSeleccionada?.id === v.id;
+                          return (
+                            <button 
+                              key={v.id} 
+                              className={`pk2-variant-size-pill ${agotada ? 'agotada' : ''} ${isSelected ? 'selected' : ''}`}
+                              disabled={agotada}
+                              onClick={() => setVarianteSeleccionada(v)}
+                            >
+                              {v.talla || 'Única'}
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
+                    
                   </div>
                 )}
 
@@ -514,6 +549,7 @@ const PublicCatalog = () => {
                  setSuccessModalOpen(false); 
                  setPrendaSeleccionada(null); 
                  setVarianteSeleccionada(null);
+                 setColorSeleccionado(null);
                  setCartOpen(true); 
                }}>
                  Ir al Carro

@@ -482,15 +482,32 @@ button { font-family: var(--font-sans); }
 .pk2-modal-price { font-size: 1.4rem; font-weight: 600; color: var(--pk2-black); }
 
 .pk2-variants-title { font-size: 0.8rem; letter-spacing: 1px; color: var(--pk2-gray); margin-bottom: 15px; text-transform: uppercase; }
-.pk2-variants-list { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 30px; }
-.pk2-variant-pill {
-  padding: 8px 15px; border: 1px solid #ddd; border-radius: 4px;
-  background: var(--pk2-white); cursor: pointer; font-size: 0.85rem;
-  display: flex; gap: 8px; align-items: center; transition: all 0.2s;
+
+/* ── Falabella Variants ── */
+.pk2-modal-variants-falabella { display: flex; flex-direction: column; gap: 20px; margin-bottom: 30px; }
+.pk2-modal-label { font-size: 0.9rem; color: var(--pk2-black); margin: 0 0 10px 0; }
+.pk2-modal-label strong { font-weight: 600; }
+
+.pk2-modal-color-thumbnails { display: flex; flex-wrap: wrap; gap: 10px; }
+.pk2-modal-color-thumb {
+  width: 48px; height: 48px; border: 2px solid transparent; border-radius: 4px; padding: 2px;
+  background: transparent; cursor: pointer; transition: all 0.2s; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
 }
-.pk2-variant-pill:hover:not(.agotada) { border-color: var(--pk2-pink); }
-.pk2-variant-pill.agotada { opacity: 0.5; cursor: not-allowed; background: #fafafa; }
-.pk2-v-divider { color: #ccc; }
+.pk2-modal-color-thumb img { width: 100%; height: 100%; object-fit: cover; border-radius: 2px; }
+.pk2-modal-color-thumb span { width: 100%; height: 100%; border-radius: 2px; border: 1px solid #eee; display: block; }
+.pk2-modal-color-thumb:hover { border-color: #ddd; }
+.pk2-modal-color-thumb.selected { border-color: var(--pk2-pink); }
+
+.pk2-variants-list { display: flex; flex-wrap: wrap; gap: 10px; }
+.pk2-variant-size-pill {
+  min-width: 45px; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px;
+  background: var(--pk2-white); cursor: pointer; font-size: 0.9rem; text-align: center;
+  transition: all 0.2s; font-weight: 500; color: var(--pk2-black);
+}
+.pk2-variant-size-pill:hover:not(.agotada) { border-color: var(--pk2-black); }
+.pk2-variant-size-pill.selected { border-color: var(--pk2-black); background: var(--pk2-black); color: var(--pk2-white); }
+.pk2-variant-size-pill.agotada { opacity: 0.4; cursor: not-allowed; background: #fafafa; text-decoration: line-through; }
 
 .pk2-modal-actions { display: flex; flex-direction: column; gap: 15px; margin-top: auto; }
 .pk2-btn-black {
