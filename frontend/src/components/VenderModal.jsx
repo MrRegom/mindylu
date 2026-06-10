@@ -414,7 +414,7 @@ const VenderModal = ({ isOpen, onClose, ventaActiva, setVentaActiva, onSuccess }
           </div>
           <div className="modal-actions">
             <button type="button" className="btn-cancel-sale" onClick={onClose}>Cancelar</button>
-            <button type="button" className="btn-confirm-sale" disabled={isSubmitting || !formData.clienta_id || cart.length === 0} onClick={handleSubmit}>
+            <button type="button" className="btn-confirm-sale" disabled={isSubmitting} onClick={handleSubmit}>
               {isSubmitting ? 'Registrando...' : 'Confirmar Pedido'}
             </button>
           </div>
