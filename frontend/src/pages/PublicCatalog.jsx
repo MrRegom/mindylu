@@ -33,7 +33,7 @@ const PublicCatalog = () => {
   const [cartItems, setCartItems] = useState([]);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [prendaSeleccionada, setPrendaSeleccionada] = useState(null);
-  const [varianteSeleccionada, setVarianteSeleccionada] = useState(null);
+  const [variantesSeleccionadas, setVariantesSeleccionadas] = useState([]);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const categoriesScrollRef = useRef(null);
   const touchStartX = useRef(null);
@@ -69,8 +69,9 @@ const PublicCatalog = () => {
     window.open(`https://wa.me/${num}?text=${encodeURIComponent(text)}`, '_blank');
   };
 
-  const addToCart = (prenda) => {
-    setCartItems([...cartItems, prenda]);
+  const addToCart = (prendasInput) => {
+    const toAdd = Array.isArray(prendasInput) ? prendasInput : [prendasInput];
+    setCartItems([...cartItems, ...toAdd]);
     showAlert("¡Agregado a la bolsa!");
     // Eliminamos el cierre automático del modal para que pueda elegir más tallas de la misma prenda
   };
@@ -384,9 +385,9 @@ const PublicCatalog = () => {
 
       {/* ── Product Modal (Luxury Redesign) ── */}
       {prendaSeleccionada && (
-        <div className="pk2-modal-overlay" onClick={() => { setPrendaSeleccionada(null); setVarianteSeleccionada(null); setActiveImageIndex(0); }}>
+        <div className="pk2-modal-overlay" onClick={() => { setPrendaSeleccionada(null); setVariantesSeleccionadas([]); setActiveImageIndex(0); }}>
           <div className="pk2-modal-content" onClick={e => e.stopPropagation()}>
-            <button className="pk2-modal-close" onClick={() => { setPrendaSeleccionada(null); setVarianteSeleccionada(null); setActiveImageIndex(0); }}>
+            <button className="pk2-modal-close" onClick={() => { setPrendaSeleccionada(null); setVariantesSeleccionadas([]); setActiveImageIndex(0); }}>
               <X size={24} strokeWidth={1.5} />
             </button>
             <div className="pk2-modal-grid">
@@ -418,7 +419,9 @@ const PublicCatalog = () => {
                     const imgObj = images[index];
                     if (imgObj && imgObj.color && prendaSeleccionada.variantes) {
                       const match = prendaSeleccionada.variantes.find(v => v.color && v.color.toLowerCase() === imgObj.color.toLowerCase() && v.cantidad > 0);
-                      if (match) setVarianteSeleccionada(match);
+                      if (match) {
+                        setVariantesSeleccionadas(prev => prev.some(vs => vs.id === match.id) ? prev : [...prev, match]);
+                      }
                     }
                   };
 
@@ -480,7 +483,7 @@ const PublicCatalog = () => {
                     <div className="pk2-variants-list">
                       {prendaSeleccionada.variantes.map((v) => {
                         const agotada = v.cantidad === 0;
-                        const isSelected = varianteSeleccionada?.id === v.id;
+                        const isSelected = variantesSeleccionadas.some(vs => vs.id === v.id);
                         return (
                           <button 
                             key={v.id} 
@@ -491,10 +494,14 @@ const PublicCatalog = () => {
                             }}
                             disabled={agotada}
                             onClick={() => {
-                              setVarianteSeleccionada(v);
-                              if (prendaSeleccionada.imagenes && prendaSeleccionada.imagenes.length > 0 && v.color) {
-                                const matchingImgIndex = prendaSeleccionada.imagenes.findIndex(img => img.color && img.color.toLowerCase() === v.color.toLowerCase());
-                                if (matchingImgIndex !== -1) setActiveImageIndex(matchingImgIndex);
+                              if (isSelected) {
+                                setVariantesSeleccionadas(prev => prev.filter(vs => vs.id !== v.id));
+                              } else {
+                                setVariantesSeleccionadas(prev => [...prev, v]);
+                                if (prendaSeleccionada.imagenes && prendaSeleccionada.imagenes.length > 0 && v.color) {
+                                  const matchingImgIndex = prendaSeleccionada.imagenes.findIndex(img => img.color && img.color.toLowerCase() === v.color.toLowerCase());
+                                  if (matchingImgIndex !== -1) setActiveImageIndex(matchingImgIndex);
+                                }
                               }
                             }}
                           >
@@ -516,11 +523,16 @@ const PublicCatalog = () => {
                     className="pk2-btn-black"
                     onClick={() => {
                       if (prendaSeleccionada.variantes && prendaSeleccionada.variantes.length > 0) {
-                        if (!varianteSeleccionada) {
-                          showAlert("Por favor selecciona una variante (color/talla).");
+                        if (variantesSeleccionadas.length === 0) {
+                          showAlert("Por favor selecciona al menos una variante (color/talla).");
                           return;
                         }
-                        addToCart({...prendaSeleccionada, varianteSeleccionada: varianteSeleccionada});
+                        const prendasA_Agregar = variantesSeleccionadas.map(vs => ({
+                          ...prendaSeleccionada, 
+                          varianteSeleccionada: vs
+                        }));
+                        addToCart(prendasA_Agregar);
+                        setVariantesSeleccionadas([]); // Limpiar selección tras agregar
                       } else {
                         addToCart(prendaSeleccionada);
                       }
@@ -531,11 +543,15 @@ const PublicCatalog = () => {
                     {prendaSeleccionada.estado === 'disponible' ? 'AGREGAR AL CARRITO' : 'NO DISPONIBLE'}
                   </button>
                   <button className="pk2-btn-outline" onClick={() => {
-                    if (prendaSeleccionada.variantes && prendaSeleccionada.variantes.length > 0 && !varianteSeleccionada) {
-                      showAlert("Por favor selecciona una variante (color/talla) para consultar.");
+                    if (prendaSeleccionada.variantes && prendaSeleccionada.variantes.length > 0 && variantesSeleccionadas.length === 0) {
+                      showAlert("Por favor selecciona al menos una variante (color/talla) para consultar.");
                       return;
                     }
-                    const varText = varianteSeleccionada ? ` (Opción: ${varianteSeleccionada.color || ''} ${varianteSeleccionada.talla || ''})` : '';
+                    let varText = '';
+                    if (variantesSeleccionadas.length > 0) {
+                      const opciones = variantesSeleccionadas.map(vs => `${vs.color || ''} ${vs.talla || ''}`).join(', ');
+                      varText = ` (Opciones: ${opciones})`;
+                    }
                     handleWhatsApp(`Hola, me encantó esta prenda: ${prendaSeleccionada.nombre}${varText}. ¿Me das más detalles?`)
                   }}>
                     <MessageCircle size={18} strokeWidth={1.5} />
