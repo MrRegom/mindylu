@@ -3,7 +3,7 @@ import api from '../services/api';
 import { 
   ShoppingBag, X, Search, User, Heart, 
   Truck, ShieldCheck, CreditCard, RefreshCcw, MessageCircle, Menu,
-  ChevronLeft, ChevronRight
+  ChevronLeft, ChevronRight, Check
 } from 'lucide-react';
 import './PublicCatalog.css';
 import { showAlert } from '../utils/alerts';
@@ -25,6 +25,21 @@ const formatPrice = (price) => {
   return `$${Number(price).toLocaleString('es-CL')}`;
 };
 
+const colorHexMap = {
+  'blanco': '#FFFFFF', 'negro': '#000000', 'gris': '#808080', 'rojo': '#FF0000',
+  'azul': '#0000FF', 'verde': '#008000', 'amarillo': '#FFFF00', 'rosa': '#FFC0CB',
+  'rosado': '#FFC0CB', 'fucsia': '#FF00FF', 'lila': '#C8A2C8', 'morado': '#800080',
+  'celeste': '#87CEEB', 'naranja': '#FFA500', 'cafe': '#6F4E37', 'café': '#6F4E37',
+  'beige': '#F5F5DC', 'crema': '#FFFDD0', 'mostaza': '#FFDB58', 'burdeo': '#800020',
+  'vino': '#722F37', 'dorado': '#FFD700', 'plateado': '#C0C0C0',
+};
+
+const getColorHex = (colorName) => {
+  if (!colorName) return '#ccc';
+  const name = colorName.toLowerCase().trim();
+  return colorHexMap[name] || '#ccc';
+};
+
 const PublicCatalog = () => {
   const [prendas, setPrendas] = useState([]);
   const [categorias, setCategorias] = useState([]);
@@ -32,9 +47,14 @@ const PublicCatalog = () => {
   const [cartOpen, setCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState([]);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
   const [prendaSeleccionada, setPrendaSeleccionada] = useState(null);
-  const [variantesSeleccionadas, setVariantesSeleccionadas] = useState([]);
+  const [varianteSeleccionada, setVarianteSeleccionada] = useState(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  
+  const [successModalOpen, setSuccessModalOpen] = useState(false);
+  const [itemAgregadoReciente, setItemAgregadoReciente] = useState(null);
+
   const categoriesScrollRef = useRef(null);
   const touchStartX = useRef(null);
 
@@ -69,11 +89,20 @@ const PublicCatalog = () => {
     window.open(`https://wa.me/${num}?text=${encodeURIComponent(text)}`, '_blank');
   };
 
-  const addToCart = (prendasInput) => {
-    const toAdd = Array.isArray(prendasInput) ? prendasInput : [prendasInput];
-    setCartItems([...cartItems, ...toAdd]);
-    showAlert("¡Agregado a la bolsa!");
-    // Eliminamos el cierre automático del modal para que pueda elegir más tallas de la misma prenda
+  const addToCart = () => {
+    if (prendaSeleccionada.variantes && prendaSeleccionada.variantes.length > 0) {
+      if (!varianteSeleccionada) {
+        showAlert("Por favor selecciona una variante (color/talla).");
+        return;
+      }
+      const itemToAdd = { ...prendaSeleccionada, varianteSeleccionada };
+      setCartItems([...cartItems, itemToAdd]);
+      setItemAgregadoReciente(itemToAdd);
+    } else {
+      setCartItems([...cartItems, prendaSeleccionada]);
+      setItemAgregadoReciente(prendaSeleccionada);
+    }
+    setSuccessModalOpen(true);
   };
 
   const removeFromCart = (index) => {
@@ -99,43 +128,28 @@ const PublicCatalog = () => {
     setCartItems([]);
   };
 
-  const ultimasPrendas = prendas.slice(0, 8);
-
-  // Fake categories for layout matching
-  const categoryBubbles = [
-    { name: "VESTIDOS", img: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&q=80&w=300" },
-    { name: "TOPS", img: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&q=80&w=300" },
-    { name: "PANTALONES", img: "https://images.unsplash.com/photo-1584370848010-d7fe6bc767ec?auto=format&fit=crop&q=80&w=300" },
-    { name: "SETS", img: "https://images.unsplash.com/photo-1515347619152-16a7fbc266cb?auto=format&fit=crop&q=80&w=300" },
-    { name: "ACCESORIOS", img: "https://images.unsplash.com/photo-1584916201218-f4242ceb4809?auto=format&fit=crop&q=80&w=300" }
-  ];
+  const ultimasPrendas = prendas.slice(0, 16);
 
   // Carousel Logic
   const [currentSlide, setCurrentSlide] = useState(0);
-  
-  // Recopilar slides (banner + polaroids)
   const slides = [];
   if (config?.banner_imagen) slides.push(getImageUrl(config.banner_imagen));
   if (config?.polaroid_1_imagen) slides.push(getImageUrl(config.polaroid_1_imagen));
   if (config?.polaroid_2_imagen) slides.push(getImageUrl(config.polaroid_2_imagen));
   if (config?.polaroid_3_imagen) slides.push(getImageUrl(config.polaroid_3_imagen));
-  // Si no hay ninguno, usar un placeholder
   if (slides.length === 0) slides.push("https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&q=80&w=1200");
 
   useEffect(() => {
     if (slides.length <= 1) return;
     const interval = setInterval(() => {
       setCurrentSlide(prev => (prev + 1) % slides.length);
-    }, 5000); // 5 segundos por slide
+    }, 5000);
     return () => clearInterval(interval);
   }, [slides.length]);
 
-  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % slides.length);
-  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
-
   return (
     <div className="pk2-root">
-      {/* ── Marquee (Cinta Deslizante) ── */}
+      {/* ── Marquee ── */}
       {config?.marquesina_texto && (
         <div className="pk2-marquee-bar">
           <div className="pk2-marquee-content" style={{ animationDuration: `${config.marquesina_velocidad || 25}s` }}>
@@ -144,28 +158,41 @@ const PublicCatalog = () => {
         </div>
       )}
 
-      {/* ── Navbar ── */}
+      {/* ── Navbar (Falabella Style) ── */}
       <nav className="pk2-navbar">
-        <div className="pk2-nav-left">
-          <Menu size={24} className="pk2-mobile-menu-icon" onClick={() => setMobileMenuOpen(true)} />
-          <div className="pk2-nav-brand-text">
-            {config?.tienda_nombre || 'MindyLu'}<span>.</span>
+        <div className="pk2-nav-top">
+          <div className="pk2-nav-left">
+            <Menu size={28} className="pk2-mobile-menu-icon" onClick={() => setMobileMenuOpen(true)} />
+            <div className="pk2-nav-brand-text">
+              {config?.tienda_nombre || 'MindyLu'}<span>.</span>
+            </div>
+          </div>
+
+          <div className="pk2-nav-center pk2-hide-mobile">
+            <div className="pk2-search-bar">
+              <input type="text" placeholder={`Buscar en ${config?.tienda_nombre || 'MindyLu'}...`} />
+              <button><Search size={20} strokeWidth={2} /></button>
+            </div>
+          </div>
+
+          <div className="pk2-nav-right">
+            <div className="pk2-nav-user pk2-hide-mobile" onClick={() => showAlert('Próximamente: Portal de Clientas')}>
+              <User size={24} strokeWidth={1.5} />
+              <span>Inicia sesión</span>
+            </div>
+            <button className="pk2-icon-btn pk2-cart-btn" onClick={() => setCartOpen(true)}>
+              <ShoppingBag size={26} strokeWidth={1.5} />
+              {cartItems.length > 0 && <span className="pk2-cart-badge">{cartItems.length}</span>}
+            </button>
           </div>
         </div>
-
-        <div className="pk2-nav-center">
-          <a href="#">CATÁLOGO</a>
-          <a href="#envios">ENVÍOS</a>
-          <a href="#envios">ENTREGAS</a>
-        </div>
-
-        <div className="pk2-nav-right">
-          <button className="pk2-icon-btn"><Search size={20} strokeWidth={1.5} /></button>
-          <button className="pk2-icon-btn pk2-hide-mobile"><Heart size={20} strokeWidth={1.5} /></button>
-          <button className="pk2-icon-btn pk2-cart-btn" onClick={() => setCartOpen(true)}>
-            <ShoppingBag size={20} strokeWidth={1.5} />
-            {cartItems.length > 0 && <span className="pk2-cart-badge">{cartItems.length}</span>}
-          </button>
+        
+        {/* Mobile Search Bar */}
+        <div className="pk2-nav-bottom pk2-hide-desktop">
+           <div className="pk2-search-bar-mobile">
+             <input type="text" placeholder={`Buscar en ${config?.tienda_nombre || 'MindyLu'}...`} />
+             <button><Search size={18} strokeWidth={2} /></button>
+           </div>
         </div>
       </nav>
 
@@ -178,37 +205,22 @@ const PublicCatalog = () => {
           <a href="#" onClick={() => setMobileMenuOpen(false)}>CATÁLOGO</a>
           <a href="#envios" onClick={() => setMobileMenuOpen(false)}>ENVÍOS</a>
           <a href="#envios" onClick={() => setMobileMenuOpen(false)}>ENTREGAS</a>
+          <a href="#" onClick={() => { showAlert('Próximamente'); setMobileMenuOpen(false); }}>MI CUENTA</a>
         </div>
       </div>
       {mobileMenuOpen && <div className="pk2-overlay" onClick={() => setMobileMenuOpen(false)}></div>}
 
       {/* ── Hero Carousel ── */}
       <header className="pk2-hero-carousel">
-        
-        {/* Slides Container */}
         <div className="pk2-carousel-slides">
           {slides.map((slide, idx) => (
             <div 
               key={idx} 
               className={`pk2-carousel-slide ${idx === currentSlide ? 'active' : ''}`}
               style={{ backgroundImage: `url(${slide})` }}
-            >
-              <div className="pk2-hero-overlay"></div>
-            </div>
+            />
           ))}
         </div>
-
-        {/* Text Content Overlay */}
-        <div className="pk2-hero-content">
-          <h1>{config?.banner_titulo || 'TU ESTILO.\nTU MOMENTO.'}</h1>
-          <h2 className="pk2-hero-cursive">{config?.banner_titulo_cursiva || 'Tu Mindy Lu.'}</h2>
-          <p>{config?.banner_subtitulo || 'Piezas únicas para mujeres reales\nque inspiran todos los días.'}</p>
-          <button className="pk2-hero-btn" onClick={() => document.getElementById('lo-nuevo').scrollIntoView({behavior: 'smooth'})}>
-            DESCUBRIR COLECCIÓN →
-          </button>
-        </div>
-
-        {/* Carousel Controls */}
         {slides.length > 1 && (
           <div className="pk2-carousel-controls">
             <div className="pk2-carousel-dots">
@@ -224,71 +236,53 @@ const PublicCatalog = () => {
         )}
       </header>
 
-      {/* ── Feature Strip ── */}
-      <section className="pk2-features">
-        <div className="pk2-feature-item">
-          <Truck size={24} strokeWidth={1} />
-          <div>
-            <strong>ENVÍO A DOMICILIO</strong>
-            <span>sobre $40.000</span>
-          </div>
-        </div>
-        <div className="pk2-feature-item">
-          <ShieldCheck size={24} strokeWidth={1} />
-          <div>
-            <strong>PAGO SEGURO</strong>
-            <span>100% protegido</span>
-          </div>
-        </div>
-        <div className="pk2-feature-item pk2-hide-mobile">
-          <MessageCircle size={24} strokeWidth={1} />
-          <div>
-            <strong>ATENCIÓN PERSONALIZADA</strong>
-            <span>escríbenos por WhatsApp</span>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Categories Strip (Typography Only) ── */}
+      {/* ── Categories Strip (Falabella Style under banner) ── */}
       <section className="pk2-categories-strip">
-        <div className="pk2-section-header-inline">
-          <div className="pk2-subtitle">COLECCIONES EXCLUSIVAS</div>
-          <h3 className="pk2-title-main">Elige tu<br/><em>estilo</em></h3>
-        </div>
-        
         <div className="pk2-categories-wrapper">
           <button className="pk2-cat-arrow left" onClick={(e) => { e.preventDefault(); scrollCategories(-1); }}>
-            <ChevronLeft size={20} />
+            <ChevronLeft size={24} strokeWidth={1.5} />
           </button>
           
           <div className="pk2-categories-horizontal-scroll" ref={categoriesScrollRef}>
             {categorias && categorias.length > 0 ? categorias.map((cat) => (
-              <a href="#" key={cat.id} className="pk2-category-word">
-                <span className="pk2-cursive-word">{cat.nombre}</span>
-              </a>
+              <div key={cat.id} className="pk2-category-item" onClick={() => document.getElementById('lo-nuevo').scrollIntoView({behavior: 'smooth'})}>
+                <div className="pk2-category-img-placeholder">
+                   <img src="https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&q=80&w=150" alt={cat.nombre} />
+                </div>
+                <span>{cat.nombre}</span>
+              </div>
             )) : (
-              <div className="pk2-category-word">
-                <span className="pk2-cursive-word">Próximamente...</span>
+              <div className="pk2-category-item">
+                <div className="pk2-category-img-placeholder"></div>
+                <span>Próximamente...</span>
               </div>
             )}
           </div>
 
           <button className="pk2-cat-arrow right" onClick={(e) => { e.preventDefault(); scrollCategories(1); }}>
-            <ChevronRight size={20} />
+            <ChevronRight size={24} strokeWidth={1.5} />
           </button>
         </div>
       </section>
 
-      {/* ── Recién Llegados ── */}
-      <section className="pk2-latest" id="lo-nuevo">
-        <div className="pk2-section-header">
-          <div>
-            <div className="pk2-subtitle">LO MÁS NUEVO</div>
-            <h3 className="pk2-title-main">Recién llegados</h3>
-          </div>
-          <a href="#" className="pk2-link">VER TODO →</a>
+      {/* ── Feature Strip ── */}
+      <section className="pk2-features">
+        <div className="pk2-feature-item">
+          <Truck size={24} strokeWidth={1.5} />
+          <div><strong>ENVÍO A DOMICILIO</strong><span>sobre $40.000</span></div>
         </div>
+        <div className="pk2-feature-item">
+          <ShieldCheck size={24} strokeWidth={1.5} />
+          <div><strong>PAGO SEGURO</strong><span>100% protegido</span></div>
+        </div>
+        <div className="pk2-feature-item pk2-hide-mobile">
+          <MessageCircle size={24} strokeWidth={1.5} />
+          <div><strong>ATENCIÓN PERSONALIZADA</strong><span>vía WhatsApp</span></div>
+        </div>
+      </section>
 
+      {/* ── Catalog Grid ── */}
+      <section className="pk2-latest" id="lo-nuevo">
         {prendas.length === 0 ? (
           <div className="pk2-empty">Próximamente nueva colección...</div>
         ) : (
@@ -296,11 +290,13 @@ const PublicCatalog = () => {
             {ultimasPrendas.map((p) => {
               const rawUrl = p.foto_url || (p.imagenes && p.imagenes[0]?.imagen) || "";
               const imgUrl = getImageUrl(rawUrl);
+              const uniqueColors = p.variantes ? Array.from(new Set(p.variantes.map(v => v.color))).filter(Boolean) : [];
+
               return (
                 <div key={p.id} className="pk2-card" onClick={() => { setPrendaSeleccionada(p); setActiveImageIndex(0); setVarianteSeleccionada(null); }}>
                   <div className="pk2-card-img-wrapper">
                     <img src={imgUrl} alt={p.nombre} />
-                    <button className="pk2-card-heart" onClick={(e) => { e.stopPropagation(); /* TODO fav */ }}>
+                    <button className="pk2-card-heart" onClick={(e) => { e.stopPropagation(); showAlert('Añadido a favoritos'); }}>
                       <Heart size={18} strokeWidth={1.5} />
                     </button>
                     {p.estado !== 'disponible' && (
@@ -310,8 +306,29 @@ const PublicCatalog = () => {
                     )}
                   </div>
                   <div className="pk2-card-info">
+                    <p className="pk2-card-brand">{config?.tienda_nombre?.toUpperCase() || 'MINDYLU'}</p>
                     <h4>{p.nombre}</h4>
-                    <span className="pk2-card-price">{formatPrice(p.precio)}</span>
+                    
+                    {uniqueColors.length > 0 && (
+                       <div className="pk2-card-colors">
+                         {uniqueColors.map((colorName, idx) => {
+                            const imgMatch = p.imagenes?.find(img => img.color?.toLowerCase() === colorName.toLowerCase());
+                            if (imgMatch) {
+                               return <img key={idx} src={getImageUrl(imgMatch.imagen)} alt={colorName} className="pk2-card-color-dot img-dot" title={colorName} />;
+                            }
+                            return <span key={idx} className="pk2-card-color-dot" style={{ backgroundColor: getColorHex(colorName) }} title={colorName}></span>;
+                         })}
+                         {uniqueColors.length > 5 && <span className="pk2-card-color-more">+{uniqueColors.length - 5}</span>}
+                       </div>
+                    )}
+
+                    <div className="pk2-card-price-row">
+                      <span className="pk2-card-price">{formatPrice(p.precio)}</span>
+                    </div>
+
+                    <button className="pk2-card-add-btn" onClick={(e) => { e.stopPropagation(); setPrendaSeleccionada(p); setActiveImageIndex(0); setVarianteSeleccionada(null); }}>
+                       Agregar <ShoppingBag size={16} />
+                    </button>
                   </div>
                 </div>
               );
@@ -320,44 +337,7 @@ const PublicCatalog = () => {
         )}
       </section>
 
-      {/* ── Envíos y Entregas ── */}
-      <section className="pk2-envios-section" id="envios" style={{ padding: '4rem 0', backgroundColor: '#fff' }}>
-        <div className="pk2-section-header-inline" style={{ marginBottom: '1rem', textAlign: 'center' }}>
-          <div className="pk2-subtitle">INFORMACIÓN DE</div>
-          <h3 className="pk2-title-main">Envíos y Entregas</h3>
-        </div>
-        
-        <div className="pk2-shipping-container">
-          <div className="pk2-shipping-track">
-            {(config?.envios_texto || "Envíos a Viña del Mar $2500\nValparaíso $2500\nCurauma Placilla $2500\nQuilpué Villa Alemana $2500\n\nRegiones envío por Starken por pagar")
-              .split('\n')
-              .filter(line => line.trim() !== '')
-              .map((line, i) => {
-                let title = line;
-                let price = '';
-                if (line.includes('$')) {
-                  const parts = line.split('$');
-                  title = parts[0].trim();
-                  price = '$' + parts[1].trim();
-                } else if (line.toLowerCase().includes('por pagar')) {
-                  title = line.replace(/por pagar/i, '').trim();
-                  price = 'Por Pagar';
-                }
-                return (
-                  <div key={i} className="pk2-shipping-card">
-                    <div className="pk2-shipping-icon">
-                      <Truck size={28} strokeWidth={1.5} />
-                    </div>
-                    <h4 className="pk2-shipping-title">{title.replace(/Envíos a /i, '')}</h4>
-                    {price && <p className="pk2-shipping-price">Cargo: {price}</p>}
-                  </div>
-                );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Footer Estilo Revista (Dark & Elegant) ── */}
+      {/* ── Footer ── */}
       <footer className="pk2-footer">
         <div className="pk2-footer-content">
           <div className="pk2-footer-brand">
@@ -368,8 +348,7 @@ const PublicCatalog = () => {
             <div className="pk2-footer-links">
               <h4>AYUDA</h4>
               <a href="#">Cambios y Devoluciones</a>
-              <a href="#">Envíos y Entregas</a>
-              <a href="#">Términos y Condiciones</a>
+              <a href="#envios">Envíos y Entregas</a>
             </div>
             <div className="pk2-footer-links">
               <h4>CONTACTO</h4>
@@ -383,11 +362,11 @@ const PublicCatalog = () => {
         </div>
       </footer>
 
-      {/* ── Product Modal (Luxury Redesign) ── */}
-      {prendaSeleccionada && (
-        <div className="pk2-modal-overlay" onClick={() => { setPrendaSeleccionada(null); setVariantesSeleccionadas([]); setActiveImageIndex(0); }}>
+      {/* ── Product Modal (Select Variant) ── */}
+      {prendaSeleccionada && !successModalOpen && (
+        <div className="pk2-modal-overlay" onClick={() => { setPrendaSeleccionada(null); setVarianteSeleccionada(null); setActiveImageIndex(0); }}>
           <div className="pk2-modal-content" onClick={e => e.stopPropagation()}>
-            <button className="pk2-modal-close" onClick={() => { setPrendaSeleccionada(null); setVariantesSeleccionadas([]); setActiveImageIndex(0); }}>
+            <button className="pk2-modal-close" onClick={() => { setPrendaSeleccionada(null); setVarianteSeleccionada(null); setActiveImageIndex(0); }}>
               <X size={24} strokeWidth={1.5} />
             </button>
             <div className="pk2-modal-grid">
@@ -416,46 +395,27 @@ const PublicCatalog = () => {
 
                   const handleImageChange = (index, images) => {
                     setActiveImageIndex(index);
-                    const imgObj = images[index];
-                    if (imgObj && imgObj.color && prendaSeleccionada.variantes) {
-                      const match = prendaSeleccionada.variantes.find(v => v.color && v.color.toLowerCase() === imgObj.color.toLowerCase() && v.cantidad > 0);
-                      if (match) {
-                        setVariantesSeleccionadas(prev => prev.some(vs => vs.id === match.id) ? prev : [...prev, match]);
-                      }
-                    }
                   };
 
-                  const handleTouchStart = (e) => {
-                    touchStartX.current = e.touches[0].clientX;
-                  };
-
+                  const handleTouchStart = (e) => { touchStartX.current = e.touches[0].clientX; };
                   const handleTouchEnd = (e) => {
                     if (!touchStartX.current) return;
-                    const touchEnd = e.changedTouches[0].clientX;
-                    const diff = touchStartX.current - touchEnd;
-                    if (diff > 40) {
-                      handleNextImage();
-                    } else if (diff < -40) {
-                      handlePrevImage();
-                    }
+                    const diff = touchStartX.current - e.changedTouches[0].clientX;
+                    if (diff > 40) handleNextImage();
+                    else if (diff < -40) handlePrevImage();
                     touchStartX.current = null;
                   };
 
                   return (
                     <div className="pk2-modal-img" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
                       <img src={getImageUrl(sliderImages[activeImageIndex]?.imagen)} alt={prendaSeleccionada.nombre} style={{ touchAction: 'pan-y' }} />
-                      
                       {sliderImages.length > 1 && (
                         <>
                           <button className="pk2-carousel-btn left" onClick={handlePrevImage}>‹</button>
                           <button className="pk2-carousel-btn right" onClick={handleNextImage}>›</button>
                           <div className="pk2-carousel-dots">
                             {sliderImages.map((_, i) => (
-                              <span 
-                                key={i} 
-                                className={`pk2-dot ${i === activeImageIndex ? 'active' : ''}`}
-                                onClick={() => handleImageChange(i, sliderImages)}
-                              />
+                              <span key={i} className={`pk2-dot ${i === activeImageIndex ? 'active' : ''}`} onClick={() => handleImageChange(i, sliderImages)} />
                             ))}
                           </div>
                         </>
@@ -466,15 +426,10 @@ const PublicCatalog = () => {
               </div>
               <div className="pk2-modal-info">
                 <div className="pk2-modal-header">
+                  <p className="pk2-card-brand">{config?.tienda_nombre?.toUpperCase() || 'MINDYLU'}</p>
                   <h2>{prendaSeleccionada.nombre}</h2>
                   <div className="pk2-modal-price">{formatPrice(prendaSeleccionada.precio)}</div>
                 </div>
-                
-                {prendaSeleccionada.descripcion && (
-                  <p className="pk2-modal-desc">
-                    {prendaSeleccionada.descripcion}
-                  </p>
-                )}
                 
                 {/* Variantes (Tallas y Colores) */}
                 {prendaSeleccionada.variantes && prendaSeleccionada.variantes.length > 0 && (
@@ -483,33 +438,27 @@ const PublicCatalog = () => {
                     <div className="pk2-variants-list">
                       {prendaSeleccionada.variantes.map((v) => {
                         const agotada = v.cantidad === 0;
-                        const isSelected = variantesSeleccionadas.some(vs => vs.id === v.id);
+                        const isSelected = varianteSeleccionada?.id === v.id;
                         return (
                           <button 
                             key={v.id} 
                             className={`pk2-variant-pill ${agotada ? 'agotada' : ''}`}
                             style={{ 
                               border: isSelected ? '2px solid var(--color-primary)' : '', 
-                              background: isSelected ? 'rgba(251, 165, 181, 0.1)' : '' 
+                              background: isSelected ? 'var(--color-surface)' : '' 
                             }}
                             disabled={agotada}
                             onClick={() => {
-                              if (isSelected) {
-                                setVariantesSeleccionadas(prev => prev.filter(vs => vs.id !== v.id));
-                              } else {
-                                setVariantesSeleccionadas(prev => [...prev, v]);
-                                if (prendaSeleccionada.imagenes && prendaSeleccionada.imagenes.length > 0 && v.color) {
-                                  const matchingImgIndex = prendaSeleccionada.imagenes.findIndex(img => img.color && img.color.toLowerCase() === v.color.toLowerCase());
-                                  if (matchingImgIndex !== -1) setActiveImageIndex(matchingImgIndex);
-                                }
+                              setVarianteSeleccionada(v);
+                              if (prendaSeleccionada.imagenes && prendaSeleccionada.imagenes.length > 0 && v.color) {
+                                const matchingImgIndex = prendaSeleccionada.imagenes.findIndex(img => img.color && img.color.toLowerCase() === v.color.toLowerCase());
+                                if (matchingImgIndex !== -1) setActiveImageIndex(matchingImgIndex);
                               }
                             }}
                           >
                             <span className="pk2-v-color">{v.color || 'Único'}</span>
                             {v.talla && <span className="pk2-v-divider">|</span>}
                             {v.talla && <span className="pk2-v-size">Talla: {v.talla}</span>}
-                            <span className="pk2-v-divider">|</span>
-                            <span className="pk2-v-stock">Stock: {v.cantidad}</span>
                             {agotada && <span className="pk2-v-out"> (Agotado)</span>}
                           </button>
                         );
@@ -520,46 +469,59 @@ const PublicCatalog = () => {
 
                 <div className="pk2-modal-actions">
                   <button 
-                    className="pk2-btn-black"
-                    onClick={() => {
-                      if (prendaSeleccionada.variantes && prendaSeleccionada.variantes.length > 0) {
-                        if (variantesSeleccionadas.length === 0) {
-                          showAlert("Por favor selecciona al menos una variante (color/talla).");
-                          return;
-                        }
-                        const prendasA_Agregar = variantesSeleccionadas.map(vs => ({
-                          ...prendaSeleccionada, 
-                          varianteSeleccionada: vs
-                        }));
-                        addToCart(prendasA_Agregar);
-                        setVariantesSeleccionadas([]); // Limpiar selección tras agregar
-                      } else {
-                        addToCart(prendaSeleccionada);
-                      }
-                    }}
+                    className="pk2-btn-black pk2-btn-large"
+                    onClick={addToCart}
                     disabled={prendaSeleccionada.estado !== 'disponible'}
                   >
-                    <ShoppingBag size={18} strokeWidth={1.5} />
-                    {prendaSeleccionada.estado === 'disponible' ? 'AGREGAR AL CARRITO' : 'NO DISPONIBLE'}
-                  </button>
-                  <button className="pk2-btn-outline" onClick={() => {
-                    if (prendaSeleccionada.variantes && prendaSeleccionada.variantes.length > 0 && variantesSeleccionadas.length === 0) {
-                      showAlert("Por favor selecciona al menos una variante (color/talla) para consultar.");
-                      return;
-                    }
-                    let varText = '';
-                    if (variantesSeleccionadas.length > 0) {
-                      const opciones = variantesSeleccionadas.map(vs => `${vs.color || ''} ${vs.talla || ''}`).join(', ');
-                      varText = ` (Opciones: ${opciones})`;
-                    }
-                    handleWhatsApp(`Hola, me encantó esta prenda: ${prendaSeleccionada.nombre}${varText}. ¿Me das más detalles?`)
-                  }}>
-                    <MessageCircle size={18} strokeWidth={1.5} />
-                    CONSULTAR
+                    <ShoppingBag size={20} strokeWidth={1.5} />
+                    {prendaSeleccionada.estado === 'disponible' ? 'Agregar' : 'No disponible'}
                   </button>
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Success Modal (Agregado al carro) ── */}
+      {successModalOpen && itemAgregadoReciente && (
+        <div className="pk2-success-overlay" onClick={() => setSuccessModalOpen(false)}>
+          <div className="pk2-success-modal" onClick={e => e.stopPropagation()}>
+             <button className="pk2-success-close" onClick={() => setSuccessModalOpen(false)}>
+               <X size={24} />
+             </button>
+             <div className="pk2-success-header">
+               <div className="pk2-success-icon"><Check size={28} strokeWidth={3} /></div>
+               <h3>Producto agregado a tu Carro</h3>
+             </div>
+             
+             <div className="pk2-success-body">
+               <img src={getImageUrl(itemAgregadoReciente.foto_url || itemAgregadoReciente.imagenes?.[0]?.imagen)} alt="Item" />
+               <div className="pk2-success-info">
+                 <p className="pk2-success-brand">{config?.tienda_nombre?.toUpperCase() || 'MINDYLU'}</p>
+                 <p className="pk2-success-name">{itemAgregadoReciente.nombre}</p>
+                 <p className="pk2-success-price">{formatPrice(itemAgregadoReciente.precio)}</p>
+                 {itemAgregadoReciente.varianteSeleccionada && (
+                   <p className="pk2-success-variant">
+                     Color: {itemAgregadoReciente.varianteSeleccionada.color || 'Único'} | Talla: {itemAgregadoReciente.varianteSeleccionada.talla || 'Única'}
+                   </p>
+                 )}
+               </div>
+             </div>
+
+             <div className="pk2-success-actions">
+               <button className="pk2-btn-black pk2-btn-large" onClick={() => { 
+                 setSuccessModalOpen(false); 
+                 setPrendaSeleccionada(null); 
+                 setVarianteSeleccionada(null);
+                 setCartOpen(true); 
+               }}>
+                 Ir al Carro
+               </button>
+               <button className="pk2-btn-outline" onClick={() => setSuccessModalOpen(false)}>
+                 Seguir comprando
+               </button>
+             </div>
           </div>
         </div>
       )}
