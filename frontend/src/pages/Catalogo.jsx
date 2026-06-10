@@ -75,7 +75,17 @@ const Catalogo = () => {
       const exists = prev.cart.find(c => c.variante_id === variante.id);
       const newCart = exists
         ? prev.cart.map(c => c.variante_id === variante.id ? { ...c, cantidad: Math.min(c.maxCantidad, c.cantidad + 1) } : c)
-        : [...prev.cart, { prenda_id: prenda.id, variante_id: variante.id, nombre: prenda.nombre, foto_url: prenda.foto_url, color: variante.color, talla: variante.talla, cantidad: 1, maxCantidad: variante.cantidad, precio: prenda.precio }];
+        : [...prev.cart, { 
+            prenda_id: prenda.id, 
+            variante_id: variante.id, 
+            nombre: prenda.nombre, 
+            foto_url: prenda.imagenes?.find(img => img.color && variante.color && img.color.toLowerCase() === variante.color.toLowerCase())?.imagen || prenda.imagenes?.[0]?.imagen || prenda.foto_url, 
+            color: variante.color, 
+            talla: variante.talla, 
+            cantidad: 1, 
+            maxCantidad: variante.cantidad, 
+            precio: prenda.precio 
+          }];
       return { ...prev, cart: newCart };
     });
     setModalOpen(true);
@@ -83,7 +93,7 @@ const Catalogo = () => {
 
   const handleVentaExitosa = () => {
     setModalOpen(false);
-    setVentaActiva({ cart: [], clienta_id: '', entrega_diaria_id: '', notas: '' });
+    setVentaActiva({ cart: [], clienta_id: '', entrega_diaria_id: '', notas: '', estado: 'apartado' });
     fetchCatalogo();
   };
 

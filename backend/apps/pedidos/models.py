@@ -33,9 +33,10 @@ class Pedido(models.Model):
     El registro maestro de una venta apartada o completada.
     """
     class Estado(models.TextChoices):
-        APARTADO = 'apartado', _('Apartado (Pendiente de pago/entrega)')
-        PAGADO = 'pagado', _('Pagado (Listo para entregar)')
-        ENTREGADO = 'entregado', _('Entregado y Finalizado')
+        APARTADO = 'apartado', _('Apartado')
+        POR_PAGAR = 'por_pagar', _('Por Pagar')
+        PAGADO = 'pagado', _('Pagado')
+        ENTREGADO = 'entregado', _('Entregado')
         CANCELADO = 'cancelado', _('Cancelado')
 
     tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name='pedidos')

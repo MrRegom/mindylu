@@ -103,8 +103,9 @@ class PedidoViewSet(viewsets.ModelViewSet):
                     nuevas_notas = data.get('notas', '')
                     if nuevas_notas:
                         pedido.notas = f"{pedido.notas} | {nuevas_notas}" if pedido.notas else nuevas_notas
-                    if data.get('estado') == Pedido.Estado.PAGADO:
-                        pedido.estado = Pedido.Estado.PAGADO
+                    nuevo_estado = data.get('estado')
+                    if nuevo_estado in [Pedido.Estado.PAGADO, Pedido.Estado.POR_PAGAR]:
+                        pedido.estado = nuevo_estado
                     pedido.save()
                 else:
                     # Si no existe, creamos uno nuevo

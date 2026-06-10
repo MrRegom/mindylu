@@ -366,7 +366,18 @@ const VenderModal = ({ isOpen, onClose, ventaActiva, setVentaActiva, onSuccess }
                   onChange={handleInputChange} 
                   style={{ accentColor: 'var(--pk2-pink)' }}
                 />
-                Por Pagar (Apartado)
+                Apartado
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 500, cursor: 'pointer', fontSize: '0.9rem', color: 'var(--pk2-dark)' }}>
+                <input 
+                  type="radio" 
+                  name="estado" 
+                  value="por_pagar" 
+                  checked={formData.estado === 'por_pagar'} 
+                  onChange={handleInputChange} 
+                  style={{ accentColor: 'var(--pk2-pink)' }}
+                />
+                Por Pagar
               </label>
               <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 500, cursor: 'pointer', fontSize: '0.9rem', color: 'var(--pk2-dark)' }}>
                 <input 
