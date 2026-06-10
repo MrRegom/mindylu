@@ -7,6 +7,8 @@ import {
 } from 'lucide-react';
 import './PublicCatalog.css';
 import { showAlert } from '../utils/alerts';
+import { SkeletonCard } from '../components/Skeleton';
+import { ImageLoader } from '../components/ImageLoader';
 
 const getImageUrl = (path) => {
   if (!path) return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E";
@@ -287,7 +289,11 @@ const PublicCatalog = () => {
 
       {/* ── Catalog Grid ── */}
       <section className="pk2-latest" id="lo-nuevo">
-        {prendas.length === 0 ? (
+        {isLoading ? (
+          <div className="pk2-grid">
+            {Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)}
+          </div>
+        ) : prendas.length === 0 ? (
           <div className="pk2-empty">Próximamente nueva colección...</div>
         ) : (
           <div className="pk2-grid">
@@ -303,7 +309,7 @@ const PublicCatalog = () => {
                   setColorSeleccionado(uniqueColors.length > 0 ? uniqueColors[0] : null);
                 }}>
                   <div className="pk2-card-img-wrapper">
-                    <img src={imgUrl} alt={p.nombre} />
+                    <ImageLoader src={imgUrl} alt={p.nombre} skeletonClass="skeleton-img" />
                     <button className="pk2-card-heart" onClick={(e) => { e.stopPropagation(); showAlert('Añadido a favoritos'); }}>
                       <Heart size={18} strokeWidth={1.5} />
                     </button>
@@ -423,7 +429,7 @@ const PublicCatalog = () => {
 
                   return (
                     <div className="pk2-modal-img" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
-                      <img src={getImageUrl(sliderImages[activeImageIndex]?.imagen)} alt={prendaSeleccionada.nombre} style={{ touchAction: 'pan-y' }} />
+                      <ImageLoader src={getImageUrl(sliderImages[activeImageIndex]?.imagen)} alt={prendaSeleccionada.nombre} style={{ touchAction: 'pan-y' }} />
                       {sliderImages.length > 1 && (
                         <>
                           <button className="pk2-carousel-btn left" onClick={handlePrevImage}>‹</button>
