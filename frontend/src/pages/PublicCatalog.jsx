@@ -3,7 +3,7 @@ import api from '../services/api';
 import { 
   ShoppingBag, X, Search, User, Heart, 
   Truck, ShieldCheck, CreditCard, RefreshCcw, MessageCircle, Menu,
-  ChevronLeft, ChevronRight, Check
+  ChevronLeft, ChevronRight, Check, Sparkles
 } from 'lucide-react';
 import './PublicCatalog.css';
 import { showAlert } from '../utils/alerts';
