@@ -583,6 +583,35 @@ button { font-family: var(--font-sans); }
 .pk2-footer-links a:hover { color: var(--pk2-pink); }
 .pk2-footer-bottom { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; text-align: center; font-size: 0.8rem; color: #7a6e72; }
 
+/* ── Overlays and Sidebars ── */
+.pk2-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5); backdrop-filter: blur(2px);
+  z-index: 1000;
+}
+
+.pk2-mobile-sidebar {
+  position: fixed; top: 0; left: -300px; width: 300px; max-width: 80vw; height: 100vh;
+  background: var(--pk2-white); z-index: 2001; transition: left 0.3s ease;
+  box-shadow: 2px 0 15px rgba(0,0,0,0.1);
+  display: flex; flex-direction: column;
+}
+.pk2-mobile-sidebar.open { left: 0; }
+.pk2-mobile-sidebar-close {
+  padding: 20px; text-align: right; border-bottom: 1px solid #eee;
+}
+.pk2-mobile-sidebar-close button {
+  background: transparent; border: none; color: var(--pk2-black); cursor: pointer;
+}
+.pk2-mobile-links {
+  display: flex; flex-direction: column; padding: 20px 0;
+}
+.pk2-mobile-links a {
+  padding: 15px 30px; font-size: 1rem; font-weight: 500;
+  border-bottom: 1px solid #fafafa; transition: color 0.3s;
+}
+.pk2-mobile-links a:hover { color: var(--pk2-pink); }
+
 /* ── Responsive ── */
 @media (max-width: 768px) {
   .pk2-hero-carousel { min-height: 200px; height: 30vh; }
