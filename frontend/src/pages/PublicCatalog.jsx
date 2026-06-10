@@ -36,6 +36,7 @@ const PublicCatalog = () => {
   const [varianteSeleccionada, setVarianteSeleccionada] = useState(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const categoriesScrollRef = useRef(null);
+  const touchStartX = useRef(null);
 
   const scrollCategories = (dir) => {
     if (categoriesScrollRef.current) {
@@ -70,9 +71,8 @@ const PublicCatalog = () => {
 
   const addToCart = (prenda) => {
     setCartItems([...cartItems, prenda]);
-    setPrendaSeleccionada(null);
-    setVarianteSeleccionada(null);
-    setCartOpen(true);
+    showAlert("¡Agregado a la bolsa!");
+    // Eliminamos el cierre automático del modal para que pueda elegir más tallas de la misma prenda
   };
 
   const removeFromCart = (index) => {
@@ -85,10 +85,14 @@ const PublicCatalog = () => {
     if (cartItems.length === 0) return;
     let text = 'Hola, quiero comprar los siguientes productos:\n\n';
     cartItems.forEach((item, idx) => {
-      text += `${idx + 1}. ${item.nombre} - ${formatPrice(item.precio)}\n`;
+      let varianteText = '';
+      if (item.varianteSeleccionada) {
+         varianteText = ` (Color: ${item.varianteSeleccionada.color || 'Único'}, Talla: ${item.varianteSeleccionada.talla || 'Única'})`;
+      }
+      text += `${idx + 1}. *${item.nombre}*${varianteText} - ${formatPrice(item.precio)}\n`;
     });
     const total = cartItems.reduce((acc, curr) => acc + Number(curr.precio || 0), 0);
-    text += `\nTotal estimado: ${formatPrice(total)}`;
+    text += `\n*Total estimado: ${formatPrice(total)}*`;
     handleWhatsApp(text);
     setCartOpen(false);
     setCartItems([]);
@@ -418,9 +422,25 @@ const PublicCatalog = () => {
                     }
                   };
 
+                  const handleTouchStart = (e) => {
+                    touchStartX.current = e.touches[0].clientX;
+                  };
+
+                  const handleTouchEnd = (e) => {
+                    if (!touchStartX.current) return;
+                    const touchEnd = e.changedTouches[0].clientX;
+                    const diff = touchStartX.current - touchEnd;
+                    if (diff > 40) {
+                      handleNextImage();
+                    } else if (diff < -40) {
+                      handlePrevImage();
+                    }
+                    touchStartX.current = null;
+                  };
+
                   return (
-                    <div className="pk2-modal-img">
-                      <img src={getImageUrl(sliderImages[activeImageIndex]?.imagen)} alt={prendaSeleccionada.nombre} />
+                    <div className="pk2-modal-img" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+                      <img src={getImageUrl(sliderImages[activeImageIndex]?.imagen)} alt={prendaSeleccionada.nombre} style={{ touchAction: 'pan-y' }} />
                       
                       {sliderImages.length > 1 && (
                         <>
@@ -551,6 +571,11 @@ const PublicCatalog = () => {
                     <img src={imgUrl} alt={item.nombre} />
                     <div className="pk2-cart-item-info">
                       <h4>{item.nombre}</h4>
+                      {item.varianteSeleccionada && (
+                        <p style={{ fontSize: '0.8rem', color: '#666', margin: '2px 0 4px 0' }}>
+                          Color: {item.varianteSeleccionada.color || 'Único'} | Talla: {item.varianteSeleccionada.talla || 'Única'}
+                        </p>
+                      )}
                       <span className="pk2-cart-item-price">{formatPrice(item.precio)}</span>
                     </div>
                     <button className="pk2-cart-item-remove" onClick={() => removeFromCart(idx)}>
