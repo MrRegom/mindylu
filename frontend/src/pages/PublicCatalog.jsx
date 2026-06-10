@@ -55,6 +55,7 @@ const PublicCatalog = () => {
   
   const [successModalOpen, setSuccessModalOpen] = useState(false);
   const [itemAgregadoReciente, setItemAgregadoReciente] = useState(null);
+  const [cantidadAComprar, setCantidadAComprar] = useState(1);
 
   const categoriesScrollRef = useRef(null);
   const touchStartX = useRef(null);
@@ -91,17 +92,24 @@ const PublicCatalog = () => {
   };
 
   const addToCart = () => {
+    const imgUrl = getImageUrl(prendaSeleccionada.foto_url || (prendaSeleccionada.imagenes && prendaSeleccionada.imagenes[0]?.imagen));
     if (prendaSeleccionada.variantes && prendaSeleccionada.variantes.length > 0) {
       if (!varianteSeleccionada) {
         showAlert("Por favor selecciona una variante (color/talla).");
         return;
       }
-      const itemToAdd = { ...prendaSeleccionada, varianteSeleccionada };
+      const itemToAdd = { 
+        ...prendaSeleccionada, 
+        varianteSeleccionada,
+        cantidad: cantidadAComprar,
+        imagen: imgUrl
+      };
       setCartItems([...cartItems, itemToAdd]);
       setItemAgregadoReciente(itemToAdd);
     } else {
-      setCartItems([...cartItems, prendaSeleccionada]);
-      setItemAgregadoReciente(prendaSeleccionada);
+      const itemToAdd = { ...prendaSeleccionada, cantidad: cantidadAComprar, imagen: imgUrl };
+      setCartItems([...cartItems, itemToAdd]);
+      setItemAgregadoReciente(itemToAdd);
     }
     setSuccessModalOpen(true);
   };
@@ -120,9 +128,9 @@ const PublicCatalog = () => {
       if (item.varianteSeleccionada) {
          varianteText = ` (Color: ${item.varianteSeleccionada.color || 'Único'}, Talla: ${item.varianteSeleccionada.talla || 'Única'})`;
       }
-      text += `${idx + 1}. *${item.nombre}*${varianteText} - ${formatPrice(item.precio)}\n`;
+      text += `${idx + 1}. *${item.nombre}*${varianteText} x${item.cantidad} - ${formatPrice(item.precio * item.cantidad)}\n`;
     });
-    const total = cartItems.reduce((acc, curr) => acc + Number(curr.precio || 0), 0);
+    const total = cartItems.reduce((acc, curr) => acc + (Number(curr.precio || 0) * curr.cantidad), 0);
     text += `\n*Total estimado: ${formatPrice(total)}*`;
     handleWhatsApp(text);
     setCartOpen(false);
@@ -131,7 +139,6 @@ const PublicCatalog = () => {
 
   const ultimasPrendas = prendas.slice(0, 16);
 
-  // Carousel Logic
   const [currentSlide, setCurrentSlide] = useState(0);
   const slides = [];
   if (config?.banner_imagen) slides.push(getImageUrl(config.banner_imagen));
@@ -150,7 +157,6 @@ const PublicCatalog = () => {
 
   return (
     <div className="pk2-root">
-      {/* ── Marquee ── */}
       {config?.marquesina_texto && (
         <div className="pk2-marquee-bar">
           <div className="pk2-marquee-content" style={{ animationDuration: `${config.marquesina_velocidad || 25}s` }}>
@@ -159,7 +165,6 @@ const PublicCatalog = () => {
         </div>
       )}
 
-      {/* ── Navbar (Falabella Style) ── */}
       <nav className="pk2-navbar">
         <div className="pk2-nav-top">
           <div className="pk2-nav-left">
@@ -188,7 +193,6 @@ const PublicCatalog = () => {
           </div>
         </div>
         
-        {/* Mobile Search Bar */}
         <div className="pk2-nav-bottom pk2-hide-desktop">
            <div className="pk2-search-bar-mobile">
              <input type="text" placeholder={`Buscar en ${config?.tienda_nombre || 'MindyLu'}...`} />
@@ -197,7 +201,6 @@ const PublicCatalog = () => {
         </div>
       </nav>
 
-      {/* ── Mobile Menu Sidebar ── */}
       <div className={`pk2-mobile-sidebar ${mobileMenuOpen ? 'open' : ''}`}>
         <div className="pk2-mobile-sidebar-close">
           <button onClick={() => setMobileMenuOpen(false)}><X size={24} /></button>
@@ -211,7 +214,6 @@ const PublicCatalog = () => {
       </div>
       {mobileMenuOpen && <div className="pk2-overlay" onClick={() => setMobileMenuOpen(false)}></div>}
 
-      {/* ── Hero Carousel ── */}
       <header className="pk2-hero-carousel">
         <div className="pk2-carousel-slides">
           {slides.map((slide, idx) => (
@@ -236,7 +238,6 @@ const PublicCatalog = () => {
           </div>
         )}
       </header>
-
       {/* ── Categories Strip (Falabella Style under banner) ── */}
       <section className="pk2-categories-strip">
         <div className="pk2-categories-wrapper">
@@ -248,7 +249,9 @@ const PublicCatalog = () => {
             {categorias && categorias.length > 0 ? categorias.map((cat) => (
               <div key={cat.id} className="pk2-category-item" onClick={() => document.getElementById('lo-nuevo').scrollIntoView({behavior: 'smooth'})}>
                 <div className="pk2-category-img-placeholder">
-                   <img src="https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&q=80&w=150" alt={cat.nombre} />
+                   <div className="pk2-cat-icon-wrapper">
+                     <Sparkles size={28} strokeWidth={1.5} color="var(--pk2-pink)" />
+                   </div>
                 </div>
                 <span>{cat.nombre}</span>
               </div>
@@ -295,7 +298,7 @@ const PublicCatalog = () => {
 
               return (
                 <div key={p.id} className="pk2-card" onClick={() => { 
-                  setPrendaSeleccionada(p); setActiveImageIndex(0); setVarianteSeleccionada(null); 
+                  setPrendaSeleccionada(p); setActiveImageIndex(0); setVarianteSeleccionada(null); setCantidadAComprar(1);
                   const uniqueColors = p.variantes ? Array.from(new Set(p.variantes.map(v => v.color))).filter(Boolean) : [];
                   setColorSeleccionado(uniqueColors.length > 0 ? uniqueColors[0] : null);
                 }}>
@@ -335,7 +338,7 @@ const PublicCatalog = () => {
                     </div>
 
                     <button className="pk2-card-add-btn" onClick={(e) => { 
-                       e.stopPropagation(); setPrendaSeleccionada(p); setActiveImageIndex(0); setVarianteSeleccionada(null); 
+                       e.stopPropagation(); setPrendaSeleccionada(p); setActiveImageIndex(0); setVarianteSeleccionada(null); setCantidadAComprar(1);
                        const uniqueColors = p.variantes ? Array.from(new Set(p.variantes.map(v => v.color))).filter(Boolean) : [];
                        setColorSeleccionado(uniqueColors.length > 0 ? uniqueColors[0] : null);
                     }}>
@@ -511,15 +514,23 @@ const PublicCatalog = () => {
                   </div>
                 )}
 
-                <div className="pk2-modal-actions">
-                  <button 
-                    className="pk2-btn-black pk2-btn-large"
-                    onClick={addToCart}
-                    disabled={prendaSeleccionada.estado !== 'disponible'}
-                  >
-                    <ShoppingBag size={20} strokeWidth={1.5} />
-                    {prendaSeleccionada.estado === 'disponible' ? 'Agregar' : 'No disponible'}
-                  </button>
+                <div className="pk2-modal-actions-wrapper">
+                  <div className="pk2-modal-qty-actions">
+                    <div className="pk2-qty-selector">
+                      <button onClick={() => setCantidadAComprar(Math.max(1, cantidadAComprar - 1))}>-</button>
+                      <span>{cantidadAComprar}</span>
+                      <button onClick={() => setCantidadAComprar(cantidadAComprar + 1)}>+</button>
+                    </div>
+                    <button 
+                      className="pk2-btn-black pk2-btn-large"
+                      onClick={addToCart}
+                      disabled={prendaSeleccionada.estado !== 'disponible'}
+                      style={{ flex: 1 }}
+                    >
+                      <ShoppingBag size={20} strokeWidth={1.5} />
+                      {prendaSeleccionada.estado === 'disponible' ? 'Agregar' : 'No disponible'}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

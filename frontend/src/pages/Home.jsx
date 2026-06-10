@@ -117,13 +117,13 @@ const Home = () => {
       </div>
 
       {/* Banner Promocional */}
-      <div className="card animate-slide-up promo-banner" style={{ animationDelay: '0.6s', padding: 0, position: 'relative', overflow: 'hidden', backgroundColor: 'var(--color-primary-light)' }}>
+      <div className="card animate-slide-up promo-banner" style={{ animationDelay: '0.6s', padding: 0, position: 'relative', overflow: 'hidden', backgroundColor: 'var(--color-accent-light)' }}>
         <div style={{ padding: '24px', position: 'relative', zIndex: 2, width: '60%' }}>
           <p style={{ color: 'var(--color-primary-dark)', fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>✨ Bienvenido</p>
-          <h2 style={{ fontSize: '1.6rem', margin: '0 0 16px 0', fontFamily: 'Playfair Display', lineHeight: 1.1 }}>Control total de tu boutique</h2>
+          <h2 style={{ fontSize: '1.6rem', margin: '0 0 16px 0', fontFamily: 'Playfair Display', lineHeight: 1.1, color: 'var(--color-primary)' }}>Control total de tu boutique</h2>
           <button onClick={() => window.location.href='/catalogo'} className="btn btn-primary" style={{ padding: '10px 20px', fontSize: '0.9rem', width: 'auto' }}>Ver Catálogo</button>
         </div>
-        <div style={{ position: 'absolute', right: 0, top: 0, height: '100%', width: '50%', background: 'linear-gradient(45deg, var(--color-primary-light), var(--color-primary))', clipPath: 'polygon(20% 0, 100% 0, 100% 100%, 0% 100%)', opacity: 0.2 }}></div>
+        <div style={{ position: 'absolute', right: 0, top: 0, height: '100%', width: '50%', background: 'linear-gradient(45deg, var(--color-accent), var(--color-primary-dark))', clipPath: 'polygon(20% 0, 100% 0, 100% 100%, 0% 100%)', opacity: 0.15 }}></div>
       </div>
 
       <div className="advanced-metrics-grid" style={{ marginTop: '32px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>

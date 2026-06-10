@@ -43,7 +43,7 @@ button { font-family: var(--font-sans); }
   width: 100%;
   background: var(--pk2-pink);
   color: var(--pk2-white);
-  padding: 8px 0;
+  padding: 4px 0;
   overflow: hidden;
   position: relative;
   z-index: 101;
@@ -93,7 +93,7 @@ button { font-family: var(--font-sans); }
 
 .pk2-nav-brand-text {
   font-family: var(--font-serif);
-  font-size: 2rem;
+  font-size: 1.4rem;
   font-weight: 600;
   color: var(--pk2-black);
   cursor: pointer;
@@ -242,10 +242,11 @@ button { font-family: var(--font-sans); }
   top: 0; left: 0; width: 100%; height: 100%;
   background-size: cover;
   background-position: center center;
+  transform: translateX(100%);
   opacity: 0;
-  transition: opacity 1.5s ease-in-out;
+  transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.6s ease;
 }
-.pk2-carousel-slide.active { opacity: 1; }
+.pk2-carousel-slide.active { opacity: 1; transform: translateX(0); z-index: 1; }
 
 .pk2-carousel-controls {
   position: absolute;
@@ -304,16 +305,16 @@ button { font-family: var(--font-sans); }
   border-color: var(--pk2-pink);
 }
 .pk2-category-img-placeholder {
-  width: 70px; height: 70px;
+  width: 60px; height: 60px;
   border-radius: 50%;
-  background: var(--pk2-bg);
+  background: var(--pk2-pink-light);
   border: 2px solid transparent;
   transition: all 0.3s;
-  overflow: hidden;
   display: flex; align-items: center; justify-content: center;
 }
-.pk2-category-img-placeholder img {
-  width: 100%; height: 100%; object-fit: cover;
+.pk2-cat-icon-wrapper {
+  color: var(--pk2-pink);
+  display: flex; align-items: center; justify-content: center;
 }
 .pk2-category-item span {
   font-size: 0.8rem;
@@ -509,7 +510,20 @@ button { font-family: var(--font-sans); }
 .pk2-variant-size-pill.selected { border-color: var(--pk2-black); background: var(--pk2-black); color: var(--pk2-white); }
 .pk2-variant-size-pill.agotada { opacity: 0.4; cursor: not-allowed; background: #fafafa; text-decoration: line-through; }
 
-.pk2-modal-actions { display: flex; flex-direction: column; gap: 15px; margin-top: auto; }
+.pk2-modal-actions-wrapper { margin-top: auto; }
+.pk2-modal-qty-actions { display: flex; gap: 15px; align-items: center; width: 100%; }
+.pk2-qty-selector {
+  display: flex; align-items: center; justify-content: space-between;
+  border: 1px solid #ddd; border-radius: 4px; padding: 0; width: 110px; height: 50px;
+}
+.pk2-qty-selector button {
+  background: transparent; border: none; font-size: 1.2rem; cursor: pointer; padding: 0 15px; height: 100%; transition: color 0.2s;
+}
+.pk2-qty-selector button:hover { color: var(--pk2-pink); }
+.pk2-qty-selector span {
+  font-weight: 600; font-size: 1rem; color: var(--pk2-black);
+}
+
 .pk2-btn-black {
   background: var(--pk2-black); color: var(--pk2-white); border: none;
   padding: 15px; font-size: 0.95rem; font-weight: 500; border-radius: 4px;
