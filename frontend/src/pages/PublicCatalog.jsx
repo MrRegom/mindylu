@@ -317,7 +317,10 @@ const PublicCatalog = () => {
                     {uniqueColors.length > 0 && (
                        <div className="pk2-card-colors">
                          {uniqueColors.map((colorName, idx) => {
-                            const imgMatch = p.imagenes?.find(img => img.color?.toLowerCase() === colorName.toLowerCase());
+                            let imgMatch = p.imagenes?.find(img => img.color?.toLowerCase() === colorName.toLowerCase());
+                            if (!imgMatch && p.imagenes && p.imagenes.length > idx) {
+                              imgMatch = p.imagenes[idx];
+                            }
                             if (imgMatch) {
                                return <img key={idx} src={getImageUrl(imgMatch.imagen)} alt={colorName} className="pk2-card-color-dot img-dot" title={colorName} />;
                             }
@@ -450,7 +453,10 @@ const PublicCatalog = () => {
                         <p className="pk2-modal-label">Color: <strong>{colorSeleccionado || 'Único'}</strong></p>
                         <div className="pk2-modal-color-thumbnails">
                           {Array.from(new Set(prendaSeleccionada.variantes.map(v => v.color))).filter(Boolean).map((col, idx) => {
-                             const imgMatch = prendaSeleccionada.imagenes?.find(img => img.color?.toLowerCase() === col.toLowerCase());
+                             let imgMatch = prendaSeleccionada.imagenes?.find(img => img.color?.toLowerCase() === col.toLowerCase());
+                             if (!imgMatch && prendaSeleccionada.imagenes && prendaSeleccionada.imagenes.length > idx) {
+                               imgMatch = prendaSeleccionada.imagenes[idx];
+                             }
                              const isSelected = colorSeleccionado === col;
                              return (
                                <button 
@@ -460,7 +466,10 @@ const PublicCatalog = () => {
                                     setColorSeleccionado(col);
                                     setVarianteSeleccionada(null); // Limpiar talla al cambiar color
                                     if (imgMatch) {
-                                      const imgIndex = prendaSeleccionada.imagenes.findIndex(img => img.color?.toLowerCase() === col.toLowerCase());
+                                      let imgIndex = prendaSeleccionada.imagenes.findIndex(img => img.color?.toLowerCase() === col.toLowerCase());
+                                      if (imgIndex === -1 && prendaSeleccionada.imagenes.length > idx) {
+                                        imgIndex = idx;
+                                      }
                                       if (imgIndex !== -1) setActiveImageIndex(imgIndex);
                                     }
                                  }}
