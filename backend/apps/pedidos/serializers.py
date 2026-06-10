@@ -61,6 +61,7 @@ class PedidoCreateDesdeCatalogoSerializer(serializers.Serializer):
     fecha_entrega_acordada = serializers.DateField(required=False, allow_null=True)
     punto_entrega_id = serializers.IntegerField(required=False, allow_null=True)
     notas = serializers.CharField(required=False, allow_blank=True)
+    estado = serializers.CharField(required=False, default='apartado')
 
 
 class EntregaDiariaSerializer(serializers.ModelSerializer):

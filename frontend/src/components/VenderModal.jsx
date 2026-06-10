@@ -23,8 +23,8 @@ const VenderModal = ({ isOpen, onClose, ventaActiva, setVentaActiva, onSuccess }
   const [searchQuery, setSearchQuery] = useState('');
   
   // --- ENLACE REACTIVO DE ESTADO ATÓMICO (Caso A - Pocos Clics!) ---
-  const { cart = [], clienta_id = '', entrega_diaria_id = '', notas = '' } = ventaActiva || {};
-  const formData = { clienta_id, entrega_diaria_id, notas };
+  const { cart = [], clienta_id = '', entrega_diaria_id = '', notas = '', estado = 'apartado' } = ventaActiva || {};
+  const formData = { clienta_id, entrega_diaria_id, notas, estado };
   const [catalogItems, setCatalogItems] = useState([]);
   const [showAddSelector, setShowAddSelector] = useState(false);
   const [addSearchQuery, setAddSearchQuery] = useState('');
@@ -41,7 +41,7 @@ const VenderModal = ({ isOpen, onClose, ventaActiva, setVentaActiva, onSuccess }
   // Emulación de setFormData compatible con useState de React
   const setFormData = (newFormDataOrFn) => {
     setVentaActiva(prev => {
-      const currentFormData = { clienta_id: prev.clienta_id, entrega_diaria_id: prev.entrega_diaria_id, notas: prev.notas };
+      const currentFormData = { clienta_id: prev.clienta_id, entrega_diaria_id: prev.entrega_diaria_id, notas: prev.notas, estado: prev.estado || 'apartado' };
       const nextFormData = typeof newFormDataOrFn === 'function' ? newFormDataOrFn(currentFormData) : newFormDataOrFn;
       return {
         ...prev,
@@ -128,7 +128,7 @@ const VenderModal = ({ isOpen, onClose, ventaActiva, setVentaActiva, onSuccess }
       prenda_id: prendaObj.id,
       variante_id: varianteObj.id,
       nombre: prendaObj.nombre,
-      foto_url: prendaObj.imagenes?.find(img => img.color === varianteObj.color)?.imagen || prendaObj.imagenes?.[0]?.imagen || prendaObj.foto_url,
+      foto_url: prendaObj.imagenes?.find(img => img.color && varianteObj.color && img.color.toLowerCase() === varianteObj.color.toLowerCase())?.imagen || prendaObj.imagenes?.[0]?.imagen || prendaObj.foto_url,
       color: varianteObj.color,
       talla: varianteObj.talla,
       cantidad: 1,
@@ -161,7 +161,8 @@ const VenderModal = ({ isOpen, onClose, ventaActiva, setVentaActiva, onSuccess }
           variante_id: item.variante_id,
           cantidad: item.cantidad,
           entrega_diaria_id: formData.entrega_diaria_id ? parseInt(formData.entrega_diaria_id) : null,
-          notas: formData.notas
+          notas: formData.notas,
+          estado: formData.estado
         };
         await api.post('/pedidos/crear-desde-catalogo/', payload);
       }
@@ -336,7 +337,7 @@ const VenderModal = ({ isOpen, onClose, ventaActiva, setVentaActiva, onSuccess }
                 value={formData.entrega_diaria_id}
                 onChange={handleInputChange}
               >
-                <option value="">Sin ruta por ahora...</option>
+                <option value="">Separado (Retira luego o Sin ruta)</option>
                 {rutasProgramadas.map(ruta => {
                   const date = new Date(ruta.fecha + 'T00:00:00');
                   const opciones = { weekday: 'long', day: 'numeric', month: 'short' };
@@ -349,6 +350,35 @@ const VenderModal = ({ isOpen, onClose, ventaActiva, setVentaActiva, onSuccess }
                   );
                 })}
               </select>
+            </div>
+          </div>
+
+          {/* Campo: Estado de Pago */}
+          <div className="form-group" style={{ marginTop: 16 }}>
+            <label>Estado de Pago</label>
+            <div style={{ display: 'flex', gap: 16, marginTop: 8 }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 500, cursor: 'pointer', fontSize: '0.9rem', color: 'var(--pk2-dark)' }}>
+                <input 
+                  type="radio" 
+                  name="estado" 
+                  value="apartado" 
+                  checked={formData.estado === 'apartado'} 
+                  onChange={handleInputChange} 
+                  style={{ accentColor: 'var(--pk2-pink)' }}
+                />
+                Por Pagar (Apartado)
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 500, cursor: 'pointer', fontSize: '0.9rem', color: 'var(--pk2-dark)' }}>
+                <input 
+                  type="radio" 
+                  name="estado" 
+                  value="pagado" 
+                  checked={formData.estado === 'pagado'} 
+                  onChange={handleInputChange} 
+                  style={{ accentColor: 'var(--pk2-pink)' }}
+                />
+                Pagado
+              </label>
             </div>
           </div>
 
