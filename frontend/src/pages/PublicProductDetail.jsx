@@ -266,10 +266,10 @@ const PublicProductDetail = () => {
 
           <div className="pk3-actions">
             <button className="pk3-btn-buy" onClick={handleAddToCart}>
-              <span className="btn-text">Agregar al Carro</span> <ShoppingBag size={18} className="btn-icon" />
+              <span className="btn-text">Agregar al Carro</span> <ShoppingBag size={18} className="pk3-btn-icon" />
             </button>
             <button className="pk3-btn-buy whatsapp-btn" onClick={handleWhatsAppBuy} style={{ background: '#25D366' }}>
-              <span className="btn-text">WhatsApp</span> <MessageCircle size={18} className="btn-icon" />
+              <span className="btn-text">WhatsApp</span> <MessageCircle size={18} className="pk3-btn-icon" />
             </button>
           </div>
 

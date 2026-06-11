@@ -111,11 +111,12 @@
 .pk3-actions { margin-bottom: 40px; }
 .pk3-btn-buy {
   width: 100%; background: #c95171; color: var(--pk2-white); border: none;
-  padding: 18px; font-size: 1rem; font-weight: 500; border-radius: 4px;
+  padding: 16px; font-size: 1rem; font-weight: 500; border-radius: 4px;
   cursor: pointer; display: flex; align-items: center; justify-content: center;
   transition: background 0.3s;
 }
 .pk3-btn-buy:hover { background: #ab445f; }
+.pk3-btn-icon { margin-left: 8px; }
 
 .pk3-description {
   margin-bottom: 30px; border-top: 1px solid #f0f0f0; padding-top: 30px;
@@ -141,7 +142,7 @@
   .pk3-title { font-size: 1.6rem; margin: 0 0 10px 0; }
   .pk3-price { font-size: 1.4rem; margin: 0 0 20px 0; }
   /* ── Barra Pegajosa Delgada (Estilo Boutique/App) ── */
-  .pk3-root { padding-bottom: 80px; }
+  .pk3-root { padding-bottom: 75px; }
   .pk3-actions { 
     position: fixed; bottom: 0; left: 0; width: 100%; 
     background: rgba(255, 255, 255, 0.98); 
@@ -149,15 +150,16 @@
     padding: 10px 15px; 
     z-index: 1000; 
     display: flex; flex-direction: row; gap: 10px; margin: 0; 
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.03);
   }
   .pk3-btn-buy { 
-    padding: 10px 5px; font-size: 0.85rem; margin-bottom: 0 !important; flex: 1;
+    padding: 0; height: 42px; font-size: 0.85rem; margin-bottom: 0 !important; flex: 1;
     display: flex; align-items: center; justify-content: center;
+    border-radius: 6px;
   }
 }
 @media (max-width: 400px) {
   .pk3-main-image-container { height: 280px; }
   .pk3-breadcrumbs-container { padding: 15px; }
-  .pk3-btn-buy { font-size: 0.85rem; }
-  .btn-icon { margin-left: 4px !important; }
+  .pk3-btn-buy { font-size: 0.8rem; height: 38px; }
 }
