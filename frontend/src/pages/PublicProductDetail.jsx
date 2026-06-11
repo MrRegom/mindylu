@@ -148,7 +148,7 @@ const PublicProductDetail = () => {
         {/* ── Galería de Imágenes (Izquierda) ── */}
         <div className="pk3-gallery">
           {allImages.length > 1 && (
-            <div className="pk3-thumbnails pk3-hide-mobile">
+            <div className="pk3-thumbnails">
               {allImages.map((img, idx) => (
                 <div 
                   key={idx} 
@@ -193,7 +193,13 @@ const PublicProductDetail = () => {
                       className={`pk3-color-btn ${colorSeleccionado === colorName ? 'selected' : ''}`}
                       onClick={() => {
                         setColorSeleccionado(colorName);
-                        setTallaSeleccionada(null); // Reset talla al cambiar color
+                        setTallaSeleccionada(null);
+                        
+                        // Buscar imagen correspondiente al color
+                        const idx = allImages.findIndex(img => img.color && img.color.toLowerCase() === colorName.toLowerCase());
+                        if (idx !== -1) {
+                          setActiveImageIndex(idx);
+                        }
                       }}
                     >
                       {colorName}
@@ -235,11 +241,11 @@ const PublicProductDetail = () => {
           </div>
 
           <div className="pk3-actions">
-            <button className="pk3-btn-buy" onClick={handleAddToCart} style={{ marginBottom: 15 }}>
-              Agregar al Carro <ShoppingBag size={20} style={{ marginLeft: 8 }} />
+            <button className="pk3-btn-buy" onClick={handleAddToCart}>
+              <span className="btn-text">Agregar al Carro</span> <ShoppingBag size={18} className="btn-icon" />
             </button>
             <button className="pk3-btn-buy whatsapp-btn" onClick={handleWhatsAppBuy} style={{ background: '#25D366' }}>
-              Comprar por WhatsApp <MessageCircle size={20} style={{ marginLeft: 8 }} />
+              <span className="btn-text">WhatsApp</span> <MessageCircle size={18} className="btn-icon" />
             </button>
           </div>
 
