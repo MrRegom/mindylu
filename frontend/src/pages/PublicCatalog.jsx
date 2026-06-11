@@ -360,14 +360,6 @@ const PublicCatalog = () => {
                     {uniqueColors.length > 0 && (
                        <div className="pk2-card-colors">
                          {uniqueColors.map((colorName, idx) => {
-                            let imgMatch = p.imagenes?.find(img => img.color?.toLowerCase() === colorName.toLowerCase());
-                            if (!imgMatch && p.imagenes && p.imagenes.length > idx) {
-                              imgMatch = p.imagenes[idx];
-                            }
-                            if (imgMatch) {
-                               return <img key={idx} src={getImageUrl(imgMatch.imagen)} alt={colorName} className="pk2-card-color-dot img-dot" title={colorName} />;
-                            }
-                            
                             const colorData = coloresLista.find(c => c.nombre.toLowerCase() === colorName.toLowerCase());
                             const hexCode = colorData?.hex_code || getColorHex(colorName);
                             
