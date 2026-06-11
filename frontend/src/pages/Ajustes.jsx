@@ -135,6 +135,22 @@ const MantenedorList = ({ titulo, icono, endpoint, placeholder, forceUppercase =
                       </select>
                     </div>
                   )}
+                  {hasColors && (
+                    <div style={{ position: 'relative', marginRight: '5px' }}>
+                      <div 
+                        style={{ width: 36, height: 36, borderRadius: '8px', background: editando.hex_code || '#ddd', border: '1px solid #ccc', cursor: 'pointer', flexShrink: 0 }}
+                        onClick={() => setShowPalette(!showPalette)}
+                        title="Elegir color"
+                      ></div>
+                      {showPalette && (
+                        <div style={{ position: 'absolute', top: '100%', left: 0, zIndex: 100, background: '#fff', padding: 8, borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 8, marginTop: 4 }}>
+                          {['#000000', '#FFFFFF', '#FF3B30', '#007AFF', '#34C759', '#FFCC00', '#8E8E93', '#F5F5DC', '#8B4513', '#FF69B4', '#AF52DE', '#C8A2C8', '#FF9500', '#5AC8FA', '#FFDB58', '#800020', '#FF00FF', '#40E0D0'].map(hex => (
+                            <div key={hex} onClick={() => { setEditando(prev => ({ ...prev, hex_code: hex })); setShowPalette(false); }} style={{ width: 24, height: 24, borderRadius: '50%', background: hex, border: '1px solid #ccc', cursor: 'pointer' }}></div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
                   <input
                     ref={editInputRef}
                     className="mantenedor-edit-input"
