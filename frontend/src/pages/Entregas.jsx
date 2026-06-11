@@ -359,8 +359,8 @@ const Entregas = () => {
       </div>
 
       {isCrearModalOpen && (
-        <div className="entregas-modal-overlay animate-fade-in">
-          <div className="entregas-modal-content animate-slide-up">
+        <div className="card glass animate-slide-down" style={{ marginBottom: '24px', padding: '24px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)' }}>
+          <div>
             <div className="entregas-modal-header">
               <h3>Programar Viaje</h3>
               <button className="btn-icon-simple" onClick={() => setIsCrearModalOpen(false)}>
@@ -414,7 +414,7 @@ const Entregas = () => {
                 </div>
               </div>
             </div>
-            <div className="entregas-modal-actions">
+            <div className="entregas-modal-actions" style={{ marginTop: '20px' }}>
               <button className="btn btn-secondary" onClick={() => setIsCrearModalOpen(false)} style={{ borderRadius: '12px' }}>Cancelar</button>
               <button className="btn btn-primary" onClick={guardarNuevasRutas} style={{ borderRadius: '12px', padding: '10px 20px', fontWeight: 600 }}>Programar Rutas</button>
             </div>

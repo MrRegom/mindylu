@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Settings, Plus, Trash2, Tag, Palette, Type, Pencil, Check, X, Ruler, Terminal, ChevronRight, Upload, Phone, LayoutTemplate, Clock, Truck } from 'lucide-react';
+import { Settings, Plus, Trash2, Tag, Palette, Type, Pencil, Check, X, Ruler, Terminal, ChevronRight, Upload, Phone, LayoutTemplate, Clock, Truck, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import './Ajustes.css';
@@ -162,19 +162,12 @@ const MantenedorList = ({ titulo, icono, endpoint, placeholder, forceUppercase =
                     </div>
                   )}
                   {hasColors && (
-                    <div style={{ position: 'relative', marginRight: '5px' }}>
+                    <div style={{ marginRight: '5px' }}>
                       <div 
                         style={{ width: 36, height: 36, borderRadius: '8px', background: editando.hex_code || '#ddd', border: '1px solid #ccc', cursor: 'pointer', flexShrink: 0 }}
                         onClick={() => setShowEditPalette(!showEditPalette)}
                         title="Elegir color"
                       ></div>
-                      {showEditPalette && (
-                        <div style={{ position: 'absolute', top: '100%', left: 0, zIndex: 100, background: '#fff', padding: 8, borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 8, marginTop: 4 }}>
-                          {EXTENDED_PALETTE.map(hex => (
-                            <div key={hex} onClick={() => { setEditando(prev => ({ ...prev, hex_code: hex })); setShowEditPalette(false); }} style={{ width: 24, height: 24, borderRadius: '50%', background: hex, border: '1px solid #ccc', cursor: 'pointer' }}></div>
-                          ))}
-                        </div>
-                      )}
                     </div>
                   )}
                   <input
@@ -187,9 +180,16 @@ const MantenedorList = ({ titulo, icono, endpoint, placeholder, forceUppercase =
                   <button type="button" className="btn-icon-success" onClick={handleSaveEdit} title="Guardar">
                     <Check size={15} />
                   </button>
-                  <button type="button" className="btn-icon-muted" onClick={handleCancelEdit} title="Cancelar">
-                    <X size={15} />
+                  <button type="button" className="btn-icon-simple btn-icon-muted" onClick={handleCancelEdit}>
+                    <X size={18} />
                   </button>
+                  {hasColors && showEditPalette && (
+                    <div style={{ width: '100%', background: '#fff', padding: 12, borderRadius: 8, border: '1px solid #e9edef', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(24px, 1fr))', gap: 10, marginTop: 8 }}>
+                      {EXTENDED_PALETTE.map(hex => (
+                        <div key={hex} onClick={() => { setEditando(prev => ({ ...prev, hex_code: hex })); setShowEditPalette(false); }} style={{ width: 28, height: 28, justifySelf: 'center', borderRadius: '50%', background: hex, border: '1px solid #ccc', cursor: 'pointer', boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.1)' }}></div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ) : (
                 /* Modo vista */
@@ -224,19 +224,12 @@ const MantenedorList = ({ titulo, icono, endpoint, placeholder, forceUppercase =
           </select>
         )}
         {hasColors && (
-          <div style={{ position: 'relative' }}>
+          <div>
             <div 
               style={{ width: 36, height: 36, borderRadius: '8px', background: nuevoHex || '#ddd', border: '1px solid #ccc', cursor: 'pointer', flexShrink: 0 }}
               onClick={() => setShowNuevoPalette(!showNuevoPalette)}
               title="Elegir color"
             ></div>
-            {showNuevoPalette && (
-              <div style={{ position: 'absolute', bottom: '100%', left: 0, zIndex: 100, background: '#fff', padding: 8, borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 8, marginBottom: 8 }}>
-                {EXTENDED_PALETTE.map(hex => (
-                  <div key={hex} onClick={() => { setNuevoHex(hex); setShowNuevoPalette(false); }} style={{ width: 24, height: 24, borderRadius: '50%', background: hex, border: '1px solid #ccc', cursor: 'pointer' }}></div>
-                ))}
-              </div>
-            )}
           </div>
         )}
         <input
@@ -249,6 +242,13 @@ const MantenedorList = ({ titulo, icono, endpoint, placeholder, forceUppercase =
           <Plus size={16} />
           <span>Agregar</span>
         </button>
+        {hasColors && showNuevoPalette && (
+          <div style={{ width: '100%', background: '#fff', padding: 12, borderRadius: 8, border: '1px solid #e9edef', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(24px, 1fr))', gap: 10, marginTop: 8 }}>
+            {EXTENDED_PALETTE.map(hex => (
+              <div key={hex} onClick={() => { setNuevoHex(hex); setShowNuevoPalette(false); }} style={{ width: 28, height: 28, justifySelf: 'center', borderRadius: '50%', background: hex, border: '1px solid #ccc', cursor: 'pointer', boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.1)' }}></div>
+            ))}
+          </div>
+        )}
       </form>
     </div>
   );
@@ -529,12 +529,18 @@ const Ajustes = () => {
           placeholder="Nuevo color (ej. Burdeo)"
           hasColors={true}
         />
-        <MantenedorList 
-          titulo="Tallas" 
-          icono={<Ruler size={18} />} 
-          endpoint="/catalogo/tallas/" 
+        <MantenedorList
+          titulo="Tallas"
+          icono={<Ruler size={20} className="icon-accent" />}
+          endpoint="/catalogo/tallas/"
           placeholder="Nueva talla (ej. XXL)"
           forceUppercase={true}
+        />
+        <MantenedorList
+          titulo="Lugares de Entrega"
+          icono={<MapPin size={20} className="icon-accent" />}
+          endpoint="/pedidos/puntos/"
+          placeholder="Nuevo lugar (ej. Metro Viña)"
         />
       </div>
 
