@@ -339,3 +339,21 @@
   text-overflow: ellipsis;
   max-width: 80%;
 }
+
+.mantenedor-select-light {
+  padding: 0.65rem 0.9rem;
+  border-radius: 8px;
+  border: 1px solid #d1d7db;
+  background-color: #ffffff;
+  color: #111b21;
+  font-size: 0.9rem;
+  transition: border-color 0.2s;
+  cursor: pointer;
+  outline: none;
+  font-family: inherit;
+  appearance: auto;
+}
+
+.mantenedor-select-light:focus {
+  border-color: var(--color-primary);
+}

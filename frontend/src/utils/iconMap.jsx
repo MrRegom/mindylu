@@ -29,6 +29,30 @@ export const CATEGORY_ICONS = {
   Droplet: <Droplet size={28} strokeWidth={1.5} />
 };
 
+export const ICON_NAMES_ES = {
+  Sparkles: 'Destellos (Por Defecto)',
+  Shirt: 'Camisa / Polera',
+  ShoppingBag: 'Bolsa de Compras',
+  Star: 'Estrella',
+  Crown: 'Corona',
+  Glasses: 'Lentes / Anteojos',
+  Heart: 'Corazón',
+  Diamond: 'Diamante',
+  Gift: 'Regalo',
+  Umbrella: 'Paraguas / Lluvia',
+  Zap: 'Rayo / Energía',
+  Scissors: 'Tijeras / Sastrería',
+  Briefcase: 'Maletín / Trabajo',
+  Watch: 'Reloj / Accesorios',
+  Palmtree: 'Palmera / Verano',
+  Sun: 'Sol / Día',
+  Moon: 'Luna / Noche',
+  Cloud: 'Nube / Invierno',
+  Snowflake: 'Copo de Nieve / Frío',
+  Flame: 'Fuego / Hot',
+  Droplet: 'Gota / Lavado'
+};
+
 export const getCategoryIcon = (iconName, props = {}) => {
   const IconComponent = CATEGORY_ICONS[iconName];
   if (!IconComponent) return <Sparkles size={28} strokeWidth={1.5} {...props} />;

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import './Ajustes.css';
 import { showAlert, showConfirm, showToast } from '../utils/alerts';
-import { CATEGORY_ICONS, getCategoryIcon } from '../utils/iconMap';
+import { CATEGORY_ICONS, getCategoryIcon, ICON_NAMES_ES } from '../utils/iconMap';
 
 /**
  * Componente mantenedor genérico para listas de catálogo.
@@ -125,8 +125,8 @@ const MantenedorList = ({ titulo, icono, endpoint, placeholder, forceUppercase =
                 <div className="mantenedor-edit-row">
                   {hasIcons && (
                     <div className="mantenedor-icon-selector">
-                      <select value={editando.icono} onChange={e => setEditando(prev => ({ ...prev, icono: e.target.value }))} className="mantenedor-edit-input" style={{ width: 'auto', marginRight: '5px' }}>
-                        {Object.keys(CATEGORY_ICONS).map(k => <option key={k} value={k}>{k}</option>)}
+                      <select value={editando.icono} onChange={e => setEditando(prev => ({ ...prev, icono: e.target.value }))} className="mantenedor-select-light" style={{ width: '130px', marginRight: '5px' }}>
+                        {Object.keys(CATEGORY_ICONS).map(k => <option key={k} value={k}>{ICON_NAMES_ES[k] || k}</option>)}
                       </select>
                     </div>
                   )}
@@ -169,8 +169,8 @@ const MantenedorList = ({ titulo, icono, endpoint, placeholder, forceUppercase =
       {/* Formulario para agregar nuevo */}
       <form className="mantenedor-form" onSubmit={handleAdd}>
         {hasIcons && (
-          <select value={nuevoIcono} onChange={e => setNuevoIcono(e.target.value)} style={{ padding: '8px', border: '1px solid var(--color-border)', borderRadius: '6px' }}>
-            {Object.keys(CATEGORY_ICONS).map(k => <option key={k} value={k}>{k}</option>)}
+          <select value={nuevoIcono} onChange={e => setNuevoIcono(e.target.value)} className="mantenedor-select-light" style={{ flexShrink: 0 }}>
+            {Object.keys(CATEGORY_ICONS).map(k => <option key={k} value={k}>{ICON_NAMES_ES[k] || k}</option>)}
           </select>
         )}
         <input
