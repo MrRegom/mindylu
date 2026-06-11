@@ -179,7 +179,6 @@ const PublicProductDetail = () => {
 
         {/* ── Info del Producto (Derecha) ── */}
         <div className="pk3-info">
-          <p className="pk3-brand">{config?.tienda_nombre?.toUpperCase() || 'MINDYLU'}</p>
           <h1 className="pk3-title">{producto.nombre}</h1>
           <p className="pk3-price">{formatPrice(producto.precio)}</p>
 

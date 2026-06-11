@@ -129,12 +129,22 @@
 .pk3-feature { display: flex; align-items: center; gap: 15px; color: #c95171; font-size: 0.9rem; font-weight: 500; }
 
 /* ── Responsive ── */
+/* ── Responsive ── */
 @media (max-width: 900px) {
-  .pk3-container { grid-template-columns: 1fr; gap: 30px; }
-  .pk3-gallery { height: 500px; flex-direction: column-reverse; }
+  .pk3-container { grid-template-columns: 1fr; gap: 20px; padding: 0 15px; }
+  .pk3-gallery { height: auto; flex-direction: column; gap: 10px; }
+  .pk3-main-image-container { height: 400px; }
+  .pk3-thumbnails { flex-direction: row; width: 100%; height: auto; overflow-x: auto; overflow-y: hidden; }
+  .pk3-thumbnail { width: 60px; height: 80px; flex-shrink: 0; }
   .pk3-hide-mobile { display: none; }
-  .pk3-title { font-size: 1.8rem; }
+  .pk3-info { padding-top: 10px; }
+  .pk3-title { font-size: 1.6rem; margin: 0 0 10px 0; }
+  .pk3-price { font-size: 1.4rem; margin: 0 0 20px 0; }
+  .pk3-actions { margin-bottom: 20px; }
+  .pk3-btn-buy { padding: 14px; font-size: 0.95rem; }
+  .pk3-qty-group { margin-bottom: 20px; }
 }
-@media (max-width: 500px) {
-  .pk3-gallery { height: 400px; }
+@media (max-width: 400px) {
+  .pk3-main-image-container { height: 320px; }
+  .pk3-breadcrumbs-container { padding: 15px; }
 }
