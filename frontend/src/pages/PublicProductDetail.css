@@ -133,7 +133,7 @@
 @media (max-width: 900px) {
   .pk3-container { grid-template-columns: 1fr; gap: 20px; padding: 0 15px; }
   .pk3-gallery { height: auto; flex-direction: column; gap: 10px; }
-  .pk3-main-image-container { height: 400px; }
+  .pk3-main-image-container { height: 360px; }
   .pk3-thumbnails { flex-direction: row; width: 100%; height: auto; overflow-x: auto; overflow-y: hidden; }
   .pk3-thumbnail { width: 60px; height: 80px; flex-shrink: 0; }
   .pk3-hide-mobile { display: none; }
@@ -151,7 +151,7 @@
   }
 }
 @media (max-width: 400px) {
-  .pk3-main-image-container { height: 320px; }
+  .pk3-main-image-container { height: 280px; }
   .pk3-breadcrumbs-container { padding: 15px; }
   .pk3-btn-buy { font-size: 0.85rem; }
   .btn-icon { margin-left: 4px !important; }
