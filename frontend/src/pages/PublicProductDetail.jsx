@@ -40,6 +40,10 @@ const PublicProductDetail = () => {
 
   useEffect(() => {
     fetchData();
+    setActiveImageIndex(0);
+    setColorSeleccionado(null);
+    setTallaSeleccionada(null);
+    setCantidadAComprar(1);
   }, [id]);
 
   const fetchData = async () => {
@@ -176,7 +180,7 @@ const PublicProductDetail = () => {
           
           <div className="pk3-main-image-container">
             {allImages.length > 0 ? (
-              <ImageLoader src={getImageUrl(allImages[activeImageIndex].imagen)} alt={producto.nombre} className="pk3-main-image" />
+              <ImageLoader src={getImageUrl((allImages[activeImageIndex] || allImages[0])?.imagen)} alt={producto.nombre} className="pk3-main-image" />
             ) : (
               <div className="pk3-no-image">Sin imagen</div>
             )}
