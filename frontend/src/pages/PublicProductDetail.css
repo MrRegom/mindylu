@@ -94,7 +94,7 @@
   color: var(--pk2-black);
 }
 .pk3-color-btn:hover, .pk3-size-btn:hover:not(.agotada) { border-color: var(--pk2-black); }
-.pk3-color-btn.selected, .pk3-size-btn.selected { border-color: var(--pk2-black); background: var(--pk2-black); color: var(--pk2-white); }
+.pk3-color-btn.selected, .pk3-size-btn.selected { border-color: #c95171; background: #c95171; color: var(--pk2-white); }
 .pk3-size-btn.agotada { opacity: 0.4; text-decoration: line-through; cursor: not-allowed; background: #fafafa; }
 
 .pk3-qty-group { margin-bottom: 30px; }

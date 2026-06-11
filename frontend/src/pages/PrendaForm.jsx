@@ -431,7 +431,7 @@ const PrendaForm = () => {
         <div className="form-section glass" style={{ zIndex: 5, position: 'relative' }}>
           <h3>Imágenes (por foto elige color y orden)</h3>
           <p style={{fontSize: '0.85rem', color: '#666', marginBottom: '16px'}}>La que marques "Principal" será la portada.</p>
-          <ImageUploader images={images} setImages={setImages} variantes={variantes} />
+          <ImageUploader images={images} setImages={setImages} variantes={variantes} colores={colores} />
         </div>
 
         <div className="form-actions">

@@ -17,7 +17,7 @@ const getImageUrl = (path) => {
     const url = new URL(import.meta.env.VITE_API_URL);
     return `${url.origin}${path.startsWith('/') ? '' : '/'}${path}`;
   } catch (e) {
-    return path;
+    return path.startsWith('/') ? path : `/${path}`;
   }
 };
 
@@ -94,6 +94,22 @@ const PublicProductDetail = () => {
 
   const handleNextImage = () => setActiveImageIndex((prev) => (prev + 1) % allImages.length);
   const handlePrevImage = () => setActiveImageIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
+
+  const handleAddToCart = () => {
+    if (variantes.length > 0 && !varianteSeleccionada) {
+      showAlert("Por favor selecciona color y talla para continuar.");
+      return;
+    }
+    const imgUrl = getImageUrl(producto.foto_url || (producto.imagenes && producto.imagenes[0]?.imagen));
+    const itemToAdd = { 
+      ...producto, 
+      varianteSeleccionada,
+      cantidad: cantidadAComprar,
+      imagen: imgUrl
+    };
+    localStorage.setItem('pendingCartItem', JSON.stringify(itemToAdd));
+    navigate('/?cart=open');
+  };
 
   const handleWhatsAppBuy = () => {
     if (variantes.length > 0 && !varianteSeleccionada) {
@@ -220,7 +236,10 @@ const PublicProductDetail = () => {
           </div>
 
           <div className="pk3-actions">
-            <button className="pk3-btn-buy" onClick={handleWhatsAppBuy}>
+            <button className="pk3-btn-buy" onClick={handleAddToCart} style={{ marginBottom: 15 }}>
+              Agregar al Carro <ShoppingBag size={20} style={{ marginLeft: 8 }} />
+            </button>
+            <button className="pk3-btn-buy whatsapp-btn" onClick={handleWhatsAppBuy} style={{ background: '#25D366' }}>
               Comprar por WhatsApp <MessageCircle size={20} style={{ marginLeft: 8 }} />
             </button>
           </div>

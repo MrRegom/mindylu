@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../services/api';
 import { 
   ShoppingBag, X, Search, User, Heart, 
@@ -19,7 +19,7 @@ const getImageUrl = (path) => {
     const url = new URL(import.meta.env.VITE_API_URL);
     return `${url.origin}${path.startsWith('/') ? '' : '/'}${path}`;
   } catch (e) {
-    return path;
+    return path.startsWith('/') ? path : `/${path}`;
   }
 };
 
@@ -47,6 +47,7 @@ const getColorHex = (colorName) => {
 
 const PublicCatalog = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [prendas, setPrendas] = useState([]);
   const [categorias, setCategorias] = useState([]);
   const [config, setConfig] = useState(null);
@@ -77,6 +78,21 @@ const PublicCatalog = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Escuchar si venimos de la vista de detalle con intención de agregar al carro
+  useEffect(() => {
+    const pendingItemStr = localStorage.getItem('pendingCartItem');
+    if (pendingItemStr && searchParams.get('cart') === 'open') {
+      try {
+        const itemToAdd = JSON.parse(pendingItemStr);
+        setCartItems(prev => [...prev, itemToAdd]);
+        setItemAgregadoReciente(itemToAdd);
+        setSuccessModalOpen(true);
+      } catch (e) {}
+      localStorage.removeItem('pendingCartItem');
+      setSearchParams(new URLSearchParams());
+    }
+  }, [searchParams, setSearchParams]);
 
   const fetchData = async () => {
     try {

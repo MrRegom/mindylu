@@ -2,11 +2,11 @@ import React, { useRef } from 'react';
 import { Upload, X, Plus } from 'lucide-react';
 import './ImageUploader.css';
 
-const ImageUploader = ({ images, setImages, variantes }) => {
+const ImageUploader = ({ images, setImages, variantes, colores }) => {
   const fileInputRef = useRef(null);
 
-  // Colores únicos disponibles de las variantes configuradas
-  const coloresUnicos = [...new Set(variantes?.map(v => v.color).filter(Boolean))] || [];
+  // Mostrar todos los colores del sistema si existen, sino usar variantes
+  const coloresUnicos = colores?.map(c => c.nombre) || [...new Set(variantes?.map(v => v.color).filter(Boolean))] || [];
   if (coloresUnicos.length === 0) coloresUnicos.push('Estándar');
 
   const handleFileChange = (e) => {
