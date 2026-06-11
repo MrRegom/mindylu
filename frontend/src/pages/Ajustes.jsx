@@ -41,8 +41,9 @@ const MantenedorList = ({ titulo, icono, endpoint, placeholder, forceUppercase =
   const [nuevoItem, setNuevoItem] = useState('');
   const [nuevoIcono, setNuevoIcono] = useState('Sparkles');
   const [nuevoHex, setNuevoHex] = useState('');
+  const [showNuevoPalette, setShowNuevoPalette] = useState(false);
+  const [showEditPalette, setShowEditPalette] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [showPalette, setShowPalette] = useState(false);
   // Estado para edición inline: { id, valor, icono, hex_code }
   const [editando, setEditando] = useState(null);
   const editInputRef = useRef(null);
@@ -164,13 +165,13 @@ const MantenedorList = ({ titulo, icono, endpoint, placeholder, forceUppercase =
                     <div style={{ position: 'relative', marginRight: '5px' }}>
                       <div 
                         style={{ width: 36, height: 36, borderRadius: '8px', background: editando.hex_code || '#ddd', border: '1px solid #ccc', cursor: 'pointer', flexShrink: 0 }}
-                        onClick={() => setShowPalette(!showPalette)}
+                        onClick={() => setShowEditPalette(!showEditPalette)}
                         title="Elegir color"
                       ></div>
-                      {showPalette && (
+                      {showEditPalette && (
                         <div style={{ position: 'absolute', top: '100%', left: 0, zIndex: 100, background: '#fff', padding: 8, borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 8, marginTop: 4 }}>
                           {EXTENDED_PALETTE.map(hex => (
-                            <div key={hex} onClick={() => { setEditando(prev => ({ ...prev, hex_code: hex })); setShowPalette(false); }} style={{ width: 24, height: 24, borderRadius: '50%', background: hex, border: '1px solid #ccc', cursor: 'pointer' }}></div>
+                            <div key={hex} onClick={() => { setEditando(prev => ({ ...prev, hex_code: hex })); setShowEditPalette(false); }} style={{ width: 24, height: 24, borderRadius: '50%', background: hex, border: '1px solid #ccc', cursor: 'pointer' }}></div>
                           ))}
                         </div>
                       )}
@@ -226,13 +227,13 @@ const MantenedorList = ({ titulo, icono, endpoint, placeholder, forceUppercase =
           <div style={{ position: 'relative' }}>
             <div 
               style={{ width: 36, height: 36, borderRadius: '8px', background: nuevoHex || '#ddd', border: '1px solid #ccc', cursor: 'pointer', flexShrink: 0 }}
-              onClick={() => setShowPalette(!showPalette)}
+              onClick={() => setShowNuevoPalette(!showNuevoPalette)}
               title="Elegir color"
             ></div>
-            {showPalette && (
+            {showNuevoPalette && (
               <div style={{ position: 'absolute', bottom: '100%', left: 0, zIndex: 100, background: '#fff', padding: 8, borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 8, marginBottom: 8 }}>
                 {EXTENDED_PALETTE.map(hex => (
-                  <div key={hex} onClick={() => { setNuevoHex(hex); setShowPalette(false); }} style={{ width: 24, height: 24, borderRadius: '50%', background: hex, border: '1px solid #ccc', cursor: 'pointer' }}></div>
+                  <div key={hex} onClick={() => { setNuevoHex(hex); setShowNuevoPalette(false); }} style={{ width: 24, height: 24, borderRadius: '50%', background: hex, border: '1px solid #ccc', cursor: 'pointer' }}></div>
                 ))}
               </div>
             )}
