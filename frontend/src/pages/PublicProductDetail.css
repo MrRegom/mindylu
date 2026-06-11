@@ -140,11 +140,26 @@
   .pk3-info { padding-top: 10px; }
   .pk3-title { font-size: 1.6rem; margin: 0 0 10px 0; }
   .pk3-price { font-size: 1.4rem; margin: 0 0 20px 0; }
-  .pk3-actions { margin-bottom: 20px; }
-  .pk3-btn-buy { padding: 14px; font-size: 0.95rem; }
   .pk3-qty-group { margin-bottom: 20px; }
+
+  /* ── Barra Pegajosa de Botones ── */
+  .pk3-root { padding-bottom: 100px; }
+  .pk3-actions { 
+    position: fixed; bottom: 0; left: 0; width: 100%; 
+    background: var(--pk2-white); padding: 15px 20px; 
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.12); z-index: 1000; 
+    display: flex; gap: 10px; margin: 0; 
+  }
+  .pk3-btn-buy { 
+    margin-bottom: 0 !important; flex: 1; 
+    padding: 14px 5px; font-size: 0.95rem; 
+    display: flex; align-items: center; justify-content: center;
+  }
+  .btn-icon { margin-left: 6px !important; }
 }
 @media (max-width: 400px) {
   .pk3-main-image-container { height: 320px; }
   .pk3-breadcrumbs-container { padding: 15px; }
+  .pk3-btn-buy { font-size: 0.85rem; }
+  .btn-icon { margin-left: 4px !important; }
 }
