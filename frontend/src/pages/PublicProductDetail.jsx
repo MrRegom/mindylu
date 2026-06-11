@@ -182,6 +182,12 @@ const PublicProductDetail = () => {
           <h1 className="pk3-title">{producto.nombre}</h1>
           <p className="pk3-price">{formatPrice(producto.precio)}</p>
 
+          {producto.descripcion && (
+            <div className="pk3-description" style={{ borderTop: 'none', paddingTop: 0, marginTop: '-10px', marginBottom: '25px' }}>
+              <p>{producto.descripcion}</p>
+            </div>
+          )}
+
           <div className="pk3-variants-section">
             {uniqueColors.length > 0 && (
               <div className="pk3-variant-group">
@@ -242,13 +248,8 @@ const PublicProductDetail = () => {
               Comprar por WhatsApp <MessageCircle size={20} style={{ marginLeft: 8 }} />
             </button>
           </div>
-
-          <div className="pk3-description">
-            <h3>Detalles del Producto</h3>
-            <p>{producto.descripcion || 'Sin descripción disponible para esta prenda.'}</p>
-          </div>
           
-          <div className="pk3-features-mini">
+          <div className="pk3-features-mini" style={{ marginTop: '30px' }}>
              <div className="pk3-feature">
                <Truck size={20} /> <span>Envíos a todo el país</span>
              </div>

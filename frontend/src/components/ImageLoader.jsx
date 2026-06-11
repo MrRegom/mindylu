@@ -5,14 +5,18 @@ export const ImageLoader = ({ src, alt, className = '', style = {}, skeletonClas
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [showSkeleton, setShowSkeleton] = useState(false);
+  const imgRef = useRef(null);
 
   useEffect(() => {
-    // Si cambia el src, reseteamos el estado
     setIsLoaded(false);
     setHasError(false);
     setShowSkeleton(false);
 
-    // Retrasar la aparición del esqueleto 100ms para evitar parpadeos si la imagen ya está en caché
+    if (imgRef.current && imgRef.current.complete && imgRef.current.naturalHeight !== 0) {
+      setIsLoaded(true);
+      return;
+    }
+
     const timer = setTimeout(() => setShowSkeleton(true), 100);
     return () => clearTimeout(timer);
   }, [src]);
@@ -23,7 +27,7 @@ export const ImageLoader = ({ src, alt, className = '', style = {}, skeletonClas
 
   const handleError = () => {
     setHasError(true);
-    setIsLoaded(true); // Para quitar el skeleton aunque haya error
+    setIsLoaded(true);
   };
 
   return (
@@ -37,6 +41,7 @@ export const ImageLoader = ({ src, alt, className = '', style = {}, skeletonClas
 
       {/* Imagen real, cargada de forma diferida (lazy) */}
       <img
+        ref={imgRef}
         src={hasError ? "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" : src}
         alt={alt}
         loading="lazy"
