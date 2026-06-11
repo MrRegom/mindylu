@@ -96,21 +96,25 @@ const PublicProductDetail = () => {
     allImages = [...allImages, ...producto.imagenes];
   }
 
+  const syncColorWithImage = (idx) => {
+    if (allImages[idx]?.color) {
+      const colorName = allImages[idx].color;
+      setColorSeleccionado(colorName.charAt(0).toUpperCase() + colorName.slice(1).toLowerCase());
+      setTallaSeleccionada(null);
+    }
+  };
+
   const handlePrevImage = () => {
-    setActiveImageIndex((prev) => (prev === 0 ? allImages.length - 1 : prev - 1));
+    const nextIdx = activeImageIndex === 0 ? allImages.length - 1 : activeImageIndex - 1;
+    setActiveImageIndex(nextIdx);
+    syncColorWithImage(nextIdx);
   };
 
   const handleNextImage = () => {
-    setActiveImageIndex((prev) => (prev === allImages.length - 1 ? 0 : prev + 1));
+    const nextIdx = activeImageIndex === allImages.length - 1 ? 0 : activeImageIndex + 1;
+    setActiveImageIndex(nextIdx);
+    syncColorWithImage(nextIdx);
   };
-
-  // Sync selected color when image changes
-  useEffect(() => {
-    if (allImages[activeImageIndex]?.color) {
-      const colorName = allImages[activeImageIndex].color;
-      setColorSeleccionado(colorName.charAt(0).toUpperCase() + colorName.slice(1).toLowerCase());
-    }
-  }, [activeImageIndex]);
 
   const handleAddToCart = () => {
     if (variantes.length > 0 && !varianteSeleccionada) {
@@ -170,7 +174,10 @@ const PublicProductDetail = () => {
                 <div 
                   key={idx} 
                   className={`pk3-thumbnail ${idx === activeImageIndex ? 'active' : ''}`}
-                  onClick={() => setActiveImageIndex(idx)}
+                  onClick={() => {
+                    setActiveImageIndex(idx);
+                    syncColorWithImage(idx);
+                  }}
                 >
                   <ImageLoader src={getImageUrl(img.imagen)} alt={`Thumb ${idx}`} />
                 </div>
