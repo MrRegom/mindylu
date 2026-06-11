@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { 
   ShoppingBag, X, Search, User, Heart, 
@@ -45,6 +46,7 @@ const getColorHex = (colorName) => {
 };
 
 const PublicCatalog = () => {
+  const navigate = useNavigate();
   const [prendas, setPrendas] = useState([]);
   const [categorias, setCategorias] = useState([]);
   const [config, setConfig] = useState(null);
@@ -321,11 +323,7 @@ const PublicCatalog = () => {
               const uniqueColors = p.variantes ? Array.from(new Set(p.variantes.map(v => v.color))).filter(Boolean) : [];
 
               return (
-                <div key={p.id} className="pk2-card" onClick={() => { 
-                  setPrendaSeleccionada(p); setActiveImageIndex(0); setVarianteSeleccionada(null); setCantidadAComprar(1);
-                  const uniqueColors = p.variantes ? Array.from(new Set(p.variantes.map(v => v.color))).filter(Boolean) : [];
-                  setColorSeleccionado(uniqueColors.length > 0 ? uniqueColors[0] : null);
-                }}>
+                <div key={p.id} className="pk2-card" onClick={() => navigate(`/producto/${p.id}`)}>
                   <div className="pk2-card-img-wrapper">
                     <ImageLoader src={imgUrl} alt={p.nombre} skeletonClass="skeleton-img" />
                     <button className="pk2-card-heart" onClick={(e) => { e.stopPropagation(); showAlert('Añadido a favoritos'); }}>
@@ -361,11 +359,10 @@ const PublicCatalog = () => {
                     </div>
 
                     <button className="pk2-card-add-btn" onClick={(e) => { 
-                       e.stopPropagation(); setPrendaSeleccionada(p); setActiveImageIndex(0); setVarianteSeleccionada(null); setCantidadAComprar(1);
-                       const uniqueColors = p.variantes ? Array.from(new Set(p.variantes.map(v => v.color))).filter(Boolean) : [];
-                       setColorSeleccionado(uniqueColors.length > 0 ? uniqueColors[0] : null);
+                       e.stopPropagation(); 
+                       navigate(`/producto/${p.id}`);
                     }}>
-                       Agregar <ShoppingBag size={16} />
+                       Ver Detalles
                     </button>
                   </div>
                 </div>
@@ -400,166 +397,7 @@ const PublicCatalog = () => {
         </div>
       </footer>
 
-      {/* ── Product Modal (Select Variant) ── */}
-      {prendaSeleccionada && !successModalOpen && (
-        <div className="pk2-modal-overlay" onClick={() => { setPrendaSeleccionada(null); setVarianteSeleccionada(null); setColorSeleccionado(null); setActiveImageIndex(0); }}>
-          <div className="pk2-modal-content" onClick={e => e.stopPropagation()}>
-            <button className="pk2-modal-close" onClick={() => { setPrendaSeleccionada(null); setVarianteSeleccionada(null); setColorSeleccionado(null); setActiveImageIndex(0); }}>
-              <X size={24} strokeWidth={1.5} />
-            </button>
-            <div className="pk2-modal-grid">
-              <div className="pk2-modal-img-container">
-                {(() => {
-                  let sliderImages = [];
-                  if (prendaSeleccionada.imagenes && prendaSeleccionada.imagenes.length > 0) {
-                    sliderImages = prendaSeleccionada.imagenes;
-                  } else if (prendaSeleccionada.foto_url) {
-                    sliderImages = [{ imagen: prendaSeleccionada.foto_url, color: null }];
-                  }
-
-                  if (sliderImages.length === 0) {
-                    return <div className="pk2-modal-img"><img src={getImageUrl("")} alt="Sin imagen" /></div>;
-                  }
-
-                  const handleNextImage = () => {
-                    const nextIdx = (activeImageIndex + 1) % sliderImages.length;
-                    handleImageChange(nextIdx, sliderImages);
-                  };
-
-                  const handlePrevImage = () => {
-                    const prevIdx = (activeImageIndex - 1 + sliderImages.length) % sliderImages.length;
-                    handleImageChange(prevIdx, sliderImages);
-                  };
-
-                  const handleImageChange = (index, images) => {
-                    setActiveImageIndex(index);
-                  };
-
-                  const handleTouchStart = (e) => { touchStartX.current = e.touches[0].clientX; };
-                  const handleTouchEnd = (e) => {
-                    if (!touchStartX.current) return;
-                    const diff = touchStartX.current - e.changedTouches[0].clientX;
-                    if (diff > 40) handleNextImage();
-                    else if (diff < -40) handlePrevImage();
-                    touchStartX.current = null;
-                  };
-
-                  return (
-                    <div className="pk2-modal-img" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
-                      <ImageLoader src={getImageUrl(sliderImages[activeImageIndex]?.imagen)} alt={prendaSeleccionada.nombre} style={{ touchAction: 'pan-y', backgroundColor: '#f4f4f4' }} objectFit="contain" />
-                      {sliderImages.length > 1 && (
-                        <>
-                          <button className="pk2-carousel-btn left" onClick={handlePrevImage}>‹</button>
-                          <button className="pk2-carousel-btn right" onClick={handleNextImage}>›</button>
-                          <div className="pk2-carousel-dots">
-                            {sliderImages.map((_, i) => (
-                              <span key={i} className={`pk2-dot ${i === activeImageIndex ? 'active' : ''}`} onClick={() => handleImageChange(i, sliderImages)} />
-                            ))}
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  );
-                })()}
-              </div>
-              <div className="pk2-modal-info">
-                <div className="pk2-modal-header">
-                  <p className="pk2-card-brand">{config?.tienda_nombre?.toUpperCase() || 'MINDYLU'}</p>
-                  <h2>{prendaSeleccionada.nombre}</h2>
-                  <div className="pk2-modal-price">{formatPrice(prendaSeleccionada.precio)}</div>
-                </div>
-                
-                {/* Variantes (Tallas y Colores Estilo Falabella) */}
-                {prendaSeleccionada.variantes && prendaSeleccionada.variantes.length > 0 && (
-                  <div className="pk2-modal-variants-falabella">
-                    
-                    {/* Selector de Color (Miniaturas) */}
-                    {Array.from(new Set(prendaSeleccionada.variantes.map(v => v.color))).filter(Boolean).length > 0 && (
-                      <div className="pk2-modal-color-selector">
-                        <p className="pk2-modal-label">Color: <strong>{colorSeleccionado || 'Único'}</strong></p>
-                        <div className="pk2-modal-color-thumbnails">
-                          {Array.from(new Set(prendaSeleccionada.variantes.map(v => v.color))).filter(Boolean).map((col, idx) => {
-                             let imgMatch = prendaSeleccionada.imagenes?.find(img => img.color?.toLowerCase() === col.toLowerCase());
-                             if (!imgMatch && prendaSeleccionada.imagenes && prendaSeleccionada.imagenes.length > idx) {
-                               imgMatch = prendaSeleccionada.imagenes[idx];
-                             }
-                             const isSelected = colorSeleccionado === col;
-                             return (
-                               <button 
-                                 key={idx} 
-                                 className={`pk2-modal-color-thumb ${isSelected ? 'selected' : ''}`}
-                                 onClick={() => {
-                                    setColorSeleccionado(col);
-                                    setVarianteSeleccionada(null); // Limpiar talla al cambiar color
-                                    if (imgMatch) {
-                                      let imgIndex = prendaSeleccionada.imagenes.findIndex(img => img.color?.toLowerCase() === col.toLowerCase());
-                                      if (imgIndex === -1 && prendaSeleccionada.imagenes.length > idx) {
-                                        imgIndex = idx;
-                                      }
-                                      if (imgIndex !== -1) setActiveImageIndex(imgIndex);
-                                    }
-                                 }}
-                                 title={col}
-                               >
-                                 {imgMatch ? (
-                                   <img src={getImageUrl(imgMatch.imagen)} alt={col} />
-                                 ) : (
-                                   <span style={{ backgroundColor: getColorHex(col) }}></span>
-                                 )}
-                               </button>
-                             );
-                          })}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Selector de Tallas */}
-                    <div className="pk2-modal-size-selector">
-                      <p className="pk2-modal-label">Elige una opción:</p>
-                      <div className="pk2-variants-list">
-                        {prendaSeleccionada.variantes.filter(v => v.color === colorSeleccionado || !v.color).map((v) => {
-                          const agotada = v.cantidad === 0;
-                          const isSelected = varianteSeleccionada?.id === v.id;
-                          return (
-                            <button 
-                              key={v.id} 
-                              className={`pk2-variant-size-pill ${agotada ? 'agotada' : ''} ${isSelected ? 'selected' : ''}`}
-                              disabled={agotada}
-                              onClick={() => setVarianteSeleccionada(v)}
-                            >
-                              {v.talla || 'Única'}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                    
-                  </div>
-                )}
-
-                <div className="pk2-modal-actions-wrapper">
-                  <div className="pk2-modal-qty-actions">
-                    <div className="pk2-qty-selector">
-                      <button onClick={() => setCantidadAComprar(Math.max(1, cantidadAComprar - 1))}>-</button>
-                      <span>{cantidadAComprar}</span>
-                      <button onClick={() => setCantidadAComprar(cantidadAComprar + 1)}>+</button>
-                    </div>
-                    <button 
-                      className="pk2-btn-black pk2-btn-large"
-                      onClick={addToCart}
-                      disabled={prendaSeleccionada.estado !== 'disponible'}
-                      style={{ flex: 1 }}
-                    >
-                      <ShoppingBag size={20} strokeWidth={1.5} />
-                      {prendaSeleccionada.estado === 'disponible' ? 'Agregar' : 'No disponible'}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Product Modal removed */}
 
       {/* ── Success Modal (Agregado al carro) ── */}
       {successModalOpen && itemAgregadoReciente && (

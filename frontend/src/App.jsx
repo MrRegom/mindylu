@@ -1,5 +1,9 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import PublicCatalog from './pages/PublicCatalog';
+import React, { Suspense, lazy } from 'react';
+
+const PublicCatalog = lazy(() => import('./pages/PublicCatalog'));
+const PublicProductDetail = lazy(() => import('./pages/PublicProductDetail'));
+
 import Layout from './components/Layout';
 import Login from './pages/Login';
 import Home from './pages/Home';
@@ -58,7 +62,17 @@ function App() {
         <Route path="/login" element={<Navigate to="/panel/login" replace />} />
         
         {/* Catálogo Público (Sin Login) */}
-        <Route path="/" element={<PublicCatalog />} />
+        <Route path="/" element={
+          <Suspense fallback={<div className="loading-spinner">Cargando...</div>}>
+            <PublicCatalog />
+          </Suspense>
+        } />
+        
+        <Route path="/producto/:id" element={
+          <Suspense fallback={<div className="loading-spinner">Cargando prenda...</div>}>
+            <PublicProductDetail />
+          </Suspense>
+        } />
         
         {/* Panel de Administración (Con Login) */}
         <Route path="/panel" element={
