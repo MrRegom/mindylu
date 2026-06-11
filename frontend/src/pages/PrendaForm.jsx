@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Plus, Trash2, Save } from 'lucide-react';
 import ColorPalettePicker from '../components/ColorPalettePicker';
+import { getHexForColor } from '../utils/colorMap';
 import api from '../services/api';
 import ImageUploader from '../components/ImageUploader';
 import './PrendaForm.css';
@@ -72,6 +73,7 @@ const PrendaForm = () => {
           ...arrPrendas.map(p => p?.nombre)
         ])].filter(n => typeof n === 'string' && n.trim() !== '').sort();
         
+        setNombresExistentes(nombresUnicos);
         
         if (id) {
           setIsLoading(true);
@@ -387,13 +389,37 @@ const PrendaForm = () => {
                 style={{ zIndex: activeDropdown && String(activeDropdown).includes(variante.id) ? 100 : (50 - index), position: 'relative' }}
               >
                 <div className="variante-row">
-                  <div className="input-group mini" style={{ marginBottom: 8 }}>
+                  <div className="input-group mini" style={{ marginBottom: 8, position: 'relative', zIndex: activeDropdown === `color-${variante.id}` ? 100 : 1 }}>
                     <label>Color</label>
-                    <ColorPalettePicker 
-                      availableColors={colores.map(c => c.nombre)} 
-                      selectedColor={variante.color} 
-                      onSelectColor={(c) => handleVarianteChange(variante.id, 'color', c)} 
-                    />
+                    <div
+                      className={`custom-select-trigger ${variante.color ? 'has-value' : ''}`}
+                      onClick={() => setActiveDropdown(prev => prev === `color-${variante.id}` ? null : `color-${variante.id}`)}
+                      style={{ padding: '8px 14px', display: 'flex', gap: '8px', alignItems: 'center' }}
+                    >
+                      {variante.color ? (
+                        <>
+                          <div style={{ width: 20, height: 20, borderRadius: '50%', background: getHexForColor(variante.color) || 'linear-gradient(45deg, #ff9a9e, #fecfef)', border: '1px solid #ddd' }}></div>
+                          <span>{variante.color}</span>
+                        </>
+                      ) : (
+                        <span>Elegir color...</span>
+                      )}
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginLeft: 'auto' }}>
+                        <polyline points="6 9 12 15 18 9" />
+                      </svg>
+                    </div>
+                    {activeDropdown === `color-${variante.id}` && (
+                      <div className="custom-select-dropdown" style={{ padding: '8px', maxWidth: '300px' }}>
+                        <ColorPalettePicker 
+                          availableColors={colores.map(c => c.nombre)} 
+                          selectedColor={variante.color} 
+                          onSelectColor={(c) => {
+                            handleVarianteChange(variante.id, 'color', c);
+                            setActiveDropdown(null);
+                          }} 
+                        />
+                      </div>
+                    )}
                   </div>
                   
                   <div className="input-group mini" style={{ position: 'relative', zIndex: activeDropdown === `talla-${variante.id}` ? 100 : 1 }}>
@@ -462,10 +488,9 @@ const PrendaForm = () => {
           <ImageUploader images={images} setImages={setImages} variantes={variantes} colores={colores} />
         </div>
 
-        <div className="form-actions sticky-bottom glass">
-          <button type="submit" className="btn btn-primary submit-btn" disabled={isSubmitting}>
-            <Save size={20} />
-            {isSubmitting ? 'Procesando...' : (id ? 'Guardar Cambios' : 'Guardar Prenda')}
+        <div className="fab-container">
+          <button type="submit" className="btn-fab" disabled={isSubmitting} title={id ? 'Guardar Cambios' : 'Guardar Prenda'}>
+            <Save size={24} />
           </button>
         </div>
       </form>
