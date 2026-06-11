@@ -61,6 +61,7 @@ const PublicCatalog = () => {
   const [itemAgregadoReciente, setItemAgregadoReciente] = useState(null);
   const [cantidadAComprar, setCantidadAComprar] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
+  const [categoriaActiva, setCategoriaActiva] = useState(null);
 
   const categoriesScrollRef = useRef(null);
   const touchStartX = useRef(null);
@@ -145,7 +146,11 @@ const PublicCatalog = () => {
     setCartItems([]);
   };
 
-  const ultimasPrendas = prendas.slice(0, 16);
+  const prendasFiltradas = categoriaActiva 
+    ? prendas.filter(p => p.categoria?.id === categoriaActiva || p.categoria === categoriaActiva)
+    : prendas;
+    
+  const ultimasPrendas = prendasFiltradas.slice(0, 16);
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const slides = [];
@@ -255,10 +260,17 @@ const PublicCatalog = () => {
           
           <div className="pk2-categories-horizontal-scroll" ref={categoriesScrollRef}>
             {categorias && categorias.length > 0 ? categorias.map((cat) => (
-              <div key={cat.id} className="pk2-category-item" onClick={() => document.getElementById('lo-nuevo').scrollIntoView({behavior: 'smooth'})}>
+              <div 
+                key={cat.id} 
+                className={`pk2-category-item ${categoriaActiva === cat.id ? 'active' : ''}`} 
+                onClick={() => {
+                  setCategoriaActiva(prev => prev === cat.id ? null : cat.id);
+                  document.getElementById('lo-nuevo').scrollIntoView({behavior: 'smooth'});
+                }}
+              >
                   <div className="pk2-category-img-placeholder">
                     <div className="pk2-cat-icon-wrapper">
-                      {getCategoryIcon(cat.icono || 'Sparkles', { strokeWidth: 1.5, size: 28, color: 'var(--pk2-pink)' })}
+                      {getCategoryIcon(cat.icono || 'Sparkles', { strokeWidth: 1.5, size: 28, color: categoriaActiva === cat.id ? '#ffffff' : 'var(--pk2-pink)' })}
                     </div>
                   </div>
                 <span>{cat.nombre}</span>
@@ -299,8 +311,8 @@ const PublicCatalog = () => {
           <div className="pk2-grid">
             {Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)}
           </div>
-        ) : prendas.length === 0 ? (
-          <div className="pk2-empty">Próximamente nueva colección...</div>
+        ) : ultimasPrendas.length === 0 ? (
+          <div className="pk2-empty">No hay productos en esta categoría por ahora...</div>
         ) : (
           <div className="pk2-grid">
             {ultimasPrendas.map((p) => {

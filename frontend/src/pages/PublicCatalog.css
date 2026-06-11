@@ -284,10 +284,13 @@ button { font-family: var(--font-sans); }
 }
 .pk2-categories-horizontal-scroll {
   display: flex;
+  justify-content: center;
+  gap: 30px;
   overflow-x: auto;
   scroll-behavior: smooth;
-  gap: 20px;
   padding: 10px 40px;
+  /* hide scrollbar */
+  -ms-overflow-style: none;
   scrollbar-width: none;
 }
 .pk2-categories-horizontal-scroll::-webkit-scrollbar { display: none; }
@@ -321,6 +324,15 @@ button { font-family: var(--font-sans); }
   font-weight: 500;
   color: var(--pk2-black);
   text-align: center;
+}
+.pk2-category-item.active .pk2-category-img-placeholder {
+  background: var(--pk2-pink);
+  transform: scale(1.1);
+  box-shadow: 0 4px 15px rgba(251, 165, 181, 0.4);
+}
+.pk2-category-item.active span {
+  font-weight: 600;
+  color: var(--pk2-pink);
 }
 
 .pk2-cat-arrow {
@@ -525,7 +537,7 @@ button { font-family: var(--font-sans); }
 }
 
 .pk2-btn-black {
-  background: var(--pk2-black); color: var(--pk2-white); border: none;
+  background: #c95171; color: var(--pk2-white); border: none;
   padding: 15px; font-size: 0.95rem; font-weight: 500; border-radius: 4px;
   cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
   transition: background 0.3s;
@@ -603,16 +615,16 @@ button { font-family: var(--font-sans); }
 .pk2-cart-total { display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: 600; margin-bottom: 20px; }
 
 /* ── Footer ── */
-.pk2-footer { background: var(--pk2-black); color: var(--pk2-white); padding: 60px 40px 20px; }
+.pk2-footer { background: #fdf6f7; color: var(--pk2-black); padding: 60px 40px 20px; border-top: 1px solid var(--pk2-pink-light); }
 .pk2-footer-content { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1.5fr 2fr; gap: 60px; margin-bottom: 60px; }
 .pk2-footer-logo { font-family: var(--font-serif); font-size: 2.5rem; margin-bottom: 15px; }
-.pk2-footer-logo span { color: var(--pk2-pink); font-family: var(--font-sans); }
-.pk2-footer-brand p { color: #a0979a; font-size: 0.9rem; line-height: 1.6; max-width: 300px; }
+.pk2-footer-logo span { color: #c95171; font-family: var(--font-sans); }
+.pk2-footer-brand p { color: var(--pk2-dark); font-size: 0.9rem; line-height: 1.6; max-width: 300px; }
 .pk2-footer-links-container { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
-.pk2-footer-links h4 { font-size: 0.8rem; letter-spacing: 2px; margin-bottom: 20px; color: var(--pk2-gray-light); }
-.pk2-footer-links a { display: block; margin-bottom: 12px; color: #a0979a; font-size: 0.9rem; transition: color 0.3s; }
-.pk2-footer-links a:hover { color: var(--pk2-pink); }
-.pk2-footer-bottom { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; text-align: center; font-size: 0.8rem; color: #7a6e72; }
+.pk2-footer-links h4 { font-size: 0.8rem; letter-spacing: 2px; margin-bottom: 20px; color: var(--pk2-gray); }
+.pk2-footer-links a { display: block; margin-bottom: 12px; color: var(--pk2-dark); font-size: 0.9rem; transition: color 0.3s; }
+.pk2-footer-links a:hover { color: #c95171; }
+.pk2-footer-bottom { border-top: 1px solid var(--pk2-pink-light); padding-top: 20px; text-align: center; font-size: 0.8rem; color: var(--pk2-gray); }
 
 /* ── Overlays and Sidebars ── */
 .pk2-overlay {
