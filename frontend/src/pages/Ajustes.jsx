@@ -6,6 +6,31 @@ import './Ajustes.css';
 import { showAlert, showConfirm, showToast } from '../utils/alerts';
 import { CATEGORY_ICONS, getCategoryIcon, ICON_NAMES_ES } from '../utils/iconMap';
 
+const EXTENDED_PALETTE = [
+  // Neutros
+  '#000000', '#333333', '#666666', '#999999', '#CCCCCC', '#FFFFFF', 
+  // Rojos y Vinos
+  '#FF0000', '#FF3B30', '#CC0000', '#8B0000', '#800020', '#722F37',
+  // Naranjas y Cafés
+  '#FF9500', '#FFA500', '#FF8C00', '#D2691E', '#8B4513', '#6F4E37',
+  // Tierra y Beige
+  '#A0522D', '#D2B48C', '#F5DEB3', '#F5F5DC', '#FFFDD0', '#FAF0E6',
+  // Amarillos y Dorados
+  '#FFFF00', '#FFCC00', '#FFDB58', '#FFD700', '#DAA520', '#B8860B',
+  // Verdes
+  '#00FF00', '#34C759', '#008000', '#228B22', '#32CD32', '#9ACD32',
+  // Verdes oscuros/oliva
+  '#006400', '#6B8E23', '#808000', '#556B2F', '#00FA9A', '#20B2AA',
+  // Azules y Celestes
+  '#0000FF', '#007AFF', '#0000CD', '#00008B', '#1E90FF', '#4169E1',
+  // Celestes y Turquesas
+  '#87CEEB', '#87CEFA', '#4682B4', '#5AC8FA', '#00FFFF', '#40E0D0',
+  // Morados y Lilas
+  '#800080', '#8A2BE2', '#9370DB', '#AF52DE', '#C8A2C8', '#DDA0DD',
+  // Rosados y Fucsias
+  '#FFC0CB', '#FFB6C1', '#FF69B4', '#FF1493', '#C71585', '#FF00FF'
+];
+
 /**
  * Componente mantenedor genérico para listas de catálogo.
  * Soporta: agregar, editar inline y eliminar ítems.
@@ -143,8 +168,8 @@ const MantenedorList = ({ titulo, icono, endpoint, placeholder, forceUppercase =
                         title="Elegir color"
                       ></div>
                       {showPalette && (
-                        <div style={{ position: 'absolute', top: '100%', left: 0, zIndex: 100, background: '#fff', padding: 8, borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 8, marginTop: 4 }}>
-                          {['#000000', '#FFFFFF', '#FF3B30', '#007AFF', '#34C759', '#FFCC00', '#8E8E93', '#F5F5DC', '#8B4513', '#FF69B4', '#AF52DE', '#C8A2C8', '#FF9500', '#5AC8FA', '#FFDB58', '#800020', '#FF00FF', '#40E0D0'].map(hex => (
+                        <div style={{ position: 'absolute', top: '100%', left: 0, zIndex: 100, background: '#fff', padding: 8, borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 8, marginTop: 4 }}>
+                          {EXTENDED_PALETTE.map(hex => (
                             <div key={hex} onClick={() => { setEditando(prev => ({ ...prev, hex_code: hex })); setShowPalette(false); }} style={{ width: 24, height: 24, borderRadius: '50%', background: hex, border: '1px solid #ccc', cursor: 'pointer' }}></div>
                           ))}
                         </div>
@@ -205,8 +230,8 @@ const MantenedorList = ({ titulo, icono, endpoint, placeholder, forceUppercase =
               title="Elegir color"
             ></div>
             {showPalette && (
-              <div style={{ position: 'absolute', bottom: '100%', left: 0, zIndex: 100, background: '#fff', padding: 8, borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 8, marginBottom: 8 }}>
-                {['#000000', '#FFFFFF', '#FF3B30', '#007AFF', '#34C759', '#FFCC00', '#8E8E93', '#F5F5DC', '#8B4513', '#FF69B4', '#AF52DE', '#C8A2C8', '#FF9500', '#5AC8FA', '#FFDB58', '#800020', '#FF00FF', '#40E0D0'].map(hex => (
+              <div style={{ position: 'absolute', bottom: '100%', left: 0, zIndex: 100, background: '#fff', padding: 8, borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 8, marginBottom: 8 }}>
+                {EXTENDED_PALETTE.map(hex => (
                   <div key={hex} onClick={() => { setNuevoHex(hex); setShowPalette(false); }} style={{ width: 24, height: 24, borderRadius: '50%', background: hex, border: '1px solid #ccc', cursor: 'pointer' }}></div>
                 ))}
               </div>
