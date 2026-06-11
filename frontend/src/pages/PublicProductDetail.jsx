@@ -31,6 +31,7 @@ const PublicProductDetail = () => {
   const navigate = useNavigate();
   const [producto, setProducto] = useState(null);
   const [config, setConfig] = useState(null);
+  const [coloresLista, setColoresLista] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   
   const [activeImageIndex, setActiveImageIndex] = useState(0);
@@ -49,12 +50,14 @@ const PublicProductDetail = () => {
   const fetchData = async () => {
     try {
       setIsLoading(true);
-      const [prodRes, configRes] = await Promise.all([
+      const [prodRes, configRes, coloresRes] = await Promise.all([
         api.get(`/catalogo/publico/prendas/${id}/`),
-        api.get(`/core/configuracion/publico/`)
+        api.get(`/core/configuracion/publico/`),
+        api.get(`/catalogo/publico/colores/`)
       ]);
       setProducto(prodRes.data);
       setConfig(configRes.data);
+      setColoresLista(coloresRes.data.results || coloresRes.data);
       
       if (prodRes.data.variantes && prodRes.data.variantes.length > 0) {
         const uniqueColors = Array.from(new Set(prodRes.data.variantes.map(v => v.color))).filter(Boolean);
@@ -217,24 +220,29 @@ const PublicProductDetail = () => {
               <div className="pk3-variant-group">
                 <span className="pk3-variant-label">Color: <strong>{colorSeleccionado}</strong></span>
                 <div className="pk3-color-options">
-                  {uniqueColors.map((colorName, idx) => (
-                    <button 
-                      key={idx}
-                      className={`pk3-color-btn ${colorSeleccionado === colorName ? 'selected' : ''}`}
-                      onClick={() => {
-                        setColorSeleccionado(colorName);
-                        setTallaSeleccionada(null);
-                        
-                        // Buscar imagen correspondiente al color
-                        const idx = allImages.findIndex(img => img.color && img.color.toLowerCase() === colorName.toLowerCase());
-                        if (idx !== -1) {
-                          setActiveImageIndex(idx);
-                        }
-                      }}
-                    >
-                      {colorName}
-                    </button>
-                  ))}
+                  {uniqueColors.map((colorName, idx) => {
+                    const colorData = coloresLista.find(c => c.nombre.toLowerCase() === colorName.toLowerCase());
+                    const hexCode = colorData?.hex_code || '#ddd';
+                    const isSelected = colorSeleccionado === colorName;
+                    return (
+                      <button 
+                        key={idx}
+                        className={`pk3-color-btn-circle ${isSelected ? 'selected' : ''}`}
+                        title={colorName}
+                        style={{ 
+                          width: '32px', height: '32px', borderRadius: '50%', border: isSelected ? '2px solid var(--color-primary)' : '1px solid #ccc',
+                          background: hexCode, cursor: 'pointer', padding: 0, transition: 'transform 0.2s'
+                        }}
+                        onClick={() => {
+                          setColorSeleccionado(colorName);
+                          setTallaSeleccionada(null);
+                          
+                          const imgIdx = allImages.findIndex(img => img.color && img.color.toLowerCase() === colorName.toLowerCase());
+                          if (imgIdx !== -1) setActiveImageIndex(imgIdx);
+                        }}
+                      />
+                    );
+                  })}
                 </div>
               </div>
             )}

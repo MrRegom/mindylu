@@ -65,6 +65,7 @@ const PublicCatalog = () => {
   const [cantidadAComprar, setCantidadAComprar] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [categoriaActiva, setCategoriaActiva] = useState(null);
+  const [coloresLista, setColoresLista] = useState([]);
 
   const categoriesScrollRef = useRef(null);
   const touchStartX = useRef(null);
@@ -98,14 +99,16 @@ const PublicCatalog = () => {
     try {
       setIsLoading(true);
       const t = Date.now();
-      const [prendasRes, configRes, catRes] = await Promise.all([
+      const [prendasRes, configRes, catRes, coloresRes] = await Promise.all([
         api.get(`/catalogo/publico/prendas/?t=${t}`),
         api.get(`/core/configuracion/publico/?t=${t}`),
-        api.get(`/catalogo/publico/categorias/?t=${t}`)
+        api.get(`/catalogo/publico/categorias/?t=${t}`),
+        api.get(`/catalogo/publico/colores/?t=${t}`)
       ]);
       setPrendas(prendasRes.data.results || prendasRes.data);
       setConfig(configRes.data);
       setCategorias(catRes.data.results || catRes.data);
+      setColoresLista(coloresRes.data.results || coloresRes.data);
     } catch (error) {
       console.error('Error fetching data', error);
     } finally {
@@ -364,7 +367,11 @@ const PublicCatalog = () => {
                             if (imgMatch) {
                                return <img key={idx} src={getImageUrl(imgMatch.imagen)} alt={colorName} className="pk2-card-color-dot img-dot" title={colorName} />;
                             }
-                            return <span key={idx} className="pk2-card-color-dot" style={{ backgroundColor: getColorHex(colorName) }} title={colorName}></span>;
+                            
+                            const colorData = coloresLista.find(c => c.nombre.toLowerCase() === colorName.toLowerCase());
+                            const hexCode = colorData?.hex_code || getColorHex(colorName);
+                            
+                            return <span key={idx} className="pk2-card-color-dot" style={{ backgroundColor: hexCode }} title={colorName}></span>;
                          })}
                          {uniqueColors.length > 5 && <span className="pk2-card-color-more">+{uniqueColors.length - 5}</span>}
                        </div>

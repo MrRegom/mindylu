@@ -197,6 +197,7 @@ class ColorPredefinido(models.Model):
     """Colores autogestionables desde la pantalla de Ajustes."""
     tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name='colores_predefinidos')
     nombre = models.CharField(max_length=100)
+    hex_code = models.CharField(max_length=7, blank=True, null=True, help_text=_('Código HEX del color'))
 
     class Meta:
         ordering = ['nombre']

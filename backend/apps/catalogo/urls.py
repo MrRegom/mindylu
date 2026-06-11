@@ -4,7 +4,7 @@
 
 from django.urls import path, include
 from rest_framework.routers import SimpleRouter
-from .views import PrendaViewSet, CicloVentaViewSet, CategoriaViewSet, ColorPredefinidoViewSet, TallaPredefinidaViewSet, NombrePrendaPredefinidoViewSet, PublicoPrendaViewSet, PublicoCategoriaViewSet
+from .views import PrendaViewSet, CicloVentaViewSet, CategoriaViewSet, ColorPredefinidoViewSet, TallaPredefinidaViewSet, NombrePrendaPredefinidoViewSet, PublicoPrendaViewSet, PublicoCategoriaViewSet, PublicoColorViewSet
 
 router = SimpleRouter()
 router.register(r'prendas', PrendaViewSet, basename='prenda')
@@ -16,6 +16,7 @@ router.register(r'nombres-prendas', NombrePrendaPredefinidoViewSet, basename='no
 
 router.register(r'publico/prendas', PublicoPrendaViewSet, basename='publico-prenda')
 router.register(r'publico/categorias', PublicoCategoriaViewSet, basename='publico-categoria')
+router.register(r'publico/colores', PublicoColorViewSet, basename='publico-color')
 
 urlpatterns = [
     path('', include(router.urls)),

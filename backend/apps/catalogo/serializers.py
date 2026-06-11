@@ -8,7 +8,7 @@ from .models import CicloVenta, Prenda, PrendaVariante, PrendaImagen, Categoria,
 class ColorPredefinidoSerializer(serializers.ModelSerializer):
     class Meta:
         model = ColorPredefinido
-        fields = ['id', 'nombre']
+        fields = ['id', 'nombre', 'hex_code']
 
 class TallaPredefinidaSerializer(serializers.ModelSerializer):
     class Meta:

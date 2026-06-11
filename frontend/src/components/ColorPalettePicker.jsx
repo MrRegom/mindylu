@@ -6,8 +6,10 @@ import './ColorPalettePicker.css';
 const ColorPalettePicker = ({ availableColors, selectedColor, onSelectColor }) => {
   return (
     <div className="color-palette-picker">
-      {availableColors.map((colorName) => {
-        const hex = getHexForColor(colorName);
+      {availableColors.map((colorItem) => {
+        const isObject = typeof colorItem === 'object';
+        const colorName = isObject ? colorItem.nombre : colorItem;
+        const hex = (isObject && colorItem.hex_code) ? colorItem.hex_code : getHexForColor(colorName);
         const isSelected = selectedColor === colorName;
         // If it's a light color, we use dark text/check so it's visible. 
         // Also if we don't have a hex (it's a generic rainbow), we use light check.

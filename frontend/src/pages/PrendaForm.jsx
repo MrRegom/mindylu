@@ -398,7 +398,7 @@ const PrendaForm = () => {
                     >
                       {variante.color ? (
                         <>
-                          <div style={{ width: 20, height: 20, borderRadius: '50%', background: getHexForColor(variante.color) || 'linear-gradient(45deg, #ff9a9e, #fecfef)', border: '1px solid #ddd' }}></div>
+                          <div style={{ width: 20, height: 20, borderRadius: '50%', background: colores.find(c => c.nombre === variante.color)?.hex_code || 'linear-gradient(45deg, #ff9a9e, #fecfef)', border: '1px solid #ddd' }}></div>
                           <span>{variante.color}</span>
                         </>
                       ) : (
@@ -411,10 +411,10 @@ const PrendaForm = () => {
                     {activeDropdown === `color-${variante.id}` && (
                       <div className="custom-select-dropdown" style={{ padding: '8px', maxWidth: '300px' }}>
                         <ColorPalettePicker 
-                          availableColors={colores.map(c => c.nombre)} 
+                          availableColors={colores} 
                           selectedColor={variante.color} 
-                          onSelectColor={(c) => {
-                            handleVarianteChange(variante.id, 'color', c);
+                          onSelectColor={(colorName) => {
+                            handleVarianteChange(variante.id, 'color', colorName);
                             setActiveDropdown(null);
                           }} 
                         />

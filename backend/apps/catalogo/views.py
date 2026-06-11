@@ -579,3 +579,17 @@ class PublicoPrendaViewSet(viewsets.ReadOnlyModelViewSet):
             qs = qs.filter(fecha_ultima_carga__gte=hoy_inicio)
             
         return qs
+
+class PublicoColorViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Endpoint público para leer los colores predefinidos (usado para mapear hex_code).
+    """
+    serializer_class = ColorPredefinidoSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def get_queryset(self):
+        from apps.core.models import Tenant
+        tenant = Tenant.objects.first()
+        if tenant:
+            return ColorPredefinido.objects.filter(tenant=tenant)
+        return ColorPredefinido.objects.none()

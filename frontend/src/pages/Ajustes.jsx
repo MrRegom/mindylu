@@ -11,12 +11,14 @@ import { CATEGORY_ICONS, getCategoryIcon, ICON_NAMES_ES } from '../utils/iconMap
  * Soporta: agregar, editar inline y eliminar ítems.
  * Cumple SRP — solo gestiona una lista de un endpoint dado.
  */
-const MantenedorList = ({ titulo, icono, endpoint, placeholder, forceUppercase = false, hasIcons = false }) => {
+const MantenedorList = ({ titulo, icono, endpoint, placeholder, forceUppercase = false, hasIcons = false, hasColors = false }) => {
   const [items, setItems] = useState([]);
   const [nuevoItem, setNuevoItem] = useState('');
   const [nuevoIcono, setNuevoIcono] = useState('Sparkles');
+  const [nuevoHex, setNuevoHex] = useState('');
   const [loading, setLoading] = useState(true);
-  // Estado para edición inline: { id, valor, icono }
+  const [showPalette, setShowPalette] = useState(false);
+  // Estado para edición inline: { id, valor, icono, hex_code }
   const [editando, setEditando] = useState(null);
   const editInputRef = useRef(null);
 
@@ -55,9 +57,11 @@ const MantenedorList = ({ titulo, icono, endpoint, placeholder, forceUppercase =
     try {
       const payload = { nombre: nombreFormateado };
       if (hasIcons) payload.icono = nuevoIcono;
+      if (hasColors && nuevoHex) payload.hex_code = nuevoHex;
       await api.post(endpoint, payload);
       setNuevoItem('');
       setNuevoIcono('Sparkles');
+      setNuevoHex('');
       fetchItems();
       showToast('success', `${nombreFormateado} agregado`);
     } catch (error) {
@@ -66,7 +70,7 @@ const MantenedorList = ({ titulo, icono, endpoint, placeholder, forceUppercase =
   };
 
   const handleStartEdit = (item) => {
-    setEditando({ id: item.id, valor: item.nombre, icono: item.icono || 'Sparkles' });
+    setEditando({ id: item.id, valor: item.nombre, icono: item.icono || 'Sparkles', hex_code: item.hex_code || '' });
   };
 
   const handleCancelEdit = () => {
@@ -79,6 +83,7 @@ const MantenedorList = ({ titulo, icono, endpoint, placeholder, forceUppercase =
     try {
       const payload = { nombre: nombreFormateado };
       if (hasIcons) payload.icono = editando.icono;
+      if (hasColors) payload.hex_code = editando.hex_code;
       await api.patch(`${endpoint}${editando.id}/`, payload);
       setEditando(null);
       fetchItems();
@@ -149,6 +154,9 @@ const MantenedorList = ({ titulo, icono, endpoint, placeholder, forceUppercase =
                 <>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     {hasIcons && <div style={{ color: 'var(--color-primary)' }}>{getCategoryIcon(item.icono || 'Sparkles', { size: 16 })}</div>}
+                    {hasColors && (
+                      <div style={{ width: 18, height: 18, borderRadius: '50%', backgroundColor: item.hex_code || '#ddd', border: '1px solid #ccc' }}></div>
+                    )}
                     <span className="mantenedor-nombre">{item.nombre}</span>
                   </div>
                   <div className="mantenedor-acciones">
@@ -172,6 +180,22 @@ const MantenedorList = ({ titulo, icono, endpoint, placeholder, forceUppercase =
           <select value={nuevoIcono} onChange={e => setNuevoIcono(e.target.value)} className="mantenedor-select-light" style={{ flexShrink: 0 }}>
             {Object.keys(CATEGORY_ICONS).map(k => <option key={k} value={k}>{ICON_NAMES_ES[k] || k}</option>)}
           </select>
+        )}
+        {hasColors && (
+          <div style={{ position: 'relative' }}>
+            <div 
+              style={{ width: 36, height: 36, borderRadius: '8px', background: nuevoHex || '#ddd', border: '1px solid #ccc', cursor: 'pointer', flexShrink: 0 }}
+              onClick={() => setShowPalette(!showPalette)}
+              title="Elegir color"
+            ></div>
+            {showPalette && (
+              <div style={{ position: 'absolute', bottom: '100%', left: 0, zIndex: 100, background: '#fff', padding: 8, borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 8, marginBottom: 8 }}>
+                {['#000000', '#FFFFFF', '#FF3B30', '#007AFF', '#34C759', '#FFCC00', '#8E8E93', '#F5F5DC', '#8B4513', '#FF69B4', '#AF52DE', '#C8A2C8', '#FF9500', '#5AC8FA', '#FFDB58', '#800020', '#FF00FF', '#40E0D0'].map(hex => (
+                  <div key={hex} onClick={() => { setNuevoHex(hex); setShowPalette(false); }} style={{ width: 24, height: 24, borderRadius: '50%', background: hex, border: '1px solid #ccc', cursor: 'pointer' }}></div>
+                ))}
+              </div>
+            )}
+          </div>
         )}
         <input
           type="text"
@@ -461,6 +485,7 @@ const Ajustes = () => {
           icono={<Palette size={20} className="icon-accent" />}
           endpoint="/catalogo/colores/"
           placeholder="Nuevo color (ej. Burdeo)"
+          hasColors={true}
         />
         <MantenedorList 
           titulo="Tallas" 
