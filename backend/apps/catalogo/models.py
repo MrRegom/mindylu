@@ -6,6 +6,10 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from apps.core.models import Tenant
+from PIL import Image, ImageOps
+from io import BytesIO
+from django.core.files.uploadedfile import InMemoryUploadedFile
+import sys
 
 
 class CicloVenta(models.Model):
@@ -41,6 +45,7 @@ class Categoria(models.Model):
     """
     tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name='categorias')
     nombre = models.CharField(max_length=100, verbose_name=_('Nombre'))
+    icono = models.CharField(max_length=50, blank=True, null=True, default='Sparkles', verbose_name=_('Ícono'))
 
     class Meta:
         ordering = ['nombre']
@@ -125,6 +130,38 @@ class PrendaImagen(models.Model):
 
     def __str__(self):
         return f"Imagen de {self.prenda.nombre}"
+
+    def save(self, *args, **kwargs):
+        if self.imagen:
+            try:
+                # Abrir imagen original
+                img = Image.open(self.imagen)
+                
+                # Respetar la orientación EXIF (rotación del celular)
+                img = ImageOps.exif_transpose(img)
+                
+                # Convertir a RGB (necesario si es PNG con transparencia y guardaremos como WEBP/JPEG)
+                if img.mode != 'RGB':
+                    img = img.convert('RGB')
+                
+                # Redimensionar si es muy grande (max 1200x1600 aprox para web)
+                img.thumbnail((1200, 1600), Image.Resampling.LANCZOS)
+                
+                # Comprimir a WebP o JPEG
+                output = BytesIO()
+                img.save(output, format='JPEG', quality=80, optimize=True)
+                output.seek(0)
+                
+                # Reemplazar archivo original con la versión comprimida
+                self.imagen = InMemoryUploadedFile(
+                    output, 'ImageField', 
+                    f"{self.imagen.name.split('.')[0]}.jpg", 
+                    'image/jpeg', sys.getsizeof(output), None
+                )
+            except Exception as e:
+                print("Error comprimiendo imagen:", e)
+                
+        super().save(*args, **kwargs)
 
 
 class PrendaVariante(models.Model):

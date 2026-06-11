@@ -27,6 +27,8 @@ const formatPrice = (price) => {
   return `$${Number(price).toLocaleString('es-CL')}`;
 };
 
+import { CATEGORY_ICONS, getCategoryIcon } from '../utils/iconMap';
+
 const colorHexMap = {
   'blanco': '#FFFFFF', 'negro': '#000000', 'gris': '#808080', 'rojo': '#FF0000',
   'azul': '#0000FF', 'verde': '#008000', 'amarillo': '#FFFF00', 'rosa': '#FFC0CB',
@@ -254,11 +256,11 @@ const PublicCatalog = () => {
           <div className="pk2-categories-horizontal-scroll" ref={categoriesScrollRef}>
             {categorias && categorias.length > 0 ? categorias.map((cat) => (
               <div key={cat.id} className="pk2-category-item" onClick={() => document.getElementById('lo-nuevo').scrollIntoView({behavior: 'smooth'})}>
-                <div className="pk2-category-img-placeholder">
-                   <div className="pk2-cat-icon-wrapper">
-                     <Sparkles size={28} strokeWidth={1.5} color="var(--pk2-pink)" />
-                   </div>
-                </div>
+                  <div className="pk2-category-img-placeholder">
+                    <div className="pk2-cat-icon-wrapper">
+                      {getCategoryIcon(cat.icono || 'Sparkles', { strokeWidth: 1.5, size: 28, color: 'var(--pk2-pink)' })}
+                    </div>
+                  </div>
                 <span>{cat.nombre}</span>
               </div>
             )) : (
@@ -433,7 +435,7 @@ const PublicCatalog = () => {
 
                   return (
                     <div className="pk2-modal-img" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
-                      <ImageLoader src={getImageUrl(sliderImages[activeImageIndex]?.imagen)} alt={prendaSeleccionada.nombre} style={{ touchAction: 'pan-y' }} />
+                      <ImageLoader src={getImageUrl(sliderImages[activeImageIndex]?.imagen)} alt={prendaSeleccionada.nombre} style={{ touchAction: 'pan-y', backgroundColor: '#f4f4f4' }} objectFit="contain" />
                       {sliderImages.length > 1 && (
                         <>
                           <button className="pk2-carousel-btn left" onClick={handlePrevImage}>‹</button>

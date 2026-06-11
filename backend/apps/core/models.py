@@ -8,6 +8,10 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from PIL import Image, ImageOps
+from io import BytesIO
+from django.core.files.uploadedfile import InMemoryUploadedFile
+import sys
 
 
 class Tenant(models.Model):
@@ -212,3 +216,40 @@ class ConfiguracionTienda(models.Model):
 
     def __str__(self):
         return f'Configuración de {self.tenant.nombre}'
+
+    def _compress_image(self, image_field, max_size=(1600, 1600)):
+        if not image_field:
+            return
+        
+        # Si no es un archivo subido en memoria temporal (ej. ya estaba guardado), lo omitimos
+        if not hasattr(image_field, 'file') or not hasattr(image_field.file, 'content_type'):
+            return
+
+        try:
+            img = Image.open(image_field)
+            img = ImageOps.exif_transpose(img)
+            
+            if img.mode != 'RGB':
+                img = img.convert('RGB')
+                
+            img.thumbnail(max_size, Image.Resampling.LANCZOS)
+            
+            output = BytesIO()
+            img.save(output, format='JPEG', quality=85, optimize=True)
+            output.seek(0)
+            
+            name = f"{image_field.name.split('.')[0]}.jpg"
+            image_field.file = InMemoryUploadedFile(
+                output, 'ImageField', name, 'image/jpeg',
+                sys.getsizeof(output), None
+            )
+            image_field.name = name
+        except Exception as e:
+            print("Error comprimiendo imagen de configuracion:", e)
+
+    def save(self, *args, **kwargs):
+        self._compress_image(self.banner_imagen, max_size=(1920, 1080))
+        self._compress_image(self.polaroid_1_imagen, max_size=(800, 800))
+        self._compress_image(self.polaroid_2_imagen, max_size=(800, 800))
+        self._compress_image(self.polaroid_3_imagen, max_size=(800, 800))
+        super().save(*args, **kwargs)

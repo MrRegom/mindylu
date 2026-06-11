@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Skeleton } from './Skeleton';
 
-export const ImageLoader = ({ src, alt, className = '', style = {}, skeletonClass = '' }) => {
+export const ImageLoader = ({ src, alt, className = '', style = {}, skeletonClass = '', objectFit = 'cover' }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
 
@@ -39,7 +39,7 @@ export const ImageLoader = ({ src, alt, className = '', style = {}, skeletonClas
         style={{
           width: '100%',
           height: '100%',
-          objectFit: 'cover',
+          objectFit: objectFit,
           opacity: isLoaded ? 1 : 0,
           transform: isLoaded ? 'scale(1)' : 'scale(1.05)',
           transition: 'opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1), transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)',

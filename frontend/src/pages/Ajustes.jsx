@@ -4,17 +4,19 @@ import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import './Ajustes.css';
 import { showAlert, showConfirm, showToast } from '../utils/alerts';
+import { CATEGORY_ICONS, getCategoryIcon } from '../utils/iconMap';
 
 /**
  * Componente mantenedor genérico para listas de catálogo.
  * Soporta: agregar, editar inline y eliminar ítems.
  * Cumple SRP — solo gestiona una lista de un endpoint dado.
  */
-const MantenedorList = ({ titulo, icono, endpoint, placeholder, forceUppercase = false }) => {
+const MantenedorList = ({ titulo, icono, endpoint, placeholder, forceUppercase = false, hasIcons = false }) => {
   const [items, setItems] = useState([]);
   const [nuevoItem, setNuevoItem] = useState('');
+  const [nuevoIcono, setNuevoIcono] = useState('Sparkles');
   const [loading, setLoading] = useState(true);
-  // Estado para edición inline: { id, valor }
+  // Estado para edición inline: { id, valor, icono }
   const [editando, setEditando] = useState(null);
   const editInputRef = useRef(null);
 
@@ -51,8 +53,11 @@ const MantenedorList = ({ titulo, icono, endpoint, placeholder, forceUppercase =
     if (!nuevoItem.trim()) return;
     const nombreFormateado = formatText(nuevoItem);
     try {
-      await api.post(endpoint, { nombre: nombreFormateado });
+      const payload = { nombre: nombreFormateado };
+      if (hasIcons) payload.icono = nuevoIcono;
+      await api.post(endpoint, payload);
       setNuevoItem('');
+      setNuevoIcono('Sparkles');
       fetchItems();
       showToast('success', `${nombreFormateado} agregado`);
     } catch (error) {
@@ -61,7 +66,7 @@ const MantenedorList = ({ titulo, icono, endpoint, placeholder, forceUppercase =
   };
 
   const handleStartEdit = (item) => {
-    setEditando({ id: item.id, valor: item.nombre });
+    setEditando({ id: item.id, valor: item.nombre, icono: item.icono || 'Sparkles' });
   };
 
   const handleCancelEdit = () => {
@@ -72,7 +77,9 @@ const MantenedorList = ({ titulo, icono, endpoint, placeholder, forceUppercase =
     if (!editando || !editando.valor.trim()) return;
     const nombreFormateado = formatText(editando.valor);
     try {
-      await api.patch(`${endpoint}${editando.id}/`, { nombre: nombreFormateado });
+      const payload = { nombre: nombreFormateado };
+      if (hasIcons) payload.icono = editando.icono;
+      await api.patch(`${endpoint}${editando.id}/`, payload);
       setEditando(null);
       fetchItems();
       showToast('success', `Actualizado a "${nombreFormateado}"`);
@@ -116,6 +123,13 @@ const MantenedorList = ({ titulo, icono, endpoint, placeholder, forceUppercase =
               {editando && editando.id === item.id ? (
                 /* Modo edición inline */
                 <div className="mantenedor-edit-row">
+                  {hasIcons && (
+                    <div className="mantenedor-icon-selector">
+                      <select value={editando.icono} onChange={e => setEditando(prev => ({ ...prev, icono: e.target.value }))} className="mantenedor-edit-input" style={{ width: 'auto', marginRight: '5px' }}>
+                        {Object.keys(CATEGORY_ICONS).map(k => <option key={k} value={k}>{k}</option>)}
+                      </select>
+                    </div>
+                  )}
                   <input
                     ref={editInputRef}
                     className="mantenedor-edit-input"
@@ -133,7 +147,10 @@ const MantenedorList = ({ titulo, icono, endpoint, placeholder, forceUppercase =
               ) : (
                 /* Modo vista */
                 <>
-                  <span className="mantenedor-nombre">{item.nombre}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    {hasIcons && <div style={{ color: 'var(--color-primary)' }}>{getCategoryIcon(item.icono || 'Sparkles', { size: 16 })}</div>}
+                    <span className="mantenedor-nombre">{item.nombre}</span>
+                  </div>
                   <div className="mantenedor-acciones">
                     <button type="button" className="btn-icon-edit" onClick={() => handleStartEdit(item)} title="Editar">
                       <Pencil size={14} />
@@ -151,6 +168,11 @@ const MantenedorList = ({ titulo, icono, endpoint, placeholder, forceUppercase =
 
       {/* Formulario para agregar nuevo */}
       <form className="mantenedor-form" onSubmit={handleAdd}>
+        {hasIcons && (
+          <select value={nuevoIcono} onChange={e => setNuevoIcono(e.target.value)} style={{ padding: '8px', border: '1px solid var(--color-border)', borderRadius: '6px' }}>
+            {Object.keys(CATEGORY_ICONS).map(k => <option key={k} value={k}>{k}</option>)}
+          </select>
+        )}
         <input
           type="text"
           value={nuevoItem}
@@ -426,6 +448,7 @@ const Ajustes = () => {
           icono={<Tag size={20} className="icon-accent" />}
           endpoint="/catalogo/categorias/"
           placeholder="Nueva categoría (ej. Pantalones)"
+          hasIcons={true}
         />
         <MantenedorList
           titulo="Nombres de Prendas"

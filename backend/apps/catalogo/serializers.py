@@ -24,7 +24,7 @@ class CategoriaSerializer(serializers.ModelSerializer):
     """Serializer CRUD para las categorías del tenant."""
     class Meta:
         model = Categoria
-        fields = ['id', 'nombre']
+        fields = ['id', 'nombre', 'icono']
 
 
 class PrendaImagenSerializer(serializers.ModelSerializer):
