@@ -107,6 +107,15 @@ h1, h2, h3, h4 {
   letter-spacing: -0.01em;
 }
 
+/* Force sans-serif for the admin panel to keep it clean and functional */
+body.page-admin h1,
+body.page-admin h2,
+body.page-admin h3,
+body.page-admin h4,
+body.page-admin label {
+  font-family: var(--font-main) !important;
+}
+
 /* Buttons */
 .btn {
   display: inline-flex;
