@@ -448,12 +448,12 @@ button { font-family: var(--font-sans); }
 .pk2-card-price { font-size: 1.1rem; font-weight: 600; color: var(--pk2-black); }
 
 .pk2-card-add-btn {
-  width: 100%; background: var(--pk2-black); color: var(--pk2-white);
+  width: 100%; background: #c95171; color: var(--pk2-white);
   border: none; padding: 10px 0; font-size: 0.85rem; font-weight: 500;
   cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
   border-radius: 4px; transition: background 0.3s;
 }
-.pk2-card-add-btn:hover { background: var(--pk2-pink); }
+.pk2-card-add-btn:hover { background: #ab445f; }
 
 /* ── Modal (Product) ── */
 .pk2-modal-overlay {

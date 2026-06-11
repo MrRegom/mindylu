@@ -338,7 +338,6 @@ const PublicCatalog = () => {
                     )}
                   </div>
                   <div className="pk2-card-info">
-                    <p className="pk2-card-brand">{config?.tienda_nombre?.toUpperCase() || 'MINDYLU'}</p>
                     <h4>{p.nombre}</h4>
                     
                     {uniqueColors.length > 0 && (
