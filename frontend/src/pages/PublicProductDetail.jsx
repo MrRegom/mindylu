@@ -92,8 +92,21 @@ const PublicProductDetail = () => {
     allImages = [...allImages, ...producto.imagenes];
   }
 
-  const handleNextImage = () => setActiveImageIndex((prev) => (prev + 1) % allImages.length);
-  const handlePrevImage = () => setActiveImageIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
+  const handlePrevImage = () => {
+    setActiveImageIndex((prev) => (prev === 0 ? allImages.length - 1 : prev - 1));
+  };
+
+  const handleNextImage = () => {
+    setActiveImageIndex((prev) => (prev === allImages.length - 1 ? 0 : prev + 1));
+  };
+
+  // Sync selected color when image changes
+  useEffect(() => {
+    if (allImages[activeImageIndex]?.color) {
+      const colorName = allImages[activeImageIndex].color;
+      setColorSeleccionado(colorName.charAt(0).toUpperCase() + colorName.slice(1).toLowerCase());
+    }
+  }, [activeImageIndex, allImages]);
 
   const handleAddToCart = () => {
     if (variantes.length > 0 && !varianteSeleccionada) {

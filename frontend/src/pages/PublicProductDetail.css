@@ -132,7 +132,7 @@
 /* ── Responsive ── */
 @media (max-width: 900px) {
   .pk3-container { grid-template-columns: 1fr; gap: 20px; padding: 0 15px; }
-  .pk3-gallery { height: auto; flex-direction: column; gap: 10px; }
+  .pk3-gallery { height: auto; flex-direction: column-reverse; gap: 10px; }
   .pk3-main-image-container { height: 360px; }
   .pk3-thumbnails { flex-direction: row; width: 100%; height: auto; overflow-x: auto; overflow-y: hidden; }
   .pk3-thumbnail { width: 60px; height: 80px; flex-shrink: 0; }
@@ -140,14 +140,19 @@
   .pk3-info { padding-top: 10px; }
   .pk3-title { font-size: 1.6rem; margin: 0 0 10px 0; }
   .pk3-price { font-size: 1.4rem; margin: 0 0 20px 0; }
-  .pk3-qty-group { margin-bottom: 20px; }
-
-  /* ── Botones Normales (No Pegajosos) ── */
+  /* ── Barra Pegajosa Delgada (Estilo Boutique/App) ── */
+  .pk3-root { padding-bottom: 80px; }
   .pk3-actions { 
-    display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; 
+    position: fixed; bottom: 0; left: 0; width: 100%; 
+    background: rgba(255, 255, 255, 0.98); 
+    border-top: 1px solid #eaeaea;
+    padding: 10px 15px; 
+    z-index: 1000; 
+    display: flex; flex-direction: row; gap: 10px; margin: 0; 
   }
   .pk3-btn-buy { 
-    padding: 14px; font-size: 0.95rem; margin-bottom: 0 !important;
+    padding: 10px 5px; font-size: 0.85rem; margin-bottom: 0 !important; flex: 1;
+    display: flex; align-items: center; justify-content: center;
   }
 }
 @media (max-width: 400px) {
