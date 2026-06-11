@@ -106,7 +106,7 @@ const PublicProductDetail = () => {
       const colorName = allImages[activeImageIndex].color;
       setColorSeleccionado(colorName.charAt(0).toUpperCase() + colorName.slice(1).toLowerCase());
     }
-  }, [activeImageIndex, allImages]);
+  }, [activeImageIndex]);
 
   const handleAddToCart = () => {
     if (variantes.length > 0 && !varianteSeleccionada) {
