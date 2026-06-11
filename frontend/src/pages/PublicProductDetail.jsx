@@ -206,6 +206,12 @@ const PublicProductDetail = () => {
           <h1 className="pk3-title">{producto.nombre}</h1>
           <p className="pk3-price">{formatPrice(producto.precio)}</p>
 
+          {producto.descripcion && (
+            <div className="pk3-description" style={{ marginBottom: '25px', color: '#555', lineHeight: '1.5' }}>
+              <p>{producto.descripcion}</p>
+            </div>
+          )}
+
           <div className="pk3-variants-section">
             {uniqueColors.length > 0 && (
               <div className="pk3-variant-group">
@@ -273,12 +279,6 @@ const PublicProductDetail = () => {
             </button>
           </div>
 
-          {producto.descripcion && (
-            <div className="pk3-description" style={{ borderTop: '1px solid #f0f0f0', paddingTop: '20px', marginTop: '10px', marginBottom: '25px' }}>
-              <p>{producto.descripcion}</p>
-            </div>
-          )}
-          
           <div className="pk3-features-mini" style={{ marginTop: '10px' }}>
              <div className="pk3-feature">
                <Truck size={20} /> <span>Envíos a todo el país</span>
