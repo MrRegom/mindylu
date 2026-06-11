@@ -4,11 +4,17 @@ import { Skeleton } from './Skeleton';
 export const ImageLoader = ({ src, alt, className = '', style = {}, skeletonClass = '', objectFit = 'cover' }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const [showSkeleton, setShowSkeleton] = useState(false);
 
   useEffect(() => {
     // Si cambia el src, reseteamos el estado
     setIsLoaded(false);
     setHasError(false);
+    setShowSkeleton(false);
+
+    // Retrasar la aparición del esqueleto 100ms para evitar parpadeos si la imagen ya está en caché
+    const timer = setTimeout(() => setShowSkeleton(true), 100);
+    return () => clearTimeout(timer);
   }, [src]);
 
   const handleLoad = () => {
@@ -23,7 +29,7 @@ export const ImageLoader = ({ src, alt, className = '', style = {}, skeletonClas
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', ...style }} className={className}>
       {/* Esqueleto de carga visible mientras la imagen no haya cargado */}
-      {!isLoaded && (
+      {(!isLoaded && showSkeleton) && (
         <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1 }}>
           <Skeleton className={skeletonClass} style={{ width: '100%', height: '100%', borderRadius: 'inherit' }} />
         </div>

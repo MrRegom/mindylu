@@ -1,8 +1,6 @@
 import React from 'react';
 import { 
-  Sparkles, Shirt, ShoppingBag, Star, Crown, Glasses, 
-  Heart, Diamond, Gift, Umbrella, Zap, Scissors, Briefcase, 
-  Watch, Palmtree, Sun, Moon, Cloud, Snowflake, Flame, Droplet
+  Sparkles, Shirt, ShoppingBag, Star, Crown, Heart, Diamond, Gift, Scissors, Tag, Gem
 } from 'lucide-react';
 
 export const CATEGORY_ICONS = {
@@ -11,46 +9,26 @@ export const CATEGORY_ICONS = {
   ShoppingBag: <ShoppingBag size={28} strokeWidth={1.5} />,
   Star: <Star size={28} strokeWidth={1.5} />,
   Crown: <Crown size={28} strokeWidth={1.5} />,
-  Glasses: <Glasses size={28} strokeWidth={1.5} />,
   Heart: <Heart size={28} strokeWidth={1.5} />,
   Diamond: <Diamond size={28} strokeWidth={1.5} />,
   Gift: <Gift size={28} strokeWidth={1.5} />,
-  Umbrella: <Umbrella size={28} strokeWidth={1.5} />,
-  Zap: <Zap size={28} strokeWidth={1.5} />,
   Scissors: <Scissors size={28} strokeWidth={1.5} />,
-  Briefcase: <Briefcase size={28} strokeWidth={1.5} />,
-  Watch: <Watch size={28} strokeWidth={1.5} />,
-  Palmtree: <Palmtree size={28} strokeWidth={1.5} />,
-  Sun: <Sun size={28} strokeWidth={1.5} />,
-  Moon: <Moon size={28} strokeWidth={1.5} />,
-  Cloud: <Cloud size={28} strokeWidth={1.5} />,
-  Snowflake: <Snowflake size={28} strokeWidth={1.5} />,
-  Flame: <Flame size={28} strokeWidth={1.5} />,
-  Droplet: <Droplet size={28} strokeWidth={1.5} />
+  Tag: <Tag size={28} strokeWidth={1.5} />,
+  Gem: <Gem size={28} strokeWidth={1.5} />
 };
 
 export const ICON_NAMES_ES = {
   Sparkles: 'Destellos (Por Defecto)',
-  Shirt: 'Camisa / Polera',
+  Shirt: 'Prenda / Ropa',
   ShoppingBag: 'Bolsa de Compras',
   Star: 'Estrella',
   Crown: 'Corona',
-  Glasses: 'Lentes / Anteojos',
   Heart: 'Corazón',
   Diamond: 'Diamante',
   Gift: 'Regalo',
-  Umbrella: 'Paraguas / Lluvia',
-  Zap: 'Rayo / Energía',
-  Scissors: 'Tijeras / Sastrería',
-  Briefcase: 'Maletín / Trabajo',
-  Watch: 'Reloj / Accesorios',
-  Palmtree: 'Palmera / Verano',
-  Sun: 'Sol / Día',
-  Moon: 'Luna / Noche',
-  Cloud: 'Nube / Invierno',
-  Snowflake: 'Copo de Nieve / Frío',
-  Flame: 'Fuego / Hot',
-  Droplet: 'Gota / Lavado'
+  Scissors: 'Sastrería / Medidas',
+  Tag: 'Etiqueta / Colección',
+  Gem: 'Joya / Accesorio'
 };
 
 export const getCategoryIcon = (iconName, props = {}) => {
