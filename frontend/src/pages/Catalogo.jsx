@@ -9,7 +9,6 @@ import { Plus, Check, ImageIcon, Trash2, Search, Edit2, Rocket, X, Share2, Calen
 import GlobalSpinner from '../components/GlobalSpinner';
 import api from '../services/api';
 import VenderModal from '../components/VenderModal';
-import EditarPrendaModal from '../components/EditarPrendaModal';
 import './Catalogo.css';
 import { showAlert, showConfirm, showToast } from '../utils/alerts';
 
@@ -34,8 +33,6 @@ const Catalogo = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [ventaActiva, setVentaActiva] = useState({ cart: [], clienta_id: '', entrega_diaria_id: '', notas: '' });
   const [fullscreenImage, setFullscreenImage] = useState(null);
-  const [editModalOpen, setEditModalOpen] = useState(false);
-  const [prendaAEditar, setPrendaAEditar] = useState(null);
 
   const fetchCatalogo = async () => {
     setIsLoading(true);
@@ -108,8 +105,7 @@ const Catalogo = () => {
     }
   };
 
-  const handleEditarPrenda = (prenda) => { setPrendaAEditar(prenda); setEditModalOpen(true); };
-  const handleEdicionExitosa = () => { setEditModalOpen(false); setPrendaAEditar(null); fetchCatalogo(); };
+  const handleEditarPrenda = (prenda) => { navigate('/panel/catalogo/editar/' + prenda.id); };
 
   // ── Modo Publicar ─────────────────────────────────────────────
   const toggleSeleccion = (id) => {
@@ -444,7 +440,6 @@ const Catalogo = () => {
 
       {/* Modales */}
       <VenderModal isOpen={modalOpen} onClose={() => setModalOpen(false)} ventaActiva={ventaActiva} setVentaActiva={setVentaActiva} onSuccess={handleVentaExitosa} />
-      <EditarPrendaModal isOpen={editModalOpen} onClose={() => setEditModalOpen(false)} prenda={prendaAEditar} onSuccess={handleEdicionExitosa} />
 
       {/* Fullscreen image */}
       {fullscreenImage && (

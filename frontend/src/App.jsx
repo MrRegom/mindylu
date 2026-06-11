@@ -80,6 +80,7 @@ function App() {
         }>
           <Route index element={<Home />} />
           <Route path="catalogo/nueva" element={<PrendaForm />} />
+          <Route path="catalogo/editar/:id" element={<PrendaForm />} />
           <Route path="catalogo/subida-masiva" element={<SubidaMasiva />} />
           <Route path="catalogo/carga-masiva" element={<CargaMasiva />} />
           <Route path="catalogo/lotes" element={<LotesProgramados />} />

@@ -234,7 +234,17 @@
 
 .form-actions {
   margin-top: 24px;
-  padding-bottom: 100px;
+  padding-bottom: 30px;
+}
+
+.sticky-bottom {
+  position: sticky;
+  bottom: 100px; /* Above the bottom nav (which is around 80px tall) */
+  z-index: 90;
+  padding: 16px;
+  border-radius: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 -10px 30px rgba(0,0,0,0.05);
 }
 
 .submit-btn {

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Plus, Trash2, Save } from 'lucide-react';
+import ColorPalettePicker from '../components/ColorPalettePicker';
 import api from '../services/api';
 import ImageUploader from '../components/ImageUploader';
 import './PrendaForm.css';
@@ -25,8 +26,10 @@ const PrendaForm = () => {
     { id: Date.now(), color: 'Negro', talla: '', cantidad: 1 }
   ]);
 
+  const { id } = useParams();
   const [nombresExistentes, setNombresExistentes] = useState([]);
   const [activeDropdown, setActiveDropdown] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Cerrar dropdowns al hacer click fuera
   useEffect(() => {
@@ -69,13 +72,44 @@ const PrendaForm = () => {
           ...arrPrendas.map(p => p?.nombre)
         ])].filter(n => typeof n === 'string' && n.trim() !== '').sort();
         
-        setNombresExistentes(nombresUnicos);
+        
+        if (id) {
+          setIsLoading(true);
+          try {
+            const resPrenda = await api.get(`/catalogo/prendas/${id}/`);
+            const p = resPrenda.data;
+            setFormData({
+              nombre: p.nombre || '',
+              precio_compra: p.precio_compra ? p.precio_compra.toLocaleString('es-CL') : '',
+              precio: p.precio ? p.precio.toLocaleString('es-CL') : '',
+              categoria: p.categoria || p.categoria_id || '',
+              descripcion: p.descripcion || ''
+            });
+            if (p.variantes && p.variantes.length > 0) {
+              setVariantes(p.variantes.map(v => ({ ...v, tempId: v.id || Date.now() + Math.random() })));
+            }
+            if (p.imagenes && p.imagenes.length > 0) {
+              setImages(p.imagenes.map(img => ({
+                id: img.id,
+                file: null,
+                preview: img.imagen,
+                color: img.color || '',
+                orden: img.orden || 0,
+                principal: img.orden === 0
+              })));
+            }
+          } catch (e) {
+            showAlert('Error al cargar la prenda para edición');
+          } finally {
+            setIsLoading(false);
+          }
+        }
       } catch (error) {
         console.error("Error cargando datos iniciales:", error);
       }
     };
     fetchData();
-  }, []);
+  }, [id]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -156,15 +190,21 @@ const PrendaForm = () => {
         payload.append('categoria_id', formData.categoria);
       }
       
-      const cleanVariantes = variantes.map(v => ({
-        color: v.color,
-        talla: v.talla,
-        cantidad: parseInt(v.cantidad, 10)
-      }));
+      const cleanVariantes = variantes.map(v => {
+        const item = {
+          color: v.color,
+          talla: v.talla,
+          cantidad: parseInt(v.cantidad, 10) || 0
+        };
+        if (id && v.id && !v.tempId) item.id = v.id; 
+        if (id && v.id && v.tempId) item.id = v.id; 
+        return item;
+      });
       payload.append('variantes', JSON.stringify(cleanVariantes));
 
       // Extraer data de imágenes
       const imagesData = images.map(imgObj => ({
+        id: imgObj.file ? null : imgObj.id,
         color: imgObj.color || '',
         orden: parseInt(imgObj.orden, 10) || 0,
         principal: !!imgObj.principal
@@ -177,11 +217,17 @@ const PrendaForm = () => {
       });
 
       // Guardar la prenda en el backend local
-      await api.post('/catalogo/prendas/', payload, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
+      if (id) {
+        await api.patch(`/catalogo/prendas/${id}/`, payload, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        showToast('success', 'Prenda actualizada con éxito');
+      } else {
+        await api.post('/catalogo/prendas/', payload, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        showToast('success', 'Prenda creada con éxito');
+      }
 
       navigate('/panel/catalogo');
     } catch (error) {
@@ -197,10 +243,13 @@ const PrendaForm = () => {
         <button className="btn-back" onClick={() => navigate('/panel/catalogo')} type="button">
           <ArrowLeft size={24} />
         </button>
-        <h2>Nueva Prenda</h2>
+        <h2>{id ? 'Editar Prenda' : 'Nueva Prenda'}</h2>
         <div style={{ width: 24 }}></div>
       </div>
 
+      {isLoading ? (
+        <div className="loading-state">Cargando datos de la prenda...</div>
+      ) : (
       <form className="prenda-form" onSubmit={handleSubmit}>
         <div className="form-section glass" style={{ zIndex: 20, position: 'relative' }}>
           <h3>Detalles Base</h3>
@@ -338,34 +387,13 @@ const PrendaForm = () => {
                 style={{ zIndex: activeDropdown && String(activeDropdown).includes(variante.id) ? 100 : (50 - index), position: 'relative' }}
               >
                 <div className="variante-row">
-                  <div className="input-group mini" style={{ position: 'relative', zIndex: activeDropdown === `color-${variante.id}` ? 100 : 1 }}>
+                  <div className="input-group mini" style={{ marginBottom: 8 }}>
                     <label>Color</label>
-                    <div
-                      className={`custom-select-trigger ${variante.color ? 'has-value' : ''}`}
-                      onClick={() => setActiveDropdown(prev => prev === `color-${variante.id}` ? null : `color-${variante.id}`)}
-                    >
-                      <span>{variante.color || 'Elegir color...'}</span>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <polyline points="6 9 12 15 18 9" />
-                      </svg>
-                    </div>
-                    {activeDropdown === `color-${variante.id}` && (
-                      <div className="custom-select-dropdown">
-                        {colores.map(c => (
-                          <div
-                            key={c.id}
-                            className={`custom-select-option ${variante.color === c.nombre ? 'selected' : ''}`}
-                            onClick={() => {
-                              handleVarianteChange(variante.id, 'color', c.nombre);
-                              setActiveDropdown(null);
-                            }}
-                          >
-                            {c.nombre}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    <input type="text" value={variante.color} required readOnly style={{ position: 'absolute', opacity: 0, height: 0, pointerEvents: 'none' }} />
+                    <ColorPalettePicker 
+                      availableColors={colores.map(c => c.nombre)} 
+                      selectedColor={variante.color} 
+                      onSelectColor={(c) => handleVarianteChange(variante.id, 'color', c)} 
+                    />
                   </div>
                   
                   <div className="input-group mini" style={{ position: 'relative', zIndex: activeDropdown === `talla-${variante.id}` ? 100 : 1 }}>
@@ -434,13 +462,14 @@ const PrendaForm = () => {
           <ImageUploader images={images} setImages={setImages} variantes={variantes} colores={colores} />
         </div>
 
-        <div className="form-actions">
+        <div className="form-actions sticky-bottom glass">
           <button type="submit" className="btn btn-primary submit-btn" disabled={isSubmitting}>
             <Save size={20} />
-            {isSubmitting ? 'Procesando...' : 'Guardar Prenda'}
+            {isSubmitting ? 'Procesando...' : (id ? 'Guardar Cambios' : 'Guardar Prenda')}
           </button>
         </div>
       </form>
+      )}
     </div>
   );
 };
