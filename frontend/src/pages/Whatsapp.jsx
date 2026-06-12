@@ -98,15 +98,15 @@ const Whatsapp = () => {
   return (
     <div className="page-container animate-fade-in" style={{ paddingBottom: 0 }}>
       <div className="page-header" style={{ marginBottom: '16px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
-            <h1>
-              <MessageCircle size={28} />
-              Bandeja de Entrada (Meta API)
+            <h1 style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1.5rem', margin: 0 }}>
+              <MessageCircle size={28} color="#25D366" />
+              Bandeja de Entrada
             </h1>
-            <p className="subtitle">Responde a tus clientas cuando el Bot necesite tu ayuda.</p>
+            <p className="subtitle" style={{ marginTop: '4px' }}>Responde a tus clientas desde aquí.</p>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#d9fdd3', padding: '6px 12px', borderRadius: '20px', color: '#0f5132', fontSize: '0.85rem', fontWeight: 600 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#d9fdd3', padding: '6px 12px', borderRadius: '20px', color: '#0f5132', fontSize: '0.8rem', fontWeight: 600 }}>
             <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#198754' }}></span>
             Webhook Conectado
           </div>
