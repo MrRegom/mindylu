@@ -158,7 +158,7 @@ const PublicCatalog = () => {
       if (item.varianteSeleccionada) {
          varianteText = ` (Color: ${item.varianteSeleccionada.color || 'Único'}, Talla: ${item.varianteSeleccionada.talla || 'Única'})`;
       }
-      text += `${idx + 1}. *${item.nombre}*${varianteText} x${item.cantidad} - ${formatPrice(item.precio * item.cantidad)}\n`;
+      text += `${idx + 1}. *${item.nombre}*${varianteText} x${item.cantidad} - ${formatPrice(item.precio * item.cantidad)} (Ref: #${item.id})\n`;
     });
     const total = cartItems.reduce((acc, curr) => acc + (Number(curr.precio || 0) * curr.cantidad), 0);
     text += `\n*Total estimado: ${formatPrice(total)}*`;

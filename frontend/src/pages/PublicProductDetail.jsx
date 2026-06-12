@@ -146,7 +146,7 @@ const PublicProductDetail = () => {
        varianteText = ` (Color: ${varianteSeleccionada.color || 'Único'}, Talla: ${varianteSeleccionada.talla || 'Única'})`;
     }
     
-    const text = `Hola, quiero comprar el siguiente producto:\n\n*${producto.nombre}*${varianteText} x${cantidadAComprar} - ${formatPrice(producto.precio * cantidadAComprar)}\n`;
+    const text = `Hola, quiero comprar el siguiente producto:\n\n*${producto.nombre}*${varianteText} x${cantidadAComprar} - ${formatPrice(producto.precio * cantidadAComprar)}\n\n(Ref: #${producto.id})`;
     const num = config?.whatsapp_numero || '56912345678';
     window.open(`https://wa.me/${num}?text=${encodeURIComponent(text)}`, '_blank');
   };

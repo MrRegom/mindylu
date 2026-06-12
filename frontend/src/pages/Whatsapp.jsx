@@ -95,20 +95,57 @@ const Whatsapp = () => {
     (chat.client_phone || '').includes(searchQuery)
   );
 
+  const renderMessageContent = (content) => {
+    if (!content) return '';
+    
+    const lines = content.split('\n');
+    return lines.map((line, i) => {
+      // Regex para detectar (Ref: #123)
+      const refRegex = /\(Ref:\s*#(\d+)\)/;
+      const match = line.match(refRegex);
+      
+      let lineContent = line;
+      let refButton = null;
+      
+      if (match) {
+        lineContent = line.replace(match[0], '').trim();
+        refButton = (
+          <a href={`/panel/catalogo?search=${match[1]}`} target="_blank" rel="noreferrer" 
+             style={{ display: 'inline-flex', alignItems: 'center', background: '#faecee', padding: '4px 10px', borderRadius: '12px', color: '#d16b7e', textDecoration: 'none', fontWeight: 600, fontSize: '0.75rem', marginTop: '4px', gap: '6px', border: '1px solid #faecee' }}>
+             <Search size={14} /> Ver Prenda Interna
+          </a>
+        );
+      }
+      
+      // Parsear negritas simples *texto*
+      const boldParts = lineContent.split(/\*(.*?)\*/);
+      const formattedLine = boldParts.map((part, j) => {
+        if (j % 2 === 1) return <strong key={j}>{part}</strong>;
+        return <span key={j}>{part}</span>;
+      });
+
+      return (
+        <span key={i} style={{ display: 'block', minHeight: line === '' ? '14px' : 'auto' }}>
+          {formattedLine}
+          {refButton && <div style={{ marginTop: '4px' }}>{refButton}</div>}
+        </span>
+      );
+    });
+  };
+
   return (
     <div className="page-container animate-fade-in" style={{ paddingBottom: 0 }}>
-      <div className="page-header" style={{ marginBottom: '16px' }}>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <div className="page-header" style={{ marginBottom: '12px', paddingBottom: '8px', borderBottom: '1px solid #faecee' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <h1 style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1.5rem', margin: 0 }}>
-              <MessageCircle size={28} color="#25D366" />
+            <h1 style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1.1rem', margin: 0, color: '#d16b7e', fontFamily: "'Playfair Display', serif" }}>
+              <MessageCircle size={20} color="#d16b7e" />
               Bandeja de Entrada
             </h1>
-            <p className="subtitle" style={{ marginTop: '4px' }}>Responde a tus clientas desde aquí.</p>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#d9fdd3', padding: '6px 12px', borderRadius: '20px', color: '#0f5132', fontSize: '0.8rem', fontWeight: 600 }}>
-            <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#198754' }}></span>
-            Webhook Conectado
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#fdf5f6', padding: '4px 8px', borderRadius: '12px', color: '#c46c7a', fontSize: '0.65rem', fontWeight: 600, border: '1px solid #faecee' }}>
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#d16b7e' }}></span>
+            Conectado
           </div>
         </div>
       </div>
@@ -198,7 +235,7 @@ const Whatsapp = () => {
                 
                 {messages.map(msg => (
                   <div key={msg.id} className={`wa-message ${msg.direction === 'INBOUND' ? 'received' : 'sent'}`}>
-                    {msg.content}
+                    {renderMessageContent(msg.content)}
                     <div className="wa-message-meta">
                       {msg.direction === 'OUTBOUND' && <UserIcon size={12} />}
                       {new Date(msg.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
