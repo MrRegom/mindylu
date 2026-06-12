@@ -501,53 +501,115 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
 @csrf_exempt
-@api_view(['GET', 'POST'])
-@permission_classes([]) # Facebook calls this without token
 def whatsapp_webhook(request):
     """
-    Webhook oficial para Meta Cloud API.
-    GET: Verificación del Webhook por parte de Facebook.
-    POST: Recepción de mensajes.
+    Webhook para recibir eventos de Meta (WhatsApp).
+    No usa IsAuthenticated porque Facebook llama a este endpoint anónimamente.
     """
     if request.method == 'GET':
-        # Verificación del Webhook
         mode = request.GET.get('hub.mode')
         token = request.GET.get('hub.verify_token')
         challenge = request.GET.get('hub.challenge')
 
-        # El verify_token configurado en developers.facebook.com
+        # Obtener el token de las variables de entorno, o usar uno por defecto
         VERIFY_TOKEN = config('WHATSAPP_VERIFY_TOKEN', default='mindylu_secret_token_123')
 
         if mode and token:
             if mode == 'subscribe' and token == VERIFY_TOKEN:
                 return HttpResponse(challenge, status=200)
             else:
-                return HttpResponse('Error, wrong validation token', status=403)
-        return HttpResponse('Hello from WhatsApp Webhook', status=200)
+                return HttpResponse('Forbidden', status=403)
+        return HttpResponse('Bad Request', status=400)
 
     elif request.method == 'POST':
-        # Recepción de Mensajes
         try:
-            body = request.data
+            import json
+            from .services.whatsapp_service import WhatsappService
             
-            # Verificamos si es un evento de WhatsApp
-            if body.get('object') == 'whatsapp_business_account':
-                for entry in body.get('entry', []):
-                    for change in entry.get('changes', []):
-                        value = change.get('value', {})
-                        messages = value.get('messages', [])
-                        
-                        # Si hay un mensaje, lo imprimimos (Acá iría la lógica de guardar en BD y Auto-responder)
-                        if messages:
-                            message = messages[0]
-                            phone_number = message.get('from')
-                            text = message.get('text', {}).get('body')
-                            print(f"Mensaje recibido de {phone_number}: {text}")
-                            
-                return HttpResponse('EVENT_RECEIVED', status=200)
-            else:
-                return HttpResponse(status=404)
+            body = json.loads(request.body.decode('utf-8'))
+            
+            # Instanciar el servicio (asume primer tenant o se podria mapear por WABA_ID si hubiera varios)
+            service = WhatsappService()
+            service.procesar_webhook_payload(body)
+            
+            return HttpResponse('EVENT_RECEIVED', status=200)
         except Exception as e:
-            print(f"Error procesando webhook: {e}")
-            return HttpResponse('Error', status=500)
+            print(f"Error en webhook POST: {e}")
+            return HttpResponse('Internal Server Error', status=500)
+            
+    return HttpResponse('Method Not Allowed', status=405)
+
+
+# --- Nuevos Endpoints para la UI (Bandeja de Entrada) ---
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from .models import Conversacion, Mensaje
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def listar_conversaciones(request):
+    conversaciones = Conversacion.objects.filter(tenant=request.user.tenant).order_by('-last_message_at')
+    data = []
+    for c in conversaciones:
+        last_msg = c.mensajes.order_by('-created_at').first()
+        data.append({
+            'id': c.id,
+            'client_phone': c.client_phone,
+            'client_name': c.client_name,
+            'unread_count': c.unread_count,
+            'status': c.status,
+            'last_message_at': c.last_message_at.isoformat() if c.last_message_at else None,
+            'last_message_content': last_msg.content if last_msg else '',
+        })
+    return Response({'conversaciones': data}, status=200)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def listar_mensajes(request, conversacion_id):
+    try:
+        conversacion = Conversacion.objects.get(id=conversacion_id, tenant=request.user.tenant)
+    except Conversacion.DoesNotExist:
+        return Response({'error': 'Conversación no encontrada'}, status=404)
+        
+    # Reset unread
+    if conversacion.unread_count > 0:
+        conversacion.unread_count = 0
+        conversacion.save()
+        
+    mensajes = conversacion.mensajes.order_by('created_at')
+    data = []
+    for m in mensajes:
+        data.append({
+            'id': m.id,
+            'direction': m.direction,
+            'content': m.content,
+            'status': m.status,
+            'created_at': m.created_at.isoformat()
+        })
+    return Response({'mensajes': data}, status=200)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def enviar_mensaje(request, conversacion_id):
+    text_body = request.data.get('content')
+    if not text_body:
+        return Response({'error': 'El contenido no puede estar vacío'}, status=400)
+        
+    from .services.whatsapp_service import WhatsappService
+    service = WhatsappService(tenant=request.user.tenant)
+    
+    nuevo_mensaje = service.enviar_mensaje_texto(conversacion_id, text_body)
+    
+    if nuevo_mensaje:
+        return Response({
+            'id': nuevo_mensaje.id,
+            'direction': nuevo_mensaje.direction,
+            'content': nuevo_mensaje.content,
+            'status': nuevo_mensaje.status,
+            'created_at': nuevo_mensaje.created_at.isoformat()
+        }, status=201)
+    else:
+        return Response({'error': 'No se pudo enviar el mensaje a través de Meta API'}, status=500)
 

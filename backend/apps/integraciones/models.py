@@ -5,13 +5,12 @@ from apps.core.models import Tenant
 
 class WhatsappConfig(models.Model):
     """
-    Guarda el estado de la conexión con Evolution API para el envío de WhatsApp.
+    Guarda el estado de la conexión con Meta API para el envío de WhatsApp.
     """
     tenant = models.OneToOneField(Tenant, on_delete=models.CASCADE, related_name='whatsapp_config')
-    instance_name = models.CharField(max_length=100, blank=True, null=True, help_text="Nombre de la instancia en Evolution API")
-    instance_id = models.CharField(max_length=100, blank=True, null=True)
-    connection_status = models.CharField(max_length=50, default='DISCONNECTED')
-    qr_code_base64 = models.TextField(blank=True, null=True)
+    phone_number_id = models.CharField(max_length=100, blank=True, null=True, help_text="ID del Número de Teléfono en Meta")
+    waba_id = models.CharField(max_length=100, blank=True, null=True, help_text="ID de la Cuenta de WhatsApp Business")
+    access_token = models.TextField(blank=True, null=True, help_text="Token Permanente del Usuario de Sistema")
     webhook_url = models.URLField(blank=True, null=True)
     is_active = models.BooleanField(default=False)
     
@@ -22,4 +21,50 @@ class WhatsappConfig(models.Model):
         verbose_name_plural = "Configuraciones de WhatsApp"
 
     def __str__(self):
-        return f"WhatsApp Config - {self.tenant.nombre} ({self.connection_status})"
+        return f"WhatsApp Config - {self.tenant.nombre}"
+
+
+class Conversacion(models.Model):
+    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE)
+    client_phone = models.CharField(max_length=50)
+    client_name = models.CharField(max_length=150, blank=True)
+    last_message_at = models.DateTimeField(auto_now=True)
+    unread_count = models.IntegerField(default=0)
+    status = models.CharField(max_length=20, choices=[('OPEN', 'Open'), ('CLOSED', 'Closed')], default='OPEN')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-last_message_at']
+        verbose_name = "Conversación"
+        verbose_name_plural = "Conversaciones"
+
+    def __str__(self):
+        return f"Conversación con {self.client_phone} ({self.status})"
+
+
+class Mensaje(models.Model):
+    DIRECTION_CHOICES = [
+        ('INBOUND', 'Entrante'),
+        ('OUTBOUND', 'Saliente'),
+    ]
+    STATUS_CHOICES = [
+        ('sent', 'Enviado'),
+        ('delivered', 'Entregado'),
+        ('read', 'Leído'),
+        ('failed', 'Fallido'),
+    ]
+
+    conversacion = models.ForeignKey(Conversacion, on_delete=models.CASCADE, related_name='mensajes')
+    wam_id = models.CharField(max_length=255, unique=True, help_text="WhatsApp Message ID")
+    direction = models.CharField(max_length=10, choices=DIRECTION_CHOICES)
+    content = models.TextField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='sent')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['created_at']
+        verbose_name = "Mensaje"
+        verbose_name_plural = "Mensajes"
+
+    def __str__(self):
+        return f"[{self.direction}] {self.content[:30]}"

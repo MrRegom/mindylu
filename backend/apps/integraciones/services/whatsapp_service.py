@@ -1,0 +1,134 @@
+import logging
+import requests
+from django.conf import settings
+from apps.integraciones.models import Conversacion, Mensaje, WhatsappConfig
+from apps.core.models import Tenant
+
+logger = logging.getLogger(__name__)
+
+class WhatsappService:
+    def __init__(self, tenant=None):
+        if tenant:
+            self.tenant = tenant
+        else:
+            # Fallback for webhook without tenant context, assume first tenant
+            self.tenant = Tenant.objects.first()
+            
+        try:
+            self.config = WhatsappConfig.objects.get(tenant=self.tenant, is_active=True)
+        except WhatsappConfig.DoesNotExist:
+            self.config = None
+            logger.warning(f"No active WhatsappConfig found for tenant {self.tenant}")
+
+    def procesar_webhook_payload(self, payload):
+        """Procesa el payload recibido de Meta."""
+        try:
+            entries = payload.get('entry', [])
+            for entry in entries:
+                changes = entry.get('changes', [])
+                for change in changes:
+                    value = change.get('value', {})
+                    messages = value.get('messages', [])
+                    contacts = value.get('contacts', [])
+                    
+                    if messages and contacts:
+                        self._procesar_mensaje(messages[0], contacts[0])
+                        
+        except Exception as e:
+            logger.error(f"Error procesando webhook payload: {e}")
+
+    def _procesar_mensaje(self, message_data, contact_data):
+        client_phone = contact_data.get('wa_id')
+        client_name = contact_data.get('profile', {}).get('name', 'Desconocido')
+        wam_id = message_data.get('id')
+        
+        # Determine content
+        msg_type = message_data.get('type')
+        content = ""
+        if msg_type == 'text':
+            content = message_data.get('text', {}).get('body', '')
+        else:
+            content = f"[Mensaje tipo: {msg_type}]"
+
+        if not client_phone or not wam_id:
+            return
+
+        # Check if message already exists
+        if Mensaje.objects.filter(wam_id=wam_id).exists():
+            return
+
+        # Get or create Conversacion
+        conversacion, created = Conversacion.objects.get_or_create(
+            tenant=self.tenant,
+            client_phone=client_phone,
+            defaults={'client_name': client_name}
+        )
+        
+        # Update conversation status
+        if not created:
+            if conversacion.client_name == 'Desconocido' and client_name != 'Desconocido':
+                conversacion.client_name = client_name
+            conversacion.unread_count += 1
+            conversacion.status = 'OPEN'
+            conversacion.save()
+
+        # Create Mensaje
+        Mensaje.objects.create(
+            conversacion=conversacion,
+            wam_id=wam_id,
+            direction='INBOUND',
+            content=content,
+            status='delivered'
+        )
+
+    def enviar_mensaje_texto(self, conversacion_id, text_body):
+        """Envia un mensaje de texto a traves de Meta API y lo guarda en BD."""
+        if not self.config or not self.config.access_token or not self.config.phone_number_id:
+            logger.error("Faltan credenciales de Meta API en WhatsappConfig.")
+            return None
+
+        try:
+            conversacion = Conversacion.objects.get(id=conversacion_id, tenant=self.tenant)
+        except Conversacion.DoesNotExist:
+            logger.error(f"Conversacion {conversacion_id} no encontrada.")
+            return None
+
+        url = f"https://graph.facebook.com/v25.0/{self.config.phone_number_id}/messages"
+        headers = {
+            "Authorization": f"Bearer {self.config.access_token}",
+            "Content-Type": "application/json"
+        }
+        payload = {
+            "messaging_product": "whatsapp",
+            "to": conversacion.client_phone,
+            "type": "text",
+            "text": {
+                "body": text_body
+            }
+        }
+
+        response = requests.post(url, headers=headers, json=payload)
+        
+        if response.status_code in [200, 201]:
+            data = response.json()
+            # Extract new message ID
+            messages_info = data.get('messages', [])
+            wam_id = messages_info[0].get('id') if messages_info else f"outbound_{conversacion.id}_{response.status_code}"
+
+            # Save to DB
+            mensaje = Mensaje.objects.create(
+                conversacion=conversacion,
+                wam_id=wam_id,
+                direction='OUTBOUND',
+                content=text_body,
+                status='sent'
+            )
+            
+            # Reset unread if we replied
+            conversacion.unread_count = 0
+            conversacion.save()
+            
+            return mensaje
+        else:
+            logger.error(f"Error enviando mensaje: {response.status_code} - {response.text}")
+            return None
