@@ -1,5 +1,5 @@
 import { Outlet, useLocation } from 'react-router-dom';
-import { Home, Search, ShoppingBag, User, CreditCard, Settings, LogOut, BarChart2 } from 'lucide-react';
+import { Home, Search, ShoppingBag, User, CreditCard, Settings, LogOut, BarChart2, MessageCircle } from 'lucide-react';
 import './Layout.css';
 
 const Layout = () => {
@@ -50,6 +50,10 @@ const Layout = () => {
             <BarChart2 size={20} />
             <span>Reportes</span>
           </a>
+          <a href="/panel/whatsapp" className={`nav-item ${location.pathname.includes('/panel/whatsapp') ? 'active' : ''}`}>
+            <MessageCircle size={20} />
+            <span>WhatsApp</span>
+          </a>
           <a href="/panel/perfil" className={`nav-item ${location.pathname.includes('/panel/perfil') ? 'active' : ''}`}>
             <CreditCard size={20} />
             <span>Perfil</span>
@@ -91,6 +95,10 @@ const Layout = () => {
           <a href="/panel/reportes" className={`nav-item ${location.pathname.includes('/panel/reportes') ? 'active' : ''}`}>
             <BarChart2 size={22} />
             <span>Reportes</span>
+          </a>
+          <a href="/panel/whatsapp" className={`nav-item ${location.pathname.includes('/panel/whatsapp') ? 'active' : ''}`}>
+            <MessageCircle size={22} />
+            <span>WhatsApp</span>
           </a>
           <a href="/panel/perfil" className={`nav-item ${location.pathname.includes('/panel/perfil') ? 'active' : ''}`}>
             <CreditCard size={22} />

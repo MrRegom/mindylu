@@ -23,6 +23,7 @@ import LotesProgramados from './pages/LotesProgramados';
 import LoteAddFotos from './pages/LoteAddFotos';
 import Perfil from './pages/Perfil';
 import SubidaMasiva from './pages/SubidaMasiva';
+import Whatsapp from './pages/Whatsapp';
 import { useEffect } from 'react';
 
 // Componente auxiliar: aplica clase CSS al body según si estamos en el panel o no
@@ -94,6 +95,7 @@ function App() {
           <Route path="cuentas" element={<Cuentas />} />
           <Route path="ajustes" element={<Ajustes />} />
           <Route path="reportes" element={<Reportes />} />
+          <Route path="whatsapp" element={<Whatsapp />} />
           <Route path="ajustes/logs" element={<Logs />} />
           <Route path="perfil" element={<Perfil />} />
         </Route>
