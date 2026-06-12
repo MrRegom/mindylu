@@ -496,3 +496,58 @@ def desconectar_whatsapp(request):
         "status": config_wa.connection_status
     }, status=status.HTTP_200_OK)
 
+
+from django.http import HttpResponse, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt
+@api_view(['GET', 'POST'])
+@permission_classes([]) # Facebook calls this without token
+def whatsapp_webhook(request):
+    """
+    Webhook oficial para Meta Cloud API.
+    GET: Verificación del Webhook por parte de Facebook.
+    POST: Recepción de mensajes.
+    """
+    if request.method == 'GET':
+        # Verificación del Webhook
+        mode = request.GET.get('hub.mode')
+        token = request.GET.get('hub.verify_token')
+        challenge = request.GET.get('hub.challenge')
+
+        # El verify_token configurado en developers.facebook.com
+        VERIFY_TOKEN = config('WHATSAPP_VERIFY_TOKEN', default='mindylu_secret_token_123')
+
+        if mode and token:
+            if mode == 'subscribe' and token == VERIFY_TOKEN:
+                return HttpResponse(challenge, status=200)
+            else:
+                return HttpResponse('Error, wrong validation token', status=403)
+        return HttpResponse('Hello from WhatsApp Webhook', status=200)
+
+    elif request.method == 'POST':
+        # Recepción de Mensajes
+        try:
+            body = request.data
+            
+            # Verificamos si es un evento de WhatsApp
+            if body.get('object') == 'whatsapp_business_account':
+                for entry in body.get('entry', []):
+                    for change in entry.get('changes', []):
+                        value = change.get('value', {})
+                        messages = value.get('messages', [])
+                        
+                        # Si hay un mensaje, lo imprimimos (Acá iría la lógica de guardar en BD y Auto-responder)
+                        if messages:
+                            message = messages[0]
+                            phone_number = message.get('from')
+                            text = message.get('text', {}).get('body')
+                            print(f"Mensaje recibido de {phone_number}: {text}")
+                            
+                return HttpResponse('EVENT_RECEIVED', status=200)
+            else:
+                return HttpResponse(status=404)
+        except Exception as e:
+            print(f"Error procesando webhook: {e}")
+            return HttpResponse('Error', status=500)
+
