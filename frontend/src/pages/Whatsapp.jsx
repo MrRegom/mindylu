@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { MessageCircle, Search, Send, Bot, User as UserIcon, Check, CheckCheck, Clock, Settings } from 'lucide-react';
+import { MessageCircle, Search, Send, Bot, User as UserIcon, Check, CheckCheck, Clock, Settings, ChevronLeft } from 'lucide-react';
 import './Whatsapp.css';
 
 const MOCK_CHATS = [
@@ -109,7 +109,7 @@ const Whatsapp = () => {
         </div>
       </div>
 
-      <div className="whatsapp-container">
+      <div className={`whatsapp-container ${activeChatId ? 'chat-active' : ''}`}>
         {/* Sidebar */}
         <div className="wa-sidebar">
           <div className="wa-sidebar-header">
@@ -160,6 +160,9 @@ const Whatsapp = () => {
                 </div>
               )}
               <div className="wa-main-header">
+                <button className="wa-back-btn" onClick={() => setActiveChatId(null)}>
+                  <ChevronLeft size={24} />
+                </button>
                 <div className="wa-avatar" style={{ width: 40, height: 40, fontSize: '1rem' }}>
                   {activeChat.name.charAt(0).toUpperCase()}
                 </div>

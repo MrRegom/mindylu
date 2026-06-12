@@ -222,3 +222,43 @@
   font-weight: 600;
   border-bottom: 1px solid #ffeeba;
 }
+
+.wa-back-btn {
+  display: none;
+  background: none;
+  border: none;
+  color: #00a884;
+  margin-right: 12px;
+  cursor: pointer;
+  padding: 4px;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .whatsapp-container {
+    height: calc(100vh - 160px);
+    min-height: 500px;
+  }
+
+  .whatsapp-container.chat-active .wa-sidebar {
+    display: none;
+  }
+
+  .whatsapp-container:not(.chat-active) .wa-main {
+    display: none;
+  }
+
+  .wa-sidebar {
+    width: 100%;
+    border-right: none;
+  }
+
+  .wa-main {
+    width: 100%;
+  }
+
+  .wa-back-btn {
+    display: flex;
+    align-items: center;
+  }
+}
