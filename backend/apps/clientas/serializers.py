@@ -8,13 +8,15 @@ from .models import Clienta
 
 class ClientaSerializer(serializers.ModelSerializer):
     historial_compras = serializers.SerializerMethodField()
+    cuenta_asignada_detalle = serializers.SerializerMethodField()
 
     class Meta:
         model = Clienta
         fields = [
             'id', 'nombre', 'telefono', 'email', 
             'perfil_facebook', 'perfil_instagram', 
-            'notas', 'fecha_registro', 'activa', 'historial_compras'
+            'notas', 'fecha_registro', 'activa', 'historial_compras',
+            'cuenta_asignada', 'cuenta_asignada_detalle'
         ]
         read_only_fields = ['fecha_registro']
 
@@ -27,6 +29,11 @@ class ClientaSerializer(serializers.ModelSerializer):
             'fecha': p.fecha_pedido.strftime('%Y-%m-%d %H:%M'),
             'total': p.total()
         } for p in pedidos]
+
+    def get_cuenta_asignada_detalle(self, obj):
+        if obj.cuenta_asignada:
+            return f"{obj.cuenta_asignada.banco} - {obj.cuenta_asignada.tipo_cuenta} ({obj.cuenta_asignada.numero_cuenta})"
+        return None
 
     def create(self, validated_data):
         # Auto-asignar el tenant del usuario autenticado

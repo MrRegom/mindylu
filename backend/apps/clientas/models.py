@@ -19,6 +19,7 @@ class Clienta(models.Model):
     email = models.EmailField(blank=True, null=True)
     perfil_facebook = models.URLField(blank=True, null=True, help_text=_('URL del perfil si compró por FB'))
     perfil_instagram = models.URLField(blank=True, null=True)
+    cuenta_asignada = models.ForeignKey('cuentas.CuentaBancaria', on_delete=models.SET_NULL, null=True, blank=True, related_name='clientas_asignadas', help_text=_('Cuenta bancaria a la que debe depositar esta clienta por defecto'))
     notas = models.TextField(blank=True, null=True, help_text=_('Ej: Es mañosa con las tallas, prefiere envíos los viernes...'))
     
     fecha_registro = models.DateTimeField(auto_now_add=True)

@@ -108,6 +108,16 @@ const ClientaDetail = () => {
             </div>
           )}
 
+          {clienta.cuenta_asignada_detalle && (
+            <div className="detail-row">
+              <div className="detail-icon" style={{ color: '#d16b7e' }}><ShoppingBag size={18} /></div>
+              <div className="detail-content">
+                <span className="label">Cuenta de Depósito</span>
+                <span className="value" style={{ fontSize: '0.9rem', color: '#d16b7e', fontWeight: 600 }}>{clienta.cuenta_asignada_detalle}</span>
+              </div>
+            </div>
+          )}
+
           {clienta.notas && (
             <div className="notes-box">
               <span className="label">Notas y Preferencias</span>

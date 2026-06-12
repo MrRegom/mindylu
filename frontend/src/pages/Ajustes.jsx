@@ -5,6 +5,7 @@ import api from '../services/api';
 import './Ajustes.css';
 import { showAlert, showConfirm, showToast } from '../utils/alerts';
 import { CATEGORY_ICONS, getCategoryIcon, ICON_NAMES_ES } from '../utils/iconMap';
+import MantenedorCuentas from '../components/MantenedorCuentas';
 
 const EXTENDED_PALETTE = [
   // Neutros
@@ -542,6 +543,7 @@ const Ajustes = () => {
           endpoint="/pedidos/puntos/"
           placeholder="Nuevo lugar (ej. Metro Viña)"
         />
+        <MantenedorCuentas />
       </div>
 
       <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'center' }}>

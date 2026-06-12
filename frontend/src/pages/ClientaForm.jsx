@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Save, User, Phone, AlignLeft } from 'lucide-react';
+import { ArrowLeft, Save, User, Phone, AlignLeft, Landmark } from 'lucide-react';
 import api from '../services/api';
 import './ClientaForm.css';
 import { showAlert, showConfirm, showToast } from '../utils/alerts';
@@ -15,9 +15,21 @@ const ClientaForm = () => {
     nombre: '',
     telefono: '',
     notas: '',
+    cuenta_asignada: ''
   });
+  const [cuentas, setCuentas] = useState([]);
 
   useEffect(() => {
+    const fetchCuentas = async () => {
+      try {
+        const res = await api.get('/cuentas/bancos/');
+        setCuentas(res.data.results || res.data);
+      } catch (error) {
+        console.error("Error cargando cuentas", error);
+      }
+    };
+    fetchCuentas();
+
     if (isEditing) {
       const fetchClienta = async () => {
         try {
@@ -26,6 +38,7 @@ const ClientaForm = () => {
             nombre: res.data.nombre || '',
             telefono: res.data.telefono || '',
             notas: res.data.notas || '',
+            cuenta_asignada: res.data.cuenta_asignada || ''
           });
         } catch (error) {
           console.error("Error cargando clienta:", error);
@@ -121,6 +134,26 @@ const ClientaForm = () => {
                 rows="4"
               />
             </div>
+          </div>
+
+          <div className="input-group">
+            <label>Cuenta Bancaria Asignada (Opcional)</label>
+            <div className="input-with-icon">
+              <Landmark size={18} className="input-icon" />
+              <select 
+                name="cuenta_asignada"
+                value={formData.cuenta_asignada}
+                onChange={handleInputChange}
+                className="input-field"
+                style={{ width: '100%', padding: '12px 12px 12px 44px', borderRadius: '12px', border: '1px solid #e9edef', fontSize: '1rem', background: '#fff' }}
+              >
+                <option value="">Ninguna - Usar cuenta por defecto</option>
+                {cuentas.map(c => (
+                  <option key={c.id} value={c.id}>{c.banco} - {c.tipo_cuenta} ({c.numero_cuenta})</option>
+                ))}
+              </select>
+            </div>
+            <span className="input-help">MindyBot enviará esta cuenta si la clienta pregunta por WhatsApp</span>
           </div>
         </div>
 

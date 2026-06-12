@@ -102,6 +102,13 @@ class WhatsappService:
         if any(keyword in content.lower() for keyword in palabras_clave):
             self._responder_consulta_entrega(conversacion, clienta, content)
 
+        # Bot de Respuesta de Cuentas (Banco)
+        palabras_clave_cuenta = ['cuenta', 'deposito', 'depositar', 'transferir', 'transferencia', 'datos para transferir', 'datos transferencia', 'a que cuenta']
+        # Filtramos para no chocar con "cuándo"
+        content_lower = content.lower()
+        if any(keyword in content_lower for keyword in palabras_clave_cuenta) and "cuando" not in content_lower and "cuándo" not in content_lower:
+            self._responder_consulta_cuenta(conversacion, clienta)
+
     def _responder_consulta_stock(self, conversacion, content):
         """
         Analiza el mensaje automático de compra y responde si hay stock o no.
@@ -171,6 +178,27 @@ class WhatsappService:
             
             respuesta = f"¡Hola hermosa! Sí, tengo tu entrega agendada para {fecha_str} a las {hora} en {lugar}. ¡Nos vemos ahí!"
             self.enviar_mensaje_texto(conversacion.id, respuesta)
+
+    def _responder_consulta_cuenta(self, conversacion, clienta):
+        cuenta = clienta.cuenta_asignada
+        if not cuenta:
+            from apps.cuentas.models import CuentaBancaria
+            cuenta = CuentaBancaria.objects.filter(tenant=self.tenant, activa=True).first()
+            
+        if cuenta:
+            respuesta = "¡Hola hermosa! Claro, aquí tienes los datos para la transferencia:\n\n"
+            respuesta += f"🏦 *Banco:* {cuenta.banco}\n"
+            respuesta += f"📋 *Tipo:* {cuenta.tipo_cuenta}\n"
+            respuesta += f"🔢 *Número:* {cuenta.numero_cuenta}\n"
+            respuesta += f"👤 *Titular:* {cuenta.nombre_titular}\n"
+            respuesta += f"🪪 *RUT:* {cuenta.rut_titular}\n"
+            if cuenta.email_notificacion:
+                respuesta += f"📧 *Correo:* {cuenta.email_notificacion}\n"
+            respuesta += "\nRecuerda enviarme el comprobante por aquí mismo 💕"
+        else:
+            respuesta = "¡Hola hermosa! Dame un segundito y te paso los datos de la cuenta por favor 💕"
+            
+        self.enviar_mensaje_texto(conversacion.id, respuesta)
 
     def enviar_mensaje_directo(self, telefono, text_body):
         """Envia un mensaje directamente a un número y lo asocia a una conversacion."""
