@@ -81,6 +81,51 @@ class WhatsappService:
             status='delivered'
         )
 
+        # Bot de Auto-Respuesta de Stock
+        if "quiero comprar el siguiente producto:" in content.lower():
+            self._responder_consulta_stock(conversacion, content)
+
+    def _responder_consulta_stock(self, conversacion, content):
+        """
+        Analiza el mensaje automático de compra y responde si hay stock o no.
+        """
+        import re
+        from apps.catalogo.models import Prenda, PrendaVariante
+        
+        nombre_match = re.search(r'\*(.*?)\*', content)
+        if not nombre_match:
+            return
+            
+        nombre = nombre_match.group(1).strip()
+        
+        color = None
+        talla = None
+        variantes_match = re.search(r'\(Color:\s*(.*?),\s*Talla:\s*(.*?)\)', content)
+        if variantes_match:
+            color = variantes_match.group(1).strip()
+            talla = variantes_match.group(2).strip()
+
+        prenda = Prenda.objects.filter(nombre__iexact=nombre, tenant=self.tenant).first()
+        if not prenda:
+            return
+
+        variantes = PrendaVariante.objects.filter(prenda=prenda)
+        
+        if color and color.lower() not in ['único', 'unico']:
+            variantes = variantes.filter(color__iexact=color)
+            
+        if talla and talla.lower() not in ['única', 'unica']:
+            variantes = variantes.filter(talla__iexact=talla)
+
+        tiene_stock = variantes.filter(cantidad__gt=0).exists()
+
+        if tiene_stock:
+            respuesta = "¡Hola! Sí, lo tenemos disponible 😊. ¿Te gustaría coordinar la entrega o tienes alguna otra duda?"
+        else:
+            respuesta = "¡Hola! Pucha, de ese modelo/color justo se nos agotó el stock 😢. ¿Te gustaría que te muestre otras opciones?"
+
+        self.enviar_mensaje_texto(conversacion.id, respuesta)
+
     def enviar_mensaje_texto(self, conversacion_id, text_body):
         """Envia un mensaje de texto a traves de Meta API y lo guarda en BD."""
         if not self.config or not self.config.access_token or not self.config.phone_number_id:
