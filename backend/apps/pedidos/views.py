@@ -139,6 +139,15 @@ class PedidoViewSet(viewsets.ModelViewSet):
                     )
                     entrega.pedidos.add(pedido)
 
+            # Send auto-message for Apartado
+            if clienta.telefono:
+                from apps.integraciones.services.whatsapp_service import WhatsappService
+                wa_service = WhatsappService(tenant=tenant)
+                wa_service.enviar_mensaje_directo(
+                    clienta.telefono,
+                    "¡Hola hermosa! Te confirmo que ya dejé tu ropita separada a tu nombre. Muchas gracias por tu compra 💕"
+                )
+
             return Response({'status': 'Pedido creado exitosamente', 'pedido_id': pedido.id}, status=status.HTTP_201_CREATED)
 
         except PrendaVariante.DoesNotExist:
