@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Settings, Plus, Trash2, Tag, Palette, Type, Pencil, Check, X, Ruler, Terminal, ChevronRight, Upload, Phone, LayoutTemplate, Clock, Truck, MapPin } from 'lucide-react';
+import { Settings, Plus, Trash2, Tag, Palette, Type, Pencil, Check, X, Ruler, Terminal, ChevronRight, Upload, Phone, LayoutTemplate, Clock, Truck, MapPin, MessageCircle, QrCode, Smartphone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import './Ajustes.css';
@@ -494,6 +494,119 @@ const ConfiguracionTiendaForm = () => {
   );
 };
 
+const WhatsappIntegrator = () => {
+  const [waConfig, setWaConfig] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchConfig = async () => {
+    try {
+      const res = await api.get('/integraciones/whatsapp/config/');
+      setWaConfig(res.data);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchConfig();
+  }, []);
+
+  const handleConnect = async () => {
+    setLoading(true);
+    try {
+      await api.post('/integraciones/whatsapp/conectar/');
+      await fetchConfig();
+      showToast('success', 'Instancia simulada de WhatsApp creada');
+    } catch (e) {
+      showAlert('Error al conectar con WhatsApp API');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDisconnect = async () => {
+    if (!await showConfirm('¿Seguro que deseas desconectar WhatsApp? Se dejarán de enviar recordatorios automáticos.')) return;
+    setLoading(true);
+    try {
+      await api.post('/integraciones/whatsapp/desconectar/');
+      await fetchConfig();
+      showToast('success', 'Sesión de WhatsApp desconectada');
+    } catch (e) {
+      showAlert('Error al desconectar');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading && !waConfig) {
+    return <div className="card glass">Cargando módulo de WhatsApp...</div>;
+  }
+
+  const isConnected = waConfig?.status === 'QR_READY' || waConfig?.status === 'CONNECTED';
+
+  return (
+    <div className="card glass" style={{ marginBottom: '32px' }}>
+      <div className="mantenedor-header" style={{ marginBottom: '24px' }}>
+        <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0, color: 'var(--color-primary-dark)' }}>
+          <MessageCircle size={24} style={{ color: '#00a884' }} />
+          Integración Oficial WhatsApp (Evolution API)
+        </h3>
+        <span style={{
+          padding: '4px 12px', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 600,
+          background: isConnected ? 'rgba(0, 168, 132, 0.1)' : 'rgba(239, 71, 111, 0.1)',
+          color: isConnected ? '#00a884' : 'var(--color-danger)'
+        }}>
+          {isConnected ? 'Activo' : 'Desconectado'}
+        </span>
+      </div>
+
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '24px', alignItems: 'flex-start' }}>
+        <div style={{ flex: '1 1 300px' }}>
+          <p style={{ color: 'var(--color-text-muted)', lineHeight: '1.6', marginBottom: '16px' }}>
+            Conecta tu número exclusivo de la boutique escaneando el código QR. Una vez conectado, MindyLu se encargará de enviar mensajes automáticos de recordatorio a las clientas según su horario de entrega.
+          </p>
+          <div style={{ background: '#f5f6f6', padding: '16px', borderRadius: '12px', marginBottom: '20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', fontWeight: 600, color: '#333' }}>
+              <Smartphone size={18} /> Instrucciones:
+            </div>
+            <ol style={{ margin: 0, paddingLeft: '20px', color: '#555', fontSize: '0.95rem' }}>
+              <li>Abre <b>WhatsApp Business</b> en tu celular.</li>
+              <li>Toca los tres puntos (Menú) o Configuración.</li>
+              <li>Selecciona <b>Dispositivos Vinculados</b>.</li>
+              <li>Apunta tu cámara al código QR de la derecha.</li>
+            </ol>
+          </div>
+          {isConnected ? (
+            <button onClick={handleDisconnect} className="btn btn-secondary" style={{ color: 'var(--color-danger)', borderColor: 'var(--color-danger)' }}>
+              Desvincular Dispositivo
+            </button>
+          ) : (
+            <button onClick={handleConnect} className="btn btn-primary" style={{ background: '#00a884', borderColor: '#00a884', color: 'white' }}>
+              Generar Código QR
+            </button>
+          )}
+        </div>
+        
+        <div style={{ width: '240px', height: '240px', background: '#fff', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #e9edef', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+          {waConfig?.qr ? (
+            <div style={{ textAlign: 'center' }}>
+              <img src={`data:image/png;base64,${waConfig.qr}`} alt="QR Code" style={{ width: '200px', height: '200px', objectFit: 'contain' }} />
+              <div style={{ fontSize: '0.8rem', color: '#00a884', marginTop: '8px', fontWeight: 'bold' }}>Simulación: Escanea para vincular</div>
+            </div>
+          ) : (
+            <div style={{ color: '#aaa', textAlign: 'center', padding: '20px' }}>
+              <QrCode size={48} style={{ opacity: 0.5, marginBottom: '12px', margin: '0 auto' }} />
+              <p style={{ margin: 0, fontSize: '0.9rem' }}>Haz clic en Generar para ver el QR</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const Ajustes = () => {
   return (
     <div className="page-container page-ajustes animate-fade-in">
@@ -506,6 +619,9 @@ const Ajustes = () => {
       </div>
 
       <ConfiguracionTiendaForm />
+
+      <h3 style={{ marginBottom: '16px', color: 'var(--color-text-strong)' }}>Integraciones y Automatizaciones</h3>
+      <WhatsappIntegrator />
 
       <h3 style={{ marginBottom: '16px', color: 'var(--color-text-strong)' }}>Mantenedores de Catálogo</h3>
       <div className="ajustes-grid">

@@ -441,3 +441,58 @@ def publicar_lote_en_facebook(request):
         
     except requests.exceptions.RequestException as e:
         return Response({'error': f"Error al publicar el Feed en Facebook: {e}"}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def obtener_config_whatsapp(request):
+    from .models import WhatsappConfig
+    config_wa, created = WhatsappConfig.objects.get_or_create(tenant=request.user.tenant)
+    return Response({
+        "status": config_wa.connection_status,
+        "qr": config_wa.qr_code_base64,
+        "instance_name": config_wa.instance_name
+    }, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def conectar_whatsapp(request):
+    """
+    Simula la creación de una instancia en Evolution API y genera un código QR.
+    En producción, esto haría un POST a tu instancia de Evolution API (ej. http://localhost:8080/instance/create).
+    """
+    from .models import WhatsappConfig
+    config_wa, created = WhatsappConfig.objects.get_or_create(tenant=request.user.tenant)
+    
+    # Simulación de respuesta de Evolution API (QR en Base64)
+    # En producción: requests.post('evolution_url/instance/create', ...)
+    config_wa.instance_name = f"mindylu_{request.user.tenant.slug}"
+    config_wa.connection_status = "QR_READY"
+    # Un string Base64 válido de un pequeño pixel transparente, solo para simular una imagen real en UI
+    config_wa.qr_code_base64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" 
+    config_wa.save()
+    
+    return Response({
+        "mensaje": "Instancia creada en Evolution API (Simulado)",
+        "qr": config_wa.qr_code_base64,
+        "status": config_wa.connection_status
+    }, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def desconectar_whatsapp(request):
+    """
+    Simula la desconexión / cierre de sesión (logout) en Evolution API.
+    """
+    from .models import WhatsappConfig
+    config_wa, created = WhatsappConfig.objects.get_or_create(tenant=request.user.tenant)
+    
+    # En producción: requests.delete('evolution_url/instance/logout/...')
+    config_wa.connection_status = "DISCONNECTED"
+    config_wa.qr_code_base64 = ""
+    config_wa.save()
+    
+    return Response({
+        "mensaje": "Sesión desconectada exitosamente",
+        "status": config_wa.connection_status
+    }, status=status.HTTP_200_OK)
+
