@@ -1,95 +1,99 @@
 import { useState, useEffect, useRef } from 'react';
 import { MessageCircle, Search, Send, Bot, User as UserIcon, Check, CheckCheck, Clock, Settings, ChevronLeft } from 'lucide-react';
+import api from '../services/api';
 import './Whatsapp.css';
 
-const MOCK_CHATS = [
-  {
-    id: 1,
-    name: 'María Ignacia',
-    phone: '+56 9 1234 5678',
-    lastMessage: 'Perfecto, nos vemos mañana a las 15:00.',
-    time: '10:45 AM',
-    unread: 0,
-    requiresHuman: false,
-    messages: [
-      { id: 1, text: 'Hola, quería confirmar mi pedido del vestido negro.', sender: 'user', time: '10:40 AM' },
-      { id: 2, text: '¡Hola María! Soy MindyBot 🤖. Tu pedido está confirmado para entrega mañana a las 15:00 hrs en Metro Viña del Mar. ¿Te ayudo con algo más?', sender: 'bot', time: '10:41 AM' },
-      { id: 3, text: 'Perfecto, nos vemos mañana a las 15:00.', sender: 'user', time: '10:45 AM' }
-    ]
-  },
-  {
-    id: 2,
-    name: 'Carolina Soto',
-    phone: '+56 9 8765 4321',
-    lastMessage: 'Quiero hablar con una vendedora por favor.',
-    time: '09:30 AM',
-    unread: 1,
-    requiresHuman: true,
-    messages: [
-      { id: 1, text: 'Tienen talla XL de la falda de jeans?', sender: 'user', time: '09:28 AM' },
-      { id: 2, text: '¡Hola Carolina! Soy MindyBot 🤖. Según nuestro catálogo, la Falda de Jeans Premium está disponible hasta la talla 42. ¿Te gustaría ver otras opciones en XL?', sender: 'bot', time: '09:29 AM' },
-      { id: 3, text: 'Quiero hablar con una vendedora por favor.', sender: 'user', time: '09:30 AM' }
-    ]
-  },
-  {
-    id: 3,
-    name: '+56 9 4444 5555',
-    phone: '+56 9 4444 5555',
-    lastMessage: 'Ayer hice una transferencia pero no me ha llegado el comprobante.',
-    time: 'Ayer',
-    unread: 2,
-    requiresHuman: true,
-    messages: [
-      { id: 1, text: 'Ayer hice una transferencia pero no me ha llegado el comprobante.', sender: 'user', time: 'Ayer' }
-    ]
-  }
-];
-
 const Whatsapp = () => {
-  const [chats, setChats] = useState(MOCK_CHATS);
+  const [chats, setChats] = useState([]);
   const [activeChatId, setActiveChatId] = useState(null);
+  const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const messagesEndRef = useRef(null);
 
-  const activeChat = chats.find(c => c.id === activeChatId);
-
+  // Poll conversations every 5 seconds
   useEffect(() => {
-    // Scroll to bottom when active chat changes or new messages arrive
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [activeChat?.messages]);
+    fetchConversaciones();
+    const interval = setInterval(fetchConversaciones, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
-  const handleSendMessage = (e) => {
+  // Fetch messages when a chat is selected or poll active chat
+  useEffect(() => {
+    if (activeChatId) {
+      fetchMensajes(activeChatId);
+      const interval = setInterval(() => fetchMensajes(activeChatId), 5000);
+      return () => clearInterval(interval);
+    }
+  }, [activeChatId]);
+
+  // Scroll to bottom when new messages arrive
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  const fetchConversaciones = async () => {
+    try {
+      const response = await api.get('integraciones/whatsapp/conversaciones/');
+      setChats(response.data.conversaciones || []);
+    } catch (error) {
+      console.error('Error fetching conversations:', error);
+    }
+  };
+
+  const fetchMensajes = async (chatId) => {
+    try {
+      const response = await api.get(`integraciones/whatsapp/conversaciones/${chatId}/mensajes/`);
+      setMessages(response.data.mensajes || []);
+      // Optimistically clear unread count for this chat in the sidebar
+      setChats(prev => prev.map(c => c.id === chatId ? { ...c, unread_count: 0 } : c));
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+    }
+  };
+
+  const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!inputText.trim() || !activeChatId) return;
 
-    const newMessage = {
-      id: Date.now(),
-      text: inputText,
-      sender: 'human',
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    };
-
-    setChats(prev => prev.map(chat => {
-      if (chat.id === activeChatId) {
-        return {
-          ...chat,
-          messages: [...chat.messages, newMessage],
-          lastMessage: inputText,
-          time: newMessage.time,
-          requiresHuman: false // Asumimos que al responder, ya atendimos la alerta
-        };
-      }
-      return chat;
-    }));
-
+    const textToSend = inputText;
     setInputText('');
+
+    // Optimistic UI update
+    const optimisticMsg = {
+      id: `temp-${Date.now()}`,
+      direction: 'OUTBOUND',
+      content: textToSend,
+      status: 'sent',
+      created_at: new Date().toISOString()
+    };
+    setMessages(prev => [...prev, optimisticMsg]);
+
+    try {
+      await api.post(`integraciones/whatsapp/conversaciones/${activeChatId}/enviar/`, {
+        content: textToSend
+      });
+      // Refresh to get the real message ID and updated status
+      fetchMensajes(activeChatId);
+      fetchConversaciones();
+    } catch (error) {
+      console.error('Error sending message:', error);
+      // Remove optimistic message on error (optional, or mark as failed)
+      setMessages(prev => prev.filter(m => m.id !== optimisticMsg.id));
+      alert('Error al enviar el mensaje. La clienta debe haberte hablado en las últimas 24 horas.');
+    }
   };
 
   const handleChatClick = (id) => {
     setActiveChatId(id);
-    // Mark as read
-    setChats(prev => prev.map(chat => chat.id === id ? { ...chat, unread: 0 } : chat));
   };
+
+  const activeChat = chats.find(c => c.id === activeChatId);
+  
+  const filteredChats = chats.filter(chat => 
+    (chat.client_name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (chat.client_phone || '').includes(searchQuery)
+  );
 
   return (
     <div className="page-container animate-fade-in" style={{ paddingBottom: 0 }}>
@@ -117,36 +121,49 @@ const Whatsapp = () => {
             <Settings size={20} style={{ color: '#666', cursor: 'pointer' }} />
           </div>
           <div className="wa-search-bar">
-            <input type="text" placeholder="Buscar clienta o número..." />
+            <input 
+              type="text" 
+              placeholder="Buscar clienta o número..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
           <div className="wa-chat-list">
-            {chats.map(chat => (
-              <div 
-                key={chat.id} 
-                className={`wa-chat-item ${activeChatId === chat.id ? 'active' : ''}`}
-                onClick={() => handleChatClick(chat.id)}
-              >
-                <div className="wa-avatar">
-                  {chat.name.charAt(0).toUpperCase()}
-                </div>
-                <div className="wa-chat-info">
-                  <div className="wa-chat-name">
-                    <span>{chat.name}</span>
-                    <span className="wa-chat-time" style={{ color: chat.unread > 0 ? '#25D366' : '#888' }}>
-                      {chat.time}
-                    </span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div className="wa-chat-preview">
-                      {chat.lastMessage}
-                    </div>
-                    {chat.unread > 0 && (
-                      <span className="wa-badge">{chat.unread}</span>
-                    )}
-                  </div>
-                </div>
+            {filteredChats.length === 0 && (
+              <div style={{ padding: '20px', textAlign: 'center', color: '#888', fontSize: '0.9rem' }}>
+                No hay conversaciones aún.
               </div>
-            ))}
+            )}
+            {filteredChats.map(chat => {
+              const displayName = chat.client_name !== 'Desconocido' ? chat.client_name : chat.client_phone;
+              return (
+                <div 
+                  key={chat.id} 
+                  className={`wa-chat-item ${activeChatId === chat.id ? 'active' : ''}`}
+                  onClick={() => handleChatClick(chat.id)}
+                >
+                  <div className="wa-avatar">
+                    {displayName.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="wa-chat-info">
+                    <div className="wa-chat-name">
+                      <span>{displayName}</span>
+                      <span className="wa-chat-time" style={{ color: chat.unread_count > 0 ? '#25D366' : '#888' }}>
+                        {chat.last_message_at ? new Date(chat.last_message_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ''}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div className="wa-chat-preview">
+                        {chat.last_message_content || 'Nuevo chat'}
+                      </div>
+                      {chat.unread_count > 0 && (
+                        <span className="wa-badge">{chat.unread_count}</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 
@@ -154,9 +171,9 @@ const Whatsapp = () => {
         <div className="wa-main">
           {activeChat ? (
             <>
-              {activeChat.requiresHuman && (
+              {activeChat.status === 'OPEN' && activeChat.unread_count > 0 && (
                 <div className="wa-handoff-banner">
-                  ⚠️ El Bot no pudo responder. Esta clienta está esperando hablar con una vendedora.
+                  Nuevos mensajes recibidos
                 </div>
               )}
               <div className="wa-main-header">
@@ -164,27 +181,28 @@ const Whatsapp = () => {
                   <ChevronLeft size={24} />
                 </button>
                 <div className="wa-avatar" style={{ width: 40, height: 40, fontSize: '1rem' }}>
-                  {activeChat.name.charAt(0).toUpperCase()}
+                  {(activeChat.client_name !== 'Desconocido' ? activeChat.client_name : activeChat.client_phone).charAt(0).toUpperCase()}
                 </div>
                 <div>
-                  <div style={{ fontWeight: 600, color: '#333' }}>{activeChat.name}</div>
-                  <div style={{ fontSize: '0.8rem', color: '#666' }}>{activeChat.phone}</div>
+                  <div style={{ fontWeight: 600, color: '#333' }}>
+                    {activeChat.client_name !== 'Desconocido' ? activeChat.client_name : activeChat.client_phone}
+                  </div>
+                  <div style={{ fontSize: '0.8rem', color: '#666' }}>{activeChat.client_phone}</div>
                 </div>
               </div>
 
               <div className="wa-chat-area">
                 <div style={{ textAlign: 'center', fontSize: '0.8rem', color: '#666', margin: '16px 0', background: 'rgba(255,255,255,0.6)', padding: '4px 12px', borderRadius: '12px', alignSelf: 'center' }}>
-                  Los mensajes enviados por MindyBot están marcados con 🤖
+                  Mensajes cifrados de extremo a extremo
                 </div>
                 
-                {activeChat.messages.map(msg => (
-                  <div key={msg.id} className={`wa-message ${msg.sender === 'user' ? 'received' : msg.sender === 'bot' ? 'bot' : 'sent'}`}>
-                    {msg.text}
+                {messages.map(msg => (
+                  <div key={msg.id} className={`wa-message ${msg.direction === 'INBOUND' ? 'received' : 'sent'}`}>
+                    {msg.content}
                     <div className="wa-message-meta">
-                      {msg.sender === 'bot' && <Bot size={12} />}
-                      {msg.sender === 'human' && <UserIcon size={12} />}
-                      {msg.time}
-                      {msg.sender !== 'user' && <CheckCheck size={14} color="#53bdeb" />}
+                      {msg.direction === 'OUTBOUND' && <UserIcon size={12} />}
+                      {new Date(msg.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                      {msg.direction === 'OUTBOUND' && <CheckCheck size={14} color="#53bdeb" />}
                     </div>
                   </div>
                 ))}
@@ -194,7 +212,7 @@ const Whatsapp = () => {
               <form className="wa-input-area" onSubmit={handleSendMessage}>
                 <input 
                   type="text" 
-                  placeholder="Escribe un mensaje para responder manualmente..." 
+                  placeholder="Escribe un mensaje..." 
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
                 />
