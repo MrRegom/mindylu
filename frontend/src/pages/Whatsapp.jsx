@@ -14,6 +14,42 @@ const Whatsapp = () => {
   const prevChatsRef = useRef([]);
   const activeChatRef = useRef(activeChatId);
 
+  const [replyingTo, setReplyingTo] = useState(null);
+  const [swipeDeleteId, setSwipeDeleteId] = useState(null);
+  const [touchStart, setTouchStart] = useState(0);
+
+  const handleTouchStart = (e) => setTouchStart(e.targetTouches[0].clientX);
+
+  const handleChatTouchMove = (e, chatId) => {
+    if (!touchStart) return;
+    const diff = touchStart - e.targetTouches[0].clientX;
+    if (diff > 50) setSwipeDeleteId(chatId);
+    else if (diff < -50) setSwipeDeleteId(null);
+  };
+
+  const handleMsgTouchMove = (e, msg) => {
+    if (!touchStart) return;
+    const diff = touchStart - e.targetTouches[0].clientX;
+    if (diff < -50) {
+      setReplyingTo(msg);
+      setTouchStart(0);
+    }
+  };
+
+  const handleDeleteChat = async (e, chatId) => {
+    e.stopPropagation();
+    try {
+      await api.delete(`integraciones/whatsapp/conversaciones/${chatId}/`);
+      setChats(prev => prev.filter(c => c.id !== chatId));
+      if (activeChatId === chatId) {
+        setActiveChatId(null);
+        setMessages([]);
+      }
+    } catch (error) {
+      console.error('Error deleting chat', error);
+    }
+  };
+
   // Sync activeChatRef with activeChatId
   useEffect(() => {
     activeChatRef.current = activeChatId;
@@ -235,8 +271,10 @@ const Whatsapp = () => {
 
     try {
       await api.post(`integraciones/whatsapp/conversaciones/${activeChatId}/enviar/`, {
-        content: textToSend
+        content: textToSend,
+        reply_to: replyingTo ? replyingTo.wam_id : null
       });
+      setReplyingTo(null);
       // Refresh to get the real message ID and updated status
       fetchMensajes(activeChatId);
       fetchConversaciones();
@@ -338,29 +376,36 @@ const Whatsapp = () => {
             {filteredChats.map(chat => {
               const displayName = chat.client_name !== 'Desconocido' ? chat.client_name : chat.client_phone;
               return (
-                <div 
-                  key={chat.id} 
-                  className={`wa-chat-item ${activeChatId === chat.id ? 'active' : ''}`}
-                  onClick={() => handleChatClick(chat.id)}
-                >
-                  <div className="wa-avatar">
-                    {displayName.charAt(0).toUpperCase()}
-                  </div>
-                  <div className="wa-chat-info">
-                    <div className="wa-chat-name">
-                      <span>{displayName}</span>
-                      <span className="wa-chat-time" style={{ color: chat.unread_count > 0 ? '#25D366' : '#888' }}>
-                        {chat.last_message_at ? new Date(chat.last_message_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ''}
-                      </span>
+                <div key={chat.id} style={{ position: 'relative', overflow: 'hidden' }}>
+                  <div 
+                    className={`wa-chat-item ${activeChatId === chat.id ? 'active' : ''}`}
+                    onClick={() => handleChatClick(chat.id)}
+                    onTouchStart={handleTouchStart}
+                    onTouchMove={(e) => handleChatTouchMove(e, chat.id)}
+                    style={{ transform: swipeDeleteId === chat.id ? 'translateX(-80px)' : 'translateX(0)', transition: 'transform 0.3s', position: 'relative', zIndex: 2, background: '#fff' }}
+                  >
+                    <div className="wa-avatar">
+                      {displayName.charAt(0).toUpperCase()}
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <div className="wa-chat-preview">
-                        {chat.last_message_content || 'Nuevo chat'}
+                    <div className="wa-chat-info">
+                      <div className="wa-chat-name">
+                        <span>{displayName}</span>
+                        <span className="wa-chat-time" style={{ color: chat.unread_count > 0 ? '#25D366' : '#888' }}>
+                          {chat.last_message_at ? new Date(chat.last_message_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ''}
+                        </span>
                       </div>
-                      {chat.unread_count > 0 && (
-                        <span className="wa-badge">{chat.unread_count}</span>
-                      )}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div className="wa-chat-preview">
+                          {chat.last_message_content || 'Nuevo chat'}
+                        </div>
+                        {chat.unread_count > 0 && (
+                          <span className="wa-badge">{chat.unread_count}</span>
+                        )}
+                      </div>
                     </div>
+                  </div>
+                  <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '80px', background: '#ea0038', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1, cursor: 'pointer' }} onClick={(e) => handleDeleteChat(e, chat.id)}>
+                    <Trash2 size={24} />
                   </div>
                 </div>
               );
@@ -398,7 +443,12 @@ const Whatsapp = () => {
                 </div>
                 
                 {messages.map(msg => (
-                  <div key={msg.id} className={`wa-message ${msg.direction === 'INBOUND' ? 'received' : 'sent'}`}>
+                  <div 
+                    key={msg.id} 
+                    className={`wa-message ${msg.direction === 'INBOUND' ? 'received' : 'sent'}`}
+                    onTouchStart={handleTouchStart}
+                    onTouchMove={(e) => handleMsgTouchMove(e, msg)}
+                  >
                     {renderMessageContent(msg.content)}
                     <div className="wa-message-meta">
                       {msg.direction === 'OUTBOUND' && <UserIcon size={12} />}
@@ -451,17 +501,29 @@ const Whatsapp = () => {
                 </button>
               </div>
 
-              <form className="wa-input-area" onSubmit={handleSendMessage}>
-                <input 
-                  type="text" 
-                  placeholder="Escribe un mensaje..." 
-                  value={inputText}
-                  onChange={(e) => setInputText(e.target.value)}
-                />
-                <button type="submit" disabled={!inputText.trim()}>
-                  <Send size={20} style={{ marginLeft: '4px' }} />
-                </button>
-              </form>
+              <div style={{ position: 'relative' }}>
+                {replyingTo && (
+                  <div style={{ background: '#f0f0f0', borderLeft: '4px solid #25D366', padding: '8px 12px', margin: '0 12px', borderRadius: '8px 8px 0 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: '0.85rem', color: '#555' }}>
+                      <strong style={{ color: '#25D366' }}>Respondiendo a:</strong> {replyingTo.content}
+                    </div>
+                    <button onClick={() => setReplyingTo(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#999' }}>
+                      <X size={16} />
+                    </button>
+                  </div>
+                )}
+                <form className="wa-input-area" onSubmit={handleSendMessage} style={replyingTo ? { borderTopLeftRadius: 0, borderTopRightRadius: 0 } : {}}>
+                  <input 
+                    type="text" 
+                    placeholder="Escribe un mensaje..." 
+                    value={inputText}
+                    onChange={(e) => setInputText(e.target.value)}
+                  />
+                  <button type="submit" disabled={!inputText.trim()}>
+                    <Send size={20} style={{ marginLeft: '4px' }} />
+                  </button>
+                </form>
+              </div>
             </>
           ) : (
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#888' }}>

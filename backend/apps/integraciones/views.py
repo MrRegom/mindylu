@@ -334,8 +334,12 @@ def publicar_en_facebook(request):
     # 2. Armar el mensaje si no viene uno personalizado
     if not custom_message:
         custom_message = (
-            f"✨ ¡Nuevo! {prenda.nombre}\n"
-            f"¡Escríbenos para reservar el tuyo! 💛"
+            f"✨ ¡Nuevo ingreso en MindyLu! ✨\n\n"
+            f"👗 Modelo: {prenda.nombre}\n\n"
+            f"¡No te quedes sin la tuya! 💛\n\n"
+            f"🛍️ Visita nuestro catálogo online y descubre todos nuestros modelos disponibles:\n"
+            f"👉 https://157-230-93-24.nip.io/catalogo\n\n"
+            f"📲 Escríbenos por mensaje directo para reservar tu pedido."
         )
 
     # 3. Publicar el post con las fotos adjuntas
@@ -345,6 +349,7 @@ def publicar_en_facebook(request):
         data_feed = {
             'message': custom_message,
             'attached_media': json.dumps(media_ids),
+            'published': 'true',
             'access_token': access_token
         }
         feed_res = requests.post(url_feed, data=data_feed)
@@ -418,8 +423,11 @@ def publicar_lote_en_facebook(request):
             custom_message = ciclo.mensaje_facebook
         else:
             custom_message = (
-                f"✨ ¡Llegó mercadería nueva! ✨\n\n"
-                f"¡Escríbenos por mensaje directo para reservar la tuya! 💛"
+                f"✨ ¡Llegó mercadería nueva a MindyLu! ✨\n\n"
+                f"Tenemos nuevos modelos increíbles esperándote. 💛\n\n"
+                f"🛍️ Visita nuestro catálogo online y descubre todas las novedades:\n"
+                f"👉 https://157-230-93-24.nip.io/catalogo\n\n"
+                f"📲 Escríbenos por mensaje directo para reservar tu pedido."
             )
 
     # 3. Publicar el post con las fotos adjuntas
@@ -428,6 +436,7 @@ def publicar_lote_en_facebook(request):
         data_feed = {
             'message': custom_message,
             'attached_media': json.dumps(media_ids),
+            'published': 'true',
             'access_token': access_token
         }
         feed_res = requests.post(url_feed, data=data_feed)
@@ -589,6 +598,7 @@ def listar_mensajes(request, conversacion_id):
     for m in mensajes:
         data.append({
             'id': m.id,
+            'wam_id': m.wam_id,
             'direction': m.direction,
             'content': m.content,
             'status': m.status,
@@ -601,17 +611,19 @@ def listar_mensajes(request, conversacion_id):
 @permission_classes([IsAuthenticated])
 def enviar_mensaje(request, conversacion_id):
     text_body = request.data.get('content')
+    reply_to = request.data.get('reply_to')
     if not text_body:
         return Response({'error': 'El contenido no puede estar vacío'}, status=400)
         
     from .services.whatsapp_service import WhatsappService
     service = WhatsappService(tenant=request.user.tenant)
     
-    nuevo_mensaje = service.enviar_mensaje_texto(conversacion_id, text_body)
+    nuevo_mensaje = service.enviar_mensaje_texto(conversacion_id, text_body, reply_to_wam_id=reply_to)
     
     if nuevo_mensaje:
         return Response({
             'id': nuevo_mensaje.id,
+            'wam_id': nuevo_mensaje.wam_id,
             'direction': nuevo_mensaje.direction,
             'content': nuevo_mensaje.content,
             'status': nuevo_mensaje.status,
@@ -619,6 +631,16 @@ def enviar_mensaje(request, conversacion_id):
         }, status=201)
     else:
         return Response({'error': 'No se pudo enviar el mensaje a través de Meta API'}, status=500)
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def eliminar_conversacion(request, conversacion_id):
+    try:
+        conversacion = Conversacion.objects.get(id=conversacion_id, tenant=request.user.tenant)
+        conversacion.delete()
+        return Response({'status': 'deleted'}, status=200)
+    except Conversacion.DoesNotExist:
+        return Response({'error': 'Conversación no encontrada'}, status=404)
 
 
 from rest_framework import viewsets

@@ -274,7 +274,7 @@ class WhatsappService:
         )
         return self.enviar_mensaje_texto(conversacion.id, text_body)
 
-    def enviar_mensaje_texto(self, conversacion_id, text_body):
+    def enviar_mensaje_texto(self, conversacion_id, text_body, reply_to_wam_id=None):
         """Envia un mensaje de texto a traves de Meta API y lo guarda en BD."""
         if not self.config or not self.config.access_token or not self.config.phone_number_id:
             logger.error("Faltan credenciales de Meta API en WhatsappConfig.")
@@ -299,6 +299,11 @@ class WhatsappService:
                 "body": text_body
             }
         }
+        
+        if reply_to_wam_id:
+            payload["context"] = {
+                "message_id": reply_to_wam_id
+            }
 
         response = requests.post(url, headers=headers, json=payload)
         
