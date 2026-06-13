@@ -56,6 +56,16 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Optimización táctil para móviles */
+a, button, input, select, textarea, .clickable {
+  touch-action: manipulation;
+}
+
+button:active, a:active, .clickable:active {
+  transform: scale(0.97);
+  transition: transform 0.1s;
+}
+
 body {
   font-family: var(--font-main);
   background-color: var(--color-bg);
