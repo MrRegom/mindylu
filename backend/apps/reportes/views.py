@@ -74,7 +74,7 @@ class DashboardAPIView(APIView):
                 'id': p.id,
                 'cliente': p.clienta.nombre if p.clienta else 'Anónimo',
                 'estado': p.estado,
-                'total': p.total,
+                'total': p.total(),
                 'fecha': p.fecha_pedido.strftime('%d %b')
             })
 
