@@ -59,12 +59,13 @@ export const showToast = (mensaje, type = 'success') => {
   });
 };
 
-export const showPrompt = async (titulo, placeholder = '') => {
+export const showPrompt = async (titulo, placeholder = '', initialValue = '') => {
   const result = await Swal.fire({
     ...swalConfig,
     title: titulo,
     input: 'text',
     inputPlaceholder: placeholder,
+    inputValue: initialValue,
     showCancelButton: true,
     confirmButtonText: 'Aceptar',
     cancelButtonText: 'Cancelar',

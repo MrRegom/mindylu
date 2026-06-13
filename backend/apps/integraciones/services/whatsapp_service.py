@@ -226,10 +226,7 @@ class WhatsappService:
                     texto_envio += f"\n*También tenemos otras opciones de envío:*\n{texto_envio_general}\n"
                 texto_envio += "\n¿De qué sector eres para ver si te podemos sumar a alguna ruta o coordinar tu envío? 💕"
             else:
-                if texto_envio_general:
-                    texto_envio = texto_envio_general
-                else:
-                    texto_envio = "Por el momento no tenemos rutas de entrega programadas, pero cuéntame, ¿cuál es tu disponibilidad o preferencia para coordinarlo y no hacerte esperar? 💕"
+                texto_envio = "Por ahora no tenemos entregas programadas, pero realizamos entregas y envíos a convenir. Cuéntame, ¿cuál es tu disponibilidad para que lo coordinemos? 💕"
             
             respuesta = f"¡Hola hermosa! {texto_envio}"
 

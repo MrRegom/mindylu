@@ -216,7 +216,7 @@ const SubidaMasiva = () => {
     }));
   };
 
-  const aplicarATodas = () => {
+  const aplicarATodas = async () => {
     if (items.length <= 1) return;
     const first = items[0];
     if (!first.precio && !first.precio_compra && !first.categoria_id) {
@@ -224,7 +224,7 @@ const SubidaMasiva = () => {
       return;
     }
     
-    if (window.confirm('¿Copiar el precio y categoría de la primera foto a todas las demás?')) {
+    if (await showConfirm('¿Copiar el precio y categoría de la primera foto a todas las demás?')) {
       setItems(prev => prev.map((item, index) => {
         if (index === 0) return item;
         return {

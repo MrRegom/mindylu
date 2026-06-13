@@ -2,11 +2,17 @@ import { useState, useEffect } from 'react';
 import { CreditCard, Plus, ArrowDownToLine, Copy } from 'lucide-react';
 import api from '../services/api';
 import './Cuentas.css';
-import { showAlert, showConfirm, showToast } from '../utils/alerts';
+import { showAlert, showConfirm, showToast, showPrompt } from '../utils/alerts';
 
 const Cuentas = () => {
   const [cuentas, setCuentas] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    banco: '', tipo_cuenta: 'Cuenta RUT', numero_cuenta: '',
+    rut_titular: '', nombre_titular: '',
+    limite_mensual_ingresos: 4000000, limite_mensual_transferencias: 50
+  });
 
   const fetchCuentas = async () => {
     setIsLoading(true);
@@ -24,36 +30,25 @@ const Cuentas = () => {
     fetchCuentas();
   }, []);
 
-  const handleCrearCuenta = async () => {
-    const banco = window.prompt("Nombre del Banco (ej: BancoEstado):");
-    if (!banco) return;
-    const tipo = window.prompt("Tipo de Cuenta (ej: Cuenta RUT, Vista):", "Cuenta RUT");
-    const numero = window.prompt("Número de Cuenta:");
-    const rut = window.prompt("RUT del titular:");
-    const nombre = window.prompt("Nombre del titular:");
-    const limiteStr = window.prompt("Límite mensual de abonos en dinero (ej: 4000000):", "4000000");
-    const limite = parseInt(limiteStr) || 4000000;
-    const transfStr = window.prompt("Límite de transferencias distintas (Ley SII - ej: 50):", "50");
-    const limiteTransf = parseInt(transfStr) || 50;
-
+  const handleGuardarCuenta = async () => {
+    if (!formData.banco || !formData.numero_cuenta || !formData.rut_titular || !formData.nombre_titular) {
+      showAlert("Por favor, completa los campos obligatorios.");
+      return;
+    }
+    
     try {
-      await api.post('/cuentas/bancos/', {
-        banco,
-        tipo_cuenta: tipo,
-        numero_cuenta: numero,
-        rut_titular: rut,
-        nombre_titular: nombre,
-        limite_mensual_ingresos: limite,
-        limite_mensual_transferencias: limiteTransf
-      });
+      await api.post('/cuentas/bancos/', formData);
+      setIsModalOpen(false);
       fetchCuentas();
+      showToast("Cuenta bancaria registrada");
     } catch (error) {
       showAlert("Error al crear la cuenta");
     }
   };
 
   const handleSimularAbono = async (cuentaId) => {
-    const montoStr = window.prompt("¿Cuánto deseas abonar a esta cuenta?");
+    const montoStr = await showPrompt("¿Cuánto deseas abonar a esta cuenta?", "Monto en pesos");
+    if (!montoStr) return;
     const monto = parseInt(montoStr);
     if (!monto || isNaN(monto)) return;
 
@@ -106,10 +101,50 @@ const Cuentas = () => {
           <h1 style={{ fontSize: '1.8rem', fontFamily: 'Playfair Display', margin: '0 0 2px 0' }}>Cuentas Bancarias</h1>
           <p style={{ color: 'var(--color-text-muted)', margin: 0, fontSize: '0.9rem' }}>Control de límites y abonos</p>
         </div>
-        <button className="btn-icon-simple" onClick={handleCrearCuenta} title="Añadir Cuenta" style={{ background: 'var(--color-primary-gradient)', color: '#FFF', border: 'none', width: '40px', height: '40px' }}>
+        <button className="btn-icon-simple" onClick={() => setIsModalOpen(true)} title="Añadir Cuenta" style={{ background: 'var(--color-primary-gradient)', color: '#FFF', border: 'none', width: '40px', height: '40px' }}>
           <Plus size={20} />
         </button>
       </div>
+
+      {isModalOpen && (
+        <div className="card glass animate-slide-down" style={{ marginBottom: '24px', padding: '24px' }}>
+          <h3 style={{ marginTop: 0, marginBottom: '20px', color: 'var(--color-primary-dark)' }}>Nueva Cuenta Bancaria</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+            <div className="form-group">
+              <label>Banco</label>
+              <input type="text" placeholder="Ej: BancoEstado" value={formData.banco} onChange={e => setFormData({...formData, banco: e.target.value})} />
+            </div>
+            <div className="form-group">
+              <label>Tipo de Cuenta</label>
+              <input type="text" placeholder="Ej: Cuenta RUT" value={formData.tipo_cuenta} onChange={e => setFormData({...formData, tipo_cuenta: e.target.value})} />
+            </div>
+            <div className="form-group">
+              <label>Número de Cuenta</label>
+              <input type="text" placeholder="Número" value={formData.numero_cuenta} onChange={e => setFormData({...formData, numero_cuenta: e.target.value})} />
+            </div>
+            <div className="form-group">
+              <label>RUT del Titular</label>
+              <input type="text" placeholder="Ej: 11.111.111-1" value={formData.rut_titular} onChange={e => setFormData({...formData, rut_titular: e.target.value})} />
+            </div>
+            <div className="form-group" style={{ gridColumn: 'span 2' }}>
+              <label>Nombre del Titular</label>
+              <input type="text" placeholder="Nombre completo" value={formData.nombre_titular} onChange={e => setFormData({...formData, nombre_titular: e.target.value})} />
+            </div>
+            <div className="form-group">
+              <label>Límite Mensual Abonos ($)</label>
+              <input type="number" value={formData.limite_mensual_ingresos} onChange={e => setFormData({...formData, limite_mensual_ingresos: parseInt(e.target.value) || 0})} />
+            </div>
+            <div className="form-group">
+              <label>Límite Transferencias Distintas (SII)</label>
+              <input type="number" value={formData.limite_mensual_transferencias} onChange={e => setFormData({...formData, limite_mensual_transferencias: parseInt(e.target.value) || 0})} />
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: '16px', marginTop: '24px', justifyContent: 'flex-end' }}>
+            <button className="btn btn-secondary" onClick={() => setIsModalOpen(false)}>Cancelar</button>
+            <button className="btn btn-primary" onClick={handleGuardarCuenta}>Guardar Cuenta</button>
+          </div>
+        </div>
+      )}
 
       <div className="cuentas-list">
         {isLoading ? (

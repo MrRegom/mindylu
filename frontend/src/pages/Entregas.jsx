@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import { Plus, Calendar, MapPin, MessageCircle, Package, Clock, Edit2, Copy, XCircle, CheckCircle, RefreshCcw, Trash2 } from 'lucide-react';
 import api from '../services/api';
 import './Entregas.css';
-import { showAlert, showConfirm, showToast } from '../utils/alerts';
+import { showAlert, showConfirm, showToast, showPrompt } from '../utils/alerts';
 
 /**
  * Componente Entregas
@@ -76,7 +76,7 @@ const Entregas = () => {
   }, []);
 
   const handleSetHora = async (entregaId, horaActual) => {
-    const hora = window.prompt("Ingresa la hora de entrega (ej: 15:30 o 18:00):", horaActual || "");
+    const hora = await showPrompt("Ingresa la hora de entrega", "Ej: 15:30 o 18:00", horaActual || "");
     if (hora !== null) {
       const horaLimpia = hora.trim();
       if (!horaLimpia) return;
@@ -205,7 +205,7 @@ const Entregas = () => {
 
   // --- EDICIÓN RELACIONAL EN CASCADA DE PUNTOS (Caso B - Modificar nombre de estación) ---
   const handleEditarLugar = async (puntoId, nombreActual) => {
-    const nuevoNombre = window.prompt("Editar nombre de la estación/lugar (afectará todos los pedidos en curso):", nombreActual);
+    const nuevoNombre = await showPrompt("Editar nombre de la estación/lugar", "Ej: Metro Baquedano", nombreActual);
     if (nuevoNombre && nuevoNombre.trim() && nuevoNombre.trim() !== nombreActual) {
       try {
         await api.patch(`/pedidos/puntos/${puntoId}/`, { nombre: nuevoNombre.trim() });
@@ -334,7 +334,7 @@ const Entregas = () => {
   };
 
   const handleCrearLugarRapido = async () => {
-    const nuevoNombre = window.prompt("Nombre del nuevo lugar:");
+    const nuevoNombre = await showPrompt("Nombre del nuevo lugar", "Ej: Metro Los Leones");
     if (nuevoNombre && nuevoNombre.trim()) {
       try {
         const res = await api.post('/pedidos/puntos/', { nombre: nuevoNombre.trim() });

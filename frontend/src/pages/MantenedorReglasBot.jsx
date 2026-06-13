@@ -44,6 +44,36 @@ const MantenedorReglasBot = () => {
       showAlert("Las palabras clave y la respuesta son obligatorias");
       return;
     }
+
+    // Validación de palabras clave del sistema y reglas existentes
+    const systemKeywords = [
+      'ruta', 'entrega', 'despacho', 'cuándo llega', 'cuando llega', 'donde entregas', 'hacen entregas',
+      'cuenta', 'deposito', 'depositar', 'transferir', 'transferencia', 'datos para transferir', 'datos transferencia', 'a que cuenta',
+      'quiero comprar el siguiente producto:'
+    ];
+
+    const inputKeywords = currentRegla.palabras_clave.toLowerCase().split(',').map(k => k.trim()).filter(k => k);
+    
+    // 1. Check against system keywords
+    const conflictSystem = inputKeywords.find(k => systemKeywords.includes(k));
+    if (conflictSystem) {
+      showAlert(`La palabra "${conflictSystem}" está reservada por el sistema (Rutas, Cuentas o Compras). Si la usas, el bot se confundirá.`);
+      return;
+    }
+
+    // 2. Check against other existing rules
+    let conflictOtherRule = null;
+    for (const r of reglas) {
+      if (r.id === currentRegla.id) continue;
+      const ruleKeywords = r.palabras_clave.toLowerCase().split(',').map(k => k.trim());
+      conflictOtherRule = inputKeywords.find(k => ruleKeywords.includes(k));
+      if (conflictOtherRule) break;
+    }
+
+    if (conflictOtherRule) {
+      showAlert(`La palabra "${conflictOtherRule}" ya está siendo ocupada por otra de tus reglas. El bot se confundirá.`);
+      return;
+    }
     
     try {
       if (currentRegla.id) {

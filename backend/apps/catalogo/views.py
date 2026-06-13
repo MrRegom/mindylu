@@ -12,6 +12,7 @@ from .serializers import (
     CicloVentaSerializer,
     CategoriaSerializer,
 )
+from .services import CatalogoService
 
 
 class CategoriaViewSet(viewsets.ModelViewSet):
@@ -156,30 +157,11 @@ class PrendaViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'])
     def subir_foto(self, request):
-        """
-        Nuevo endpoint unificado para subir fotos al catálogo.
-
-        Detecta si la prenda ya existe por nombre (case-insensitive) dentro del tenant.
-        - Si ya existe → devuelve { existe: true, prenda: {...} } para que el frontend
-          pregunte si se desea sumar stock.
-        - Si no existe → crea la prenda nueva con imagen y variantes.
-
-        Espera FormData con:
-          - nombre (str)
-          - precio (int)
-          - categoria_id (int, opcional)
-          - variantes (JSON str): [{ color, talla, cantidad }]
-          - imagen (file, opcional)
-        """
         import json
-        from django.db import transaction
-        from .models import PrendaImagen
-
         nombre = request.data.get('nombre', '').strip()
         if not nombre:
             return Response({'error': 'El nombre es obligatorio.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Detección de duplicado por nombre (iexact = insensible a mayúsculas)
         prenda_existente = Prenda.objects.filter(
             tenant=request.user.tenant,
             nombre__iexact=nombre
@@ -191,7 +173,6 @@ class PrendaViewSet(viewsets.ModelViewSet):
                 'prenda': PrendaSerializer(prenda_existente).data
             }, status=status.HTTP_200_OK)
 
-        # No existe → crear nueva
         try:
             precio = int(request.data.get('precio', 0))
             categoria_id = request.data.get('categoria_id', None)
@@ -199,26 +180,14 @@ class PrendaViewSet(viewsets.ModelViewSet):
             variantes_data = json.loads(variantes_str) if isinstance(variantes_str, str) else variantes_str
             imagen_file = request.FILES.get('imagen')
 
-            with transaction.atomic():
-                prenda = Prenda.objects.create(
-                    tenant=request.user.tenant,
-                    nombre=nombre,
-                    precio=precio,
-                    categoria_id=categoria_id if categoria_id else None,
-                    talla_tipo='unica'
-                )
-                if not variantes_data:
-                    PrendaVariante.objects.create(prenda=prenda, color='Único', talla='Única', cantidad=1)
-                else:
-                    for v in variantes_data:
-                        PrendaVariante.objects.create(
-                            prenda=prenda,
-                            color=v.get('color', 'Único'),
-                            talla=v.get('talla', 'Única'),
-                            cantidad=int(v.get('cantidad', 1))
-                        )
-                if imagen_file:
-                    PrendaImagen.objects.create(prenda=prenda, imagen=imagen_file, orden=0)
+            prenda = CatalogoService.crear_prenda_con_variantes(
+                tenant=request.user.tenant,
+                nombre=nombre,
+                precio=precio,
+                categoria_id=categoria_id,
+                variantes_data=variantes_data,
+                imagen_file=imagen_file
+            )
 
             return Response({
                 'existe': False,
@@ -230,18 +199,6 @@ class PrendaViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'])
     def publicar_seleccionadas(self, request):
-        """
-        Publica o programa en Facebook las prendas seleccionadas desde el catálogo.
-
-        Espera JSON:
-          {
-            "prenda_ids": [1, 2, 3],
-            "mensaje": "Nuevas llegadas ✨",
-            "fecha_programada": "2026-05-27T22:00:00" (null = publicar ahora)
-          }
-        """
-        from django.db import transaction
-
         prenda_ids = request.data.get('prenda_ids', [])
         mensaje = request.data.get('mensaje', '')
         fecha_programada_str = request.data.get('fecha_programada', None)
@@ -249,53 +206,27 @@ class PrendaViewSet(viewsets.ModelViewSet):
         if not prenda_ids:
             return Response({'error': 'Debes seleccionar al menos una prenda.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Verificar que todas las prendas pertenezcan al tenant (seguridad multi-tenant)
-        prendas = Prenda.objects.filter(id__in=prenda_ids, tenant=request.user.tenant)
-        if prendas.count() != len(prenda_ids):
-            return Response({'error': 'Una o más prendas no existen en tu catálogo.'}, status=status.HTTP_400_BAD_REQUEST)
-
         try:
-            with transaction.atomic():
-                from django.utils.dateparse import parse_datetime
-
-                ciclo = CicloVenta.objects.create(
-                    tenant=request.user.tenant,
-                    mensaje_facebook=mensaje,
-                    estado=CicloVenta.Estado.PROGRAMADO if fecha_programada_str else CicloVenta.Estado.ACTIVO
-                )
-                if fecha_programada_str:
-                    ciclo.fecha_programada = parse_datetime(fecha_programada_str)
-                    ciclo.save()
-
-                # Asociar las prendas seleccionadas al ciclo
-                prendas.update(ciclo=ciclo)
-
-                if fecha_programada_str:
-                    from apps.integraciones.scheduler import schedule_publicacion_lote
-                    schedule_publicacion_lote(ciclo.id, ciclo.fecha_programada)
-                else:
-                    # Publicar inmediatamente (en segundo plano)
-                    from django.utils import timezone
-                    from apps.integraciones.scheduler import schedule_publicacion_lote
-                    schedule_publicacion_lote(ciclo.id, timezone.now())
+            ciclo, count = CatalogoService.programar_publicacion(
+                tenant=request.user.tenant,
+                prenda_ids=prenda_ids,
+                mensaje=mensaje,
+                fecha_programada_str=fecha_programada_str
+            )
 
             return Response({
-                'mensaje': f'{prendas.count()} prendas enviadas a publicar.',
+                'mensaje': f'{count} prendas enviadas a publicar.',
                 'ciclo_id': ciclo.id
             }, status=status.HTTP_200_OK)
 
+        except ValueError as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['post'])
     def bulk_create(self, request):
-        """
-        Crea múltiples prendas a la vez (compatibilidad con flujo anterior).
-        """
         import json
-        from django.db import transaction
-        from .models import PrendaImagen
-
         try:
             items_str = request.data.get('items', '[]')
             items = json.loads(items_str)
@@ -307,49 +238,14 @@ class PrendaViewSet(viewsets.ModelViewSet):
         if not items:
             return Response({'error': 'No se enviaron items.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        creadas_ids = []
         try:
-            with transaction.atomic():
-                from django.utils.dateparse import parse_datetime
-                ciclo = CicloVenta.objects.create(
-                    tenant=request.user.tenant,
-                    mensaje_facebook=mensaje_facebook,
-                    estado=CicloVenta.Estado.PROGRAMADO if fecha_programada_str else CicloVenta.Estado.ACTIVO
-                )
-                if fecha_programada_str:
-                    ciclo.fecha_programada = parse_datetime(fecha_programada_str)
-                    ciclo.save()
-
-                for i, item in enumerate(items):
-                    cat_id = item.get('categoria_id')
-                    precio_comp = item.get('precio_compra')
-                    prenda = Prenda.objects.create(
-                        tenant=request.user.tenant,
-                        ciclo=ciclo,
-                        nombre=item.get('nombre', 'Producto Sin Nombre'),
-                        precio=int(item.get('precio', 0)),
-                        precio_compra=int(precio_comp) if precio_comp else None,
-                        categoria_id=cat_id if cat_id else None,
-                        talla_tipo=item.get('talla_tipo', 'unica')
-                    )
-                    variantes_list = item.get('variantes', [])
-                    if not variantes_list:
-                        PrendaVariante.objects.create(prenda=prenda, color='Único', talla='Única', cantidad=1)
-                    else:
-                        for v in variantes_list:
-                            PrendaVariante.objects.create(
-                                prenda=prenda,
-                                color=v.get('color', 'Único'),
-                                talla=v.get('talla', 'Única'),
-                                cantidad=int(v.get('cantidad', 1))
-                            )
-                    imagen_file = request.FILES.get(f'imagenes_{i}')
-                    if imagen_file:
-                        PrendaImagen.objects.create(prenda=prenda, imagen=imagen_file, orden=0)
-                    creadas_ids.append(prenda.id)
-                if fecha_programada_str:
-                    from apps.integraciones.scheduler import schedule_publicacion_lote
-                    schedule_publicacion_lote(ciclo.id, ciclo.fecha_programada)
+            ciclo, creadas_ids = CatalogoService.crear_lote_masivo(
+                tenant=request.user.tenant,
+                items=items,
+                fecha_programada_str=fecha_programada_str,
+                mensaje_facebook=mensaje_facebook,
+                files=request.FILES
+            )
 
             return Response({
                 'mensaje': f'Se crearon {len(creadas_ids)} prendas masivamente.',
