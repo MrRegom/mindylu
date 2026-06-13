@@ -45,88 +45,94 @@ const Whatsapp = () => {
 
   // WebSocket connection
   useEffect(() => {
-    // Initial fetch to populate state
-    fetchConversaciones();
+    let ws = null;
+    let reconnectTimer = null;
 
-    // Use ws:// for http, wss:// for https
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    // When using VITE dev server proxy, we might need a direct URL. But let's assume the API URL domain
-    let host = window.location.host;
-    if (import.meta.env.VITE_API_URL) {
-      host = new URL(import.meta.env.VITE_API_URL).host;
-    }
-    
-    const wsUrl = `${protocol}//${host}/ws/chat/`;
-    const ws = new WebSocket(wsUrl);
-
-    ws.onopen = () => {
-      console.log('WebSocket Connected');
-    };
-
-    ws.onmessage = (event) => {
-      const payload = JSON.parse(event.data);
-      if (payload.type === 'chat_message') {
-        const data = payload.data;
-        
-        // Handle incoming message sound
-        if (data.mensaje.direction === 'INBOUND') {
-          playNotificationSound();
-        }
-
-        // Update chats list (sidebar)
-        setChats(prevChats => {
-          const chatExists = prevChats.some(c => c.id === data.conversacion_id);
-          let newChats;
-          if (chatExists) {
-            newChats = prevChats.map(c => {
-              if (c.id === data.conversacion_id) {
-                return {
-                  ...c,
-                  unread_count: data.unread_count,
-                  last_message_content: data.mensaje.content,
-                  last_message_at: data.mensaje.created_at,
-                  client_name: data.client_name
-                };
-              }
-              return c;
-            });
-          } else {
-            newChats = [{
-              id: data.conversacion_id,
-              client_phone: data.client_phone,
-              client_name: data.client_name,
-              unread_count: data.unread_count,
-              last_message_content: data.mensaje.content,
-              last_message_at: data.mensaje.created_at,
-              status: 'OPEN'
-            }, ...prevChats];
-          }
-          
-          // Sort by latest message
-          return newChats.sort((a, b) => new Date(b.last_message_at || 0) - new Date(a.last_message_at || 0));
-        });
-
-        // Update active chat messages if we are viewing this conversation
-        if (activeChatRef.current === data.conversacion_id) {
-          setMessages(prevMsgs => {
-            // Avoid duplicates
-            if (prevMsgs.some(m => m.id === data.mensaje.id)) return prevMsgs;
-            return [...prevMsgs, data.mensaje];
-          });
-        }
+    const connectWebSocket = () => {
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      let host = window.location.host;
+      if (import.meta.env.VITE_API_URL) {
+        host = new URL(import.meta.env.VITE_API_URL).host;
       }
+      
+      const wsUrl = `${protocol}//${host}/ws/chat/`;
+      ws = new WebSocket(wsUrl);
+
+      ws.onopen = () => {
+        console.log('WebSocket Connected');
+        // Fetch para obtener mensajes perdidos durante desconexión
+        fetchConversaciones();
+        if (activeChatRef.current) {
+          fetchMensajes(activeChatRef.current);
+        }
+      };
+
+      ws.onmessage = (event) => {
+        const payload = JSON.parse(event.data);
+        if (payload.type === 'chat_message') {
+          const data = payload.data;
+          
+          if (data.mensaje.direction === 'INBOUND') {
+            playNotificationSound();
+          }
+
+          setChats(prevChats => {
+            const chatExists = prevChats.some(c => c.id === data.conversacion_id);
+            let newChats;
+            if (chatExists) {
+              newChats = prevChats.map(c => {
+                if (c.id === data.conversacion_id) {
+                  return {
+                    ...c,
+                    unread_count: data.unread_count,
+                    last_message_content: data.mensaje.content,
+                    last_message_at: data.mensaje.created_at,
+                    client_name: data.client_name
+                  };
+                }
+                return c;
+              });
+            } else {
+              newChats = [{
+                id: data.conversacion_id,
+                client_phone: data.client_phone,
+                client_name: data.client_name,
+                unread_count: data.unread_count,
+                last_message_content: data.mensaje.content,
+                last_message_at: data.mensaje.created_at,
+                status: 'OPEN'
+              }, ...prevChats];
+            }
+            return newChats.sort((a, b) => new Date(b.last_message_at || 0) - new Date(a.last_message_at || 0));
+          });
+
+          if (activeChatRef.current === data.conversacion_id) {
+            setMessages(prevMsgs => {
+              if (prevMsgs.some(m => m.id === data.mensaje.id)) return prevMsgs;
+              return [...prevMsgs, data.mensaje];
+            });
+          }
+        }
+      };
+
+      ws.onerror = (err) => {
+        console.error('WebSocket Error:', err);
+      };
+
+      ws.onclose = () => {
+        console.log('WebSocket Disconnected. Reconnecting in 3s...');
+        reconnectTimer = setTimeout(connectWebSocket, 3000);
+      };
     };
 
-    ws.onerror = (err) => {
-      console.error('WebSocket Error:', err);
-    };
-
-    ws.onclose = () => {
-      console.log('WebSocket Disconnected');
-    };
+    connectWebSocket();
 
     return () => {
-      ws.close();
+      if (reconnectTimer) clearTimeout(reconnectTimer);
+      if (ws) {
+        ws.onclose = null; // Prevent reconnect loop on unmount
+        ws.close();
+      }
     };
   }, []);
 

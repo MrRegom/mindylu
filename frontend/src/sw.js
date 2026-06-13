@@ -17,7 +17,12 @@ self.addEventListener('push', function (event) {
     };
     
     event.waitUntil(
-      self.registration.showNotification(data.title, options)
+      self.registration.showNotification(data.title, options).then(() => {
+        // Set App Badge if supported
+        if (data.data && data.data.unreadCount !== undefined && 'setAppBadge' in navigator) {
+          return navigator.setAppBadge(data.data.unreadCount);
+        }
+      })
     );
   }
 });
@@ -41,6 +46,10 @@ self.addEventListener('notificationclick', function(event) {
       // Si no, abrir una nueva ventana
       if (clients.openWindow) {
         return clients.openWindow(targetUrl);
+      }
+    }).then(() => {
+      if ('clearAppBadge' in navigator) {
+        return navigator.clearAppBadge();
       }
     })
   );
