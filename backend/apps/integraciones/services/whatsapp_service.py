@@ -194,7 +194,13 @@ class WhatsappService:
             lugar = entrega.punto_entrega.nombre if entrega.punto_entrega else 'Lugar por definir'
             
             respuesta = f"¡Hola hermosa! Sí, tengo tu entrega agendada para {fecha_str} a las {hora} en {lugar}. ¡Nos vemos ahí!"
-            self.enviar_mensaje_texto(conversacion.id, respuesta)
+        else:
+            from apps.core.models import ConfiguracionTienda
+            config_tienda = ConfiguracionTienda.objects.filter(tenant=self.tenant).first()
+            texto_envio = config_tienda.envios_texto if config_tienda and config_tienda.envios_texto else "Actualmente hacemos entregas y envíos a convenir. Escríbeme por aquí y lo coordinamos 💕"
+            respuesta = f"¡Hola hermosa! {texto_envio}"
+
+        self.enviar_mensaje_texto(conversacion.id, respuesta)
 
     def _responder_consulta_cuenta(self, conversacion, clienta):
         cuenta = clienta.cuenta_asignada

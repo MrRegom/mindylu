@@ -56,7 +56,13 @@ const MantenedorReglasBot = () => {
       setIsModalOpen(false);
       fetchReglas();
     } catch (error) {
-      showAlert("Error al guardar la regla");
+      if (error.response?.data?.palabras_clave) {
+        showAlert(error.response.data.palabras_clave[0]);
+      } else if (error.response?.data?.non_field_errors) {
+        showAlert(error.response.data.non_field_errors[0]);
+      } else {
+        showAlert("Error al guardar la regla");
+      }
       console.error(error);
     }
   };
