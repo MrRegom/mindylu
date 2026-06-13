@@ -50,7 +50,9 @@ class CatalogoService:
             if fecha_programada_str:
                 schedule_publicacion_lote(ciclo.id, ciclo.fecha_programada)
             else:
-                schedule_publicacion_lote(ciclo.id, timezone.now())
+                import threading
+                from apps.integraciones.tasks import ejecutar_publicacion_lote
+                threading.Thread(target=ejecutar_publicacion_lote, args=(ciclo.id,)).start()
 
         return ciclo, prendas.count()
 
@@ -97,5 +99,9 @@ class CatalogoService:
 
             if fecha_programada_str:
                 schedule_publicacion_lote(ciclo.id, ciclo.fecha_programada)
+            else:
+                import threading
+                from apps.integraciones.tasks import ejecutar_publicacion_lote
+                threading.Thread(target=ejecutar_publicacion_lote, args=(ciclo.id,)).start()
 
         return ciclo, creadas_ids

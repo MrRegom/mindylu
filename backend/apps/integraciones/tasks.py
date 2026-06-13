@@ -25,8 +25,9 @@ def ejecutar_publicacion_lote(ciclo_id):
         ciclo.save()
         return
 
-    access_token = getattr(settings, 'FACEBOOK_PAGE_ACCESS_TOKEN', None)
-    page_id = getattr(settings, 'FACEBOOK_PAGE_ID', None)
+    from decouple import config
+    access_token = config('FACEBOOK_ACCESS_TOKEN', default='')
+    page_id = config('FACEBOOK_PAGE_ID', default='')
 
     if not access_token or not page_id:
         print("Configuración de Facebook faltante en el servidor.")
@@ -59,13 +60,20 @@ def ejecutar_publicacion_lote(ciclo_id):
         if ciclo.mensaje_facebook:
             mensaje = ciclo.mensaje_facebook
         else:
-            mensaje = "✨ ¡Llegó mercadería nueva! ✨\n\n¡Escríbenos por mensaje directo para reservar la tuya! 💛"
+            mensaje = (
+                f"✨ ¡Llegó mercadería nueva a MindyLu! ✨\n\n"
+                f"Tenemos nuevos modelos increíbles esperándote. 💛\n\n"
+                f"🛍️ Visita nuestro catálogo online y descubre todas las novedades:\n"
+                f"👉 https://157-230-93-24.nip.io/catalogo\n\n"
+                f"📲 Escríbenos por mensaje directo para reservar tu pedido."
+            )
 
         try:
             url_feed = f"https://graph.facebook.com/v19.0/{page_id}/feed"
             payload = {
                 'message': mensaje,
                 'attached_media': media_ids,
+                'published': 'true',
                 'access_token': access_token
             }
             res_feed = requests.post(url_feed, json=payload)
