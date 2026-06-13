@@ -1,0 +1,121 @@
+.pwa-install-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  z-index: 99999; /* Highest possible */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.pwa-install-card {
+  background: white;
+  border-radius: 24px;
+  padding: 32px 24px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  text-align: center;
+  border: 1px solid rgba(251, 165, 181, 0.3);
+}
+
+.pwa-install-card .pwa-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 16px;
+}
+
+.pwa-install-card .pwa-logo span {
+  color: var(--color-primary, #d16b7e);
+}
+
+.pwa-install-card h2 {
+  font-family: var(--font-main);
+  font-size: 1.5rem;
+  color: #111b21;
+  margin-bottom: 12px;
+}
+
+.pwa-install-card p {
+  color: #667781;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+
+.btn-install-pwa {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: var(--color-primary, #d16b7e);
+  color: white;
+  padding: 16px;
+  border-radius: 16px;
+  border: none;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s;
+  box-shadow: 0 8px 16px rgba(209, 107, 126, 0.3);
+}
+
+.btn-install-pwa:disabled {
+  background: #ccc;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.btn-install-pwa:active {
+  transform: scale(0.96);
+}
+
+.ios-instructions {
+  background: #f8f9fa;
+  border-radius: 16px;
+  padding: 16px;
+  text-align: left;
+  border: 1px solid #e9ecef;
+  position: relative;
+}
+
+.ios-instructions p {
+  margin-bottom: 12px;
+  color: #1a1a1a;
+}
+
+.ios-instructions ol {
+  padding-left: 20px;
+  color: #4a4a4a;
+  font-size: 0.95rem;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.ios-instructions li {
+  margin-bottom: 8px;
+}
+
+.ios-arrow-hint {
+  position: absolute;
+  bottom: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #1677ff;
+  animation: bounceDown 1.5s infinite;
+}
+
+@keyframes bounceDown {
+  0%, 100% { transform: translate(-50%, 0); }
+  50% { transform: translate(-50%, 10px); }
+}

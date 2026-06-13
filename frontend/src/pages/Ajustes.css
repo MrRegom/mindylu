@@ -368,3 +368,57 @@
 .mantenedor-select-light:focus {
   border-color: var(--color-primary);
 }
+
+/* ── Tabs para Ajustes ── */
+.ajustes-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  margin-bottom: 24px;
+  padding-bottom: 8px;
+  scrollbar-width: none; /* Firefox */
+}
+
+.ajustes-tabs::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+.ajustes-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(251, 165, 181, 0.3);
+  border-radius: 99px;
+  font-family: var(--font-main);
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #667781;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+
+.ajustes-tab:hover {
+  background: #ffffff;
+  color: var(--color-primary);
+  transform: translateY(-1px);
+}
+
+.ajustes-tab.active {
+  background: var(--color-primary);
+  color: #ffffff;
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 12px rgba(28, 30, 27, 0.2);
+}
+
+.ajustes-tab-content {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

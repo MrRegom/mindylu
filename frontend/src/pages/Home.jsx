@@ -52,8 +52,12 @@ const Home = () => {
           </h1>
           <p>Aquí tienes el resumen de tu negocio</p>
         </div>
-        <div className="header-avatar" style={{ width: 48, height: 48, borderRadius: '50%', overflow: 'hidden', marginLeft: 'auto', border: '2px solid white', boxShadow: 'var(--shadow-sm)' }}>
-          <img src={stats.usuario_avatar ? (stats.usuario_avatar.startsWith('http') ? stats.usuario_avatar : `${(import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1/').replace('/api/v1/', '')}${stats.usuario_avatar}`) : "https://i.pravatar.cc/150?img=5"} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        <div className="header-avatar" style={{ width: 48, height: 48, borderRadius: '50%', overflow: 'hidden', marginLeft: 'auto', border: '2px solid white', boxShadow: 'var(--shadow-sm)', backgroundColor: '#1a1a1a', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '1.2rem', fontWeight: 'bold' }}>
+          {stats.usuario_avatar ? (
+            <img src={stats.usuario_avatar.startsWith('http') ? stats.usuario_avatar : `${(import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1/').replace('/api/v1/', '')}${stats.usuario_avatar}`} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          ) : (
+            "M"
+          )}
         </div>
       </div>
       

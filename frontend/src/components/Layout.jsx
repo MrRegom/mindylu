@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
-import { Home, Search, ShoppingBag, User, Settings, LogOut, BarChart2, MessageCircle, Plus, ChevronRight, Menu, X } from 'lucide-react';
+import { Home, Search, ShoppingBag, User, Settings, LogOut, BarChart2, MessageCircle, Plus, ChevronRight, Menu, X, Truck } from 'lucide-react';
 import './Layout.css';
+import PWAInstallPrompt from './PWAInstallPrompt';
 
 const Layout = () => {
   const location = useLocation();
@@ -119,11 +120,16 @@ const Layout = () => {
           <ShoppingBag size={24} />
           <span>Productos</span>
         </a>
-        <a href="/panel/clientas" className={`bottom-nav-item ${location.pathname.includes('/panel/clientas') ? 'active' : ''}`}>
-          <User size={24} />
-          <span>Clientas</span>
+        <a href="/panel/entregas" className={`bottom-nav-item ${location.pathname.includes('/panel/entregas') ? 'active' : ''}`}>
+          <Truck size={24} />
+          <span>Entregas</span>
+        </a>
+        <a href="/panel/ajustes" className={`bottom-nav-item ${location.pathname.includes('/panel/ajustes') ? 'active' : ''}`}>
+          <Settings size={24} />
+          <span>Ajustes</span>
         </a>
       </nav>
+      <PWAInstallPrompt />
     </div>
   );
 };

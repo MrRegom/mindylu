@@ -496,6 +496,8 @@ const ConfiguracionTiendaForm = () => {
 };
 
 const Ajustes = () => {
+  const [activeTab, setActiveTab] = useState('tienda');
+
   return (
     <div className="page-container page-ajustes animate-fade-in">
       <div className="page-header">
@@ -503,64 +505,97 @@ const Ajustes = () => {
           <Settings size={28} />
           Ajustes
         </h1>
-        <p className="subtitle">Configura los valores por defecto y la apariencia de la tienda pública.</p>
+        <p className="subtitle">Configura tu boutique y catálogos.</p>
       </div>
 
-      <ConfiguracionTiendaForm />
-
-      <h3 style={{ marginBottom: '16px', color: 'var(--color-text-strong)' }}>Mantenedores de Catálogo</h3>
-      <div className="ajustes-grid">
-        <MantenedorList
-          titulo="Categorías"
-          icono={<Tag size={20} className="icon-accent" />}
-          endpoint="/catalogo/categorias/"
-          placeholder="Nueva categoría (ej. Pantalones)"
-          hasIcons={true}
-        />
-        <MantenedorList
-          titulo="Nombres de Prendas"
-          icono={<Type size={20} className="icon-accent" />}
-          endpoint="/catalogo/nombres-prendas/"
-          placeholder="Nuevo nombre base"
-        />
-        <MantenedorList
-          titulo="Colores"
-          icono={<Palette size={20} className="icon-accent" />}
-          endpoint="/catalogo/colores/"
-          placeholder="Nuevo color (ej. Burdeo)"
-          hasColors={true}
-        />
-        <MantenedorList
-          titulo="Tallas"
-          icono={<Ruler size={20} className="icon-accent" />}
-          endpoint="/catalogo/tallas/"
-          placeholder="Nueva talla (ej. XXL)"
-          forceUppercase={true}
-        />
-        <MantenedorList
-          titulo="Lugares de Entrega"
-          icono={<MapPin size={20} className="icon-accent" />}
-          endpoint="/pedidos/puntos/"
-          placeholder="Nuevo lugar (ej. Metro Viña)"
-        />
-        <MantenedorCuentas />
+      <div className="ajustes-tabs">
+        <button className={`ajustes-tab ${activeTab === 'tienda' ? 'active' : ''}`} onClick={() => setActiveTab('tienda')}>
+          <LayoutTemplate size={18} /> Apariencia
+        </button>
+        <button className={`ajustes-tab ${activeTab === 'catalogo' ? 'active' : ''}`} onClick={() => setActiveTab('catalogo')}>
+          <Tag size={18} /> Catálogo
+        </button>
+        <button className={`ajustes-tab ${activeTab === 'logistica' ? 'active' : ''}`} onClick={() => setActiveTab('logistica')}>
+          <Truck size={18} /> Logística y Pagos
+        </button>
+        <button className={`ajustes-tab ${activeTab === 'avanzado' ? 'active' : ''}`} onClick={() => setActiveTab('avanzado')}>
+          <Settings size={18} /> Avanzado
+        </button>
       </div>
 
-      <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
-        <button 
-          onClick={() => window.location.href = '/panel/ajustes/bot-reglas'}
-          style={{ background: '#eaf4ff', color: '#1677ff', border: '1px solid #91caff', padding: '12px 24px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: 600, fontSize: '0.95rem' }}
-        >
-          <MessageSquare size={20} />
-          Configurar Reglas del Bot de WhatsApp
-        </button>
-        <button 
-          onClick={() => window.location.href = '/panel/ajustes/logs'}
-          style={{ background: '#fff1f0', color: '#ff4d4f', border: '1px solid #ffa39e', padding: '12px 24px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: 600, fontSize: '0.95rem' }}
-        >
-          <Terminal size={20} />
-          Ver Registro de Errores (Logs)
-        </button>
+      <div className="ajustes-tab-content">
+        {activeTab === 'tienda' && (
+          <ConfiguracionTiendaForm />
+        )}
+
+        {activeTab === 'catalogo' && (
+          <div className="ajustes-grid">
+            <MantenedorList
+              titulo="Categorías"
+              icono={<Tag size={20} className="icon-accent" />}
+              endpoint="/catalogo/categorias/"
+              placeholder="Nueva categoría (ej. Pantalones)"
+              hasIcons={true}
+            />
+            <MantenedorList
+              titulo="Nombres de Prendas"
+              icono={<Type size={20} className="icon-accent" />}
+              endpoint="/catalogo/nombres-prendas/"
+              placeholder="Nuevo nombre base"
+            />
+            <MantenedorList
+              titulo="Colores"
+              icono={<Palette size={20} className="icon-accent" />}
+              endpoint="/catalogo/colores/"
+              placeholder="Nuevo color (ej. Burdeo)"
+              hasColors={true}
+            />
+            <MantenedorList
+              titulo="Tallas"
+              icono={<Ruler size={20} className="icon-accent" />}
+              endpoint="/catalogo/tallas/"
+              placeholder="Nueva talla (ej. XXL)"
+              forceUppercase={true}
+            />
+          </div>
+        )}
+
+        {activeTab === 'logistica' && (
+          <div className="ajustes-grid">
+            <MantenedorList
+              titulo="Lugares de Entrega"
+              icono={<MapPin size={20} className="icon-accent" />}
+              endpoint="/pedidos/puntos/"
+              placeholder="Nuevo lugar (ej. Metro Viña)"
+            />
+            <MantenedorCuentas />
+          </div>
+        )}
+
+        {activeTab === 'avanzado' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '400px' }}>
+            <button 
+              onClick={() => window.location.href = '/panel/ajustes/bot-reglas'}
+              style={{ background: '#eaf4ff', color: '#1677ff', border: '1px solid #91caff', padding: '16px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', fontWeight: 600, fontSize: '1rem', width: '100%' }}
+            >
+              <MessageSquare size={24} />
+              <div style={{ textAlign: 'left' }}>
+                <div>Bot de WhatsApp</div>
+                <div style={{ fontSize: '0.8rem', fontWeight: 400, color: '#666' }}>Configura respuestas automáticas</div>
+              </div>
+            </button>
+            <button 
+              onClick={() => window.location.href = '/panel/ajustes/logs'}
+              style={{ background: '#fff1f0', color: '#ff4d4f', border: '1px solid #ffa39e', padding: '16px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', fontWeight: 600, fontSize: '1rem', width: '100%' }}
+            >
+              <Terminal size={24} />
+              <div style={{ textAlign: 'left' }}>
+                <div>Registro de Errores</div>
+                <div style={{ fontSize: '0.8rem', fontWeight: 400, color: '#666' }}>Ver logs del sistema</div>
+              </div>
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
