@@ -97,10 +97,17 @@ class WhatsappService:
             self._responder_consulta_stock(conversacion, content)
             return
 
-        # Bot de Reglas Personalizadas (Mayor prioridad)
+        content_lower = content.lower()
+        
+        # 1. Bot de Respuesta de Rutas (Mayor prioridad de sistema)
+        palabras_clave_rutas = ['ruta', 'entrega', 'despacho', 'cuándo llega', 'cuando llega', 'donde entregas', 'hacen entregas']
+        if any(keyword in content_lower for keyword in palabras_clave_rutas):
+            self._responder_consulta_entrega(conversacion, clienta, content)
+            return
+
+        # 2. Bot de Reglas Personalizadas
         from apps.integraciones.models import ReglaRespuestaBot
         reglas_activas = ReglaRespuestaBot.objects.filter(tenant=self.tenant, activa=True)
-        content_lower = content.lower()
         regla_aplicada = False
 
         for regla in reglas_activas:
@@ -113,11 +120,6 @@ class WhatsappService:
         
         if regla_aplicada:
             return
-
-        # Bot de Respuesta de Rutas
-        palabras_clave = ['ruta', 'entrega', 'despacho', 'cuándo llega', 'cuando llega', 'donde entregas']
-        if any(keyword in content.lower() for keyword in palabras_clave):
-            self._responder_consulta_entrega(conversacion, clienta, content)
 
         # Bot de Respuesta de Cuentas (Banco)
         palabras_clave_cuenta = ['cuenta', 'deposito', 'depositar', 'transferir', 'transferencia', 'datos para transferir', 'datos transferencia', 'a que cuenta']
@@ -200,19 +202,26 @@ class WhatsappService:
             if config_tienda and config_tienda.envios_texto:
                 texto_envio = config_tienda.envios_texto
             else:
-                proxima_ruta = EntregaDiaria.objects.filter(tenant=self.tenant, fecha__gte=hoy).order_by('fecha').first()
+                proximas_rutas = EntregaDiaria.objects.filter(tenant=self.tenant, fecha__gte=hoy).select_related('punto_entrega').order_by('fecha', 'hora_estimada')
                 
-                if proxima_ruta:
-                    dias_diff = (proxima_ruta.fecha - hoy).days
-                    if dias_diff == 0:
-                        dia_texto = "hoy"
-                    elif dias_diff == 1:
-                        dia_texto = "mañana"
-                    else:
-                        dias_semana = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
-                        dia_texto = f"el próximo {dias_semana[proxima_ruta.fecha.weekday()]}"
+                if proximas_rutas.exists():
+                    texto_envio = "Sí, hacemos entregas 🚚. Nuestras próximas rutas programadas son:\n"
+                    
+                    rutas_por_fecha = {}
+                    for ruta in proximas_rutas:
+                        if ruta.fecha not in rutas_por_fecha:
+                            rutas_por_fecha[ruta.fecha] = []
+                        rutas_por_fecha[ruta.fecha].append(ruta)
                         
-                    texto_envio = f"Tenemos rutas de entrega programadas para {dia_texto} 🚚. Dime de qué sector eres para ver si te podemos sumar o coordinar tu envío 💕"
+                    for fecha, rutas in rutas_por_fecha.items():
+                        dias_semana = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
+                        fecha_str = f"{dias_semana[fecha.weekday()]} {fecha.day}"
+                        texto_envio += f"\n📅 *{fecha_str}*:\n"
+                        for ruta in rutas:
+                            hora_str = ruta.hora_estimada.strftime('%H:%M') if ruta.hora_estimada else 'a convenir'
+                            texto_envio += f"📍 {ruta.punto_entrega.nombre} ({hora_str})\n"
+                            
+                    texto_envio += "\n¿De qué sector eres para ver si te podemos sumar a alguna ruta o coordinar tu envío? 💕"
                 else:
                     texto_envio = "Por el momento no tenemos rutas de entrega programadas, pero cuéntame, ¿cuál es tu disponibilidad o preferencia para coordinarlo y no hacerte esperar? 💕"
             
