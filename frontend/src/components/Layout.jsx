@@ -91,36 +91,21 @@ const Layout = () => {
       </aside>
 
       <main className="main-content">
+        <header className="mobile-header mobile-only">
+          <button className="mobile-menu-btn" onClick={() => setIsMobileMenuOpen(true)}>
+            <Menu size={24} />
+          </button>
+          <div className="mobile-header-logo">
+            MindyLu<span>.</span>
+          </div>
+          <button className="mobile-header-action" onClick={() => window.location.href='/panel/catalogo'}>
+            <Plus size={20} />
+          </button>
+        </header>
+
         <div className="content-wrapper">
           <Outlet />
         </div>
-
-        {/* Bottom Nav para Móvil */}
-        <nav className="bottom-nav mobile-only">
-          <a href="/panel" className={`nav-item ${location.pathname === '/panel' ? 'active' : ''}`}>
-            <Home size={22} />
-            <span>Inicio</span>
-          </a>
-          <a href="/panel/whatsapp" className={`nav-item ${location.pathname.includes('/panel/whatsapp') ? 'active' : ''}`}>
-            <MessageCircle size={22} />
-            <span>Bandeja</span>
-          </a>
-          
-          <div className="nav-item-fab-container">
-            <button className="nav-fab" onClick={() => window.location.href='/panel/catalogo'}>
-              <Plus size={24} color="#fff" />
-            </button>
-          </div>
-
-          <a href="/panel/entregas" className={`nav-item ${location.pathname.includes('/panel/entregas') ? 'active' : ''}`}>
-            <ShoppingBag size={22} />
-            <span>Pedidos</span>
-          </a>
-          <button className="nav-item" onClick={() => setIsMobileMenuOpen(true)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
-            <Menu size={22} />
-            <span>Menú</span>
-          </button>
-        </nav>
       </main>
     </div>
   );
