@@ -563,6 +563,13 @@ def listar_conversaciones(request):
         })
     return Response({'conversaciones': data}, status=200)
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def obtener_unread_count(request):
+    from django.db.models import Sum
+    total = Conversacion.objects.filter(tenant=request.user.tenant, status='OPEN').aggregate(total=Sum('unread_count'))['total'] or 0
+    return Response({'unread_count': total}, status=200)
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

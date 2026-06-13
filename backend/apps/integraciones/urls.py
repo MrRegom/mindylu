@@ -5,7 +5,7 @@ from .views import (
     publicar_en_facebook, publicar_lote_en_facebook,
     obtener_config_whatsapp, conectar_whatsapp, desconectar_whatsapp, whatsapp_webhook,
     listar_conversaciones, listar_mensajes, enviar_mensaje, sugerencias_productos,
-    guardar_suscripcion_push, obtener_vapid_public_key
+    guardar_suscripcion_push, obtener_vapid_public_key, obtener_unread_count
 )
 
 urlpatterns = [
@@ -24,6 +24,7 @@ urlpatterns = [
     
     # Nuevos endpoints de Bandeja de Entrada
     path('whatsapp/conversaciones/', listar_conversaciones, name='whatsapp_conversaciones'),
+    path('whatsapp/unread-count/', obtener_unread_count, name='whatsapp_unread_count'),
     path('whatsapp/conversaciones/<int:conversacion_id>/mensajes/', listar_mensajes, name='whatsapp_mensajes'),
     path('whatsapp/conversaciones/<int:conversacion_id>/enviar/', enviar_mensaje, name='whatsapp_enviar_mensaje'),
     path('whatsapp/conversaciones/<int:conversacion_id>/sugerencias/', sugerencias_productos, name='whatsapp_sugerencias'),

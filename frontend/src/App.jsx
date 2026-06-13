@@ -39,6 +39,8 @@ function BodyClassManager() {
   return null;
 }
 
+import { GlobalProvider } from './contexts/GlobalContext';
+
 function App() {
   // Leemos el token real para ver si está logueado
   const isAuthenticated = !!localStorage.getItem('access_token');
@@ -55,9 +57,10 @@ function App() {
   }, []);
 
   return (
-    <Router>
-      <BodyClassManager />
-      <Routes>
+    <GlobalProvider>
+      <Router>
+        <BodyClassManager />
+        <Routes>
         <Route path="/panel/login" element={
           isAuthenticated ? <Navigate to="/panel" replace /> : <Login />
         } />
@@ -104,7 +107,8 @@ function App() {
           <Route path="perfil" element={<Perfil />} />
         </Route>
       </Routes>
-    </Router>
+      </Router>
+    </GlobalProvider>
   );
 }
 

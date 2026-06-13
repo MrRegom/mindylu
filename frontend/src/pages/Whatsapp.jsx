@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useContext } from 'react';
 import { MessageCircle, Search, Send, Bot, User as UserIcon, Check, CheckCheck, Clock, Settings, ChevronLeft } from 'lucide-react';
+import { GlobalContext } from '../contexts/GlobalContext';
 import api from '../services/api';
 import './Whatsapp.css';
 
@@ -18,123 +19,72 @@ const Whatsapp = () => {
     activeChatRef.current = activeChatId;
   }, [activeChatId]);
 
-  // Reproducir sonido de notificación
-  const playNotificationSound = () => {
-    try {
-      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      const oscillator = audioCtx.createOscillator();
-      const gainNode = audioCtx.createGain();
-      
-      oscillator.type = 'sine';
-      oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // A5
-      oscillator.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.1); // A6
-      
-      gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
-      gainNode.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.05);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(audioCtx.destination);
-      
-      oscillator.start(audioCtx.currentTime);
-      oscillator.stop(audioCtx.currentTime + 0.2);
-    } catch (e) {
-      console.log('Audio de notificación no soportado o bloqueado');
-    }
-  };
+  const { wsMessage, fetchUnreadCount } = useContext(GlobalContext);
 
-  // WebSocket connection
+  // Initial fetch
   useEffect(() => {
-    let ws = null;
-    let reconnectTimer = null;
+    fetchConversaciones();
+    if (activeChatRef.current) {
+      fetchMensajes(activeChatRef.current);
+    }
+  }, []);
 
-    const connectWebSocket = () => {
-      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      let host = window.location.host;
-      if (import.meta.env.VITE_API_URL) {
-        host = new URL(import.meta.env.VITE_API_URL).host;
-      }
+  // Handle incoming global wsMessage
+  useEffect(() => {
+    if (!wsMessage) return;
+
+    if (wsMessage.type === 'chat_message') {
+      const data = wsMessage.data;
       
-      const wsUrl = `${protocol}//${host}/ws/chat/`;
-      ws = new WebSocket(wsUrl);
-
-      ws.onopen = () => {
-        console.log('WebSocket Connected');
-        // Fetch para obtener mensajes perdidos durante desconexión
-        fetchConversaciones();
-        if (activeChatRef.current) {
-          fetchMensajes(activeChatRef.current);
-        }
-      };
-
-      ws.onmessage = (event) => {
-        const payload = JSON.parse(event.data);
-        if (payload.type === 'chat_message') {
-          const data = payload.data;
-          
-          if (data.mensaje.direction === 'INBOUND') {
-            playNotificationSound();
-          }
-
-          setChats(prevChats => {
-            const chatExists = prevChats.some(c => c.id === data.conversacion_id);
-            let newChats;
-            if (chatExists) {
-              newChats = prevChats.map(c => {
-                if (c.id === data.conversacion_id) {
-                  return {
-                    ...c,
-                    unread_count: data.unread_count,
-                    last_message_content: data.mensaje.content,
-                    last_message_at: data.mensaje.created_at,
-                    client_name: data.client_name
-                  };
-                }
-                return c;
-              });
-            } else {
-              newChats = [{
-                id: data.conversacion_id,
-                client_phone: data.client_phone,
-                client_name: data.client_name,
+      setChats(prevChats => {
+        const chatExists = prevChats.some(c => c.id === data.conversacion_id);
+        let newChats;
+        if (chatExists) {
+          newChats = prevChats.map(c => {
+            if (c.id === data.conversacion_id) {
+              return {
+                ...c,
                 unread_count: data.unread_count,
                 last_message_content: data.mensaje.content,
                 last_message_at: data.mensaje.created_at,
-                status: 'OPEN'
-              }, ...prevChats];
+                client_name: data.client_name
+              };
             }
-            return newChats.sort((a, b) => new Date(b.last_message_at || 0) - new Date(a.last_message_at || 0));
+            return c;
           });
-
-          if (activeChatRef.current === data.conversacion_id) {
-            setMessages(prevMsgs => {
-              if (prevMsgs.some(m => m.id === data.mensaje.id)) return prevMsgs;
-              return [...prevMsgs, data.mensaje];
-            });
-          }
+        } else {
+          newChats = [{
+            id: data.conversacion_id,
+            client_phone: data.client_phone,
+            client_name: data.client_name,
+            unread_count: data.unread_count,
+            last_message_content: data.mensaje.content,
+            last_message_at: data.mensaje.created_at,
+            status: 'OPEN'
+          }, ...prevChats];
         }
-      };
+        return newChats.sort((a, b) => new Date(b.last_message_at || 0) - new Date(a.last_message_at || 0));
+      });
 
-      ws.onerror = (err) => {
-        console.error('WebSocket Error:', err);
-      };
-
-      ws.onclose = () => {
-        console.log('WebSocket Disconnected. Reconnecting in 3s...');
-        reconnectTimer = setTimeout(connectWebSocket, 3000);
-      };
-    };
-
-    connectWebSocket();
-
-    return () => {
-      if (reconnectTimer) clearTimeout(reconnectTimer);
-      if (ws) {
-        ws.onclose = null; // Prevent reconnect loop on unmount
-        ws.close();
+      if (activeChatRef.current === data.conversacion_id) {
+        setMessages(prevMsgs => {
+          if (prevMsgs.some(m => m.id === data.mensaje.id)) return prevMsgs;
+          return [...prevMsgs, data.mensaje];
+        });
+        
+        // If we are looking at this chat, we should probably mark it as read immediately!
+        // We can just call fetchUnreadCount to re-sync if needed, but the backend handles read receipt via `api.get(/mensajes/)`
+        if (data.mensaje.direction === 'INBOUND') {
+          // Si estamos viendo el chat, los mensajes se leen de inmediato
+          api.get(`/integraciones/whatsapp/conversaciones/${data.conversacion_id}/mensajes/`).then(() => {
+            fetchUnreadCount(); // update global badge
+            // update local chat unread count
+            setChats(prev => prev.map(c => c.id === data.conversacion_id ? { ...c, unread_count: 0 } : c));
+          });
+        }
       }
-    };
-  }, []);
+    }
+  }, [wsMessage, fetchUnreadCount]);
 
   const [suggestedProducts, setSuggestedProducts] = useState([]);
 

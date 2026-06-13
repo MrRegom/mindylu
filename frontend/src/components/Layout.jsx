@@ -1,12 +1,14 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { Home, Search, ShoppingBag, User, Settings, LogOut, BarChart2, MessageCircle, Plus, ChevronRight, Menu, X, Truck } from 'lucide-react';
+import { GlobalContext } from '../contexts/GlobalContext';
 import './Layout.css';
 import PWAInstallPrompt from './PWAInstallPrompt';
 
 const Layout = () => {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { unreadCount } = useContext(GlobalContext);
   
   // No mostrar navegación en la pantalla de login
   if (location.pathname === '/panel/login' || location.pathname === '/login') {
@@ -54,7 +56,12 @@ const Layout = () => {
             <span>Catálogo</span>
           </a>
           <a href="/panel/whatsapp" className={`nav-item ${location.pathname.includes('/panel/whatsapp') ? 'active' : ''}`} onClick={() => setIsMobileMenuOpen(false)}>
-            <MessageCircle size={20} />
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+              <MessageCircle size={20} />
+              {unreadCount > 0 && (
+                <span style={{ position: 'absolute', top: -6, right: -12, backgroundColor: 'var(--color-success, #2ecc71)', color: 'white', fontSize: '0.65rem', fontWeight: 'bold', padding: '2px 6px', borderRadius: '10px', lineHeight: 1, zIndex: 2 }}>{unreadCount}</span>
+              )}
+            </div>
             <span>Bandeja</span>
           </a>
           <a href="/panel/entregas" className={`nav-item ${location.pathname.includes('/panel/entregas') ? 'active' : ''}`} onClick={() => setIsMobileMenuOpen(false)}>
@@ -113,7 +120,12 @@ const Layout = () => {
           <span>Inicio</span>
         </a>
         <a href="/panel/whatsapp" className={`bottom-nav-item ${location.pathname.includes('/panel/whatsapp') ? 'active' : ''}`}>
-          <MessageCircle size={24} />
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+            <MessageCircle size={24} />
+            {unreadCount > 0 && (
+              <span style={{ position: 'absolute', top: -4, right: -10, backgroundColor: 'var(--color-success, #2ecc71)', color: 'white', fontSize: '0.65rem', fontWeight: 'bold', padding: '2px 6px', borderRadius: '10px', lineHeight: 1, zIndex: 2 }}>{unreadCount}</span>
+            )}
+          </div>
           <span>Chats</span>
         </a>
         <a href="/panel/catalogo" className={`bottom-nav-item ${location.pathname.includes('/panel/catalogo') ? 'active' : ''}`}>
