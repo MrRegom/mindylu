@@ -29,6 +29,13 @@ do
         systemctl daemon-reload
         systemctl restart gunicorn
 
+        # Setup Nginx
+        echo "Updating Nginx configuration..."
+        cp $TARGET/mindylu.conf /etc/nginx/sites-available/mindylu
+        # Enforce symlink
+        ln -sf /etc/nginx/sites-available/mindylu /etc/nginx/sites-enabled/mindylu
+        systemctl reload nginx
+
         # Frontend setup
         echo "Setting up Frontend..."
         cd $TARGET/frontend
