@@ -3,7 +3,7 @@
 // ─────────────────────────────────────────────────────────────
 
 import { useState, useEffect } from 'react';
-import { Plus, Calendar, MapPin, MessageCircle, Package, Clock, Edit2, Copy, XCircle, CheckCircle, RefreshCcw } from 'lucide-react';
+import { Plus, Calendar, MapPin, MessageCircle, Package, Clock, Edit2, Copy, XCircle, CheckCircle, RefreshCcw, Trash2 } from 'lucide-react';
 import api from '../services/api';
 import './Entregas.css';
 import { showAlert, showConfirm, showToast } from '../utils/alerts';
@@ -218,6 +218,20 @@ const Entregas = () => {
     }
   };
 
+  const handleEliminarLugar = async (puntoId, nombre) => {
+    if (await showConfirm(`¿Seguro que deseas eliminar el lugar "${nombre}"? Las rutas que usen este lugar perderán la referencia.`)) {
+      try {
+        await api.delete(`/pedidos/puntos/${puntoId}/`);
+        showToast(`Lugar "${nombre}" eliminado.`);
+        await fetchPuntosEntrega();
+        fetchEntregas();
+      } catch (error) {
+        showAlert("No se pudo eliminar el lugar. Es probable que esté siendo usado en entregas activas.");
+        console.error(error);
+      }
+    }
+  };
+
   const entregasPorFecha = entregas.reduce((acc, entrega) => {
     if (!acc[entrega.fecha]) acc[entrega.fecha] = [];
     acc[entrega.fecha].push(entrega);
@@ -395,17 +409,30 @@ const Entregas = () => {
                         </div>
                         <div className="punto-item-nombre">
                           <span>{punto.nombre}</span>
-                          <button 
-                            className="btn-icon-simple" 
-                            style={{ opacity: 0.5 }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleEditarLugar(punto.id, punto.nombre);
-                            }}
-                            title="Editar nombre"
-                          >
-                            <Edit2 size={14} />
-                          </button>
+                          <div style={{ display: 'flex', gap: '4px' }}>
+                            <button 
+                              className="btn-icon-simple" 
+                              style={{ opacity: 0.5 }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEditarLugar(punto.id, punto.nombre);
+                              }}
+                              title="Editar nombre"
+                            >
+                              <Edit2 size={14} />
+                            </button>
+                            <button 
+                              className="btn-icon-simple" 
+                              style={{ opacity: 0.5, color: 'var(--color-danger)' }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEliminarLugar(punto.id, punto.nombre);
+                              }}
+                              title="Eliminar lugar"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
                         </div>
                       </div>
                     );
