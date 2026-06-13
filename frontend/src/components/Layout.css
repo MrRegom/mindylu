@@ -160,8 +160,9 @@
   .mobile-only {
     display: none !important;
   }
+}
 
-  /* Layout properties that only apply on desktop */
+/* ── Sidebar Global Styles (Desktop & Mobile) ──────── */
 
   .sidebar-logo {
     font-family: 'Playfair Display', serif;
@@ -314,6 +315,8 @@
     background: #fef2f2;
   }
 
+/* ── Responsive Main Content (Desktop) ────────────── */
+@media (min-width: 1024px) {
   /* Ajustar Main Content para Desktop */
   .main-content {
     padding-bottom: 0; /* Remove bottom nav space */

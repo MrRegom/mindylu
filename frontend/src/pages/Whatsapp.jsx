@@ -135,7 +135,7 @@ const Whatsapp = () => {
 
   return (
     <div className="page-container animate-fade-in" style={{ paddingBottom: 0 }}>
-      <div className="page-header" style={{ marginBottom: '12px', paddingBottom: '8px', borderBottom: '1px solid #faecee' }}>
+      <div className="page-header whatsapp-header-desktop" style={{ marginBottom: '12px', paddingBottom: '8px', borderBottom: '1px solid #faecee' }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <h1 style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1.1rem', margin: 0, color: '#d16b7e', fontFamily: "'Playfair Display', serif" }}>
