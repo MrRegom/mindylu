@@ -197,31 +197,37 @@ class WhatsappService:
             
             respuesta = f"¡Hola hermosa! Sí, tengo tu entrega agendada para {fecha_str} a las {hora} en {lugar}. ¡Nos vemos ahí!"
         else:
+            proximas_rutas = EntregaDiaria.objects.filter(tenant=self.tenant, fecha__gte=hoy).select_related('punto_entrega').order_by('fecha', 'hora_estimada')
+            
+            texto_rutas = ""
+            if proximas_rutas.exists():
+                texto_rutas = "Nuestras próximas rutas programadas son:\n"
+                rutas_por_fecha = {}
+                for ruta in proximas_rutas:
+                    if ruta.fecha not in rutas_por_fecha:
+                        rutas_por_fecha[ruta.fecha] = []
+                    rutas_por_fecha[ruta.fecha].append(ruta)
+                    
+                for fecha, rutas in rutas_por_fecha.items():
+                    dias_semana = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
+                    fecha_str = f"{dias_semana[fecha.weekday()]} {fecha.day}"
+                    texto_rutas += f"\n📅 *{fecha_str}*:\n"
+                    for ruta in rutas:
+                        hora_str = ruta.hora_estimada.strftime('%H:%M') if ruta.hora_estimada else 'a convenir'
+                        texto_rutas += f"📍 {ruta.punto_entrega.nombre} ({hora_str})\n"
+
             from apps.core.models import ConfiguracionTienda
             config_tienda = ConfiguracionTienda.objects.filter(tenant=self.tenant).first()
-            if config_tienda and config_tienda.envios_texto:
-                texto_envio = config_tienda.envios_texto
+            texto_envio_general = config_tienda.envios_texto if config_tienda and config_tienda.envios_texto else ""
+
+            if texto_rutas:
+                texto_envio = f"Sí, hacemos entregas 🚚. {texto_rutas}\n"
+                if texto_envio_general:
+                    texto_envio += f"\n*También tenemos otras opciones de envío:*\n{texto_envio_general}\n"
+                texto_envio += "\n¿De qué sector eres para ver si te podemos sumar a alguna ruta o coordinar tu envío? 💕"
             else:
-                proximas_rutas = EntregaDiaria.objects.filter(tenant=self.tenant, fecha__gte=hoy).select_related('punto_entrega').order_by('fecha', 'hora_estimada')
-                
-                if proximas_rutas.exists():
-                    texto_envio = "Sí, hacemos entregas 🚚. Nuestras próximas rutas programadas son:\n"
-                    
-                    rutas_por_fecha = {}
-                    for ruta in proximas_rutas:
-                        if ruta.fecha not in rutas_por_fecha:
-                            rutas_por_fecha[ruta.fecha] = []
-                        rutas_por_fecha[ruta.fecha].append(ruta)
-                        
-                    for fecha, rutas in rutas_por_fecha.items():
-                        dias_semana = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
-                        fecha_str = f"{dias_semana[fecha.weekday()]} {fecha.day}"
-                        texto_envio += f"\n📅 *{fecha_str}*:\n"
-                        for ruta in rutas:
-                            hora_str = ruta.hora_estimada.strftime('%H:%M') if ruta.hora_estimada else 'a convenir'
-                            texto_envio += f"📍 {ruta.punto_entrega.nombre} ({hora_str})\n"
-                            
-                    texto_envio += "\n¿De qué sector eres para ver si te podemos sumar a alguna ruta o coordinar tu envío? 💕"
+                if texto_envio_general:
+                    texto_envio = texto_envio_general
                 else:
                     texto_envio = "Por el momento no tenemos rutas de entrega programadas, pero cuéntame, ¿cuál es tu disponibilidad o preferencia para coordinarlo y no hacerte esperar? 💕"
             
