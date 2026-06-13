@@ -197,7 +197,17 @@ class WhatsappService:
         else:
             from apps.core.models import ConfiguracionTienda
             config_tienda = ConfiguracionTienda.objects.filter(tenant=self.tenant).first()
-            texto_envio = config_tienda.envios_texto if config_tienda and config_tienda.envios_texto else "Actualmente hacemos entregas y envíos a convenir. Escríbeme por aquí y lo coordinamos 💕"
+            if config_tienda and config_tienda.envios_texto:
+                texto_envio = config_tienda.envios_texto
+            else:
+                mañana = hoy + datetime.timedelta(days=1)
+                rutas_mañana = EntregaDiaria.objects.filter(tenant=self.tenant, fecha=mañana).exists()
+                
+                if rutas_mañana:
+                    texto_envio = "Mañana tenemos rutas de entrega programadas 🚚. Dime de qué sector eres para ver si te podemos sumar o coordinar tu envío 💕"
+                else:
+                    texto_envio = "Por el momento no tenemos rutas de entrega programadas, pero cuéntame, ¿cuál es tu disponibilidad o preferencia para coordinarlo y no hacerte esperar? 💕"
+            
             respuesta = f"¡Hola hermosa! {texto_envio}"
 
         self.enviar_mensaje_texto(conversacion.id, respuesta)
