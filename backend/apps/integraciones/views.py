@@ -554,13 +554,17 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from .models import Conversacion, Mensaje
 
+from django.db.models import OuterRef, Subquery
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def listar_conversaciones(request):
-    conversaciones = Conversacion.objects.filter(tenant=request.user.tenant).order_by('-last_message_at')
+    last_msg_qs = Mensaje.objects.filter(conversacion=OuterRef('pk')).order_by('-created_at')
+    conversaciones = Conversacion.objects.filter(tenant=request.user.tenant)\
+        .annotate(last_message_content=Subquery(last_msg_qs.values('content')[:1]))\
+        .order_by('-last_message_at')
     data = []
     for c in conversaciones:
-        last_msg = c.mensajes.order_by('-created_at').first()
         data.append({
             'id': c.id,
             'client_phone': c.client_phone,
@@ -568,7 +572,7 @@ def listar_conversaciones(request):
             'unread_count': c.unread_count,
             'status': c.status,
             'last_message_at': c.last_message_at.isoformat() if c.last_message_at else None,
-            'last_message_content': last_msg.content if last_msg else '',
+            'last_message_content': getattr(c, 'last_message_content', ''),
         })
     return Response({'conversaciones': data}, status=200)
 

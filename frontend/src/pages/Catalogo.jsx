@@ -249,9 +249,9 @@ const Catalogo = () => {
                   if (imgUrl) setFullscreenImage(imgUrl);
                 }} style={{ cursor: modoPublicar ? 'pointer' : 'zoom-in' }}>
                   {prenda.imagenes?.length > 0 ? (
-                    <img src={prenda.imagenes[0].imagen} alt={prenda.nombre} />
+                    <img src={prenda.imagenes[0].imagen} alt={prenda.nombre} loading="lazy" />
                   ) : prenda.foto_url ? (
-                    <img src={prenda.foto_url} alt={prenda.nombre} />
+                    <img src={prenda.foto_url} alt={prenda.nombre} loading="lazy" />
                   ) : (
                     <div className="foto-placeholder"><ImageIcon size={32} /></div>
                   )}
