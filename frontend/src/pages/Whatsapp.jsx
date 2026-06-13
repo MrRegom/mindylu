@@ -131,6 +131,58 @@ const Whatsapp = () => {
 
   const [suggestedProducts, setSuggestedProducts] = useState([]);
 
+  // Web Push Notifications Registration
+  useEffect(() => {
+    const registerPush = async () => {
+      if ('serviceWorker' in navigator && 'PushManager' in window) {
+        try {
+          const swReg = await navigator.serviceWorker.ready;
+          const subscription = await swReg.pushManager.getSubscription();
+          
+          if (!subscription) {
+            // No estamos suscritos, pedir permiso y suscribir
+            const permission = await Notification.requestPermission();
+            if (permission === 'granted') {
+              const res = await api.get('integraciones/webpush/vapid-public-key/');
+              const publicVapidKey = res.data.public_key;
+              
+              if (publicVapidKey) {
+                const convertedVapidKey = urlBase64ToUint8Array(publicVapidKey);
+                const newSubscription = await swReg.pushManager.subscribe({
+                  userVisibleOnly: true,
+                  applicationServerKey: convertedVapidKey
+                });
+                
+                // Enviar al backend
+                await api.post('integraciones/webpush/subscribe/', newSubscription);
+              }
+            }
+          } else {
+            // Ya estamos suscritos, igual mandamos el endpoint al backend por si acaso
+            await api.post('integraciones/webpush/subscribe/', subscription);
+          }
+        } catch (error) {
+          console.error("Error al registrar Push Notifications:", error);
+        }
+      }
+    };
+    
+    registerPush();
+  }, []);
+
+  const urlBase64ToUint8Array = (base64String) => {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding)
+      .replace(/\-/g, '+')
+      .replace(/_/g, '/');
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+    for (let i = 0; i < rawData.length; ++i) {
+      outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+  };
+
   // Fetch messages when a chat is selected
   useEffect(() => {
     if (activeChatId) {

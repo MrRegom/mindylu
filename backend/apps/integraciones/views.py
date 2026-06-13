@@ -695,3 +695,40 @@ def sugerencias_productos(request, conversacion_id):
 
     return Response({'sugerencias': sugerencias}, status=200)
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def guardar_suscripcion_push(request):
+    """
+    Guarda o actualiza la suscripción de Web Push del usuario actual.
+    """
+    from apps.core.models import PushSubscription
+    
+    endpoint = request.data.get('endpoint')
+    keys = request.data.get('keys', {})
+    p256dh = keys.get('p256dh')
+    auth = keys.get('auth')
+
+    if not endpoint or not p256dh or not auth:
+        return Response({'error': 'Faltan datos de la suscripción'}, status=400)
+
+    # Buscar si ya existe el endpoint para actualizarlo o crearlo
+    sub, created = PushSubscription.objects.update_or_create(
+        endpoint=endpoint,
+        defaults={
+            'usuario': request.user,
+            'p256dh': p256dh,
+            'auth': auth
+        }
+    )
+
+    return Response({'status': 'Suscripción guardada'}, status=200)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def obtener_vapid_public_key(request):
+    """
+    Retorna la llave pública de VAPID para que el frontend pueda suscribirse.
+    """
+    vapid_public = config('VAPID_PUBLIC_KEY', default='')
+    return Response({'public_key': vapid_public}, status=200)
+

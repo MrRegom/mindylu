@@ -4,7 +4,8 @@ from .views import (
     sincronizar_facebook, listar_publicaciones_facebook,
     publicar_en_facebook, publicar_lote_en_facebook,
     obtener_config_whatsapp, conectar_whatsapp, desconectar_whatsapp, whatsapp_webhook,
-    listar_conversaciones, listar_mensajes, enviar_mensaje, sugerencias_productos
+    listar_conversaciones, listar_mensajes, enviar_mensaje, sugerencias_productos,
+    guardar_suscripcion_push, obtener_vapid_public_key
 )
 
 urlpatterns = [
@@ -26,6 +27,10 @@ urlpatterns = [
     path('whatsapp/conversaciones/<int:conversacion_id>/mensajes/', listar_mensajes, name='whatsapp_mensajes'),
     path('whatsapp/conversaciones/<int:conversacion_id>/enviar/', enviar_mensaje, name='whatsapp_enviar_mensaje'),
     path('whatsapp/conversaciones/<int:conversacion_id>/sugerencias/', sugerencias_productos, name='whatsapp_sugerencias'),
+    
+    # Web Push
+    path('webpush/vapid-public-key/', obtener_vapid_public_key, name='webpush_vapid_key'),
+    path('webpush/subscribe/', guardar_suscripcion_push, name='webpush_subscribe'),
 ]
 
 from rest_framework.routers import DefaultRouter

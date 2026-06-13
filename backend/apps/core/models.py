@@ -253,3 +253,21 @@ class ConfiguracionTienda(models.Model):
         self._compress_image(self.polaroid_2_imagen, max_size=(800, 800))
         self._compress_image(self.polaroid_3_imagen, max_size=(800, 800))
         super().save(*args, **kwargs)
+
+
+class PushSubscription(models.Model):
+    """
+    Suscripción de Web Push para notificaciones nativas en el navegador/PWA.
+    """
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='push_subscriptions')
+    endpoint = models.URLField(max_length=500, unique=True)
+    p256dh = models.CharField(max_length=200)
+    auth = models.CharField(max_length=200)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = _('Suscripción Push')
+        verbose_name_plural = _('Suscripciones Push')
+
+    def __str__(self):
+        return f"Push Sub de {self.usuario.nombre} - {self.fecha_creacion.strftime('%d/%m/%Y')}"

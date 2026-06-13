@@ -61,7 +61,7 @@ class WhatsappService:
         conversacion, created = Conversacion.objects.get_or_create(
             tenant=self.tenant,
             client_phone=client_phone,
-            defaults={'client_name': client_name}
+            defaults={'client_name': client_name, 'unread_count': 1}
         )
         
         # Crear Clienta automáticamente
@@ -94,6 +94,9 @@ class WhatsappService:
 
         # Broadcast via WebSocket
         self._broadcast_websocket(conversacion, mensaje)
+
+        # Enviar Notificación Web Push Nivel OS
+        self._enviar_notificacion_push(conversacion, client_name, content)
 
         # Bot de Auto-Respuesta de Stock
         if "quiero comprar el siguiente producto:" in content.lower():

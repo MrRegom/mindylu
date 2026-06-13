@@ -36,3 +36,6 @@ django-apscheduler==0.7.0
 channels==4.1.0
 daphne==4.1.2
 uvicorn[standard]==0.27.1
+
+# Web Push Notifications
+pywebpush==1.14.0
