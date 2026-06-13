@@ -351,3 +351,60 @@ class WhatsappService:
                 'data': data
             }
         )
+
+    def _enviar_notificacion_push(self, conversacion, client_name, content):
+        """
+        Envía una notificación Web Push a todos los usuarios del tenant
+        para alertarlos de un nuevo mensaje.
+        """
+        from apps.core.models import PushSubscription
+        import json
+        from pywebpush import webpush, WebPushException
+        from decouple import config
+        import os
+
+        vapid_private = config('VAPID_PRIVATE_KEY', default='')
+        vapid_public = config('VAPID_PUBLIC_KEY', default='')
+        admin_email = config('VAPID_ADMIN_EMAIL', default='mailto:admin@mindylu.com')
+
+        if not vapid_private or not vapid_public:
+            return
+
+        # Ensure path is absolute if it's a file
+        from django.conf import settings
+        if vapid_private == './private_key.pem':
+            vapid_private = os.path.join(settings.BASE_DIR, 'private_key.pem')
+
+        # Buscar todas las suscripciones de los usuarios de este tenant
+        suscripciones = PushSubscription.objects.filter(usuario__tenant=self.tenant)
+        
+        payload = {
+            "title": f"Nuevo mensaje de {client_name}",
+            "body": content[:100] + "..." if len(content) > 100 else content,
+            "data": {
+                "url": f"/panel/whatsapp?chat={conversacion.id}"
+            }
+        }
+
+        for sub in suscripciones:
+            try:
+                webpush(
+                    subscription_info={
+                        "endpoint": sub.endpoint,
+                        "keys": {
+                            "p256dh": sub.p256dh,
+                            "auth": sub.auth
+                        }
+                    },
+                    data=json.dumps(payload),
+                    vapid_private_key=vapid_private,
+                    vapid_claims={
+                        "sub": admin_email
+                    }
+                )
+            except WebPushException as ex:
+                logger.error(f"Error enviando Web Push: {repr(ex)}")
+                if ex.response and ex.response.status_code in [404, 410]:
+                    sub.delete()
+            except Exception as e:
+                logger.error(f"Error inesperado en Web Push: {e}")
