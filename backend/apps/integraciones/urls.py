@@ -4,7 +4,7 @@ from .views import (
     sincronizar_facebook, listar_publicaciones_facebook,
     publicar_en_facebook, publicar_lote_en_facebook,
     obtener_config_whatsapp, conectar_whatsapp, desconectar_whatsapp, whatsapp_webhook,
-    listar_conversaciones, listar_mensajes, enviar_mensaje
+    listar_conversaciones, listar_mensajes, enviar_mensaje, sugerencias_productos
 )
 
 urlpatterns = [
@@ -25,6 +25,7 @@ urlpatterns = [
     path('whatsapp/conversaciones/', listar_conversaciones, name='whatsapp_conversaciones'),
     path('whatsapp/conversaciones/<int:conversacion_id>/mensajes/', listar_mensajes, name='whatsapp_mensajes'),
     path('whatsapp/conversaciones/<int:conversacion_id>/enviar/', enviar_mensaje, name='whatsapp_enviar_mensaje'),
+    path('whatsapp/conversaciones/<int:conversacion_id>/sugerencias/', sugerencias_productos, name='whatsapp_sugerencias'),
 ]
 
 from rest_framework.routers import DefaultRouter

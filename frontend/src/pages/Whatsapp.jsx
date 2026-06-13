@@ -129,6 +129,8 @@ const Whatsapp = () => {
     };
   }, []);
 
+  const [suggestedProducts, setSuggestedProducts] = useState([]);
+
   // Fetch messages when a chat is selected
   useEffect(() => {
     if (activeChatId) {
@@ -136,6 +138,30 @@ const Whatsapp = () => {
       // Removed polling since WebSockets will handle updates
     }
   }, [activeChatId]);
+
+  // Fetch suggestions whenever messages change for the active chat
+  useEffect(() => {
+    if (activeChatId && messages.length > 0) {
+      // Check if the last message is inbound
+      const lastMsg = messages[messages.length - 1];
+      if (lastMsg && lastMsg.direction === 'INBOUND') {
+        fetchSuggestions(activeChatId);
+      } else {
+        setSuggestedProducts([]); // Clear if we replied
+      }
+    } else {
+      setSuggestedProducts([]);
+    }
+  }, [messages, activeChatId]);
+
+  const fetchSuggestions = async (chatId) => {
+    try {
+      const response = await api.get(`integraciones/whatsapp/conversaciones/${chatId}/sugerencias/`);
+      setSuggestedProducts(response.data.sugerencias || []);
+    } catch (error) {
+      console.error('Error fetching suggestions:', error);
+    }
+  };
 
   // Scroll to bottom when new messages arrive
   useEffect(() => {
@@ -374,6 +400,32 @@ const Whatsapp = () => {
                 ))}
                 <div ref={messagesEndRef} />
               </div>
+
+              {suggestedProducts.length > 0 && (
+                <div className="wa-suggestions">
+                  <div style={{ fontSize: '0.8rem', color: '#666', marginBottom: '8px', paddingLeft: '8px' }}>
+                    Sugerencias (basado en mensaje del cliente):
+                  </div>
+                  <div className="wa-suggestions-list">
+                    {suggestedProducts.map(p => (
+                      <div key={p.id} className="wa-suggestion-card">
+                        <img src={p.imagen || 'https://via.placeholder.com/60'} alt={p.nombre} />
+                        <div className="wa-suggestion-info">
+                          <div className="wa-suggestion-name">{p.nombre}</div>
+                          <div className="wa-suggestion-price">${p.precio}</div>
+                          <div className="wa-suggestion-stock">{p.stock_info}</div>
+                        </div>
+                        <button 
+                          className="wa-suggestion-send" 
+                          onClick={() => setInputText(`Mira este modelo: *${p.nombre}* a $${p.precio}.\nDisponibilidad: ${p.stock_info}\nVer catálogo: ${window.location.origin}`)}
+                        >
+                          Enviar
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <div className="wa-quick-replies">
                 <button type="button" className="wa-quick-reply-btn" onClick={() => setInputText(inputText + "🏦 *Datos Bancarios*\nBanco Estado\nCuenta Rut\n11.111.111-1\nMindy Lu\ncorreo@mindylu.com")}>

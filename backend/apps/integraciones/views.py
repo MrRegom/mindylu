@@ -628,3 +628,70 @@ class ReglaRespuestaBotViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(tenant=self.request.user.tenant)
 
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def sugerencias_productos(request, conversacion_id):
+    """
+    Analiza el último mensaje del cliente y retorna sugerencias de productos.
+    """
+    from apps.catalogo.models import Prenda
+    from django.db.models import Q
+    import re
+    
+    try:
+        conversacion = Conversacion.objects.get(id=conversacion_id, tenant=request.user.tenant)
+    except Conversacion.DoesNotExist:
+        return Response({'error': 'Conversación no encontrada'}, status=404)
+
+    last_msg = conversacion.mensajes.filter(direction='INBOUND').order_by('-created_at').first()
+    if not last_msg:
+        return Response({'sugerencias': []}, status=200)
+
+    text = last_msg.content.lower()
+    
+    # 1. Limpieza básica y tokenización
+    words = re.findall(r'\b\w{3,}\b', text)
+    if not words:
+        return Response({'sugerencias': []}, status=200)
+
+    # 2. Búsqueda en Prenda (nombre) y PrendaVariante (color, talla)
+    # Excluimos palabras muy comunes si es necesario, pero icontains ayuda
+    q_objects = Q()
+    for word in words:
+        if word in ['que', 'los', 'las', 'por', 'con', 'para', 'una', 'uno', 'del', 'tienes', 'hola', 'quiero', 'necesito', 'busco']:
+            continue
+        q_objects |= Q(nombre__icontains=word)
+        q_objects |= Q(variantes__color__icontains=word)
+        q_objects |= Q(variantes__talla__icontains=word)
+        q_objects |= Q(categoria__nombre__icontains=word)
+
+    if not q_objects:
+        return Response({'sugerencias': []}, status=200)
+
+    # Filtrar prendas del tenant con stock > 0 que coincidan con la búsqueda
+    prendas = Prenda.objects.filter(tenant=request.user.tenant, variantes__cantidad__gt=0).filter(q_objects).distinct()[:5]
+
+    sugerencias = []
+    for p in prendas:
+        img_url = p.foto_url
+        if not img_url:
+            primera_img = p.imagenes.first()
+            if primera_img and primera_img.imagen:
+                img_url = request.build_absolute_uri(primera_img.imagen.url)
+
+        # Detalles de stock por variante
+        stock_details = []
+        for v in p.variantes.filter(cantidad__gt=0):
+            stock_details.append(f"{v.talla or 'Unica'} {v.color or ''}({v.cantidad})")
+            
+        sugerencias.append({
+            'id': p.id,
+            'nombre': p.nombre,
+            'precio': p.precio,
+            'imagen': img_url,
+            'stock_info': ", ".join(stock_details)
+        })
+
+    return Response({'sugerencias': sugerencias}, status=200)
+
