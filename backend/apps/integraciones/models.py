@@ -68,3 +68,22 @@ class Mensaje(models.Model):
 
     def __str__(self):
         return f"[{self.direction}] {self.content[:30]}"
+
+
+class ReglaRespuestaBot(models.Model):
+    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name='reglas_bot')
+    palabras_clave = models.CharField(
+        max_length=500, 
+        help_text="Palabras o frases separadas por comas (ej: horario, donde estan, direccion)"
+    )
+    respuesta = models.TextField(help_text="Respuesta que enviará el bot cuando detecte alguna de las palabras clave")
+    activa = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Regla de Respuesta Bot"
+        verbose_name_plural = "Reglas de Respuesta Bot"
+
+    def __str__(self):
+        return f"Regla: {self.palabras_clave[:30]} ({'Activa' if self.activa else 'Inactiva'})"

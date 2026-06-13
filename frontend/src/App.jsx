@@ -24,6 +24,8 @@ import LoteAddFotos from './pages/LoteAddFotos';
 import Perfil from './pages/Perfil';
 import SubidaMasiva from './pages/SubidaMasiva';
 import Whatsapp from './pages/Whatsapp';
+import NuevaVenta from './pages/NuevaVenta';
+import MantenedorReglasBot from './pages/MantenedorReglasBot';
 import { useEffect } from 'react';
 
 // Componente auxiliar: aplica clase CSS al body según si estamos en el panel o no
@@ -87,6 +89,7 @@ function App() {
           <Route path="catalogo/lotes" element={<LotesProgramados />} />
           <Route path="catalogo/lotes/:id/editar" element={<LoteAddFotos />} />
           <Route path="catalogo" element={<Catalogo />} />
+          <Route path="nueva-venta" element={<NuevaVenta />} />
           <Route path="entregas" element={<Entregas />} />
           <Route path="clientas/nueva" element={<ClientaForm />} />
           <Route path="clientas/:id/editar" element={<ClientaForm />} />
@@ -94,6 +97,7 @@ function App() {
           <Route path="clientas" element={<Clientas />} />
           <Route path="cuentas" element={<Cuentas />} />
           <Route path="ajustes" element={<Ajustes />} />
+          <Route path="ajustes/bot-reglas" element={<MantenedorReglasBot />} />
           <Route path="reportes" element={<Reportes />} />
           <Route path="whatsapp" element={<Whatsapp />} />
           <Route path="ajustes/logs" element={<Logs />} />

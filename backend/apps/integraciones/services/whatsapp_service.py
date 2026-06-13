@@ -97,6 +97,23 @@ class WhatsappService:
             self._responder_consulta_stock(conversacion, content)
             return
 
+        # Bot de Reglas Personalizadas (Mayor prioridad)
+        from apps.integraciones.models import ReglaRespuestaBot
+        reglas_activas = ReglaRespuestaBot.objects.filter(tenant=self.tenant, activa=True)
+        content_lower = content.lower()
+        regla_aplicada = False
+
+        for regla in reglas_activas:
+            # Dividir las palabras clave separadas por coma
+            palabras = [p.strip().lower() for p in regla.palabras_clave.split(',') if p.strip()]
+            if any(palabra in content_lower for palabra in palabras):
+                self.enviar_mensaje_texto(conversacion.id, regla.respuesta)
+                regla_aplicada = True
+                break # Solo aplicar la primera regla que coincida
+        
+        if regla_aplicada:
+            return
+
         # Bot de Respuesta de Rutas
         palabras_clave = ['ruta', 'entrega', 'despacho', 'cuándo llega', 'cuando llega', 'donde entregas']
         if any(keyword in content.lower() for keyword in palabras_clave):

@@ -8,7 +8,6 @@ import { createPortal } from 'react-dom';
 import { Plus, Check, ImageIcon, Trash2, Search, Edit2, Rocket, X, Share2, Calendar, Star, Images } from 'lucide-react';
 import GlobalSpinner from '../components/GlobalSpinner';
 import api from '../services/api';
-import VenderModal from '../components/VenderModal';
 import './Catalogo.css';
 import { showAlert, showConfirm, showToast } from '../utils/alerts';
 
@@ -30,8 +29,6 @@ const Catalogo = () => {
   const [publicando, setPublicando] = useState(false);
 
   // Modales existentes
-  const [modalOpen, setModalOpen] = useState(false);
-  const [ventaActiva, setVentaActiva] = useState({ cart: [], clienta_id: '', entrega_diaria_id: '', notas: '' });
   const [fullscreenImage, setFullscreenImage] = useState(null);
 
   const fetchCatalogo = async () => {
@@ -66,32 +63,9 @@ const Catalogo = () => {
   );
 
   // ── Venta / Apartado ──────────────────────────────────────────
-  const openVenderModal = (prenda, variante) => {
+  const handleVenderPrenda = (prenda, variante) => {
     if (variante.cantidad === 0 || modoPublicar) return;
-    setVentaActiva(prev => {
-      const exists = prev.cart.find(c => c.variante_id === variante.id);
-      const newCart = exists
-        ? prev.cart.map(c => c.variante_id === variante.id ? { ...c, cantidad: Math.min(c.maxCantidad, c.cantidad + 1) } : c)
-        : [...prev.cart, { 
-            prenda_id: prenda.id, 
-            variante_id: variante.id, 
-            nombre: prenda.nombre, 
-            foto_url: prenda.imagenes?.find(img => img.color && variante.color && img.color.toLowerCase() === variante.color.toLowerCase())?.imagen || prenda.imagenes?.[0]?.imagen || prenda.foto_url, 
-            color: variante.color, 
-            talla: variante.talla, 
-            cantidad: 1, 
-            maxCantidad: variante.cantidad, 
-            precio: prenda.precio 
-          }];
-      return { ...prev, cart: newCart };
-    });
-    setModalOpen(true);
-  };
-
-  const handleVentaExitosa = () => {
-    setModalOpen(false);
-    setVentaActiva({ cart: [], clienta_id: '', entrega_diaria_id: '', notas: '', estado: 'apartado' });
-    fetchCatalogo();
+    navigate(`/panel/nueva-venta?prenda_id=${prenda.id}`);
   };
 
   const handleArchivarPrenda = async (prendaId, nombre) => {
@@ -351,7 +325,7 @@ const Catalogo = () => {
                                 disabled={agotado}
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  openVenderModal(prenda, variante);
+                                  handleVenderPrenda(prenda, variante);
                                 }}
                                 title={agotado ? 'Agotado' : 'Apartar'}
                               >
@@ -388,21 +362,7 @@ const Catalogo = () => {
         </div>
       )}
 
-      {/* Barra flotante de venta en curso */}
-      {ventaActiva.cart.length > 0 && !modalOpen && !modoPublicar && (
-        <div className="venta-flotante-bar glass animate-slide-up">
-          <div className="venta-flotante-info">
-            <span className="cart-badge">{ventaActiva.cart.reduce((sum, item) => sum + item.cantidad, 0)}</span>
-            <span>Prendas en tu apartado actual</span>
-          </div>
-          <div className="venta-flotante-actions">
-            <button className="btn btn-secondary btn-small" onClick={() => setVentaActiva({ cart: [], clienta_id: '', entrega_diaria_id: '', notas: '' })}>Vaciar</button>
-            <button className="btn btn-primary btn-small" onClick={() => setModalOpen(true)}>Continuar</button>
-          </div>
-        </div>
-      )}
-
-      {/* Modal de publicación */}
+      {/* Barra flotante de publicación */}
       {publicarModal && createPortal(
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 99999, display: 'flex', alignItems: 'flex-end' }} onClick={() => setPublicarModal(false)}>
           <div className="glass" onClick={e => e.stopPropagation()} style={{ width: '100%', borderRadius: '20px 20px 0 0', padding: 24, paddingBottom: 'calc(24px + env(safe-area-inset-bottom))' }}>
@@ -437,9 +397,6 @@ const Catalogo = () => {
         </div>,
         document.body
       )}
-
-      {/* Modales */}
-      <VenderModal isOpen={modalOpen} onClose={() => setModalOpen(false)} ventaActiva={ventaActiva} setVentaActiva={setVentaActiva} onSuccess={handleVentaExitosa} />
 
       {/* Fullscreen image */}
       {fullscreenImage && (

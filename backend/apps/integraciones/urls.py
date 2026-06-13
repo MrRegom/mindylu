@@ -26,3 +26,12 @@ urlpatterns = [
     path('whatsapp/conversaciones/<int:conversacion_id>/mensajes/', listar_mensajes, name='whatsapp_mensajes'),
     path('whatsapp/conversaciones/<int:conversacion_id>/enviar/', enviar_mensaje, name='whatsapp_enviar_mensaje'),
 ]
+
+from rest_framework.routers import DefaultRouter
+from .views import ReglaRespuestaBotViewSet
+
+router = DefaultRouter()
+router.register(r'whatsapp/reglas', ReglaRespuestaBotViewSet, basename='whatsapp-reglas')
+
+urlpatterns += router.urls
+

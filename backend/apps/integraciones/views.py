@@ -613,3 +613,18 @@ def enviar_mensaje(request, conversacion_id):
     else:
         return Response({'error': 'No se pudo enviar el mensaje a través de Meta API'}, status=500)
 
+
+from rest_framework import viewsets
+from .models import ReglaRespuestaBot
+from .serializers import ReglaRespuestaBotSerializer
+
+class ReglaRespuestaBotViewSet(viewsets.ModelViewSet):
+    serializer_class = ReglaRespuestaBotSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return ReglaRespuestaBot.objects.filter(tenant=self.request.user.tenant)
+
+    def perform_create(self, serializer):
+        serializer.save(tenant=self.request.user.tenant)
+
