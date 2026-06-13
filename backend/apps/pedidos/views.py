@@ -145,7 +145,7 @@ class PedidoViewSet(viewsets.ModelViewSet):
                 wa_service = WhatsappService(tenant=tenant)
                 wa_service.enviar_mensaje_directo(
                     clienta.telefono,
-                    "¡Hola hermosa! Te confirmo que ya dejé tu ropita separada a tu nombre. Muchas gracias por tu compra 💕"
+                    "¡Hola Linda! Te confirmo que ya dejé tu ropita separada a tu nombre. Muchas gracias por tu compra 💕"
                 )
 
             return Response({'status': 'Pedido creado exitosamente', 'pedido_id': pedido.id}, status=status.HTTP_201_CREATED)

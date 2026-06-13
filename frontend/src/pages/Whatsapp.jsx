@@ -10,6 +10,32 @@ const Whatsapp = () => {
   const [inputText, setInputText] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const messagesEndRef = useRef(null);
+  const prevChatsRef = useRef([]);
+
+  // Reproducir sonido de notificación
+  const playNotificationSound = () => {
+    try {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+      
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // A5
+      oscillator.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.1); // A6
+      
+      gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+      gainNode.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.05);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+      
+      oscillator.start(audioCtx.currentTime);
+      oscillator.stop(audioCtx.currentTime + 0.2);
+    } catch (e) {
+      console.log('Audio de notificación no soportado o bloqueado');
+    }
+  };
 
   // Poll conversations every 5 seconds
   useEffect(() => {
@@ -35,7 +61,26 @@ const Whatsapp = () => {
   const fetchConversaciones = async () => {
     try {
       const response = await api.get('integraciones/whatsapp/conversaciones/');
-      setChats(response.data.conversaciones || []);
+      const newChats = response.data.conversaciones || [];
+      
+      // Detectar si hay un nuevo mensaje (incremento en unread_count)
+      if (prevChatsRef.current.length > 0) {
+        let shouldPlaySound = false;
+        newChats.forEach(chat => {
+          const oldChat = prevChatsRef.current.find(c => c.id === chat.id);
+          if (!oldChat && chat.unread_count > 0) {
+            shouldPlaySound = true;
+          } else if (oldChat && chat.unread_count > oldChat.unread_count) {
+            shouldPlaySound = true;
+          }
+        });
+        if (shouldPlaySound) {
+          playNotificationSound();
+        }
+      }
+      
+      prevChatsRef.current = newChats;
+      setChats(newChats);
     } catch (error) {
       console.error('Error fetching conversations:', error);
     }
@@ -134,8 +179,8 @@ const Whatsapp = () => {
   };
 
   return (
-    <div className="page-container animate-fade-in" style={{ paddingBottom: 0 }}>
-      <div className="page-header whatsapp-header-desktop" style={{ marginBottom: '12px', paddingBottom: '8px', borderBottom: '1px solid #faecee' }}>
+    <div className="page-container whatsapp-page animate-fade-in">
+      <div className="page-header whatsapp-header-desktop" style={{ padding: '12px 24px', borderBottom: '1px solid #faecee', background: '#fff', margin: 0 }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <h1 style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1.1rem', margin: 0, color: '#d16b7e', fontFamily: "'Playfair Display', serif" }}>

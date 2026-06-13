@@ -195,7 +195,7 @@ class WhatsappService:
                 
             lugar = entrega.punto_entrega.nombre if entrega.punto_entrega else 'Lugar por definir'
             
-            respuesta = f"¡Hola hermosa! Sí, tengo tu entrega agendada para {fecha_str} a las {hora} en {lugar}. ¡Nos vemos ahí!"
+            respuesta = f"¡Hola Linda! Sí, tengo tu entrega agendada para {fecha_str} a las {hora} en {lugar}. ¡Nos vemos ahí!"
         else:
             proximas_rutas = EntregaDiaria.objects.filter(tenant=self.tenant, fecha__gte=hoy).select_related('punto_entrega').order_by('fecha', 'hora_estimada')
             
@@ -228,7 +228,7 @@ class WhatsappService:
             else:
                 texto_envio = "Por ahora no tenemos entregas programadas, pero realizamos entregas y envíos a convenir. Cuéntame, ¿cuál es tu disponibilidad para que lo coordinemos? 💕"
             
-            respuesta = f"¡Hola hermosa! {texto_envio}"
+            respuesta = f"¡Hola Linda! {texto_envio}"
 
         self.enviar_mensaje_texto(conversacion.id, respuesta)
 
@@ -239,7 +239,7 @@ class WhatsappService:
             cuenta = CuentaBancaria.objects.filter(tenant=self.tenant, activa=True).first()
             
         if cuenta:
-            respuesta = "¡Hola hermosa! Claro, aquí tienes los datos para la transferencia:\n\n"
+            respuesta = "¡Hola Linda! Claro, aquí tienes los datos para la transferencia:\n\n"
             respuesta += f"🏦 *Banco:* {cuenta.banco}\n"
             respuesta += f"📋 *Tipo:* {cuenta.tipo_cuenta}\n"
             respuesta += f"🔢 *Número:* {cuenta.numero_cuenta}\n"
@@ -249,7 +249,7 @@ class WhatsappService:
                 respuesta += f"📧 *Correo:* {cuenta.email_notificacion}\n"
             respuesta += "\nRecuerda enviarme el comprobante por aquí mismo 💕"
         else:
-            respuesta = "¡Hola hermosa! Dame un segundito y te paso los datos de la cuenta por favor 💕"
+            respuesta = "¡Hola Linda! Dame un segundito y te paso los datos de la cuenta por favor 💕"
             
         self.enviar_mensaje_texto(conversacion.id, respuesta)
 
