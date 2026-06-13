@@ -291,6 +291,21 @@ const Whatsapp = () => {
                 <div ref={messagesEndRef} />
               </div>
 
+              <div className="wa-quick-replies">
+                <button type="button" className="wa-quick-reply-btn" onClick={() => setInputText(inputText + "🏦 *Datos Bancarios*\nBanco Estado\nCuenta Rut\n11.111.111-1\nMindy Lu\ncorreo@mindylu.com")}>
+                  🏦 Datos Bancarios
+                </button>
+                <button type="button" className="wa-quick-reply-btn" onClick={() => setInputText(inputText + "🚚 *Entregas*\nRealizamos entregas presenciales a convenir y envíos a todo Chile vía Starken o Chilexpress.")}>
+                  🚚 Entregas
+                </button>
+                <button type="button" className="wa-quick-reply-btn" onClick={() => setInputText(inputText + "👗 *Catálogo*\nRevisa todas nuestras prendas disponibles aquí: " + window.location.origin)}>
+                  👗 Catálogo
+                </button>
+                <button type="button" className="wa-quick-reply-btn" onClick={() => setInputText(inputText + "¡Hola hermosa! ✨ ¿En qué te puedo ayudar?")}>
+                  ✨ Saludo
+                </button>
+              </div>
+
               <form className="wa-input-area" onSubmit={handleSendMessage}>
                 <input 
                   type="text" 

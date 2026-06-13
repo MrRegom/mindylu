@@ -187,12 +187,44 @@
   margin-top: 4px;
 }
 
-.wa-input-area {
-  padding: 16px 24px;
-  background: #f0f2f5;
+/* Quick Replies */
+.wa-quick-replies {
   display: flex;
+  gap: 8px;
+  padding: 8px 16px;
+  background: #f0f2f5;
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-top: 1px solid #d1d7db;
+}
+.wa-quick-replies::-webkit-scrollbar {
+  display: none;
+}
+.wa-quick-reply-btn {
+  background: #ffffff;
+  border: 1px solid #d1d7db;
+  border-radius: 16px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  color: #111b21;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+.wa-quick-reply-btn:hover {
+  background: #e8f0fe;
+  border-color: #1677ff;
+  color: #1677ff;
+}
+
+/* Input Area */
+.wa-input-area {
+  display: flex;
+  padding: 10px 16px;
+  background: #f0f2f5;
   align-items: center;
-  gap: 16px;
+  border-top: none; /* Removed since quick-replies has the border now */
 }
 
 .wa-input-area input {
