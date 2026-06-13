@@ -200,11 +200,19 @@ class WhatsappService:
             if config_tienda and config_tienda.envios_texto:
                 texto_envio = config_tienda.envios_texto
             else:
-                mañana = hoy + datetime.timedelta(days=1)
-                rutas_mañana = EntregaDiaria.objects.filter(tenant=self.tenant, fecha=mañana).exists()
+                proxima_ruta = EntregaDiaria.objects.filter(tenant=self.tenant, fecha__gte=hoy).order_by('fecha').first()
                 
-                if rutas_mañana:
-                    texto_envio = "Mañana tenemos rutas de entrega programadas 🚚. Dime de qué sector eres para ver si te podemos sumar o coordinar tu envío 💕"
+                if proxima_ruta:
+                    dias_diff = (proxima_ruta.fecha - hoy).days
+                    if dias_diff == 0:
+                        dia_texto = "hoy"
+                    elif dias_diff == 1:
+                        dia_texto = "mañana"
+                    else:
+                        dias_semana = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
+                        dia_texto = f"el próximo {dias_semana[proxima_ruta.fecha.weekday()]}"
+                        
+                    texto_envio = f"Tenemos rutas de entrega programadas para {dia_texto} 🚚. Dime de qué sector eres para ver si te podemos sumar o coordinar tu envío 💕"
                 else:
                     texto_envio = "Por el momento no tenemos rutas de entrega programadas, pero cuéntame, ¿cuál es tu disponibilidad o preferencia para coordinarlo y no hacerte esperar? 💕"
             
