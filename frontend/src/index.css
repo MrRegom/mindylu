@@ -75,6 +75,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   position: relative;
   overflow-x: hidden;
+  overscroll-behavior-y: none; /* Previene el pull-to-refresh nativo y el rebote en PWAs */
 }
 
 /* Base Layout — Panel admin: mobile centrado | Catálogo público: fullwidth */

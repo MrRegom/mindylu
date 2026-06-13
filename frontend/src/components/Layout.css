@@ -81,7 +81,8 @@
   overflow-y: auto;
   overflow-x: hidden;
   position: relative;
-  padding-bottom: env(safe-area-inset-bottom); /* Solo safe area */
+  /* Espacio para el bottom nav en móvil */
+  padding-bottom: calc(70px + env(safe-area-inset-bottom)); 
   background: #fdfdfd;
 }
 
@@ -148,6 +149,52 @@
     position: relative;
     box-shadow: none;
   }
+}
+
+/* ── Bottom Navigation (Mobile Only) ─────────────── */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: calc(64px + env(safe-area-inset-bottom));
+  padding-bottom: env(safe-area-inset-bottom);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(0,0,0,0.08);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 1000;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.03);
+}
+
+.bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: #8e8e93;
+  text-decoration: none;
+  font-size: 0.65rem;
+  font-weight: 500;
+  width: 25%;
+  height: 100%;
+  transition: color 0.2s;
+}
+
+.bottom-nav-item.active {
+  color: var(--color-primary);
+}
+
+.bottom-nav-item svg {
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.bottom-nav-item.active svg {
+  transform: scale(1.15);
 }
 
 /* ── Responsive Layout (Desktop) ─────────────────── */

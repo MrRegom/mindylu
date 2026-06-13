@@ -91,22 +91,39 @@ const Layout = () => {
       </aside>
 
       <main className="main-content">
-        <header className="mobile-header mobile-only">
-          <button className="mobile-menu-btn" onClick={() => setIsMobileMenuOpen(true)}>
-            <Menu size={24} />
-          </button>
-          <div className="mobile-header-logo">
-            MindyLu<span>.</span>
-          </div>
-          <button className="mobile-header-action" onClick={() => window.location.href='/panel/catalogo'}>
-            <Plus size={20} />
-          </button>
-        </header>
+        {/* En móvil, el header se omite o se hace súper minimalista. Solo lo mostramos si no es whatsapp para darle full screen */}
+        {!location.pathname.includes('/panel/whatsapp') && (
+          <header className="mobile-header mobile-only">
+            <div className="mobile-header-logo" style={{ margin: '0 auto' }}>
+              MindyLu<span>.</span>
+            </div>
+          </header>
+        )}
 
         <div className="content-wrapper">
           <Outlet />
         </div>
       </main>
+
+      {/* Bottom Navigation para Móvil */}
+      <nav className="bottom-nav mobile-only">
+        <a href="/panel" className={`bottom-nav-item ${location.pathname === '/panel' ? 'active' : ''}`}>
+          <Home size={24} />
+          <span>Inicio</span>
+        </a>
+        <a href="/panel/whatsapp" className={`bottom-nav-item ${location.pathname.includes('/panel/whatsapp') ? 'active' : ''}`}>
+          <MessageCircle size={24} />
+          <span>Chats</span>
+        </a>
+        <a href="/panel/catalogo" className={`bottom-nav-item ${location.pathname.includes('/panel/catalogo') ? 'active' : ''}`}>
+          <ShoppingBag size={24} />
+          <span>Productos</span>
+        </a>
+        <a href="/panel/clientas" className={`bottom-nav-item ${location.pathname.includes('/panel/clientas') ? 'active' : ''}`}>
+          <User size={24} />
+          <span>Clientas</span>
+        </a>
+      </nav>
     </div>
   );
 };
