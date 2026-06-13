@@ -11,6 +11,12 @@ const Whatsapp = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const messagesEndRef = useRef(null);
   const prevChatsRef = useRef([]);
+  const activeChatRef = useRef(activeChatId);
+
+  // Sync activeChatRef with activeChatId
+  useEffect(() => {
+    activeChatRef.current = activeChatId;
+  }, [activeChatId]);
 
   // Reproducir sonido de notificación
   const playNotificationSound = () => {
@@ -101,18 +107,13 @@ const Whatsapp = () => {
         });
 
         // Update active chat messages if we are viewing this conversation
-        setActiveChatId(currentActive => {
-          if (currentActive === data.conversacion_id) {
-            setMessages(prevMsgs => {
-              // Avoid duplicates
-              if (prevMsgs.some(m => m.id === data.mensaje.id)) return prevMsgs;
-              return [...prevMsgs, data.mensaje];
-            });
-            // If we are looking at it, and a new message arrived, we technically "read" it immediately
-            // But usually WhatsApp polling or a separate request marks it as read. For now, rely on standard behavior.
-          }
-          return currentActive;
-        });
+        if (activeChatRef.current === data.conversacion_id) {
+          setMessages(prevMsgs => {
+            // Avoid duplicates
+            if (prevMsgs.some(m => m.id === data.mensaje.id)) return prevMsgs;
+            return [...prevMsgs, data.mensaje];
+          });
+        }
       }
     };
 
