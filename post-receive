@@ -22,11 +22,11 @@ do
         python manage.py migrate
         python manage.py collectstatic --noinput
         
-        # Restart Gunicorn if it exists
-        if systemctl list-unit-files | grep -q gunicorn.service; then
-            echo "Restarting Gunicorn..."
-            systemctl restart gunicorn
-        fi
+        # Setup Gunicorn/ASGI service
+        echo "Updating Gunicorn service..."
+        cp $TARGET/gunicorn.service /etc/systemd/system/gunicorn.service
+        systemctl daemon-reload
+        systemctl restart gunicorn
 
         # Frontend setup
         echo "Setting up Frontend..."

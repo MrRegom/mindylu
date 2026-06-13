@@ -84,13 +84,16 @@ class WhatsappService:
             conversacion.save()
 
         # Create Mensaje
-        Mensaje.objects.create(
+        mensaje = Mensaje.objects.create(
             conversacion=conversacion,
             wam_id=wam_id,
             direction='INBOUND',
             content=content,
             status='delivered'
         )
+
+        # Broadcast via WebSocket
+        self._broadcast_websocket(conversacion, mensaje)
 
         # Bot de Auto-Respuesta de Stock
         if "quiero comprar el siguiente producto:" in content.lower():
@@ -309,7 +312,39 @@ class WhatsappService:
             conversacion.unread_count = 0
             conversacion.save()
             
+            # Broadcast via WebSocket
+            self._broadcast_websocket(conversacion, mensaje)
+            
             return mensaje
         else:
             logger.error(f"Error enviando mensaje: {response.status_code} - {response.text}")
             return None
+
+    def _broadcast_websocket(self, conversacion, mensaje):
+        from asgiref.sync import async_to_sync
+        from channels.layers import get_channel_layer
+        
+        channel_layer = get_channel_layer()
+        if not channel_layer:
+            return
+            
+        data = {
+            'conversacion_id': conversacion.id,
+            'client_phone': conversacion.client_phone,
+            'client_name': conversacion.client_name,
+            'unread_count': conversacion.unread_count,
+            'mensaje': {
+                'id': mensaje.id,
+                'content': mensaje.content,
+                'direction': mensaje.direction,
+                'created_at': mensaje.created_at.isoformat(),
+            }
+        }
+        
+        async_to_sync(channel_layer.group_send)(
+            'whatsapp_chats',
+            {
+                'type': 'chat_message',
+                'data': data
+            }
+        )

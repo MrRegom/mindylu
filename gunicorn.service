@@ -7,7 +7,7 @@ User=root
 Group=www-data
 WorkingDirectory=/var/www/mindylu/backend
 Environment="PATH=/var/www/mindylu/backend/venv/bin"
-ExecStart=/var/www/mindylu/backend/venv/bin/gunicorn --access-logfile - --workers 3 --bind unix:/run/gunicorn.sock config.wsgi:application
+ExecStart=/var/www/mindylu/backend/venv/bin/gunicorn --access-logfile - --workers 3 -k uvicorn.workers.UvicornWorker --bind unix:/run/gunicorn.sock config.asgi:application
 
 [Install]
 WantedBy=multi-user.target

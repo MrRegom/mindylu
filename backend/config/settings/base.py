@@ -18,6 +18,7 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=lamb
 
 # ─── Aplicaciones instaladas ───────────────────────────────
 DJANGO_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -32,6 +33,7 @@ THIRD_PARTY_APPS = [
     'corsheaders',
     'django_filters',
     'django_apscheduler',
+    'channels',
 ]
 
 LOCAL_APPS = [
@@ -78,6 +80,13 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
+ASGI_APPLICATION = 'config.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
 
 # ─── Base de datos ──────────────────────────────────────────
 DATABASES = {
