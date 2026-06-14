@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 // Instancia de axios configurada con la URL base del backend
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1/';
+const isProduction = import.meta.env.PROD;
+const API_URL = isProduction ? '/api/v1/' : (import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1/');
 
 const api = axios.create({
   baseURL: API_URL,
