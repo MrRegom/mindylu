@@ -30,9 +30,9 @@ class WatermarkService:
                     logo_height = int(logo_width * aspect_ratio)
                     logo = logo.resize((logo_width, logo_height), Image.Resampling.LANCZOS)
                     
-                    # Reducir opacidad (ej. 35% para que se note más)
+                    # Reducir opacidad (ej. 75% para que sea bien visible)
                     alpha = logo.split()[3]
-                    alpha = alpha.point(lambda p: p * 0.35)
+                    alpha = alpha.point(lambda p: p * 0.75)
                     logo.putalpha(alpha)
                     
                     # Rotar un poco la marca de agua
