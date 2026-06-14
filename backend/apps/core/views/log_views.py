@@ -4,16 +4,15 @@ from apps.core.models import ErrorLog
 from apps.core.serializers import ErrorLogSerializer
 from rest_framework.permissions import IsAuthenticated
 
-class ErrorLogViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
+class ErrorLogViewSet(viewsets.ModelViewSet):
     """
-    ViewSet para ErrorLog.
-    - list: obtiene historial
-    - create: permite al frontend subir sus errores
-    - destroy (opcional): para limpiar los logs si es necesario
+    Vista para ver y registrar logs de error del frontend y backend.
     """
-    queryset = ErrorLog.objects.all()
     serializer_class = ErrorLogSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = []
+
+    def get_queryset(self):
+        return ErrorLog.objects.all().order_by('-fecha')
 
     def destroy(self, request, *args, **kwargs):
         # Permite borrar todo si se llama a un endpoint especial, o por ID
