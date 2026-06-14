@@ -4,7 +4,7 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShoppingBag, ArrowRight } from 'lucide-react';
+import { ShoppingBag, ArrowRight, Lock, Mail } from 'lucide-react';
 import api from '../services/api';
 import './Login.css';
 
@@ -15,11 +15,6 @@ import './Login.css';
  * para garantizar el uso de la dirección IP local de desarrollo en lugar de
  * localhost hardcodeado (lo que causaba fallos de red en móviles).
  */
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ShoppingBag, ArrowRight, Lock, Mail } from 'lucide-react';
-import api from '../services/api';
-import './Login.css';
 
 const Login = () => {
   const navigate = useNavigate();
