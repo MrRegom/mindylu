@@ -15,6 +15,12 @@ import './Login.css';
  * para garantizar el uso de la dirección IP local de desarrollo en lugar de
  * localhost hardcodeado (lo que causaba fallos de red en móviles).
  */
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ShoppingBag, ArrowRight, Lock, Mail } from 'lucide-react';
+import api from '../services/api';
+import './Login.css';
+
 const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
@@ -28,68 +34,91 @@ const Login = () => {
     setError('');
     
     try {
-      // Consumimos a través del cliente api configurado con la IP de red local
       const response = await api.post('/auth/login/', {
         email,
         password
       });
       
-      // Guardar token y datos del usuario
       localStorage.setItem('access_token', response.data.tokens.access);
       localStorage.setItem('refresh_token', response.data.tokens.refresh);
       localStorage.setItem('user', JSON.stringify(response.data.usuario));
       
-      // Redirigir al panel de administración
       window.location.href = '/panel';
       
     } catch (err) {
       console.error("Error en login:", err);
-      // Mensaje técnico adaptado
-      setError('Correo o contraseña incorrectos o error de red.');
+      setError('Correo o contraseña incorrectos.');
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="login-container animate-fade-in">
-      <div className="login-header animate-slide-up">
-        <img src="/lulogo.png" alt="Lu Prenditas Logo" style={{ width: 'auto', height: '140px', objectFit: 'contain', marginBottom: '2rem', dropShadow: '0 4px 12px rgba(0,0,0,0.08)' }} />
+    <div className="login-wrapper">
+      <div className="login-left">
+        <div className="login-left-content animate-fade-in">
+          <div className="login-logo-container">
+            <img src="/lulogo.png" alt="Lu Prenditas Logo" className="login-logo-large" />
+          </div>
+          <h1>MindyLu <span>Workspace</span></h1>
+          <p>Plataforma Enterprise para el control absoluto de tu negocio.</p>
+        </div>
+        <div className="login-left-bg"></div>
       </div>
 
-      <form className="login-form animate-slide-up" style={{ animationDelay: '0.1s' }} onSubmit={handleSubmit}>
-        <div className="input-group">
-          <label>Correo Electrónico</label>
-          <input 
-            type="email" 
-            placeholder="tu@correo.com" 
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            autoCapitalize="none"
-            autoCorrect="off"
-            required 
-          />
-        </div>
-        
-        <div className="input-group">
-          <label>Contraseña</label>
-          <input 
-            type="password" 
-            placeholder="••••••••" 
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            autoCapitalize="none"
-            autoCorrect="off"
-            required 
-          />
-        </div>
+      <div className="login-right">
+        <div className="login-form-container animate-slide-up">
+          <div className="login-mobile-header">
+            <img src="/lulogo.png" alt="Lu Prenditas Logo" className="login-logo-mobile" />
+            <h2>Bienvenida de nuevo</h2>
+            <p>Ingresa tus credenciales para acceder al panel.</p>
+          </div>
 
-        {error && <div style={{ color: 'var(--color-error)', fontSize: '0.875rem', marginTop: '8px', textAlign: 'center' }}>{error}</div>}
+          <form className="login-form-enterprise" onSubmit={handleSubmit}>
+            <div className="input-group-enterprise">
+              <label>Correo Electrónico</label>
+              <div className="input-with-icon">
+                <Mail size={20} className="input-icon" />
+                <input 
+                  type="email" 
+                  placeholder="admin@luprenditas.cl" 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  required 
+                />
+              </div>
+            </div>
+            
+            <div className="input-group-enterprise">
+              <label>Contraseña</label>
+              <div className="input-with-icon">
+                <Lock size={20} className="input-icon" />
+                <input 
+                  type="password" 
+                  placeholder="••••••••" 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  required 
+                />
+              </div>
+            </div>
 
-        <button type="submit" className="btn btn-primary login-btn" disabled={isLoading}>
-          {isLoading ? 'Entrando...' : 'Entrar a mi tienda'}
-          {!isLoading && <ArrowRight size={20} />}
-        </button>
-      </form>
+            {error && <div className="login-error-message">{error}</div>}
+
+            <button type="submit" className="btn-enterprise-primary" disabled={isLoading}>
+              {isLoading ? 'Autenticando...' : 'Acceder al Panel'}
+              {!isLoading && <ArrowRight size={20} />}
+            </button>
+          </form>
+
+          <div className="login-footer">
+            <p>&copy; {new Date().getFullYear()} MindyLu Technologies. Secure Login.</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
