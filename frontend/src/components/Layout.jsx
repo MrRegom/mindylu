@@ -143,6 +143,10 @@ const Layout = () => {
           <User size={24} />
           <span>Clientes</span>
         </a>
+        <a href="/panel/ajustes" className={`bottom-nav-item ${location.pathname.includes('/panel/ajustes') ? 'active' : ''}`}>
+          <Settings size={24} />
+          <span>Ajustes</span>
+        </a>
       </nav>
       <PWAInstallPrompt />
     </div>
