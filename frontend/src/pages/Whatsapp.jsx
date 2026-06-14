@@ -58,6 +58,45 @@ const Whatsapp = () => {
 
   const { wsMessage, fetchUnreadCount } = useContext(GlobalContext);
 
+  const fetchConversaciones = async () => {
+    try {
+      const response = await api.get('integraciones/whatsapp/conversaciones/');
+      const newChats = response.data.conversaciones || [];
+      
+      // Detectar si hay un nuevo mensaje (incremento en unread_count)
+      if (prevChatsRef.current.length > 0) {
+        let shouldPlaySound = false;
+        newChats.forEach(chat => {
+          const oldChat = prevChatsRef.current.find(c => c.id === chat.id);
+          if (!oldChat && chat.unread_count > 0) {
+            shouldPlaySound = true;
+          } else if (oldChat && chat.unread_count > oldChat.unread_count) {
+            shouldPlaySound = true;
+          }
+        });
+        if (shouldPlaySound) {
+          // playNotificationSound();
+        }
+      }
+      
+      prevChatsRef.current = newChats;
+      setChats(newChats);
+    } catch (error) {
+      console.error('Error fetching conversations:', error);
+    }
+  };
+
+  const fetchMensajes = async (chatId) => {
+    try {
+      const response = await api.get(`integraciones/whatsapp/conversaciones/${chatId}/mensajes/`);
+      setMessages(response.data.mensajes || []);
+      // Optimistically clear unread count for this chat in the sidebar
+      setChats(prev => prev.map(c => c.id === chatId ? { ...c, unread_count: 0 } : c));
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+    }
+  };
+
   // Initial fetch
   useEffect(() => {
     fetchConversaciones();
@@ -126,6 +165,19 @@ const Whatsapp = () => {
   const [suggestedProducts, setSuggestedProducts] = useState([]);
 
   // Web Push Notifications Registration
+  const urlBase64ToUint8Array = (base64String) => {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding)
+      .replace(/-/g, '+')
+      .replace(/_/g, '/');
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+    for (let i = 0; i < rawData.length; ++i) {
+      outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+  };
+
   useEffect(() => {
     const registerPush = async () => {
       if ('serviceWorker' in navigator && 'PushManager' in window) {
@@ -134,9 +186,7 @@ const Whatsapp = () => {
           const subscription = await swReg.pushManager.getSubscription();
           
           if (!subscription) {
-            // No estamos suscritos, pedir permiso y suscribir
-            const permission = await Notification.requestPermission();
-            if (permission === 'granted') {
+            if (Notification.permission === 'granted') {
               const res = await api.get('integraciones/webpush/vapid-public-key/');
               const publicVapidKey = res.data.public_key;
               
@@ -147,12 +197,10 @@ const Whatsapp = () => {
                   applicationServerKey: convertedVapidKey
                 });
                 
-                // Enviar al backend
                 await api.post('integraciones/webpush/subscribe/', newSubscription);
               }
             }
           } else {
-            // Ya estamos suscritos, igual mandamos el endpoint al backend por si acaso
             await api.post('integraciones/webpush/subscribe/', subscription);
           }
         } catch (error) {
@@ -164,41 +212,12 @@ const Whatsapp = () => {
     registerPush();
   }, []);
 
-  const urlBase64ToUint8Array = (base64String) => {
-    const padding = '='.repeat((4 - base64String.length % 4) % 4);
-    const base64 = (base64String + padding)
-      .replace(/\-/g, '+')
-      .replace(/_/g, '/');
-    const rawData = window.atob(base64);
-    const outputArray = new Uint8Array(rawData.length);
-    for (let i = 0; i < rawData.length; ++i) {
-      outputArray[i] = rawData.charCodeAt(i);
-    }
-    return outputArray;
-  };
-
   // Fetch messages when a chat is selected
   useEffect(() => {
     if (activeChatId) {
       fetchMensajes(activeChatId);
-      // Removed polling since WebSockets will handle updates
     }
   }, [activeChatId]);
-
-  // Fetch suggestions whenever messages change for the active chat
-  useEffect(() => {
-    if (activeChatId && messages.length > 0) {
-      // Check if the last message is inbound
-      const lastMsg = messages[messages.length - 1];
-      if (lastMsg && lastMsg.direction === 'INBOUND') {
-        fetchSuggestions(activeChatId);
-      } else {
-        setSuggestedProducts([]); // Clear if we replied
-      }
-    } else {
-      setSuggestedProducts([]);
-    }
-  }, [messages, activeChatId]);
 
   const fetchSuggestions = async (chatId) => {
     try {
@@ -209,49 +228,20 @@ const Whatsapp = () => {
     }
   };
 
+  // Fetch suggestions whenever messages change for the active chat
+  useEffect(() => {
+    if (activeChatId && messages.length > 0) {
+      const lastMsg = messages[messages.length - 1];
+      if (lastMsg && lastMsg.direction === 'INBOUND') {
+        fetchSuggestions(activeChatId);
+      }
+    }
+  }, [messages, activeChatId]);
+
   // Scroll to bottom when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
-
-  const fetchConversaciones = async () => {
-    try {
-      const response = await api.get('integraciones/whatsapp/conversaciones/');
-      const newChats = response.data.conversaciones || [];
-      
-      // Detectar si hay un nuevo mensaje (incremento en unread_count)
-      if (prevChatsRef.current.length > 0) {
-        let shouldPlaySound = false;
-        newChats.forEach(chat => {
-          const oldChat = prevChatsRef.current.find(c => c.id === chat.id);
-          if (!oldChat && chat.unread_count > 0) {
-            shouldPlaySound = true;
-          } else if (oldChat && chat.unread_count > oldChat.unread_count) {
-            shouldPlaySound = true;
-          }
-        });
-        if (shouldPlaySound) {
-          playNotificationSound();
-        }
-      }
-      
-      prevChatsRef.current = newChats;
-      setChats(newChats);
-    } catch (error) {
-      console.error('Error fetching conversations:', error);
-    }
-  };
-
-  const fetchMensajes = async (chatId) => {
-    try {
-      const response = await api.get(`integraciones/whatsapp/conversaciones/${chatId}/mensajes/`);
-      setMessages(response.data.mensajes || []);
-      // Optimistically clear unread count for this chat in the sidebar
-      setChats(prev => prev.map(c => c.id === chatId ? { ...c, unread_count: 0 } : c));
-    } catch (error) {
-      console.error('Error fetching messages:', error);
-    }
-  };
 
   const handleSendMessage = async (e, directText = null) => {
     if (e) e.preventDefault();
