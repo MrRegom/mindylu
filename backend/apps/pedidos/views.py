@@ -31,7 +31,17 @@ class PedidoViewSet(viewsets.ModelViewSet):
     serializer_class = PedidoSerializer
 
     def get_queryset(self):
-        return Pedido.objects.filter(tenant=self.request.user.tenant)
+        qs = Pedido.objects.filter(tenant=self.request.user.tenant)
+        
+        estado = self.request.query_params.get('estado')
+        if estado:
+            qs = qs.filter(estado=estado)
+            
+        sin_ruta = self.request.query_params.get('sin_ruta')
+        if sin_ruta == 'true':
+            qs = qs.filter(rutas_entrega__isnull=True)
+            
+        return qs
 
     @action(detail=False, methods=['post'], url_path='crear-desde-catalogo')
     def crear_desde_catalogo(self, request):
@@ -145,7 +155,7 @@ class PedidoViewSet(viewsets.ModelViewSet):
                 wa_service = WhatsappService(tenant=tenant)
                 wa_service.enviar_mensaje_directo(
                     clienta.telefono,
-                    "¡Hola Linda! Te confirmo que ya dejé tu ropita separada a tu nombre. Muchas gracias por tu compra 💕"
+                    "¡Hola Linda! Te confirmo que ya dejé tu prendita separada a tu nombre. Muchas gracias por tu compra 💕"
                 )
 
             return Response({'status': 'Pedido creado exitosamente', 'pedido_id': pedido.id}, status=status.HTTP_201_CREATED)
@@ -227,6 +237,27 @@ class PedidoViewSet(viewsets.ModelViewSet):
                     for ruta in pedido.rutas_entrega.all():
                         ruta.pedidos.remove(pedido)
             return Response({'status': 'Pedido desvinculado de la ruta correctamente.'})
+        except EntregaDiaria.DoesNotExist:
+            return Response({'error': 'Ruta no encontrada.'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @action(detail=True, methods=['post'], url_path='asignar_ruta')
+    def asignar_ruta(self, request, pk=None):
+        """
+        Asigna el pedido a una ruta específica.
+        """
+        pedido = self.get_object()
+        ruta_id = request.data.get('ruta_id')
+        
+        if not ruta_id:
+            return Response({'error': 'Debe proveer una ruta_id.'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        try:
+            with transaction.atomic():
+                ruta = EntregaDiaria.objects.get(id=ruta_id, tenant=request.user.tenant)
+                ruta.pedidos.add(pedido)
+            return Response({'status': 'Pedido asignado a la ruta correctamente.'})
         except EntregaDiaria.DoesNotExist:
             return Response({'error': 'Ruta no encontrada.'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:

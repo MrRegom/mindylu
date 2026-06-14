@@ -300,7 +300,16 @@ const Whatsapp = () => {
     (chat.client_phone || '').includes(searchQuery)
   );
 
-  const renderMessageContent = (content) => {
+  const [expandedCards, setExpandedCards] = useState({});
+
+  const toggleCard = (msgId, prendaId) => {
+    setExpandedCards(prev => ({
+      ...prev,
+      [`${msgId}-${prendaId}`]: !prev[`${msgId}-${prendaId}`]
+    }));
+  };
+
+  const renderMessageContent = (content, msgId) => {
     if (!content) return '';
     
     const lines = content.split('\n');
@@ -336,13 +345,16 @@ const Whatsapp = () => {
            }
         }
 
+        const cardKey = `${msgId}-${match[1]}`;
+        const isExpanded = expandedCards[cardKey];
+
         refButton = (
           <div style={{ marginTop: '8px', marginBottom: '8px' }}>
-            <a href={`/panel/catalogo?search=${match[1]}`} target="_blank" rel="noreferrer" 
-               style={{ display: 'inline-flex', alignItems: 'center', background: '#faecee', padding: '4px 10px', borderRadius: '12px', color: '#d16b7e', textDecoration: 'none', fontWeight: 600, fontSize: '0.75rem', gap: '6px', border: '1px solid #faecee' }}>
-               <Search size={14} /> Ver Prenda Interna
-            </a>
-            {extractedColor && extractedTalla && activeChat && (
+            <button type="button" onClick={() => toggleCard(msgId, match[1])}
+               style={{ display: 'inline-flex', alignItems: 'center', background: '#faecee', padding: '4px 10px', borderRadius: '12px', color: '#d16b7e', border: '1px solid #faecee', cursor: 'pointer', fontWeight: 600, fontSize: '0.75rem', gap: '6px' }}>
+               <Search size={14} /> Ver Detalles / Vender
+            </button>
+            {isExpanded && extractedColor && extractedTalla && activeChat && (
                <PrendaChatCard 
                  prendaId={match[1]} 
                  color={extractedColor} 
@@ -486,7 +498,7 @@ const Whatsapp = () => {
                     onTouchStart={handleTouchStart}
                     onTouchMove={(e) => handleMsgTouchMove(e, msg)}
                   >
-                    {renderMessageContent(msg.content)}
+                    {renderMessageContent(msg.content, msg.id)}
                     <div className="wa-message-meta">
                       {msg.direction === 'OUTBOUND' && <UserIcon size={12} />}
                       {new Date(msg.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}

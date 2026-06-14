@@ -7,6 +7,7 @@ import { Plus, Calendar, MapPin, MessageCircle, Package, Clock, Edit2, Copy, XCi
 import api from '../services/api';
 import './Entregas.css';
 import { showAlert, showConfirm, showToast, showPrompt } from '../utils/alerts';
+import Swal from 'sweetalert2';
 
 /**
  * Componente Entregas
@@ -20,15 +21,28 @@ import { showAlert, showConfirm, showToast, showPrompt } from '../utils/alerts';
  */
 const Entregas = () => {
   const [entregas, setEntregas] = useState([]);
+  const [reservas, setReservas] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [expandedRutas, setExpandedRutas] = useState({});
+
+  const toggleRutaAccordion = (entregaId) => {
+    setExpandedRutas(prev => ({
+      ...prev,
+      [entregaId]: !prev[entregaId]
+    }));
+  };
 
   const fetchEntregas = async () => {
     setIsLoading(true);
     try {
-      const response = await api.get('/pedidos/entregas/');
-      setEntregas(response.data.results || response.data);
+      const [entregasRes, reservasRes] = await Promise.all([
+        api.get('/pedidos/entregas/'),
+        api.get('/pedidos/pedidos/?estado=apartado&sin_ruta=true')
+      ]);
+      setEntregas(entregasRes.data.results || entregasRes.data);
+      setReservas(reservasRes.data.results || reservasRes.data);
     } catch (error) {
-      console.error("Error al cargar entregas:", error);
+      console.error("Error al cargar entregas/reservas:", error);
     } finally {
       setIsLoading(false);
     }
@@ -67,6 +81,44 @@ const Entregas = () => {
       } catch (error) {
         console.error(error);
         showAlert(error.response?.data?.error || "Error al reagendar.");
+      }
+    }
+  };
+
+  const handleAsignarRuta = async (pedidoId) => {
+    const options = {};
+    const hoy = new Date().toISOString().split('T')[0];
+    const rutasFuturas = entregas.filter(r => r.fecha >= hoy).sort((a,b) => a.fecha.localeCompare(b.fecha));
+    
+    rutasFuturas.forEach(r => {
+      const fechaFormat = new Date(r.fecha + 'T00:00:00').toLocaleDateString('es-ES', {weekday:'short', day:'numeric'});
+      const label = `${fechaFormat} - ${r.punto_entrega_detalle?.nombre}`;
+      options[r.id] = label;
+    });
+
+    const { value: rutaId, isConfirmed } = await Swal.fire({
+      title: 'Asignar a Ruta',
+      input: 'select',
+      inputOptions: options,
+      inputPlaceholder: 'Selecciona una ruta',
+      showCancelButton: true,
+      confirmButtonText: 'Asignar',
+      cancelButtonText: 'Cancelar',
+      customClass: {
+        popup: 'swal-mobile-popup',
+        confirmButton: 'btn swal-btn-primary',
+        cancelButton: 'btn swal-btn-secondary',
+      }
+    });
+
+    if (isConfirmed && rutaId) {
+      try {
+        await api.post(`/pedidos/pedidos/${pedidoId}/asignar_ruta/`, { ruta_id: rutaId });
+        showToast("Pedido asignado a la ruta exitosamente.");
+        fetchEntregas();
+      } catch (error) {
+        console.error(error);
+        showAlert(error.response?.data?.error || "Error al asignar ruta.");
       }
     }
   };
@@ -459,6 +511,51 @@ const Entregas = () => {
         </div>
       ) : (
         <div className="dias-list">
+          {reservas.length > 0 && (
+            <div className="dia-section animate-slide-up" style={{ marginBottom: '32px', background: '#fff3e0', padding: '16px', borderRadius: '12px', border: '1px solid #ffe0b2' }}>
+              <div className="dia-header-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                <h2 className="dia-titulo" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 8, fontSize: '1.1rem', color: '#e65100' }}>
+                  <Package size={18} /> 
+                  Reservas por Asignar ({reservas.length})
+                </h2>
+              </div>
+              <div className="pedidos-list card" style={{ background: 'rgba(255,255,255,0.8)', border: 'none', padding: '16px' }}>
+                {reservas.map(pedido => (
+                  <div key={pedido.id} className="pedido-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div className="pedido-info">
+                      <div className="cliente-nombre" style={{ fontWeight: 600, fontSize: '0.95rem', marginBottom: '4px' }}>
+                        {pedido.clienta_detalle?.nombre}
+                      </div>
+                      <div className="pedido-resumen" style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>
+                        {pedido.items.length} prenda(s) - ${pedido.total.toLocaleString('es-CL')}
+                      </div>
+                      {pedido.notas && (
+                        <div style={{ color: 'var(--color-danger)', fontSize: '0.8rem', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <span style={{ transform: 'rotate(45deg)' }}>📌</span> {pedido.notas}
+                        </div>
+                      )}
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                      <button 
+                        onClick={() => handleAsignarRuta(pedido.id)}
+                        style={{ padding: '6px 12px', borderRadius: '8px', background: 'var(--color-primary-bg)', color: 'var(--color-primary)', border: '1px solid rgba(212,175,55,0.2)', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}
+                      >
+                        Asignar Ruta
+                      </button>
+                      <button 
+                        onClick={() => handleCancelarPedido(pedido.id)}
+                        style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'var(--color-danger-bg)', color: 'var(--color-danger)', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                        title="Cancelar pedido"
+                      >
+                        <XCircle size={18} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {Object.keys(entregasPorFecha).sort().map(fecha => (
             <div key={fecha} className="dia-section animate-slide-up" style={{ marginBottom: '32px' }}>
               <div className="dia-header-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
@@ -486,19 +583,24 @@ const Entregas = () => {
               
               <div className="timeline-container" style={{ position: 'relative' }}>
                 {entregasPorFecha[fecha].map((entrega, index) => {
-                  const isActive = true; // Para simular el diseño, expandiremos todos los que tengan pedidos
+                  const isExpanded = expandedRutas[entrega.id];
                   return (
                     <div key={entrega.id} className="entrega-timeline-item" style={{ position: 'relative', zIndex: 1, marginBottom: '24px' }}>
                       <div className="entrega-card" style={{ background: 'transparent', padding: '0', boxShadow: 'none' }}>
-                        <div className="entrega-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                        <div 
+                          className="entrega-card-header" 
+                          onClick={() => toggleRutaAccordion(entrega.id)}
+                          style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', cursor: 'pointer', padding: '8px', background: isExpanded ? 'rgba(0,0,0,0.03)' : 'transparent', borderRadius: '8px', transition: 'background 0.2s' }}
+                        >
                           <h3 style={{ fontSize: '1.05rem', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <MapPin size={18} color="var(--color-text)" />
                             {entrega.punto_entrega_detalle?.nombre || 'Punto sin nombre'}
+                            <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', fontWeight: 'normal', marginLeft: '4px' }}>({entrega.pedidos.length} pedidos)</span>
                           </h3>
                           <div className="hora-badge-container" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                             {entrega.hora_estimada ? (
                               <>
-                                <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }} onClick={() => handleSetHora(entrega.id, entrega.hora_estimada)}>
+                                <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }} onClick={(e) => { e.stopPropagation(); handleSetHora(entrega.id, entrega.hora_estimada); }}>
                                   <Clock size={14} /> {entrega.hora_estimada.substring(0, 5)}
                                   <Edit2 size={12} style={{marginLeft: '2px', opacity: 0.5}} />
                                 </span>
@@ -529,14 +631,14 @@ const Entregas = () => {
                                 </button>
                               </>
                             ) : (
-                              <button style={{ background: 'none', border: 'none', color: 'var(--color-primary)', fontSize: '0.85rem', cursor: 'pointer' }} onClick={() => handleSetHora(entrega.id, null)}>
+                              <button style={{ background: 'none', border: 'none', color: 'var(--color-primary)', fontSize: '0.85rem', cursor: 'pointer' }} onClick={(e) => { e.stopPropagation(); handleSetHora(entrega.id, null); }}>
                                 Fijar Hora
                               </button>
                             )}
                           </div>
                         </div>
 
-                        {entrega.pedidos.length > 0 && (
+                        {isExpanded && entrega.pedidos.length > 0 && (
                           <div className="pedidos-list card" style={{ background: 'rgba(0,0,0,0.02)', border: 'none', padding: '16px' }}>
                             {entrega.pedidos.map(pedido => (
                               <div key={pedido.id} className={`pedido-item ${pedido.estado === 'entregado' ? 'pedido-entregado' : ''}`} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>

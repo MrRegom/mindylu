@@ -10,6 +10,8 @@ const PrendaChatCard = ({ prendaId, color, talla, cantidad, clientPhone, clientN
   const [prendaData, setPrendaData] = useState(null);
   const [clientaId, setClientaId] = useState(null);
   const [varianteEncontrada, setVarianteEncontrada] = useState(null);
+  const [rutas, setRutas] = useState([]);
+  const [selectedRuta, setSelectedRuta] = useState('');
 
   useEffect(() => {
     fetchDatos();
@@ -31,7 +33,6 @@ const PrendaChatCard = ({ prendaId, color, talla, cantidad, clientPhone, clientN
           v.talla?.toLowerCase() === talla.toLowerCase()
         );
         if (!variante) {
-            // Fallback si no coincide exacto, tomar la primera
             variante = prenda.variantes[0];
         }
         setVarianteEncontrada(variante);
@@ -44,13 +45,22 @@ const PrendaChatCard = ({ prendaId, color, talla, cantidad, clientPhone, clientN
       if (clientas && clientas.length > 0) {
         setClientaId(clientas[0].id);
       } else {
-        // Si no existe, crear clienta rápida
         const newClientaRes = await api.post('/clientas/', { 
           nombre: clientName || 'Clienta WhatsApp', 
           telefono: clientPhone 
         });
         setClientaId(newClientaRes.data.id);
       }
+
+      // 4. Traer rutas futuras
+      const rutasRes = await api.get('/pedidos/entregas/');
+      const rutasData = rutasRes.data.results || rutasRes.data;
+      
+      // Filtrar rutas desde hoy en adelante (opcional, pero ayuda a limpiar)
+      const hoy = new Date().toISOString().split('T')[0];
+      const rutasFuturas = rutasData.filter(r => r.fecha >= hoy).sort((a,b) => a.fecha.localeCompare(b.fecha));
+      setRutas(rutasFuturas);
+
     } catch (error) {
       console.error("Error fetching data for PrendaChatCard:", error);
     } finally {
@@ -77,11 +87,14 @@ const PrendaChatCard = ({ prendaId, color, talla, cantidad, clientPhone, clientN
         estado: 'apartado',
         notas: 'Separado desde chat WhatsApp'
       };
+
+      if (selectedRuta) {
+        payload.entrega_diaria_id = parseInt(selectedRuta);
+      }
       
       await api.post('/pedidos/crear-desde-catalogo/', payload);
       
       showToast("¡Prenda separada con éxito!", "success");
-      // Opcional: recargar variantes para actualizar stock visualmente
       fetchDatos();
     } catch (error) {
       console.error("Error al separar prenda:", error);
@@ -129,14 +142,27 @@ const PrendaChatCard = ({ prendaId, color, talla, cantidad, clientPhone, clientN
         </div>
       </div>
       
-      <div className="prenda-chat-actions">
+      <div className="prenda-chat-actions" style={{ flexDirection: 'column' }}>
+        <select 
+          value={selectedRuta} 
+          onChange={(e) => setSelectedRuta(e.target.value)}
+          style={{ padding: '8px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '0.8rem', width: '100%', outline: 'none' }}
+        >
+          <option value="">Solo Reservar (Sin ruta)</option>
+          {rutas.map(r => (
+            <option key={r.id} value={r.id}>
+              {new Date(r.fecha + 'T00:00:00').toLocaleDateString('es-ES', {weekday:'short', day:'numeric'})} - {r.punto_entrega_detalle?.nombre} {r.hora_estimada ? `(${r.hora_estimada.substring(0,5)})` : ''}
+            </option>
+          ))}
+        </select>
+        
         <button 
           className="btn-separar-prenda" 
           onClick={handleSepararPrenda}
           disabled={isSubmitting || stockDisponible < parseInt(cantidad)}
         >
           {isSubmitting ? <Loader2 className="spinner" size={16} /> : <ShoppingBag size={16} />}
-          {isSubmitting ? 'Separando...' : 'Separar Prenda (1 Clic)'}
+          {isSubmitting ? 'Procesando...' : 'Vender Prenda'}
         </button>
       </div>
     </div>
