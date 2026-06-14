@@ -294,13 +294,14 @@
 
 
 /* -- Apariencia Live Preview -- */
-.apariencia-split-layout { display: grid; grid-template-columns: 1fr; gap: 32px; }
+.apariencia-split-layout { display: grid; grid-template-columns: 1fr; gap: 32px; min-width: 0; width: 100%; max-width: 100%; }
 @media (min-width: 900px) { .apariencia-split-layout { grid-template-columns: 1.2fr 1fr; } }
-.apariencia-form-col { display: flex; flex-direction: column; gap: 20px; }
+.apariencia-form-col { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
 .apariencia-form-col {
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
+  min-width: 0;
 }
 
 .form-group {
@@ -310,9 +311,10 @@
   max-width: 100%;
   box-sizing: border-box;
   margin-bottom: 16px;
+  min-width: 0;
 }
 
-.form-group-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; max-width: 100%; box-sizing: border-box; }
+.form-group-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; max-width: 100%; box-sizing: border-box; min-width: 0; }
 @media (max-width: 600px) { .form-group-row { grid-template-columns: 1fr !important; } }
 .form-group label { display: flex; align-items: center; gap: 6px; font-weight: 600; margin-bottom: 8px; color: var(--color-text-strong); font-size: 0.9rem; font-family: var(--font-main); }
 .input-field { box-sizing: border-box; width: 100%; padding: 14px 16px; border-radius: 12px; border: 2px solid rgba(251, 165, 181, 0.4); background: #ffffff; transition: all 0.3s; font-family: inherit; color: #4a3b40; font-weight: 500; font-size: 0.95rem; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
@@ -344,6 +346,7 @@
 .file-upload-wrapper {
   position: relative;
   width: 100%;
+  min-width: 0;
 }
 .file-upload-input {
   position: absolute;
@@ -371,6 +374,7 @@
   max-width: 100%;
   box-sizing: border-box;
   overflow: hidden;
+  min-width: 0;
 }
 .file-upload-wrapper:hover .file-upload-box {
   background: rgba(251, 165, 181, 0.12);
@@ -390,6 +394,7 @@
   align-items: center;
   justify-content: center;
   color: #fba5b5;
+  flex-shrink: 0;
 }
 .file-upload-text {
   font-size: 0.9rem;
@@ -397,6 +402,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 80%;
+  min-width: 0;
 }
 
 .mantenedor-select-light {
