@@ -24,15 +24,15 @@ class WatermarkService:
                 logo_path = os.path.join(settings.BASE_DIR, 'img', 'lulogo.png')
                 if os.path.exists(logo_path):
                     logo = Image.open(logo_path).convert("RGBA")
-                    # Escalar el logo a un 20% del ancho de la foto
-                    logo_width = int(img_width * 0.20)
+                    # Escalar el logo a un 25% del ancho de la foto
+                    logo_width = int(img_width * 0.25)
                     aspect_ratio = logo.size[1] / logo.size[0]
                     logo_height = int(logo_width * aspect_ratio)
                     logo = logo.resize((logo_width, logo_height), Image.Resampling.LANCZOS)
                     
-                    # Reducir opacidad (ej. 10%)
+                    # Reducir opacidad (ej. 35% para que se note más)
                     alpha = logo.split()[3]
-                    alpha = alpha.point(lambda p: p * 0.12)
+                    alpha = alpha.point(lambda p: p * 0.35)
                     logo.putalpha(alpha)
                     
                     # Rotar un poco la marca de agua

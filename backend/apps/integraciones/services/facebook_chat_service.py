@@ -169,12 +169,23 @@ class FacebookChatService:
         return mensaje
 
     def _procesar_comentario(self, value_data):
-        """Envía un mensaje privado a quien hizo el comentario y puede dar un like."""
+        """Envía un mensaje privado a quien hizo el comentario y responde públicamente de forma inteligente."""
         comment_id = value_data.get('comment_id')
+        message_text = value_data.get('message', '').lower()
         if not comment_id:
             return
             
-        texto_respuesta = "¡Hola linda! 💕 Te acabamos de enviar un mensaje interno con los detalles."
+        # Generar una respuesta inteligente según el contenido del mensaje
+        if any(word in message_text for word in ['talla', 'medida', 'size', 'chica', 'grande']):
+            texto_respuesta = "¡Hola linda! 💕 Puedes revisar en tiempo real todas las tallas y colores disponibles de esta prenda directo en nuestra App: https://mindylu.cl/ Te enviamos también un mensajito privado."
+        elif any(word in message_text for word in ['precio', 'cuanto', 'valor', 'cuesta']):
+            texto_respuesta = "¡Hola hermosa! ✨ El precio detallado y la opción para reservar esta prenda al instante los encuentras en nuestra App oficial: https://mindylu.cl/ Revisa tu bandeja de mensajes."
+        elif any(word in message_text for word in ['envio', 'despacho', 'entrega']):
+            texto_respuesta = "¡Hola linda! 🚚 Hacemos envíos a todo Chile. Puedes comprar seguro y coordinar tu envío directo desde nuestra App: https://mindylu.cl/ Te dejamos un DM."
+        elif any(word in message_text for word in ['direccion', 'ubicacion', 'donde', 'tienda']):
+            texto_respuesta = "¡Hola linda! 📍 Puedes ver todas nuestras opciones de entrega y comprar de manera súper fácil en nuestro catálogo: https://mindylu.cl/"
+        else:
+            texto_respuesta = "¡Hola linda! 💕 ¡Gracias por tu comentario! Te invitamos a ver todo nuestro catálogo en tiempo real (con stock, precios y envíos) aquí: https://mindylu.cl/ Revisa tu bandeja de mensajes."
         
         # 1. Responder el comentario públicamente
         url_reply = f"https://graph.facebook.com/v19.0/{comment_id}/comments"
@@ -191,13 +202,13 @@ class FacebookChatService:
             logger.warning(f"No se pudo responder al comentario de forma pública: {e}")
             
         # 2. Enviar mensaje privado (Private Replies)
-        texto_privado = "¡Hola! Gracias por comentar nuestra foto. Aquí te dejamos toda la información y nuestro catálogo: ..."
+        texto_privado = "¡Hola linda! Gracias por comentar nuestra publicación en Facebook. ✨\n\nAquí tienes el enlace directo a nuestro catálogo oficial donde podrás ver todos los precios, tallas disponibles y hacer tu pedido súper fácil y rápido: https://mindylu.cl/\n\nCualquier duda, ¡estamos para ayudarte! 💕"
         url_private = f"https://graph.facebook.com/v19.0/{self.page_id}/messages"
         payload_private = {
             "recipient": {"comment_id": comment_id},
             "message": {"text": texto_privado},
             "messaging_type": "MESSAGE_TAG",
-            "tag": "POST_PURCHASE_UPDATE" # O algún tag permitido, aunque para Private Replies suele bastar.
+            "tag": "POST_PURCHASE_UPDATE"
         }
         try:
             requests.post(url_private, json=payload_private, headers=headers)
