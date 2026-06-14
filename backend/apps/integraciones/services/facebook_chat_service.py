@@ -18,14 +18,27 @@ class FacebookChatService:
         self.page_id = config('FACEBOOK_PAGE_ID', default='')
 
     def procesar_webhook_payload(self, payload):
-        """Procesa el payload recibido de Facebook Messenger."""
+        """Procesa el payload recibido de Facebook Messenger o Feed."""
         try:
             entries = payload.get('entry', [])
             for entry in entries:
+                # 1. Procesar mensajes directos (Messenger)
                 messaging_events = entry.get('messaging', [])
                 for event in messaging_events:
                     if 'message' in event:
                         self._procesar_mensaje(event)
+                
+                # 2. Procesar eventos del feed (Comentarios)
+                changes = entry.get('changes', [])
+                for change in changes:
+                    if change.get('field') == 'feed':
+                        value = change.get('value', {})
+                        # Solo procesamos comentarios nuevos ('add') que no sean de la propia página
+                        if value.get('item') == 'comment' and value.get('verb') == 'add':
+                            sender_id = value.get('sender_id')
+                            if sender_id != self.page_id:
+                                self._procesar_comentario(value)
+
         except Exception as e:
             logger.error(f"Error procesando webhook payload de FB: {e}")
 
@@ -34,18 +47,30 @@ class FacebookChatService:
         message_data = event.get('message', {})
         mid = message_data.get('mid')
         text = message_data.get('text', '')
+        attachments = message_data.get('attachments', [])
 
-        if not sender_id or not mid or not text:
+        if not sender_id or not mid:
             return
+            
+        if not text and not attachments:
+            return
+            
+        if not text and attachments:
+            attach_type = attachments[0].get('type', 'desconocido')
+            if attach_type == 'image':
+                url = attachments[0].get('payload', {}).get('url', '')
+                text = f"📷 [Imagen adjunta]: {url}"
+            else:
+                text = f"📎 [Archivo adjunto tipo: {attach_type}]"
 
         # Check for duplicates
         if Mensaje.objects.filter(external_id=mid).exists():
             return
 
         # Get sender profile name from Facebook Graph API (Optional but good for UI)
-        client_name = 'Desconocido'
+        client_name = 'Cliente Facebook'
         try:
-            profile_url = f"https://graph.facebook.com/{sender_id}?fields=first_name,last_name&access_token={self.access_token}"
+            profile_url = f"https://graph.facebook.com/v19.0/{sender_id}?fields=first_name,last_name&access_token={self.access_token}"
             res = requests.get(profile_url)
             if res.status_code == 200:
                 profile_data = res.json()
@@ -63,8 +88,10 @@ class FacebookChatService:
         
         # Update conversation status
         if not created:
-            if conversacion.client_name == 'Desconocido' and client_name != 'Desconocido':
+            if conversacion.client_name in ['Desconocido', 'Cliente Facebook'] and client_name != 'Cliente Facebook':
                 conversacion.client_name = client_name
+            elif conversacion.client_name == 'Desconocido':
+                conversacion.client_name = 'Cliente Facebook'
             conversacion.unread_count += 1
             conversacion.status = 'OPEN'
             conversacion.save()
@@ -140,3 +167,39 @@ class FacebookChatService:
         conversacion.save()
 
         return mensaje
+
+    def _procesar_comentario(self, value_data):
+        """Envía un mensaje privado a quien hizo el comentario y puede dar un like."""
+        comment_id = value_data.get('comment_id')
+        if not comment_id:
+            return
+            
+        texto_respuesta = "¡Hola linda! 💕 Te acabamos de enviar un mensaje interno con los detalles."
+        
+        # 1. Responder el comentario públicamente
+        url_reply = f"https://graph.facebook.com/v19.0/{comment_id}/comments"
+        payload_reply = {
+            "message": texto_respuesta
+        }
+        headers = {
+            'Authorization': f'Bearer {self.access_token}',
+            'Content-Type': 'application/json'
+        }
+        try:
+            requests.post(url_reply, json=payload_reply, headers=headers)
+        except Exception as e:
+            logger.warning(f"No se pudo responder al comentario de forma pública: {e}")
+            
+        # 2. Enviar mensaje privado (Private Replies)
+        texto_privado = "¡Hola! Gracias por comentar nuestra foto. Aquí te dejamos toda la información y nuestro catálogo: ..."
+        url_private = f"https://graph.facebook.com/v19.0/{self.page_id}/messages"
+        payload_private = {
+            "recipient": {"comment_id": comment_id},
+            "message": {"text": texto_privado},
+            "messaging_type": "MESSAGE_TAG",
+            "tag": "POST_PURCHASE_UPDATE" # O algún tag permitido, aunque para Private Replies suele bastar.
+        }
+        try:
+            requests.post(url_private, json=payload_private, headers=headers)
+        except Exception as e:
+            logger.warning(f"No se pudo enviar mensaje privado al comentario: {e}")

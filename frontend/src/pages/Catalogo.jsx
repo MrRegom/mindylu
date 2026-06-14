@@ -5,11 +5,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
-import { Plus, Check, ImageIcon, Trash2, Search, Edit2, Rocket, X, Share2, Calendar, Star, Images } from 'lucide-react';
+import { Plus, Check, ImageIcon, Trash2, Search, Edit2, Rocket, X, Share2, Calendar, Star, Images, Facebook } from 'lucide-react';
 import GlobalSpinner from '../components/GlobalSpinner';
 import api from '../services/api';
 import './Catalogo.css';
 import { showAlert, showConfirm, showToast } from '../utils/alerts';
+import FacebookPublishModal from '../components/catalogo/FacebookPublishModal';
 
 const Catalogo = () => {
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ const Catalogo = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [categoriaActiva, setCategoriaActiva] = useState(null); // null = Todas
+  const [prendaToPublish, setPrendaToPublish] = useState(null);
   const [soloHoy, setSoloHoy] = useState(false);
 
   // Modo publicación
@@ -268,6 +270,9 @@ const Catalogo = () => {
                     </div>
                     {!modoPublicar && (
                       <div style={{ display: 'flex', gap: 2 }}>
+                        <button onClick={(e) => { e.stopPropagation(); setPrendaToPublish(prenda); }} style={{ background: 'transparent', border: 'none', color: '#1877F2', cursor: 'pointer', padding: 4, display: 'inline-flex' }} title="Publicar en Facebook">
+                          <Facebook size={16} />
+                        </button>
                         <button onClick={(e) => { e.stopPropagation(); handleEditarPrenda(prenda); }} style={{ background: 'transparent', border: 'none', color: 'var(--color-primary)', cursor: 'pointer', padding: 4, display: 'inline-flex' }}>
                           <Edit2 size={16} />
                         </button>
@@ -406,6 +411,15 @@ const Catalogo = () => {
           </button>
           <img src={fullscreenImage} alt="Fullscreen" style={{ maxWidth: '95%', maxHeight: '95%', objectFit: 'contain' }} />
         </div>
+      )}
+
+      {/* Facebook Publish Modal */}
+      {prendaToPublish && (
+        <FacebookPublishModal 
+          prenda={prendaToPublish} 
+          onClose={() => setPrendaToPublish(null)} 
+          onPublished={() => fetchCatalogo()} 
+        />
       )}
     </div>
   );

@@ -197,6 +197,87 @@ class PrendaViewSet(viewsets.ModelViewSet):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+    @action(detail=True, methods=['post'])
+    def preview_facebook(self, request, pk=None):
+        prenda = self.get_object()
+        img_obj = prenda.imagenes.first()
+        if not img_obj:
+            return Response({'error': 'La prenda no tiene imagen principal'}, status=status.HTTP_400_BAD_REQUEST)
+
+        from apps.integraciones.services.watermark_service import WatermarkService
+        # Talla representativa
+        talla_str = "Varias"
+        variantes = prenda.variantes.all()
+        if variantes.exists():
+            talla_str = "/".join(set(v.talla for v in variantes if v.talla))
+
+        watermark_path = WatermarkService.estampar_precio(
+            image_path=img_obj.imagen.path,
+            precio=prenda.precio,
+            talla=talla_str
+        )
+        if not watermark_path:
+            return Response({'error': 'No se pudo generar el preview'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        # Enviar el archivo
+        from django.http import FileResponse
+        import os
+        response = FileResponse(open(watermark_path, 'rb'), content_type='image/jpeg')
+        response['Content-Disposition'] = f'attachment; filename="preview_{pk}.jpg"'
+        return response
+
+    @action(detail=True, methods=['post'])
+    def publicar_facebook(self, request, pk=None):
+        prenda = self.get_object()
+        mensaje = request.data.get('mensaje', f"Nueva prenda disponible: {prenda.nombre}")
+        
+        img_obj = prenda.imagenes.first()
+        if not img_obj:
+            return Response({'error': 'La prenda no tiene imagen principal'}, status=status.HTTP_400_BAD_REQUEST)
+
+        from apps.integraciones.services.watermark_service import WatermarkService
+        talla_str = "Varias"
+        variantes = prenda.variantes.all()
+        if variantes.exists():
+            talla_str = "/".join(set(v.talla for v in variantes if v.talla))
+
+        watermark_path = WatermarkService.estampar_precio(
+            image_path=img_obj.imagen.path,
+            precio=prenda.precio,
+            talla=talla_str
+        )
+        if not watermark_path:
+            return Response({'error': 'No se pudo generar la imagen para publicar'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        import requests
+        from decouple import config
+        page_id = config('FACEBOOK_PAGE_ID', default='')
+        access_token = config('FACEBOOK_ACCESS_TOKEN', default='')
+        
+        url = f"https://graph.facebook.com/v19.0/{page_id}/photos"
+        payload = {
+            'message': mensaje,
+            'access_token': access_token,
+            'published': 'true'
+        }
+        
+        try:
+            with open(watermark_path, 'rb') as f:
+                files = {'source': f}
+                res = requests.post(url, data=payload, files=files)
+                res.raise_for_status()
+                data = res.json()
+                
+            import os
+            try:
+                os.remove(watermark_path)
+            except:
+                pass
+                
+            return Response({'success': True, 'post_id': data.get('post_id')})
+        except Exception as e:
+            return Response({'error': f"Error publicando en Facebook: {e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
     @action(detail=False, methods=['post'])
     def publicar_seleccionadas(self, request):
         prenda_ids = request.data.get('prenda_ids', [])
