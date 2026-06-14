@@ -146,7 +146,7 @@ const Home = () => {
                       </div>
                       <span style={{ fontWeight: 500, fontSize: '0.95rem' }}>{prod.nombre}</span>
                     </div>
-                    <span style={{ fontWeight: 600, color: 'var(--color-text-muted)' }}>{prod.total_vendido} uds</span>
+                    <span style={{ fontWeight: 600, color: 'var(--color-text-muted)' }}>{prod.total_vendido} prendas</span>
                   </div>
                 ))}
               </div>
