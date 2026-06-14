@@ -360,14 +360,58 @@ const Catalogo = () => {
             <button className="btn btn-small" onClick={() => setSeleccionadas(new Set())} style={{ background: 'rgba(255,255,255,0.2)', color: 'white', border: 'none' }}>
               Vaciar
             </button>
-            <button className="btn btn-small" onClick={() => setPublicarModal(true)} style={{ background: 'white', color: 'var(--color-primary)', fontWeight: 700, border: 'none' }}>
+            <button className="btn btn-small" onClick={async () => {
+              // Generar texto por defecto
+              let textoBase = "✨ Prenditas disponibles para entrega inmediata ✨\n\n";
+              
+              try {
+                // Intentar obtener entregas programadas futuras
+                const res = await api.get('/pedidos/entregas/');
+                const entregas = res.data;
+                const futuras = entregas.filter(e => new Date(e.fecha + 'T' + e.hora_estimada) >= new Date());
+                
+                if (futuras.length > 0) {
+                  // Agrupar por fecha
+                  const porFecha = {};
+                  futuras.forEach(e => {
+                    if (!porFecha[e.fecha]) porFecha[e.fecha] = [];
+                    porFecha[e.fecha].push(e);
+                  });
+                  
+                  const primeraFecha = Object.keys(porFecha).sort()[0];
+                  const d = new Date(primeraFecha + 'T00:00:00');
+                  const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+                  const nombreDia = dias[d.getDay()];
+                  const fechaStr = `${d.getDate()}/${(d.getMonth()+1).toString().padStart(2,'0')}`;
+                  
+                  textoBase += `👉🏼 ${nombreDia} ${fechaStr} (estaciones de metro):\n`;
+                  porFecha[primeraFecha].sort((a,b) => a.hora_estimada.localeCompare(b.hora_estimada)).forEach(e => {
+                    const horaMin = e.hora_estimada.substring(0,5);
+                    textoBase += ` • ${horaMin} hrs → ${e.punto_entrega_nombre}\n`;
+                  });
+                  textoBase += `\n🚚 ${nombreDia} ${fechaStr} delivery a domicilio, Quilpue, Villa alemana, Peñablanca y viña del mar.\n`;
+                } else {
+                  // Texto genérico si no hay entregas programadas
+                  textoBase += `👉🏼 Entregas en estaciones de metro:\n(Pronto confirmaremos horarios)\n\n🚚 Delivery a domicilio en Quilpue, Villa alemana, Peñablanca y Viña del mar.\n`;
+                }
+              } catch (e) {
+                // Fallback si falla la API
+                textoBase += `👉🏼 Entregas en estaciones de metro:\n(Pronto confirmaremos horarios)\n\n🚚 Delivery a domicilio en Quilpue, Villa alemana, Peñablanca y Viña del mar.\n`;
+              }
+              
+              textoBase += `📍 Curauma (entrego al costado de la Universidad Católica y tengo delivery a domicilio con recargo).\n`;
+              textoBase += `🚛 Envíos a todo Chile por Starken y bluexpress`;
+              
+              setMensajePublicar(textoBase);
+              setPublicarModal(true);
+            }} style={{ background: 'white', color: 'var(--color-primary)', fontWeight: 700, border: 'none' }}>
               Publicar
             </button>
           </div>
         </div>
       )}
 
-      {/* Barra flotante de publicación */}
+      {/* Modal de Publicación */}
       {publicarModal && createPortal(
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 99999, display: 'flex', alignItems: 'flex-end' }} onClick={() => setPublicarModal(false)}>
           <div className="glass" onClick={e => e.stopPropagation()} style={{ width: '100%', borderRadius: '20px 20px 0 0', padding: 24, paddingBottom: 'calc(24px + env(safe-area-inset-bottom))' }}>
