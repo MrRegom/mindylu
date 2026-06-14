@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useContext } from 'react';
-import { MessageCircle, Search, Send, Bot, User as UserIcon, Check, CheckCheck, Clock, Settings, ChevronLeft, Trash2, X } from 'lucide-react';
+import { MessageCircle, Search, Send, Bot, User as UserIcon, Check, CheckCheck, Clock, Settings, ChevronLeft, Trash2, X, ShoppingBag } from 'lucide-react';
 import { GlobalContext } from '../contexts/GlobalContext';
 import api from '../services/api';
 import './Whatsapp.css';
