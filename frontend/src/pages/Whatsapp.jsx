@@ -3,6 +3,7 @@ import { MessageCircle, Search, Send, Bot, User as UserIcon, Check, CheckCheck, 
 import { GlobalContext } from '../contexts/GlobalContext';
 import api from '../services/api';
 import './Whatsapp.css';
+import PrendaChatCard from '../components/PrendaChatCard';
 
 const Whatsapp = () => {
   const [chats, setChats] = useState([]);
@@ -313,11 +314,38 @@ const Whatsapp = () => {
       
       if (match) {
         lineContent = line.replace(match[0], '').trim();
+        
+        let extractedColor = '';
+        let extractedTalla = '';
+        let extractedCantidad = 1;
+
+        if (i > 0) {
+           const prevLine = lines[i - 1];
+           const cMatch = prevLine.match(/Color:\s*(.*?)(?:,|(?=\)))/i);
+           const tMatch = prevLine.match(/Talla:\s*(.*?)(?:\)|,)/i);
+           const qMatch = prevLine.match(/x(\d+)/);
+           extractedColor = cMatch ? cMatch[1].trim() : '';
+           extractedTalla = tMatch ? tMatch[1].trim() : '';
+           extractedCantidad = qMatch ? parseInt(qMatch[1]) : 1;
+        }
+
         refButton = (
-          <a href={`/panel/catalogo?search=${match[1]}`} target="_blank" rel="noreferrer" 
-             style={{ display: 'inline-flex', alignItems: 'center', background: '#faecee', padding: '4px 10px', borderRadius: '12px', color: '#d16b7e', textDecoration: 'none', fontWeight: 600, fontSize: '0.75rem', marginTop: '4px', gap: '6px', border: '1px solid #faecee' }}>
-             <Search size={14} /> Ver Prenda Interna
-          </a>
+          <div style={{ marginTop: '8px', marginBottom: '8px' }}>
+            <a href={`/panel/catalogo?search=${match[1]}`} target="_blank" rel="noreferrer" 
+               style={{ display: 'inline-flex', alignItems: 'center', background: '#faecee', padding: '4px 10px', borderRadius: '12px', color: '#d16b7e', textDecoration: 'none', fontWeight: 600, fontSize: '0.75rem', gap: '6px', border: '1px solid #faecee' }}>
+               <Search size={14} /> Ver Prenda Interna
+            </a>
+            {extractedColor && extractedTalla && activeChat && (
+               <PrendaChatCard 
+                 prendaId={match[1]} 
+                 color={extractedColor} 
+                 talla={extractedTalla} 
+                 cantidad={extractedCantidad}
+                 clientPhone={activeChat.client_phone}
+                 clientName={activeChat.client_name}
+               />
+            )}
+          </div>
         );
       }
       

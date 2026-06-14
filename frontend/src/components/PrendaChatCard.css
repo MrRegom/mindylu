@@ -1,0 +1,98 @@
+.prenda-chat-card {
+  display: flex;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  padding: 10px;
+  margin-top: 8px;
+  border: 1px solid var(--color-border);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 320px;
+}
+
+.prenda-chat-header {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.prenda-chat-img {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid #eee;
+  flex-shrink: 0;
+}
+
+.prenda-chat-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.prenda-chat-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.prenda-chat-meta {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.prenda-chat-stock {
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.prenda-chat-stock.disponible {
+  color: var(--color-success);
+}
+
+.prenda-chat-stock.agotado {
+  color: var(--color-danger);
+}
+
+.prenda-chat-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-separar-prenda {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px;
+  background: var(--color-primary-gradient);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.1s, opacity 0.2s;
+}
+
+.btn-separar-prenda:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  filter: grayscale(1);
+}
+
+.btn-separar-prenda:active:not(:disabled) {
+  transform: scale(0.97);
+}
