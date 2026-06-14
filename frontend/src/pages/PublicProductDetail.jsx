@@ -253,13 +253,18 @@ const PublicProductDetail = () => {
                 <div className="pk3-size-options">
                   {uniqueTallas.map((talla, idx) => {
                      const varianteMatch = tallasDisponibles.find(v => v.talla === talla);
-                     const isAgotada = varianteMatch && varianteMatch.stock <= 0;
+                     const isAgotada = varianteMatch && (varianteMatch.cantidad || 0) <= 0;
                      return (
                        <button
                          key={idx}
                          className={`pk3-size-btn ${tallaSeleccionada === talla ? 'selected' : ''} ${isAgotada ? 'agotada' : ''}`}
                          disabled={isAgotada}
-                         onClick={() => setTallaSeleccionada(talla)}
+                         onClick={() => {
+                           setTallaSeleccionada(talla);
+                           if (varianteMatch && cantidadAComprar > varianteMatch.cantidad) {
+                             setCantidadAComprar(varianteMatch.cantidad || 1);
+                           }
+                         }}
                        >
                          {talla}
                        </button>
@@ -270,11 +275,21 @@ const PublicProductDetail = () => {
             )}
           </div>
 
-          <div className="pk3-qty-group">
+           <div className="pk3-qty-group">
              <div className="pk3-qty-selector">
                 <button onClick={() => setCantidadAComprar(Math.max(1, cantidadAComprar - 1))}>-</button>
                 <span>{cantidadAComprar}</span>
-                <button onClick={() => setCantidadAComprar(cantidadAComprar + 1)}>+</button>
+                <button onClick={() => {
+                  if (varianteSeleccionada) {
+                    if (cantidadAComprar < varianteSeleccionada.cantidad) {
+                      setCantidadAComprar(cantidadAComprar + 1);
+                    } else {
+                      showAlert(`Solo quedan ${varianteSeleccionada.cantidad} unidades disponibles de esta variante.`);
+                    }
+                  } else {
+                    setCantidadAComprar(cantidadAComprar + 1);
+                  }
+                }}>+</button>
              </div>
           </div>
 

@@ -95,7 +95,7 @@ const PrendaForm = () => {
                 file: null,
                 preview: img.imagen,
                 color: img.color || '',
-                orden: img.orden || 0,
+                orden: img.orden === 0 ? 1 : img.orden,
                 principal: img.orden === 0
               })));
             }
