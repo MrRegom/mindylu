@@ -319,14 +319,21 @@ const Whatsapp = () => {
         let extractedTalla = '';
         let extractedCantidad = 1;
 
-        if (i > 0) {
-           const prevLine = lines[i - 1];
+        // Buscar hacia arriba en las líneas anteriores para encontrar la información de la variante (ignorando líneas en blanco)
+        for (let j = i - 1; j >= 0; j--) {
+           const prevLine = lines[j];
+           if (!prevLine.trim()) continue;
+
            const cMatch = prevLine.match(/Color:\s*(.*?)(?:,|(?=\)))/i);
            const tMatch = prevLine.match(/Talla:\s*(.*?)(?:\)|,)/i);
            const qMatch = prevLine.match(/x(\d+)/);
-           extractedColor = cMatch ? cMatch[1].trim() : '';
-           extractedTalla = tMatch ? tMatch[1].trim() : '';
-           extractedCantidad = qMatch ? parseInt(qMatch[1]) : 1;
+
+           if (cMatch || tMatch) {
+               extractedColor = cMatch ? cMatch[1].trim() : '';
+               extractedTalla = tMatch ? tMatch[1].trim() : '';
+               extractedCantidad = qMatch ? parseInt(qMatch[1]) : 1;
+               break;
+           }
         }
 
         refButton = (
@@ -506,32 +513,6 @@ const Whatsapp = () => {
                 ))}
                 <div ref={messagesEndRef} />
               </div>
-
-              {suggestedProducts.length > 0 && (
-                <div className="wa-suggestions">
-                  <div style={{ fontSize: '0.8rem', color: '#666', marginBottom: '8px', paddingLeft: '8px' }}>
-                    Sugerencias (basado en mensaje del cliente):
-                  </div>
-                  <div className="wa-suggestions-list">
-                    {suggestedProducts.map(p => (
-                      <div key={p.id} className="wa-suggestion-card">
-                        <img src={p.imagen || 'https://via.placeholder.com/60'} alt={p.nombre} />
-                        <div className="wa-suggestion-info">
-                          <div className="wa-suggestion-name">{p.nombre}</div>
-                          <div className="wa-suggestion-price">${p.precio}</div>
-                          <div className="wa-suggestion-stock">{p.stock_info}</div>
-                        </div>
-                        <button 
-                          className="wa-suggestion-send" 
-                          onClick={() => setInputText(`Mira este modelo: *${p.nombre}* a $${p.precio}.\nDisponibilidad: ${p.stock_info}\nVer catálogo: ${window.location.origin}`)}
-                        >
-                          Enviar
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
 
               <div className="wa-quick-replies">
                 <button type="button" className="wa-quick-reply-btn" onClick={() => setInputText(inputText + "🏦 *Datos Bancarios*\nBanco Estado\nCuenta Rut\n11.111.111-1\nMindy Lu\ncorreo@mindylu.com")}>
