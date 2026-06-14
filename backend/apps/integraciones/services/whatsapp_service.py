@@ -208,7 +208,8 @@ class WhatsappService:
             
             respuesta = f"¡Hola Linda! Sí, tengo tu entrega agendada para {fecha_str} a las {hora} en {lugar}. ¡Nos vemos ahí!"
         else:
-            proximas_rutas = EntregaDiaria.objects.filter(tenant=self.tenant, fecha__gte=hoy).select_related('punto_entrega').order_by('fecha', 'hora_estimada')
+            # Mostrar las rutas a partir de mañana, ya que las de hoy ya están cerradas/despachadas
+            proximas_rutas = EntregaDiaria.objects.filter(tenant=self.tenant, fecha__gt=hoy).select_related('punto_entrega').order_by('fecha', 'hora_estimada')
             
             texto_rutas = ""
             if proximas_rutas.exists():

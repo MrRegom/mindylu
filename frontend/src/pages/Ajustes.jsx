@@ -245,14 +245,17 @@ const MantenedorList = ({ titulo, icono, endpoint, placeholder, forceUppercase =
 };
 
 const ConfiguracionTiendaForm = () => {
-  const [config, setConfig] = useState({
-    marquesina_texto: '',
-    marquesina_velocidad: 25,
-    banner_titulo: '',
-    banner_subtitulo: '',
-    whatsapp_numero: '56972677820',
-    tienda_nombre: 'MindyLu',
-  });
+    const [config, setConfig] = useState({
+      marquesina_texto: '',
+      marquesina_velocidad: 25,
+      banner_titulo: '',
+      banner_subtitulo: '',
+      envios_texto: '',
+      sugerencia_mensaje_top: '',
+      sugerencia_mensaje_bottom: '',
+      whatsapp_numero: '56972677820',
+      tienda_nombre: 'MindyLu',
+    });
   const [bannerFile, setBannerFile] = useState(null);
   const [polaroid1File, setPolaroid1File] = useState(null);
   const [polaroid2File, setPolaroid2File] = useState(null);
@@ -296,6 +299,8 @@ const ConfiguracionTiendaForm = () => {
       formData.append('banner_titulo_cursiva', config.banner_titulo_cursiva || '');
       formData.append('banner_subtitulo', config.banner_subtitulo || '');
       formData.append('envios_texto', config.envios_texto || '');
+      formData.append('sugerencia_mensaje_top', config.sugerencia_mensaje_top || '');
+      formData.append('sugerencia_mensaje_bottom', config.sugerencia_mensaje_bottom || '');
       formData.append('whatsapp_numero', config.whatsapp_numero || '');
       formData.append('tienda_nombre', config.tienda_nombre || 'MindyLu');
       
@@ -371,6 +376,16 @@ const ConfiguracionTiendaForm = () => {
           <div className="form-group">
             <label><Truck size={16} /> Información de Envíos</label>
             <textarea name="envios_texto" className="input-field" value={config.envios_texto || ''} onChange={handleChange} rows="5" placeholder="Envíos a todo Chile...\nValparaíso: $2500" />
+          </div>
+
+          <div className="form-group">
+            <label><MessageCircle size={16} /> Texto Superior Sugerencia WhatsApp</label>
+            <textarea name="sugerencia_mensaje_top" className="input-field" value={config.sugerencia_mensaje_top || ''} onChange={handleChange} rows="2" placeholder="¡Hola linda! Mira esta opción hermosa..." />
+          </div>
+
+          <div className="form-group">
+            <label><MessageCircle size={16} /> Texto Inferior Sugerencia WhatsApp</label>
+            <textarea name="sugerencia_mensaje_bottom" className="input-field" value={config.sugerencia_mensaje_bottom || ''} onChange={handleChange} rows="2" placeholder="¿Te gusta? 💕" />
           </div>
 
           <div className="form-group">

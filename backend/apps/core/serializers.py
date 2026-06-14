@@ -115,6 +115,6 @@ class ConfiguracionTiendaSerializer(serializers.ModelSerializer):
             'marquesina_texto', 'marquesina_velocidad', 'banner_imagen', 
             'polaroid_1_imagen', 'polaroid_2_imagen', 'polaroid_3_imagen',
             'banner_titulo', 'banner_titulo_cursiva', 'banner_subtitulo', 'whatsapp_numero', 'tienda_nombre',
-            'envios_texto'
+            'envios_texto', 'sugerencia_mensaje_top', 'sugerencia_mensaje_bottom'
         ]
 

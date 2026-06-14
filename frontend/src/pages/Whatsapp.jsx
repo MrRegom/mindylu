@@ -245,6 +245,19 @@ const Whatsapp = () => {
   const [suggestionModalOpen, setSuggestionModalOpen] = useState(false);
   const [showCuentasMenu, setShowCuentasMenu] = useState(false);
   const [showRutasMenu, setShowRutasMenu] = useState(false);
+  const [configuracionTienda, setConfiguracionTienda] = useState(null);
+
+  useEffect(() => {
+    const fetchConfig = async () => {
+      try {
+        const res = await api.get('/core/configuracion/privado/');
+        setConfiguracionTienda(res.data);
+      } catch (e) {
+        console.error('Error fetching config', e);
+      }
+    };
+    fetchConfig();
+  }, []);
 
   // Cerrar menús al hacer click fuera
   useEffect(() => {
@@ -308,24 +321,30 @@ const Whatsapp = () => {
 
   const handleSendSuggestion = async (p) => {
     try {
+      const topText = configuracionTienda?.sugerencia_mensaje_top || '¡Hola linda! Mira esta opción hermosa que tengo disponible 😍';
+      const bottomText = configuracionTienda?.sugerencia_mensaje_bottom || '¿Te gusta? 💕';
+      
+      const contentText = `${topText}\n*${p.nombre}* - $${Number(p.precio).toLocaleString('es-CL')}\n\nStock actual: ${p.stock_info}\n\n${bottomText}`;
+      
       // Optimistic message (now with image)
       const optimisticMsg = {
         id: `temp-${Date.now()}`,
         direction: 'OUTBOUND',
-        content: `¡Mira esta opción hermosa que tengo disponible! 😍\n*${p.nombre}* - $${Number(p.precio).toLocaleString('es-CL')}\n\nStock actual: ${p.stock_info}\n\n¿Te gusta? 💕\n[IMG:${p.imagen}]`,
+        content: `${contentText}\n[IMG:${p.imagen}]`,
         status: 'sent',
         created_at: new Date().toISOString()
       };
       setMessages(prev => [...prev, optimisticMsg]);
+      setSuggestionModalOpen(false);
 
       await api.post(`integraciones/whatsapp/conversaciones/${activeChatId}/enviar/`, {
-        content: `¡Mira esta opción hermosa que tengo disponible! 😍\n*${p.nombre}* - $${Number(p.precio).toLocaleString('es-CL')}\n\nStock actual: ${p.stock_info}\n\n¿Te gusta? 💕`,
+        content: contentText,
         image_url: p.imagen
       });
+      fetchConversaciones(); // refresh last message
       fetchMensajes(activeChatId);
-      fetchConversaciones();
     } catch (error) {
-      console.error('Error sending suggestion:', error);
+      console.error(error);
       alert('Error al enviar la sugerencia.');
       fetchMensajes(activeChatId); // refresh
     }

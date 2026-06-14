@@ -209,6 +209,14 @@ class ConfiguracionTienda(models.Model):
         default='Envíos a Viña del Mar $2500\nValparaíso $2500\nCurauma Placilla $2500\nQuilpué Villa Alemana $2500\n\nRegiones envío por Starken por pagar',
         verbose_name=_('Información de Envíos')
     )
+    sugerencia_mensaje_top = models.TextField(
+        default='¡Hola linda! Mira esta opción hermosa que tengo disponible 😍',
+        verbose_name=_('Texto superior de sugerencia')
+    )
+    sugerencia_mensaje_bottom = models.TextField(
+        default='¿Te gusta? 💕',
+        verbose_name=_('Texto inferior de sugerencia')
+    )
 
     class Meta:
         verbose_name = _('Configuración de Tienda')
