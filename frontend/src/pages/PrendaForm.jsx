@@ -187,8 +187,8 @@ const PrendaForm = () => {
         const precioCompraLimpio = formData.precio_compra.toString().replace(/\./g, '');
         payload.append('precio_compra', precioCompraLimpio);
       }
-      if (formData.categoria) {
-        payload.append('categoria_id', formData.categoria);
+      if (formData.categoria !== undefined && formData.categoria !== null) {
+        payload.append('categoria', formData.categoria);
       }
       
       const cleanVariantes = variantes.map(v => {
