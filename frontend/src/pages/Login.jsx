@@ -54,8 +54,6 @@ const Login = () => {
           <div className="login-logo-container">
             <img src="/lulogo.png" alt="Lu Prenditas Logo" className="login-logo-large" />
           </div>
-          <h1>MindyLu <span>Workspace</span></h1>
-          <p>Plataforma Enterprise para el control absoluto de tu negocio.</p>
         </div>
         <div className="login-left-bg"></div>
       </div>
