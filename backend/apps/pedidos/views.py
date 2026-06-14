@@ -279,6 +279,11 @@ class EntregaDiariaViewSet(viewsets.ModelViewSet):
             fecha__gte=hoy - timedelta(days=2)
         ).prefetch_related('pedidos', 'pedidos__clienta', 'pedidos__items__variante__prenda')
 
+    @action(detail=False, methods=['get'], permission_classes=[])
+    def debug_all(self, request):
+        entregas = EntregaDiaria.objects.all().values('id', 'fecha', 'punto_entrega_id', 'hora_estimada', 'tenant_id')
+        return Response(list(entregas))
+
     def create(self, request, *args, **kwargs):
         # Evitamos el error de unique_together si el usuario intenta crear una ruta que ya existe.
         tenant = request.user.tenant
