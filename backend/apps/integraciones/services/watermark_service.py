@@ -18,35 +18,55 @@ class WatermarkService:
             draw = ImageDraw.Draw(overlay)
             img_width, img_height = img.size
 
-            # --- 1. MARCA DE AGUA DEL LOGO (Repetida y transparente) ---
+            # --- 1. MARCA DE AGUA DE TEXTO (Repetida y transparente) ---
             try:
-                from django.conf import settings
-                logo_path = os.path.join(settings.BASE_DIR, 'img', 'lulogo.png')
-                if os.path.exists(logo_path):
-                    logo = Image.open(logo_path).convert("RGBA")
-                    # Escalar el logo a un 25% del ancho de la foto
-                    logo_width = int(img_width * 0.25)
-                    aspect_ratio = logo.size[1] / logo.size[0]
-                    logo_height = int(logo_width * aspect_ratio)
-                    logo = logo.resize((logo_width, logo_height), Image.Resampling.LANCZOS)
-                    
-                    # Reducir opacidad (ej. 75% para que sea bien visible)
-                    alpha = logo.split()[3]
-                    alpha = alpha.point(lambda p: p * 0.75)
-                    logo.putalpha(alpha)
-                    
-                    # Rotar un poco la marca de agua
-                    logo_rotated = logo.rotate(30, expand=True)
-                    lw, lh = logo_rotated.size
-                    
-                    # Pegar en grilla
-                    for x in range(-lw, img_width + lw, int(lw * 1.5)):
-                        for y in range(-lh, img_height + lh, int(lh * 1.5)):
-                            # Desfase en filas intercaladas
-                            offset_x = x if (y // int(lh * 1.5)) % 2 == 0 else x + int(lw * 0.75)
-                            overlay.paste(logo_rotated, (int(offset_x), y), logo_rotated)
+                # Crear una imagen temporal para el texto rotado
+                text_watermark = "Lu Prenditas"
+                # Tamaño de fuente para la marca de agua (proporcional a la imagen)
+                wm_font_size = max(int(img_width * 0.08), 30)
+                
+                try:
+                    # Intentar cargar una fuente elegante/cursiva si existe, si no usar Arial Bold
+                    wm_font = ImageFont.truetype("arialbd.ttf", wm_font_size)
+                except IOError:
+                    try:
+                        wm_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", wm_font_size)
+                    except IOError:
+                        wm_font = ImageFont.load_default()
+
+                # Calcular tamaño del texto
+                dummy_draw = ImageDraw.Draw(Image.new('RGBA', (1, 1)))
+                wm_bbox = dummy_draw.textbbox((0, 0), text_watermark, font=wm_font)
+                wm_width = wm_bbox[2] - wm_bbox[0]
+                wm_height = wm_bbox[3] - wm_bbox[1]
+
+                # Crear imagen para el texto (con un poco de margen)
+                txt_img = Image.new('RGBA', (wm_width + 40, wm_height + 40), (255, 255, 255, 0))
+                txt_draw = ImageDraw.Draw(txt_img)
+                
+                # Dibujar texto en blanco semitransparente con una ligera sombra negra para contraste
+                # Sombra (para que se lea en fondos claros)
+                txt_draw.text((22, 22), text_watermark, font=wm_font, fill=(0, 0, 0, 40))
+                # Texto principal (para que se lea en fondos oscuros)
+                txt_draw.text((20, 20), text_watermark, font=wm_font, fill=(255, 255, 255, 90))
+                
+                # Rotar el texto 30 grados
+                txt_rotated = txt_img.rotate(30, expand=True)
+                rw, rh = txt_rotated.size
+                
+                # Pegar en grilla sobre el overlay
+                # Separación entre marcas de agua
+                step_x = int(rw * 1.5)
+                step_y = int(rh * 2.0)
+                
+                for x in range(-rw, img_width + rw, step_x):
+                    for y in range(-rh, img_height + rh, step_y):
+                        # Desfase en filas intercaladas
+                        offset_x = x if (y // step_y) % 2 == 0 else x + int(step_x * 0.5)
+                        overlay.paste(txt_rotated, (int(offset_x), y), txt_rotated)
+                        
             except Exception as e:
-                print(f"No se pudo estampar el logo de agua: {e}")
+                print(f"No se pudo estampar el texto de agua: {e}")
             # -----------------------------------------------------------
 
             # --- 2. PRECIO (Estilo elegante) ---
