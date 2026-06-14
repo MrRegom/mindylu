@@ -342,7 +342,7 @@ const Whatsapp = () => {
           <div style={{ marginTop: '8px', marginBottom: '8px' }}>
             <button type="button" onClick={() => toggleCard(msgId, match[1])}
                style={{ display: 'inline-flex', alignItems: 'center', background: '#faecee', padding: '4px 10px', borderRadius: '12px', color: '#d16b7e', border: '1px solid #faecee', cursor: 'pointer', fontWeight: 600, fontSize: '0.75rem', gap: '6px' }}>
-               <Search size={14} /> Ver Detalles / Vender
+               <ShoppingBag size={14} /> Vender
             </button>
             {isExpanded && extractedColor && extractedTalla && activeChat && (
                <PrendaChatCard 

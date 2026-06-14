@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ShoppingBag, Loader2 } from 'lucide-react';
 import api from '../services/api';
 import { showAlert, showToast } from '../utils/alerts';
+import Swal from 'sweetalert2';
 import './PrendaChatCard.css';
 
 const PrendaChatCard = ({ prendaId, color, talla, cantidad, clientPhone, clientName }) => {
@@ -80,6 +81,40 @@ const PrendaChatCard = ({ prendaId, color, talla, cantidad, clientPhone, clientN
 
     setIsSubmitting(true);
     try {
+      let finalRutaId = selectedRuta;
+      
+      if (rutas.length > 0) {
+        const options = { '': 'Solo Reservar (Sin ruta)' };
+        rutas.forEach(r => {
+          const dateStr = new Date(r.fecha + 'T00:00:00').toLocaleDateString('es-ES', {weekday:'short', day:'numeric'});
+          const horaStr = r.hora_estimada ? `(${r.hora_estimada.substring(0,5)})` : '';
+          options[r.id] = `${dateStr} - ${r.punto_entrega_detalle?.nombre} ${horaStr}`;
+        });
+
+        const { value: rutaSeleccionada, isConfirmed } = await Swal.fire({
+          title: 'Asignar Ruta',
+          text: '¿A qué ruta deseas enviar esta venta?',
+          input: 'select',
+          inputOptions: options,
+          inputPlaceholder: 'Selecciona una ruta',
+          showCancelButton: true,
+          confirmButtonText: 'Vender Prenda',
+          cancelButtonText: 'Cancelar',
+          customClass: {
+            popup: 'swal-mobile-popup',
+            confirmButton: 'btn swal-btn-primary',
+            cancelButton: 'btn swal-btn-secondary',
+          }
+        });
+
+        if (!isConfirmed) {
+          setIsSubmitting(false);
+          return;
+        }
+        
+        finalRutaId = rutaSeleccionada;
+      }
+
       const payload = {
         clienta_id: clientaId,
         variante_id: varianteEncontrada.id,
@@ -88,8 +123,8 @@ const PrendaChatCard = ({ prendaId, color, talla, cantidad, clientPhone, clientN
         notas: 'Separado desde chat WhatsApp'
       };
 
-      if (selectedRuta) {
-        payload.entrega_diaria_id = parseInt(selectedRuta);
+      if (finalRutaId) {
+        payload.entrega_diaria_id = parseInt(finalRutaId);
       }
       
       await api.post('/pedidos/crear-desde-catalogo/', payload);
@@ -143,26 +178,13 @@ const PrendaChatCard = ({ prendaId, color, talla, cantidad, clientPhone, clientN
       </div>
       
       <div className="prenda-chat-actions" style={{ flexDirection: 'column' }}>
-        <select 
-          value={selectedRuta} 
-          onChange={(e) => setSelectedRuta(e.target.value)}
-          style={{ padding: '8px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '0.8rem', width: '100%', outline: 'none' }}
-        >
-          <option value="">Solo Reservar (Sin ruta)</option>
-          {rutas.map(r => (
-            <option key={r.id} value={r.id}>
-              {new Date(r.fecha + 'T00:00:00').toLocaleDateString('es-ES', {weekday:'short', day:'numeric'})} - {r.punto_entrega_detalle?.nombre} {r.hora_estimada ? `(${r.hora_estimada.substring(0,5)})` : ''}
-            </option>
-          ))}
-        </select>
-        
         <button 
           className="btn-separar-prenda" 
           onClick={handleSepararPrenda}
           disabled={isSubmitting || stockDisponible < parseInt(cantidad)}
         >
           {isSubmitting ? <Loader2 className="spinner" size={16} /> : <ShoppingBag size={16} />}
-          {isSubmitting ? 'Procesando...' : 'Vender Prenda'}
+          {isSubmitting ? 'Procesando...' : 'Vender'}
         </button>
       </div>
     </div>
