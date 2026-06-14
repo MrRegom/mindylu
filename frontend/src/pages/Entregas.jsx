@@ -35,9 +35,10 @@ const Entregas = () => {
   const fetchEntregas = async () => {
     setIsLoading(true);
     try {
+      const cacheBuster = new Date().getTime();
       const [entregasRes, reservasRes] = await Promise.all([
-        api.get('/pedidos/entregas/'),
-        api.get('/pedidos/pedidos/?estado=apartado&sin_ruta=true')
+        api.get(`/pedidos/entregas/?_t=${cacheBuster}`),
+        api.get(`/pedidos/pedidos/?estado=apartado&sin_ruta=true&_t=${cacheBuster}`)
       ]);
       setEntregas(entregasRes.data.results || entregasRes.data);
       setReservas(reservasRes.data.results || reservasRes.data);
