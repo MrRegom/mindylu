@@ -503,7 +503,7 @@ const Entregas = () => {
 
       {isLoading ? (
         <div className="loading-state">Cargando rutas...</div>
-      ) : entregas.length === 0 ? (
+      ) : entregas.length === 0 && reservas.length === 0 ? (
         <div className="empty-state glass">
           <div className="empty-icon"><Package size={48} /></div>
           <h3>No hay entregas pendientes</h3>

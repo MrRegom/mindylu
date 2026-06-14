@@ -101,8 +101,11 @@ const Layout = () => {
       <main className="main-content">
         {/* En móvil, el header se omite o se hace súper minimalista. Solo lo mostramos si no es whatsapp para darle full screen */}
         {!location.pathname.includes('/panel/whatsapp') && (
-          <header className="mobile-header mobile-only">
-            <div className="mobile-header-logo" style={{ margin: '0 auto' }}>
+          <header className="mobile-header mobile-only" style={{ display: 'flex', alignItems: 'center', padding: '0 15px' }}>
+            <button onClick={() => setIsMobileMenuOpen(true)} style={{ background: 'none', border: 'none', color: '#1a1a1a', padding: '10px 0', marginRight: 'auto' }}>
+              <Menu size={24} />
+            </button>
+            <div className="mobile-header-logo" style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
               MindyLu<span>.</span>
             </div>
           </header>
@@ -130,15 +133,15 @@ const Layout = () => {
         </a>
         <a href="/panel/catalogo" className={`bottom-nav-item ${location.pathname.includes('/panel/catalogo') ? 'active' : ''}`}>
           <ShoppingBag size={24} />
-          <span>Productos</span>
+          <span>Catálogo</span>
         </a>
         <a href="/panel/entregas" className={`bottom-nav-item ${location.pathname.includes('/panel/entregas') ? 'active' : ''}`}>
           <Truck size={24} />
           <span>Entregas</span>
         </a>
-        <a href="/panel/ajustes" className={`bottom-nav-item ${location.pathname.includes('/panel/ajustes') ? 'active' : ''}`}>
-          <Settings size={24} />
-          <span>Ajustes</span>
+        <a href="/panel/clientas" className={`bottom-nav-item ${location.pathname.includes('/panel/clientas') ? 'active' : ''}`}>
+          <User size={24} />
+          <span>Clientes</span>
         </a>
       </nav>
       <PWAInstallPrompt />
