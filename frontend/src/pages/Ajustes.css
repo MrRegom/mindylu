@@ -1,7 +1,13 @@
+.page-ajustes, .page-ajustes * {
+  box-sizing: border-box;
+}
+
 .page-ajustes {
   padding-bottom: 80px;
   background-color: #fdf2f4; /* Soft blush pink like the catalog */
   min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 .page-ajustes .page-header {

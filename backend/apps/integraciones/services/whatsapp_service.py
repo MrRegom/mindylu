@@ -325,11 +325,15 @@ class WhatsappService:
             external_id = messages_info[0].get('id') if messages_info else f"outbound_{conversacion.id}_{response.status_code}"
 
             # Save to DB
+            db_content = text_body
+            if image_url:
+                db_content = f"{text_body}\n[IMG:{image_url}]"
+                
             mensaje = Mensaje.objects.create(
                 conversacion=conversacion,
                 external_id=external_id,
                 direction='OUTBOUND',
-                content=text_body,
+                content=db_content,
                 status='sent'
             )
             

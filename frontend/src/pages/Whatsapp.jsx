@@ -308,11 +308,11 @@ const Whatsapp = () => {
 
   const handleSendSuggestion = async (p) => {
     try {
-      // Optimistic message (only text for now, but backend will send image)
+      // Optimistic message (now with image)
       const optimisticMsg = {
         id: `temp-${Date.now()}`,
         direction: 'OUTBOUND',
-        content: `[Imagen adjunta] ¡Mira esta opción hermosa que tengo disponible! 😍\n*${p.nombre}* - $${Number(p.precio).toLocaleString('es-CL')}\n\nStock actual: ${p.stock_info}\n\n¿Te gusta? 💕`,
+        content: `¡Mira esta opción hermosa que tengo disponible! 😍\n*${p.nombre}* - $${Number(p.precio).toLocaleString('es-CL')}\n\nStock actual: ${p.stock_info}\n\n¿Te gusta? 💕\n[IMG:${p.imagen}]`,
         status: 'sent',
         created_at: new Date().toISOString()
       };
@@ -354,8 +354,18 @@ const Whatsapp = () => {
   const renderMessageContent = (content, msgId) => {
     if (!content) return '';
     
-    const lines = content.split('\n');
-    return lines.map((line, i) => {
+    // Extraer imagen si existe en el formato [IMG:url]
+    let textContent = content;
+    let imageUrl = null;
+    const imgRegex = /\[IMG:(.+?)\]/;
+    const imgMatch = textContent.match(imgRegex);
+    if (imgMatch) {
+      imageUrl = imgMatch[1];
+      textContent = textContent.replace(imgRegex, '').trim();
+    }
+    
+    const lines = textContent.split('\n');
+    const renderedLines = lines.map((line, i) => {
       // Regex para detectar (Ref: #123)
       const refRegex = /\(Ref:\s*#(\d+)\)/;
       const match = line.match(refRegex);
@@ -370,7 +380,7 @@ const Whatsapp = () => {
         let extractedTalla = '';
         let extractedCantidad = 1;
 
-        // Buscar hacia arriba en las líneas anteriores para encontrar la información de la variante (ignorando líneas en blanco)
+        // Buscar hacia arriba en las líneas anteriores para encontrar la información de la variante
         for (let j = i - 1; j >= 0; j--) {
            const prevLine = lines[j];
            if (!prevLine.trim()) continue;
@@ -424,6 +434,17 @@ const Whatsapp = () => {
         </span>
       );
     });
+
+    return (
+      <>
+        {imageUrl && (
+          <div style={{ marginBottom: '8px', borderRadius: '8px', overflow: 'hidden' }}>
+            <img src={imageUrl} alt="Sugerencia" style={{ width: '100%', maxHeight: '250px', objectFit: 'cover', borderRadius: '8px' }} />
+          </div>
+        )}
+        {renderedLines}
+      </>
+    );
   };
 
   return (
@@ -575,7 +596,7 @@ const Whatsapp = () => {
 
               {/* Menús flotantes (fuera del contenedor con overflow) */}
               {(showCuentasMenu || showRutasMenu) && (
-                <div style={{ position: 'absolute', bottom: '130px', left: '16px', background: 'white', borderRadius: '12px', boxShadow: '0 4px 16px rgba(0,0,0,0.2)', padding: '8px', display: 'flex', flexDirection: 'column', gap: '4px', zIndex: 1000, width: 'max-content', maxWidth: '80%', maxHeight: '300px', overflowY: 'auto', border: '1px solid #eee' }}>
+                <div className="quick-menu-container" style={{ position: 'absolute', bottom: '130px', left: '16px', background: 'white', borderRadius: '12px', boxShadow: '0 4px 16px rgba(0,0,0,0.2)', padding: '8px', display: 'flex', flexDirection: 'column', gap: '4px', zIndex: 1000, width: 'max-content', maxWidth: '80%', maxHeight: '300px', overflowY: 'auto', border: '1px solid #eee' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', paddingBottom: '8px', borderBottom: '1px solid #f0f0f0' }}>
                     <h4 style={{ margin: 0, fontSize: '0.9rem', color: '#555' }}>{showCuentasMenu ? '🏦 Selecciona una Cuenta' : '🚚 Selecciona una Ruta'}</h4>
                     <button onClick={() => { setShowCuentasMenu(false); setShowRutasMenu(false); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#999', padding: '4px' }}><X size={16} /></button>
