@@ -263,6 +263,29 @@
   box-shadow: 0 6px 15px rgba(251, 165, 181, 0.4);
 }
 
+/* ── Selector Nativo de Color ── */
+.color-picker-input {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background-color: transparent;
+  flex-shrink: 0;
+}
+.color-picker-input::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+.color-picker-input::-webkit-color-swatch {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+.color-picker-input::-moz-color-swatch {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
 
 /* -- Apariencia Live Preview -- */
 .apariencia-split-layout { display: grid; grid-template-columns: 1fr; gap: 32px; }

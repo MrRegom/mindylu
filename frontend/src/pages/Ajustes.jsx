@@ -164,11 +164,13 @@ const MantenedorList = ({ titulo, icono, endpoint, placeholder, forceUppercase =
                   )}
                   {hasColors && (
                     <div style={{ marginRight: '5px' }}>
-                      <div 
-                        style={{ width: 36, height: 36, borderRadius: '8px', background: editando.hex_code || '#ddd', border: '1px solid #ccc', cursor: 'pointer', flexShrink: 0 }}
-                        onClick={() => setShowEditPalette(!showEditPalette)}
+                      <input
+                        type="color"
+                        className="color-picker-input"
+                        value={editando.hex_code || '#ff9a9e'}
+                        onChange={(e) => setEditando(prev => ({ ...prev, hex_code: e.target.value }))}
                         title="Elegir color"
-                      ></div>
+                      />
                     </div>
                   )}
                   <input
@@ -184,13 +186,6 @@ const MantenedorList = ({ titulo, icono, endpoint, placeholder, forceUppercase =
                   <button type="button" className="btn-icon-simple btn-icon-muted" onClick={handleCancelEdit}>
                     <X size={18} />
                   </button>
-                  {hasColors && showEditPalette && (
-                    <div style={{ width: '100%', background: '#fff', padding: 12, borderRadius: 8, border: '1px solid #e9edef', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(24px, 1fr))', gap: 10, marginTop: 8 }}>
-                      {EXTENDED_PALETTE.map(hex => (
-                        <div key={hex} onClick={() => { setEditando(prev => ({ ...prev, hex_code: hex })); setShowEditPalette(false); }} style={{ width: 28, height: 28, justifySelf: 'center', borderRadius: '50%', background: hex, border: '1px solid #ccc', cursor: 'pointer', boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.1)' }}></div>
-                      ))}
-                    </div>
-                  )}
                 </div>
               ) : (
                 /* Modo vista */
@@ -225,13 +220,13 @@ const MantenedorList = ({ titulo, icono, endpoint, placeholder, forceUppercase =
           </select>
         )}
         {hasColors && (
-          <div>
-            <div 
-              style={{ width: 36, height: 36, borderRadius: '8px', background: nuevoHex || '#ddd', border: '1px solid #ccc', cursor: 'pointer', flexShrink: 0 }}
-              onClick={() => setShowNuevoPalette(!showNuevoPalette)}
-              title="Elegir color"
-            ></div>
-          </div>
+          <input
+            type="color"
+            className="color-picker-input"
+            value={nuevoHex || '#ff9a9e'}
+            onChange={(e) => setNuevoHex(e.target.value)}
+            title="Elegir color"
+          />
         )}
         <input
           type="text"
@@ -243,13 +238,6 @@ const MantenedorList = ({ titulo, icono, endpoint, placeholder, forceUppercase =
           <Plus size={16} />
           <span>Agregar</span>
         </button>
-        {hasColors && showNuevoPalette && (
-          <div style={{ width: '100%', background: '#fff', padding: 12, borderRadius: 8, border: '1px solid #e9edef', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(24px, 1fr))', gap: 10, marginTop: 8 }}>
-            {EXTENDED_PALETTE.map(hex => (
-              <div key={hex} onClick={() => { setNuevoHex(hex); setShowNuevoPalette(false); }} style={{ width: 28, height: 28, justifySelf: 'center', borderRadius: '50%', background: hex, border: '1px solid #ccc', cursor: 'pointer', boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.1)' }}></div>
-            ))}
-          </div>
-        )}
       </form>
     </div>
   );
