@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Search, ShoppingBag } from 'lucide-react';
-import api from '../../../services/api';
-import { showAlert, showToast } from '../../../utils/alerts';
+import api from '../../services/api';
+import { showAlert, showToast } from '../../utils/alerts';
 import '../EditarPrendaModal.css';
 
 const VenderPrendaModal = ({ prenda, onClose, onSuccess }) => {
