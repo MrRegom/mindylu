@@ -53,9 +53,7 @@ const Login = () => {
   return (
     <div className="login-container animate-fade-in">
       <div className="login-header animate-slide-up">
-        <img src="/lulogo.png" alt="Lu Prenditas Logo" style={{ width: 'auto', height: '140px', objectFit: 'contain', marginBottom: '1rem', dropShadow: '0 4px 12px rgba(0,0,0,0.08)' }} />
-        <h1>Lu Prenditas</h1>
-        <p>Sistema Administrativo</p>
+        <img src="/lulogo.png" alt="Lu Prenditas Logo" style={{ width: 'auto', height: '140px', objectFit: 'contain', marginBottom: '2rem', dropShadow: '0 4px 12px rgba(0,0,0,0.08)' }} />
       </div>
 
       <form className="login-form animate-slide-up" style={{ animationDelay: '0.1s' }} onSubmit={handleSubmit}>
