@@ -1,5 +1,11 @@
 from rest_framework import serializers
-from .models import ReglaRespuestaBot
+from .models import ReglaRespuestaBot, RespuestaRapida
+
+class RespuestaRapidaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RespuestaRapida
+        fields = ['id', 'titulo', 'mensaje', 'orden', 'created_at']
+        read_only_fields = ['id', 'created_at']
 
 class ReglaRespuestaBotSerializer(serializers.ModelSerializer):
     class Meta:

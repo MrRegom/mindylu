@@ -574,6 +574,16 @@ const Ajustes = () => {
               </div>
             </button>
             <button 
+              onClick={() => window.location.href = '/panel/ajustes/chats-rapidos'}
+              style={{ background: '#f6ffed', color: '#389e0d', border: '1px solid #b7eb8f', padding: '16px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', fontWeight: 600, fontSize: '1rem', width: '100%' }}
+            >
+              <MessageSquare size={24} />
+              <div style={{ textAlign: 'left' }}>
+                <div>Chats Rápidos</div>
+                <div style={{ fontSize: '0.8rem', fontWeight: 400, color: '#666' }}>Configura botones de WhatsApp</div>
+              </div>
+            </button>
+            <button 
               onClick={() => window.location.href = '/panel/ajustes/logs'}
               style={{ background: '#fff1f0', color: '#ff4d4f', border: '1px solid #ffa39e', padding: '16px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', fontWeight: 600, fontSize: '1rem', width: '100%' }}
             >

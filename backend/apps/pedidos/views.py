@@ -271,10 +271,12 @@ class EntregaDiariaViewSet(viewsets.ModelViewSet):
     serializer_class = EntregaDiariaSerializer
 
     def get_queryset(self):
+        # Usamos timedelta para no esconder rutas por desface de zona horaria o de un par de días atrás.
+        from datetime import timedelta
         hoy = timezone.localdate()
         return EntregaDiaria.objects.filter(
             tenant=self.request.user.tenant,
-            fecha__gte=hoy
+            fecha__gte=hoy - timedelta(days=2)
         ).prefetch_related('pedidos', 'pedidos__clienta', 'pedidos__items__variante__prenda')
 
     def create(self, request, *args, **kwargs):

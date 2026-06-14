@@ -87,3 +87,18 @@ class ReglaRespuestaBot(models.Model):
 
     def __str__(self):
         return f"Regla: {self.palabras_clave[:30]} ({'Activa' if self.activa else 'Inactiva'})"
+
+class RespuestaRapida(models.Model):
+    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name='respuestas_rapidas')
+    titulo = models.CharField(max_length=50, help_text="Ej: 🏦 Datos Bancarios")
+    mensaje = models.TextField(help_text="El mensaje que se enviará al cliente")
+    orden = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['orden', 'created_at']
+        verbose_name = "Respuesta Rápida"
+        verbose_name_plural = "Respuestas Rápidas"
+
+    def __str__(self):
+        return self.titulo

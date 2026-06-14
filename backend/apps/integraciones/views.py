@@ -648,8 +648,8 @@ def eliminar_conversacion(request, conversacion_id):
 
 
 from rest_framework import viewsets
-from .models import ReglaRespuestaBot
-from .serializers import ReglaRespuestaBotSerializer
+from .models import ReglaRespuestaBot, RespuestaRapida
+from .serializers import ReglaRespuestaBotSerializer, RespuestaRapidaSerializer
 
 class ReglaRespuestaBotViewSet(viewsets.ModelViewSet):
     serializer_class = ReglaRespuestaBotSerializer
@@ -657,6 +657,16 @@ class ReglaRespuestaBotViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return ReglaRespuestaBot.objects.filter(tenant=self.request.user.tenant)
+
+    def perform_create(self, serializer):
+        serializer.save(tenant=self.request.user.tenant)
+
+class RespuestaRapidaViewSet(viewsets.ModelViewSet):
+    serializer_class = RespuestaRapidaSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return RespuestaRapida.objects.filter(tenant=self.request.user.tenant)
 
     def perform_create(self, serializer):
         serializer.save(tenant=self.request.user.tenant)

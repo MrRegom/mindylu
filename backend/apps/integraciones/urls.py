@@ -37,10 +37,11 @@ urlpatterns = [
 ]
 
 from rest_framework.routers import DefaultRouter
-from .views import ReglaRespuestaBotViewSet
+from .views import ReglaRespuestaBotViewSet, RespuestaRapidaViewSet
 
 router = DefaultRouter()
 router.register(r'whatsapp/reglas', ReglaRespuestaBotViewSet, basename='whatsapp-reglas')
+router.register(r'whatsapp/respuestas-rapidas', RespuestaRapidaViewSet, basename='whatsapp-respuestas-rapidas')
 
 urlpatterns += router.urls
 

@@ -26,6 +26,7 @@ import SubidaMasiva from './pages/SubidaMasiva';
 import Whatsapp from './pages/Whatsapp';
 import NuevaVenta from './pages/NuevaVenta';
 import MantenedorReglasBot from './pages/MantenedorReglasBot';
+import MantenedorRespuestasRapidas from './pages/MantenedorRespuestasRapidas';
 import { useEffect } from 'react';
 
 // Componente auxiliar: aplica clase CSS al body según si estamos en el panel o no
@@ -101,6 +102,7 @@ function App() {
           <Route path="cuentas" element={<Cuentas />} />
           <Route path="ajustes" element={<Ajustes />} />
           <Route path="ajustes/bot-reglas" element={<MantenedorReglasBot />} />
+          <Route path="ajustes/chats-rapidos" element={<MantenedorRespuestasRapidas />} />
           <Route path="reportes" element={<Reportes />} />
           <Route path="whatsapp" element={<Whatsapp />} />
           <Route path="ajustes/logs" element={<Logs />} />

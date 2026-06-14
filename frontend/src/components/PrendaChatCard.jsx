@@ -57,9 +57,8 @@ const PrendaChatCard = ({ prendaId, color, talla, cantidad, clientPhone, clientN
       const rutasRes = await api.get('/pedidos/entregas/');
       const rutasData = rutasRes.data.results || rutasRes.data;
       
-      // Filtrar rutas desde hoy en adelante (opcional, pero ayuda a limpiar)
-      const hoy = new Date().toISOString().split('T')[0];
-      const rutasFuturas = rutasData.filter(r => r.fecha >= hoy).sort((a,b) => a.fecha.localeCompare(b.fecha));
+      // No filtramos estrictamente por hoy para evitar desfaces horarios, el backend ya envía un rango razonable
+      const rutasFuturas = rutasData.sort((a,b) => a.fecha.localeCompare(b.fecha));
       setRutas(rutasFuturas);
 
     } catch (error) {

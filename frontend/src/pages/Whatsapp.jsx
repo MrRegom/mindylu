@@ -58,6 +58,8 @@ const Whatsapp = () => {
 
   const { wsMessage, fetchUnreadCount } = useContext(GlobalContext);
 
+  const [respuestasRapidas, setRespuestasRapidas] = useState([]);
+
   const fetchConversaciones = async () => {
     try {
       const response = await api.get('integraciones/whatsapp/conversaciones/');
@@ -74,15 +76,21 @@ const Whatsapp = () => {
             shouldPlaySound = true;
           }
         });
-        if (shouldPlaySound) {
-          // playNotificationSound();
-        }
       }
       
       prevChatsRef.current = newChats;
       setChats(newChats);
     } catch (error) {
       console.error('Error fetching conversations:', error);
+    }
+  };
+
+  const fetchRespuestasRapidas = async () => {
+    try {
+      const res = await api.get('integraciones/whatsapp/respuestas-rapidas/');
+      setRespuestasRapidas(res.data.results || res.data);
+    } catch (error) {
+      console.error('Error fetching respuestas rapidas:', error);
     }
   };
 
@@ -100,6 +108,7 @@ const Whatsapp = () => {
   // Initial fetch
   useEffect(() => {
     fetchConversaciones();
+    fetchRespuestasRapidas();
     if (activeChatRef.current) {
       fetchMensajes(activeChatRef.current);
     }
@@ -517,18 +526,19 @@ const Whatsapp = () => {
               </div>
 
               <div className="wa-quick-replies">
-                <button type="button" className="wa-quick-reply-btn" onClick={() => setInputText(inputText + "🏦 *Datos Bancarios*\nBanco Estado\nCuenta Rut\n11.111.111-1\nMindy Lu\ncorreo@mindylu.com")}>
-                  🏦 Datos Bancarios
-                </button>
-                <button type="button" className="wa-quick-reply-btn" onClick={() => setInputText(inputText + "🚚 *Entregas*\nRealizamos entregas presenciales a convenir y envíos a todo Chile vía Starken o Chilexpress.")}>
-                  🚚 Entregas
-                </button>
-                <button type="button" className="wa-quick-reply-btn" onClick={() => setInputText(inputText + "👗 *Catálogo*\nRevisa todas nuestras prendas disponibles aquí: " + window.location.origin)}>
-                  👗 Catálogo
-                </button>
-                <button type="button" className="wa-quick-reply-btn" onClick={() => setInputText(inputText + "¡Hola hermosa! ✨ ¿En qué te puedo ayudar?")}>
-                  ✨ Saludo
-                </button>
+                {respuestasRapidas.map(respuesta => (
+                  <button 
+                    key={respuesta.id}
+                    type="button" 
+                    className="wa-quick-reply-btn" 
+                    onClick={() => setInputText(inputText + (inputText ? '\n' : '') + respuesta.mensaje)}
+                  >
+                    {respuesta.titulo}
+                  </button>
+                ))}
+                {respuestasRapidas.length === 0 && (
+                  <span style={{ fontSize: '0.8rem', color: '#999', padding: '0 8px' }}>No hay respuestas rápidas configuradas.</span>
+                )}
               </div>
 
               <div style={{ position: 'relative' }}>
