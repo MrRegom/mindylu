@@ -156,8 +156,8 @@
   border: 1.5px solid var(--color-primary);
   border-radius: 6px;
   font-size: 0.9rem;
-  color: var(--color-text);
-  background: var(--color-primary-light);
+  color: #111b21;
+  background: #fff0f3;
   outline: none;
 }
 
