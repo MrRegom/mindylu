@@ -53,7 +53,7 @@ const Login = () => {
   return (
     <div className="login-container animate-fade-in">
       <div className="login-header animate-slide-up">
-        <img src="/lulogo.png" alt="Lu Prenditas Logo" style={{ width: '120px', height: '120px', objectFit: 'cover', borderRadius: '50%', marginBottom: '1rem', boxShadow: '0 8px 16px rgba(0,0,0,0.1)', border: '4px solid white' }} />
+        <img src="/lulogo.png" alt="Lu Prenditas Logo" style={{ width: 'auto', height: '140px', objectFit: 'contain', marginBottom: '1rem', dropShadow: '0 4px 12px rgba(0,0,0,0.08)' }} />
         <h1>Lu Prenditas</h1>
         <p>Sistema Administrativo</p>
       </div>

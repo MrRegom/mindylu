@@ -36,6 +36,12 @@ do
             systemctl restart gunicorn
         fi
 
+        # Restart Scheduler if it exists
+        if systemctl list-unit-files | grep -q mindylu-scheduler.service; then
+            echo "Restarting Scheduler..."
+            systemctl restart mindylu-scheduler
+        fi
+
         # Frontend setup
         echo "Setting up Frontend..."
         cd $TARGET/frontend
