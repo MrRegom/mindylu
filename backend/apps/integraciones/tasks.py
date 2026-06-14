@@ -36,25 +36,39 @@ def ejecutar_publicacion_lote(ciclo_id):
     media_ids = []
 
     for prenda in prendas:
-        imagen = prenda.imagenes.first()
-        if imagen or prenda.foto_url:
-            try:
-                url_photo = f"https://graph.facebook.com/v19.0/{page_id}/photos"
-                data = {'published': 'false', 'access_token': access_token}
-                files = None
-                
-                if imagen and imagen.imagen:
-                    files = {'source': open(imagen.imagen.path, 'rb')}
-                else:
-                    data['url'] = prenda.foto_url
-
-                res = requests.post(url_photo, data=data, files=files)
-                res.raise_for_status()
-                res_data = res.json()
-                if 'id' in res_data:
-                    media_ids.append({"media_fbid": res_data['id']})
-            except Exception as e:
-                print(f"Error subiendo imagen a Facebook: {e}")
+        imagenes = list(prenda.imagenes.all())
+        if imagenes:
+            for imagen in imagenes:
+                if len(media_ids) >= 10:
+                    break
+                try:
+                    url_photo = f"https://graph.facebook.com/v19.0/{page_id}/photos"
+                    data = {'published': 'false', 'access_token': access_token}
+                    files = None
+                    if imagen.imagen:
+                        files = {'source': open(imagen.imagen.path, 'rb')}
+                        res = requests.post(url_photo, data=data, files=files)
+                        res.raise_for_status()
+                        res_data = res.json()
+                        if 'id' in res_data:
+                            media_ids.append({"media_fbid": res_data['id']})
+                except Exception as e:
+                    print(f"Error subiendo imagen a Facebook: {e}")
+        elif prenda.foto_url:
+            if len(media_ids) < 10:
+                try:
+                    url_photo = f"https://graph.facebook.com/v19.0/{page_id}/photos"
+                    data = {'published': 'false', 'access_token': access_token, 'url': prenda.foto_url}
+                    res = requests.post(url_photo, data=data)
+                    res.raise_for_status()
+                    res_data = res.json()
+                    if 'id' in res_data:
+                        media_ids.append({"media_fbid": res_data['id']})
+                except Exception as e:
+                    print(f"Error subiendo imagen a Facebook: {e}")
+        
+        if len(media_ids) >= 10:
+            break
 
     if media_ids:
         if ciclo.mensaje_facebook:
