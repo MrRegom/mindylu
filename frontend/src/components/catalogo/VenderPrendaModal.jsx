@@ -164,7 +164,7 @@ const VenderPrendaModal = ({ prenda, onClose, onSuccess }) => {
               <option value="">Solo Separar (Sin ruta)</option>
               {rutas.map(r => {
                 const dateStr = new Date(r.fecha + 'T00:00:00').toLocaleDateString('es-ES', {weekday:'short', day:'numeric'});
-                const horaStr = r.hora_estimada ? () : '';
+                const horaStr = r.hora_estimada ? `(${r.hora_estimada.substring(0,5)})` : '';
                 return (
                   <option key={r.id} value={r.id}>
                     {dateStr} - {r.punto_entrega_detalle?.nombre} {horaStr}
