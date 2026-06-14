@@ -4,6 +4,7 @@ import { GlobalContext } from '../contexts/GlobalContext';
 import api from '../services/api';
 import './Whatsapp.css';
 import PrendaChatCard from '../components/PrendaChatCard';
+import SuggestionModal from '../components/SuggestionModal';
 
 const Whatsapp = () => {
   const [chats, setChats] = useState([]);
@@ -221,31 +222,14 @@ const Whatsapp = () => {
     registerPush();
   }, []);
 
+  const [suggestionModalOpen, setSuggestionModalOpen] = useState(false);
+
   // Fetch messages when a chat is selected
   useEffect(() => {
     if (activeChatId) {
       fetchMensajes(activeChatId);
     }
   }, [activeChatId]);
-
-  const fetchSuggestions = async (chatId) => {
-    try {
-      const response = await api.get(`integraciones/whatsapp/conversaciones/${chatId}/sugerencias/`);
-      setSuggestedProducts(response.data.sugerencias || []);
-    } catch (error) {
-      console.error('Error fetching suggestions:', error);
-    }
-  };
-
-  // Fetch suggestions whenever messages change for the active chat
-  useEffect(() => {
-    if (activeChatId && messages.length > 0) {
-      const lastMsg = messages[messages.length - 1];
-      if (lastMsg && lastMsg.direction === 'INBOUND') {
-        fetchSuggestions(activeChatId);
-      }
-    }
-  }, [messages, activeChatId]);
 
   // Scroll to bottom when new messages arrive
   useEffect(() => {
@@ -551,6 +535,15 @@ const Whatsapp = () => {
               </div>
 
               <div className="wa-quick-replies">
+                <button 
+                  type="button"
+                  className="wa-quick-reply-btn"
+                  style={{ background: '#d16b7e', color: 'white', border: 'none', fontWeight: 'bold' }}
+                  onClick={() => setSuggestionModalOpen(true)}
+                >
+                  🛍️ Sugerir Opción
+                </button>
+
                 {respuestasRapidas.map(respuesta => (
                   <button 
                     key={respuesta.id}
@@ -561,25 +554,7 @@ const Whatsapp = () => {
                     {respuesta.titulo}
                   </button>
                 ))}
-                {respuestasRapidas.length === 0 && (
-                  <span style={{ fontSize: '0.8rem', color: '#999', padding: '0 8px' }}>No hay respuestas rápidas configuradas.</span>
-                )}
               </div>
-
-              {suggestedProducts.length > 0 && (
-                <div className="wa-suggested-products" style={{ padding: '8px 16px', display: 'flex', gap: '8px', overflowX: 'auto', background: '#fdf5f6', borderTop: '1px solid #faecee' }}>
-                  <span style={{ fontSize: '0.8rem', color: '#c46c7a', fontWeight: 'bold', alignSelf: 'center', whiteSpace: 'nowrap' }}>Sugerir Opciones (Envía la foto por Whatsapp):</span>
-                  {suggestedProducts.map(p => (
-                    <div key={p.id} style={{ display: 'flex', alignItems: 'center', background: '#fff', border: '1px solid #faecee', borderRadius: '8px', padding: '4px 8px', cursor: 'pointer', minWidth: 'max-content' }} onClick={() => handleSendSuggestion(p)}>
-                      <img src={p.imagen} alt={p.nombre} style={{ width: '32px', height: '32px', objectFit: 'cover', borderRadius: '4px', marginRight: '8px' }} />
-                      <div>
-                        <div style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#333' }}>{p.nombre}</div>
-                        <div style={{ fontSize: '0.65rem', color: '#888' }}>{p.stock_info}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
 
               <div style={{ position: 'relative' }}>
                 {replyingTo && (
@@ -616,6 +591,13 @@ const Whatsapp = () => {
           )}
         </div>
       </div>
+      
+      {suggestionModalOpen && (
+        <SuggestionModal 
+          onClose={() => setSuggestionModalOpen(false)} 
+          onSend={handleSendSuggestion}
+        />
+      )}
     </div>
   );
 };
