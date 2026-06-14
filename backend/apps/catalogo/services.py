@@ -31,9 +31,16 @@ class CatalogoService:
 
     @staticmethod
     def programar_publicacion(tenant, prenda_ids, mensaje, fecha_programada_str):
+        from django.db.models import Sum
         prendas = Prenda.objects.filter(id__in=prenda_ids, tenant=tenant)
         if prendas.count() != len(prenda_ids):
             raise ValueError('Una o más prendas no existen en tu catálogo.')
+            
+        # Filtrar solo prendas que tengan stock real (> 0)
+        prendas_con_stock = prendas.annotate(total_stock=Sum('variantes__cantidad')).filter(total_stock__gt=0)
+        
+        if prendas_con_stock.count() == 0:
+            raise ValueError('Ninguna de las prendas seleccionadas tiene stock disponible.')
 
         with transaction.atomic():
             ciclo = CicloVenta.objects.create(
@@ -45,7 +52,8 @@ class CatalogoService:
                 ciclo.fecha_programada = parse_datetime(fecha_programada_str)
                 ciclo.save()
 
-            prendas.update(ciclo=ciclo)
+            # Solo asignamos el ciclo a las prendas que sí tienen stock
+            prendas_con_stock.update(ciclo=ciclo)
 
             if fecha_programada_str:
                 schedule_publicacion_lote(ciclo.id, ciclo.fecha_programada)
@@ -54,7 +62,7 @@ class CatalogoService:
                 from apps.integraciones.tasks import ejecutar_publicacion_lote
                 threading.Thread(target=ejecutar_publicacion_lote, args=(ciclo.id,)).start()
 
-        return ciclo, prendas.count()
+        return ciclo, prendas_con_stock.count()
 
     @staticmethod
     def crear_lote_masivo(tenant, items, fecha_programada_str, mensaje_facebook, files):
