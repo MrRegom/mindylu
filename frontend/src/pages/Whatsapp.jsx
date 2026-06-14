@@ -252,12 +252,14 @@ const Whatsapp = () => {
     }
   };
 
-  const handleSendMessage = async (e) => {
-    e.preventDefault();
-    if (!inputText.trim() || !activeChatId) return;
+  const handleSendMessage = async (e, directText = null) => {
+    if (e) e.preventDefault();
+    const textToSend = directText || inputText;
+    if (!textToSend.trim() || !activeChatId) return;
 
-    const textToSend = inputText;
-    setInputText('');
+    if (!directText) {
+      setInputText('');
+    }
 
     // Optimistic UI update
     const optimisticMsg = {
@@ -455,6 +457,23 @@ const Whatsapp = () => {
                       {new Date(msg.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                       {msg.direction === 'OUTBOUND' && <CheckCheck size={14} color="#53bdeb" />}
                     </div>
+                    {/* Quick Action Buttons para Intención de Compra */}
+                    {msg.direction === 'INBOUND' && msg.content.toLowerCase().includes("quiero comprar los siguientes") && (
+                      <div style={{ display: 'flex', gap: '8px', marginTop: '8px', flexWrap: 'wrap' }}>
+                        <button 
+                          onClick={() => handleSendMessage(null, "¡Hola linda! ✨ Sí, lo tengo disponible. ¿Te gustaría coordinar la entrega o retiro?")}
+                          style={{ background: '#dcf8c6', border: '1px solid #7cb342', color: '#33691e', padding: '4px 10px', borderRadius: '12px', fontSize: '0.75rem', cursor: 'pointer', fontWeight: 'bold' }}
+                        >
+                          ✅ Disponible
+                        </button>
+                        <button 
+                          onClick={() => handleSendMessage(null, "¡Hola linda! 🥺 Pucha, justo se me agotó ese modelo. ¿Te gustaría que te muestre otras opciones hermosas que tengo?")}
+                          style={{ background: '#ffcdd2', border: '1px solid #e53935', color: '#b71c1c', padding: '4px 10px', borderRadius: '12px', fontSize: '0.75rem', cursor: 'pointer', fontWeight: 'bold' }}
+                        >
+                          ❌ Agotado
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ))}
                 <div ref={messagesEndRef} />
