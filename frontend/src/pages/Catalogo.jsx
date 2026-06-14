@@ -5,7 +5,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
-import { Plus, Check, ImageIcon, Trash2, Search, Edit2, Rocket, X, Share2, Calendar, Star, Images, Facebook } from 'lucide-react';
+import { Plus, Check, ImageIcon, Trash2, Search, Edit2, Rocket, X, Share2, Calendar, Star, Images, Send } from 'lucide-react';
 import GlobalSpinner from '../components/GlobalSpinner';
 import api from '../services/api';
 import './Catalogo.css';
@@ -271,7 +271,7 @@ const Catalogo = () => {
                     {!modoPublicar && (
                       <div style={{ display: 'flex', gap: 2 }}>
                         <button onClick={(e) => { e.stopPropagation(); setPrendaToPublish(prenda); }} style={{ background: 'transparent', border: 'none', color: '#1877F2', cursor: 'pointer', padding: 4, display: 'inline-flex' }} title="Publicar en Facebook">
-                          <Facebook size={16} />
+                          <Send size={16} />
                         </button>
                         <button onClick={(e) => { e.stopPropagation(); handleEditarPrenda(prenda); }} style={{ background: 'transparent', border: 'none', color: 'var(--color-primary)', cursor: 'pointer', padding: 4, display: 'inline-flex' }}>
                           <Edit2 size={16} />

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Facebook, Loader } from 'lucide-react';
+import { X, Send, Loader } from 'lucide-react';
 import api from '../../services/api';
 import { showAlert } from '../../utils/alerts';
 
@@ -51,7 +51,7 @@ const FacebookPublishModal = ({ prenda, onClose, onPublished }) => {
       <div style={modalStyle} className="animate-slide-up">
         <div style={headerStyle}>
           <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 8, color: '#1877F2' }}>
-            <Facebook size={24} />
+            <Send size={24} />
             Publicar en Facebook
           </h3>
           <button onClick={onClose} style={closeBtnStyle}><X size={20} /></button>
