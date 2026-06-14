@@ -33,11 +33,11 @@ class FacebookChatService:
                 for change in changes:
                     if change.get('field') == 'feed':
                         value = change.get('value', {})
-                        # Solo procesamos comentarios nuevos ('add') que no sean de la propia página
+                        # Solo procesamos comentarios nuevos ('add')
                         if value.get('item') == 'comment' and value.get('verb') == 'add':
                             sender_id = value.get('sender_id')
-                            if sender_id != self.page_id:
-                                self._procesar_comentario(value)
+                            # Se quitó la restricción temporalmente para que la dueña pueda probar
+                            self._procesar_comentario(value)
 
         except Exception as e:
             logger.error(f"Error procesando webhook payload de FB: {e}")

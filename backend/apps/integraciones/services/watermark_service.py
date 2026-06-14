@@ -22,17 +22,13 @@ class WatermarkService:
             try:
                 # Crear una imagen temporal para el texto rotado
                 text_watermark = "Lu Prenditas"
-                # Tamaño de fuente para la marca de agua (proporcional a la imagen)
-                wm_font_size = max(int(img_width * 0.08), 30)
+                # Tamaño de fuente más grande para que sea notorio
+                wm_font_size = max(int(img_width * 0.12), 40)
                 
                 try:
-                    # Intentar cargar una fuente elegante/cursiva si existe, si no usar Arial Bold
-                    wm_font = ImageFont.truetype("arialbd.ttf", wm_font_size)
+                    wm_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf", wm_font_size)
                 except IOError:
-                    try:
-                        wm_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", wm_font_size)
-                    except IOError:
-                        wm_font = ImageFont.load_default()
+                    wm_font = ImageFont.load_default()
 
                 # Calcular tamaño del texto
                 dummy_draw = ImageDraw.Draw(Image.new('RGBA', (1, 1)))
@@ -44,20 +40,19 @@ class WatermarkService:
                 txt_img = Image.new('RGBA', (wm_width + 40, wm_height + 40), (255, 255, 255, 0))
                 txt_draw = ImageDraw.Draw(txt_img)
                 
-                # Dibujar texto en blanco semitransparente con una ligera sombra negra para contraste
-                # Sombra (para que se lea en fondos claros)
-                txt_draw.text((22, 22), text_watermark, font=wm_font, fill=(0, 0, 0, 40))
-                # Texto principal (para que se lea en fondos oscuros)
-                txt_draw.text((20, 20), text_watermark, font=wm_font, fill=(255, 255, 255, 90))
+                # Dibujar texto en blanco con sombra negra más marcada para garantizar lectura
+                # Sombra gruesa negra
+                txt_draw.text((23, 23), text_watermark, font=wm_font, fill=(0, 0, 0, 100))
+                # Texto principal blanco más sólido
+                txt_draw.text((20, 20), text_watermark, font=wm_font, fill=(255, 255, 255, 180))
                 
                 # Rotar el texto 30 grados
                 txt_rotated = txt_img.rotate(30, expand=True)
                 rw, rh = txt_rotated.size
                 
-                # Pegar en grilla sobre el overlay
-                # Separación entre marcas de agua
-                step_x = int(rw * 1.5)
-                step_y = int(rh * 2.0)
+                # Pegar en grilla sobre el overlay más juntos para que se vea más
+                step_x = int(rw * 1.2)
+                step_y = int(rh * 1.5)
                 
                 for x in range(-rw, img_width + rw, step_x):
                     for y in range(-rh, img_height + rh, step_y):
