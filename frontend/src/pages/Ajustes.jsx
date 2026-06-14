@@ -322,7 +322,7 @@ const ConfiguracionTiendaForm = () => {
   if (loading) return <p className="text-muted text-center py-4">Cargando configuración...</p>;
 
   return (
-    <div className="card glass configuracion-tienda-card" style={{ marginBottom: '24px', overflow: 'hidden' }}>
+    <div className="card glass configuracion-tienda-card" style={{ marginBottom: '24px', overflow: 'hidden', padding: '16px', boxSizing: 'border-box', width: '100%', maxWidth: '100vw' }}>
       <div className="card-header border-b pb-4 mb-4" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
         <LayoutTemplate size={24} className="icon-primary" />
         <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--color-text-strong)' }}>Apariencia de la Tienda</h2>

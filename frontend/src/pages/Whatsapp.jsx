@@ -459,29 +459,9 @@ const Whatsapp = () => {
             />
           </div>
           
-          <div style={{ display: 'flex', borderBottom: '1px solid #eee', marginBottom: '8px' }}>
-            <button 
-              onClick={() => setActiveTab('whatsapp')}
-              style={{ 
-                flex: 1, padding: '10px 0', border: 'none', background: 'none', cursor: 'pointer',
-                borderBottom: activeTab === 'whatsapp' ? '2px solid #25D366' : '2px solid transparent',
-                color: activeTab === 'whatsapp' ? '#25D366' : '#888',
-                fontWeight: activeTab === 'whatsapp' ? 'bold' : 'normal'
-              }}
-            >
-              WhatsApp
-            </button>
-            <button 
-              onClick={() => setActiveTab('facebook')}
-              style={{ 
-                flex: 1, padding: '10px 0', border: 'none', background: 'none', cursor: 'pointer',
-                borderBottom: activeTab === 'facebook' ? '2px solid #0084FF' : '2px solid transparent',
-                color: activeTab === 'facebook' ? '#0084FF' : '#888',
-                fontWeight: activeTab === 'facebook' ? 'bold' : 'normal'
-              }}
-            >
-              Facebook
-            </button>
+          <div style={{ display: 'none' }}>
+            {/* Pestañas ocultas por solicitud del usuario */}
+            <button onClick={() => setActiveTab('whatsapp')}>WhatsApp</button>
           </div>
           <div className="wa-chat-list">
             {filteredChats.length === 0 && (
@@ -593,28 +573,16 @@ const Whatsapp = () => {
                 <div ref={messagesEndRef} />
               </div>
 
-              <div className="wa-quick-replies">
-                <button 
-                  type="button"
-                  className="wa-quick-reply-btn"
-                  style={{ background: '#d16b7e', color: 'white', border: 'none', fontWeight: 'bold' }}
-                  onClick={() => setSuggestionModalOpen(true)}
-                >
-                  🛍️ Sugerir Opción
-                </button>
-
-                {/* Dropdown de Cuentas */}
-                <div className="quick-menu-container" style={{ position: 'relative' }}>
-                  <button 
-                    type="button"
-                    className="wa-quick-reply-btn"
-                    style={{ background: '#4a90e2', color: 'white', border: 'none', fontWeight: 'bold' }}
-                    onClick={() => { setShowCuentasMenu(!showCuentasMenu); setShowRutasMenu(false); }}
-                  >
-                    🏦 Cuentas
-                  </button>
+              {/* Menús flotantes (fuera del contenedor con overflow) */}
+              {(showCuentasMenu || showRutasMenu) && (
+                <div style={{ position: 'absolute', bottom: '130px', left: '16px', background: 'white', borderRadius: '12px', boxShadow: '0 4px 16px rgba(0,0,0,0.2)', padding: '8px', display: 'flex', flexDirection: 'column', gap: '4px', zIndex: 1000, width: 'max-content', maxWidth: '80%', maxHeight: '300px', overflowY: 'auto', border: '1px solid #eee' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', paddingBottom: '8px', borderBottom: '1px solid #f0f0f0' }}>
+                    <h4 style={{ margin: 0, fontSize: '0.9rem', color: '#555' }}>{showCuentasMenu ? '🏦 Selecciona una Cuenta' : '🚚 Selecciona una Ruta'}</h4>
+                    <button onClick={() => { setShowCuentasMenu(false); setShowRutasMenu(false); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#999', padding: '4px' }}><X size={16} /></button>
+                  </div>
+                  
                   {showCuentasMenu && (
-                    <div style={{ position: 'absolute', bottom: '100%', left: 0, marginBottom: '8px', background: 'white', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.15)', padding: '8px', display: 'flex', flexDirection: 'column', gap: '4px', zIndex: 100, width: 'max-content', maxWidth: '300px', maxHeight: '300px', overflowY: 'auto' }}>
+                    <>
                       {cuentasBancarias.length === 0 ? (
                         <div style={{ padding: '8px', fontSize: '0.8rem', color: '#888' }}>No hay cuentas guardadas</div>
                       ) : (
@@ -622,7 +590,7 @@ const Whatsapp = () => {
                           <button 
                             key={c.id} 
                             type="button" 
-                            style={{ textAlign: 'left', padding: '8px 12px', border: 'none', background: '#f5f7fa', borderRadius: '8px', cursor: 'pointer', fontSize: '0.8rem' }}
+                            style={{ textAlign: 'left', padding: '10px 12px', border: 'none', background: '#f5f7fa', borderRadius: '8px', cursor: 'pointer', fontSize: '0.85rem', transition: 'background 0.2s' }}
                             onClick={() => {
                               const texto = `🏦 *Banco:* ${c.banco}\n📋 *Tipo:* ${c.tipo_cuenta}\n🔢 *Número:* ${c.numero_cuenta}\n👤 *Titular:* ${c.nombre_titular}\n🪪 *RUT:* ${c.rut_titular}`;
                               setInputText(inputText + (inputText ? '\n\n' : '') + texto);
@@ -633,22 +601,11 @@ const Whatsapp = () => {
                           </button>
                         ))
                       )}
-                    </div>
+                    </>
                   )}
-                </div>
 
-                {/* Dropdown de Rutas */}
-                <div className="quick-menu-container" style={{ position: 'relative' }}>
-                  <button 
-                    type="button"
-                    className="wa-quick-reply-btn"
-                    style={{ background: '#f39c12', color: 'white', border: 'none', fontWeight: 'bold' }}
-                    onClick={() => { setShowRutasMenu(!showRutasMenu); setShowCuentasMenu(false); }}
-                  >
-                    🚚 Entregas
-                  </button>
                   {showRutasMenu && (
-                    <div style={{ position: 'absolute', bottom: '100%', left: 0, marginBottom: '8px', background: 'white', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.15)', padding: '8px', display: 'flex', flexDirection: 'column', gap: '4px', zIndex: 100, width: 'max-content', maxWidth: '300px', maxHeight: '300px', overflowY: 'auto' }}>
+                    <>
                       {rutasActivas.length === 0 ? (
                         <div style={{ padding: '8px', fontSize: '0.8rem', color: '#888' }}>No hay rutas programadas</div>
                       ) : (
@@ -656,9 +613,9 @@ const Whatsapp = () => {
                           <button 
                             key={r.id} 
                             type="button" 
-                            style={{ textAlign: 'left', padding: '8px 12px', border: 'none', background: '#fcf3cf', borderRadius: '8px', cursor: 'pointer', fontSize: '0.8rem' }}
+                            style={{ textAlign: 'left', padding: '10px 12px', border: 'none', background: '#fcf3cf', borderRadius: '8px', cursor: 'pointer', fontSize: '0.85rem', transition: 'background 0.2s' }}
                             onClick={() => {
-                              const fechaFormateada = new Date(r.fecha).toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'short' });
+                              const fechaFormateada = new Date(r.fecha + 'T00:00:00').toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'short' });
                               const horaStr = r.hora_estimada ? r.hora_estimada.substring(0, 5) : 'a convenir';
                               const punto = r.punto_entrega_detalle ? r.punto_entrega_detalle.nombre : 'Punto por definir';
                               const texto = `📍 *Ruta:* ${punto}\n📅 *Fecha:* ${fechaFormateada}\n🕒 *Hora:* ${horaStr}`;
@@ -666,13 +623,42 @@ const Whatsapp = () => {
                               setShowRutasMenu(false);
                             }}
                           >
-                            <strong>{r.fecha}</strong>: {r.punto_entrega_detalle?.nombre}
+                            <strong>{new Date(r.fecha + 'T00:00:00').toLocaleDateString('es-CL', { day:'2-digit', month:'2-digit' })}</strong>: {r.punto_entrega_detalle?.nombre} {r.hora_estimada ? `(${r.hora_estimada.substring(0,5)})` : ''}
                           </button>
                         ))
                       )}
-                    </div>
+                    </>
                   )}
                 </div>
+              )}
+
+              <div className="wa-quick-replies">
+                <button 
+                  type="button"
+                  className="wa-quick-reply-btn"
+                  style={{ background: '#d16b7e', color: 'white', border: 'none', fontWeight: 'bold' }}
+                  onClick={() => setSuggestionModalOpen(true)}
+                >
+                  🛍️ Sugerir Opción
+                </button>
+
+                <button 
+                  type="button"
+                  className="wa-quick-reply-btn"
+                  style={{ background: '#4a90e2', color: 'white', border: 'none', fontWeight: 'bold' }}
+                  onClick={() => { setShowCuentasMenu(!showCuentasMenu); setShowRutasMenu(false); }}
+                >
+                  🏦 Cuentas
+                </button>
+
+                <button 
+                  type="button"
+                  className="wa-quick-reply-btn"
+                  style={{ background: '#f39c12', color: 'white', border: 'none', fontWeight: 'bold' }}
+                  onClick={() => { setShowRutasMenu(!showRutasMenu); setShowCuentasMenu(false); }}
+                >
+                  🚚 Entregas
+                </button>
 
                 {respuestasRapidas.map(respuesta => (
                   <button 
