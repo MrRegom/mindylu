@@ -97,7 +97,22 @@ const PublicCatalog = () => {
     if (pendingItemStr && searchParams.get('cart') === 'open') {
       try {
         const itemToAdd = JSON.parse(pendingItemStr);
-        setCartItems(prev => [...prev, itemToAdd]);
+        setCartItems(prev => {
+          const existingItemIndex = prev.findIndex(item => {
+            if (item.id !== itemToAdd.id) return false;
+            if (item.varianteSeleccionada && itemToAdd.varianteSeleccionada) {
+               return item.varianteSeleccionada.id === itemToAdd.varianteSeleccionada.id;
+            }
+            return true;
+          });
+          if (existingItemIndex >= 0) {
+            const newCart = [...prev];
+            newCart[existingItemIndex].cantidad += itemToAdd.cantidad;
+            return newCart;
+          } else {
+            return [...prev, itemToAdd];
+          }
+        });
         setItemAgregadoReciente(itemToAdd);
         setSuccessModalOpen(true);
       } catch (e) {}
@@ -134,24 +149,35 @@ const PublicCatalog = () => {
 
   const addToCart = () => {
     const imgUrl = getImageUrl(prendaSeleccionada.foto_url || (prendaSeleccionada.imagenes && prendaSeleccionada.imagenes[0]?.imagen));
+    let itemToAdd = { ...prendaSeleccionada, cantidad: cantidadAComprar, imagen: imgUrl };
+
     if (prendaSeleccionada.variantes && prendaSeleccionada.variantes.length > 0) {
       if (!varianteSeleccionada) {
         showAlert("Por favor selecciona una variante (color/talla).");
         return;
       }
-      const itemToAdd = { 
-        ...prendaSeleccionada, 
-        varianteSeleccionada,
-        cantidad: cantidadAComprar,
-        imagen: imgUrl
-      };
-      setCartItems([...cartItems, itemToAdd]);
-      setItemAgregadoReciente(itemToAdd);
-    } else {
-      const itemToAdd = { ...prendaSeleccionada, cantidad: cantidadAComprar, imagen: imgUrl };
-      setCartItems([...cartItems, itemToAdd]);
-      setItemAgregadoReciente(itemToAdd);
+      itemToAdd.varianteSeleccionada = varianteSeleccionada;
     }
+
+    setCartItems(prev => {
+      const existingItemIndex = prev.findIndex(item => {
+        if (item.id !== itemToAdd.id) return false;
+        if (item.varianteSeleccionada && itemToAdd.varianteSeleccionada) {
+           return item.varianteSeleccionada.id === itemToAdd.varianteSeleccionada.id;
+        }
+        return true;
+      });
+      
+      if (existingItemIndex >= 0) {
+        const newCart = [...prev];
+        newCart[existingItemIndex].cantidad += itemToAdd.cantidad;
+        return newCart;
+      } else {
+        return [...prev, itemToAdd];
+      }
+    });
+
+    setItemAgregadoReciente(itemToAdd);
     setSuccessModalOpen(true);
   };
 
