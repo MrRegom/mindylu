@@ -20,43 +20,36 @@ class WatermarkService:
 
             # --- 1. MARCA DE AGUA DE TEXTO (Repetida y transparente) ---
             try:
-                # Crear una imagen temporal para el texto rotado
                 text_watermark = "Lu Prenditas"
-                # Tamaño de fuente más grande para que sea notorio
-                wm_font_size = max(int(img_width * 0.12), 40)
+                # Tamaño de fuente más pequeño (como el ejemplo de las zapatillas)
+                wm_font_size = max(int(img_width * 0.05), 18)
                 
                 try:
-                    wm_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf", wm_font_size)
+                    # Usar una fuente más fina (Sans)
+                    wm_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", wm_font_size)
                 except IOError:
                     wm_font = ImageFont.load_default()
 
-                # Calcular tamaño del texto
                 dummy_draw = ImageDraw.Draw(Image.new('RGBA', (1, 1)))
                 wm_bbox = dummy_draw.textbbox((0, 0), text_watermark, font=wm_font)
                 wm_width = wm_bbox[2] - wm_bbox[0]
                 wm_height = wm_bbox[3] - wm_bbox[1]
 
-                # Crear imagen para el texto (con un poco de margen)
                 txt_img = Image.new('RGBA', (wm_width + 40, wm_height + 40), (255, 255, 255, 0))
                 txt_draw = ImageDraw.Draw(txt_img)
                 
-                # Dibujar texto en blanco con sombra negra más marcada para garantizar lectura
-                # Sombra gruesa negra
-                txt_draw.text((23, 23), text_watermark, font=wm_font, fill=(0, 0, 0, 100))
-                # Texto principal blanco más sólido
-                txt_draw.text((20, 20), text_watermark, font=wm_font, fill=(255, 255, 255, 180))
+                # Letra blanca suave sin sombra oscura para un look más limpio y menos invasivo
+                txt_draw.text((20, 20), text_watermark, font=wm_font, fill=(255, 255, 255, 110))
                 
-                # Rotar el texto 30 grados
                 txt_rotated = txt_img.rotate(30, expand=True)
                 rw, rh = txt_rotated.size
                 
-                # Pegar en grilla sobre el overlay más juntos para que se vea más
-                step_x = int(rw * 1.2)
-                step_y = int(rh * 1.5)
+                # Pegar en grilla más junta (para que cubra toda la foto con un patrón chico)
+                step_x = int(rw * 1.3)
+                step_y = int(rh * 1.6)
                 
                 for x in range(-rw, img_width + rw, step_x):
                     for y in range(-rh, img_height + rh, step_y):
-                        # Desfase en filas intercaladas
                         offset_x = x if (y // step_y) % 2 == 0 else x + int(step_x * 0.5)
                         overlay.paste(txt_rotated, (int(offset_x), y), txt_rotated)
                         
