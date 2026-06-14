@@ -38,4 +38,5 @@ daphne==4.1.2
 uvicorn[standard]==0.27.1
 
 # Web Push Notifications
+cryptography==42.0.8
 pywebpush==1.14.0

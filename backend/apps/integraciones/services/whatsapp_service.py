@@ -274,8 +274,8 @@ class WhatsappService:
         )
         return self.enviar_mensaje_texto(conversacion.id, text_body)
 
-    def enviar_mensaje_texto(self, conversacion_id, text_body, reply_to_wam_id=None):
-        """Envia un mensaje de texto a traves de Meta API y lo guarda en BD."""
+    def enviar_mensaje_texto(self, conversacion_id, text_body, reply_to_wam_id=None, image_url=None):
+        """Envia un mensaje de texto o imagen a traves de Meta API y lo guarda en BD."""
         if not self.config or not self.config.access_token or not self.config.phone_number_id:
             logger.error("Faltan credenciales de Meta API en WhatsappConfig.")
             return None
@@ -291,14 +291,26 @@ class WhatsappService:
             "Authorization": f"Bearer {self.config.access_token}",
             "Content-Type": "application/json"
         }
-        payload = {
-            "messaging_product": "whatsapp",
-            "to": conversacion.client_phone,
-            "type": "text",
-            "text": {
-                "body": text_body
+        
+        if image_url:
+            payload = {
+                "messaging_product": "whatsapp",
+                "to": conversacion.client_phone,
+                "type": "image",
+                "image": {
+                    "link": image_url,
+                    "caption": text_body or ""
+                }
             }
-        }
+        else:
+            payload = {
+                "messaging_product": "whatsapp",
+                "to": conversacion.client_phone,
+                "type": "text",
+                "text": {
+                    "body": text_body or ""
+                }
+            }
         
         if reply_to_wam_id:
             payload["context"] = {

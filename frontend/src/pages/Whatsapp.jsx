@@ -288,6 +288,31 @@ const Whatsapp = () => {
     }
   };
 
+  const handleSendSuggestion = async (p) => {
+    try {
+      // Optimistic message (only text for now, but backend will send image)
+      const optimisticMsg = {
+        id: `temp-${Date.now()}`,
+        direction: 'OUTBOUND',
+        content: `[Imagen adjunta] ¡Mira esta opción hermosa que tengo disponible! 😍\n*${p.nombre}* - $${Number(p.precio).toLocaleString('es-CL')}\n\nStock actual: ${p.stock_info}\n\n¿Te gusta? 💕`,
+        status: 'sent',
+        created_at: new Date().toISOString()
+      };
+      setMessages(prev => [...prev, optimisticMsg]);
+
+      await api.post(`integraciones/whatsapp/conversaciones/${activeChatId}/enviar/`, {
+        content: `¡Mira esta opción hermosa que tengo disponible! 😍\n*${p.nombre}* - $${Number(p.precio).toLocaleString('es-CL')}\n\nStock actual: ${p.stock_info}\n\n¿Te gusta? 💕`,
+        image_url: p.imagen
+      });
+      fetchMensajes(activeChatId);
+      fetchConversaciones();
+    } catch (error) {
+      console.error('Error sending suggestion:', error);
+      alert('Error al enviar la sugerencia.');
+      fetchMensajes(activeChatId); // refresh
+    }
+  };
+
   const handleChatClick = (id) => {
     setActiveChatId(id);
   };
@@ -504,7 +529,7 @@ const Whatsapp = () => {
                       {msg.direction === 'OUTBOUND' && <CheckCheck size={14} color="#53bdeb" />}
                     </div>
                     {/* Quick Action Buttons para Intención de Compra */}
-                    {msg.direction === 'INBOUND' && msg.content.toLowerCase().includes("quiero comprar los siguientes") && (
+                    {msg.direction === 'INBOUND' && msg.content.toLowerCase().includes("quiero comprar") && (
                       <div style={{ display: 'flex', gap: '8px', marginTop: '8px', flexWrap: 'wrap' }}>
                         <button 
                           onClick={() => handleSendMessage(null, "¡Hola linda! ✨ Sí, lo tengo disponible. ¿Te gustaría coordinar la entrega o retiro?")}
@@ -540,6 +565,21 @@ const Whatsapp = () => {
                   <span style={{ fontSize: '0.8rem', color: '#999', padding: '0 8px' }}>No hay respuestas rápidas configuradas.</span>
                 )}
               </div>
+
+              {suggestedProducts.length > 0 && (
+                <div className="wa-suggested-products" style={{ padding: '8px 16px', display: 'flex', gap: '8px', overflowX: 'auto', background: '#fdf5f6', borderTop: '1px solid #faecee' }}>
+                  <span style={{ fontSize: '0.8rem', color: '#c46c7a', fontWeight: 'bold', alignSelf: 'center', whiteSpace: 'nowrap' }}>Sugerir Opciones (Envía la foto por Whatsapp):</span>
+                  {suggestedProducts.map(p => (
+                    <div key={p.id} style={{ display: 'flex', alignItems: 'center', background: '#fff', border: '1px solid #faecee', borderRadius: '8px', padding: '4px 8px', cursor: 'pointer', minWidth: 'max-content' }} onClick={() => handleSendSuggestion(p)}>
+                      <img src={p.imagen} alt={p.nombre} style={{ width: '32px', height: '32px', objectFit: 'cover', borderRadius: '4px', marginRight: '8px' }} />
+                      <div>
+                        <div style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#333' }}>{p.nombre}</div>
+                        <div style={{ fontSize: '0.65rem', color: '#888' }}>{p.stock_info}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
 
               <div style={{ position: 'relative' }}>
                 {replyingTo && (

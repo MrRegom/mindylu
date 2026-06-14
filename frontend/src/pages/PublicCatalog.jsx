@@ -52,7 +52,14 @@ const PublicCatalog = () => {
   const [categorias, setCategorias] = useState([]);
   const [config, setConfig] = useState(null);
   const [cartOpen, setCartOpen] = useState(false);
-  const [cartItems, setCartItems] = useState([]);
+  const [cartItems, setCartItems] = useState(() => {
+    try {
+      const saved = localStorage.getItem('cartItems');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   const [prendaSeleccionada, setPrendaSeleccionada] = useState(null);
@@ -79,6 +86,10 @@ const PublicCatalog = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem('cartItems', JSON.stringify(cartItems));
+  }, [cartItems]);
 
   // Escuchar si venimos de la vista de detalle con intención de agregar al carro
   useEffect(() => {

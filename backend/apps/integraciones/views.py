@@ -616,13 +616,14 @@ def listar_mensajes(request, conversacion_id):
 def enviar_mensaje(request, conversacion_id):
     text_body = request.data.get('content')
     reply_to = request.data.get('reply_to')
-    if not text_body:
+    image_url = request.data.get('image_url')
+    if not text_body and not image_url:
         return Response({'error': 'El contenido no puede estar vacío'}, status=400)
         
     from .services.whatsapp_service import WhatsappService
     service = WhatsappService(tenant=request.user.tenant)
     
-    nuevo_mensaje = service.enviar_mensaje_texto(conversacion_id, text_body, reply_to_wam_id=reply_to)
+    nuevo_mensaje = service.enviar_mensaje_texto(conversacion_id, text_body, reply_to_wam_id=reply_to, image_url=image_url)
     
     if nuevo_mensaje:
         return Response({
