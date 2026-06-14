@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Search, ShoppingBag } from 'lucide-react';
 import api from '../../../services/api';
 import { showAlert, showToast } from '../../../utils/alerts';
@@ -91,7 +91,7 @@ const VenderPrendaModal = ({ prenda, onClose, onSuccess }) => {
           <img src={prenda.foto_url || (prenda.imagenes?.[0]?.imagen)} alt={prenda.nombre} style={{ width: 60, height: 60, objectFit: 'cover', borderRadius: '8px' }} />
           <div>
             <h4 style={{ margin: '0 0 4px 0' }}>{prenda.nombre}</h4>
-            <span style={{ fontWeight: 600, color: 'var(--color-primary)' }}>$</span>
+            <span style={{ fontWeight: 600, color: 'var(--color-primary)' }}>${Number(prenda.precio || 0).toLocaleString('es-CL')}</span>
           </div>
         </div>
 
@@ -119,7 +119,7 @@ const VenderPrendaModal = ({ prenda, onClose, onSuccess }) => {
             >
               {filteredClientas.length === 0 && <option value="" disabled>No hay coincidencias</option>}
               {filteredClientas.map(c => (
-                <option key={c.id} value={c.id}>{c.nombre} {c.telefono ? () : ''}</option>
+                <option key={c.id} value={c.id}>{c.nombre} {c.telefono ? `(${c.telefono})` : ''}</option>
               ))}
             </select>
           </div>
