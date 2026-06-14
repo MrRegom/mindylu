@@ -179,6 +179,7 @@ const MantenedorList = ({ titulo, icono, endpoint, placeholder, forceUppercase =
                     value={editando.valor}
                     onChange={e => setEditando(prev => ({ ...prev, valor: e.target.value }))}
                     onKeyDown={handleEditKeyDown}
+                    style={{ backgroundColor: '#fff0f3', color: '#111b21' }}
                   />
                   <button type="button" className="btn-icon-success" onClick={handleSaveEdit} title="Guardar">
                     <Check size={15} />
