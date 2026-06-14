@@ -367,6 +367,10 @@
   color: #4a3b40;
   font-weight: 500;
   transition: all 0.3s ease;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 .file-upload-wrapper:hover .file-upload-box {
   background: rgba(251, 165, 181, 0.12);
