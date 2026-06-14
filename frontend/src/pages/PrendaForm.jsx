@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Plus, Trash2, Save } from 'lucide-react';
-import ColorPalettePicker from '../components/ColorPalettePicker';
 import { getHexForColor } from '../utils/colorMap';
 import api from '../services/api';
 import ImageUploader from '../components/ImageUploader';
@@ -409,15 +408,19 @@ const PrendaForm = () => {
                       </svg>
                     </div>
                     {activeDropdown === `color-${variante.id}` && (
-                      <div className="custom-select-dropdown" style={{ padding: '8px', maxWidth: '300px' }}>
-                        <ColorPalettePicker 
-                          availableColors={colores} 
-                          selectedColor={variante.color} 
-                          onSelectColor={(colorName) => {
-                            handleVarianteChange(variante.id, 'color', colorName);
-                            setActiveDropdown(null);
-                          }} 
-                        />
+                      <div className="custom-select-dropdown" style={{ zIndex: 100 }}>
+                        {colores.map(c => (
+                          <div
+                            key={c.id}
+                            className={`custom-select-option ${variante.color === c.nombre ? 'selected' : ''}`}
+                            onClick={() => {
+                              handleVarianteChange(variante.id, 'color', c.nombre);
+                              setActiveDropdown(null);
+                            }}
+                          >
+                            {c.nombre}
+                          </div>
+                        ))}
                       </div>
                     )}
                   </div>

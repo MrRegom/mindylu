@@ -1,6 +1,5 @@
 import React, { useRef } from 'react';
 import { Upload, X, Plus } from 'lucide-react';
-import ColorPalettePicker from './ColorPalettePicker';
 import './ImageUploader.css';
 
 const ImageUploader = ({ images, setImages, variantes, colores }) => {
@@ -82,11 +81,16 @@ const ImageUploader = ({ images, setImages, variantes, colores }) => {
             <img src={img.preview} alt={`preview-${idx}`} className="row-preview-img" />
           </div>
           <div className="col-color" style={{ display: 'flex', alignItems: 'center' }}>
-            <ColorPalettePicker 
-              availableColors={coloresUnicos} 
-              selectedColor={img.color} 
-              onSelectColor={(c) => updateImage(img.id, 'color', c === img.color ? '' : c)} 
-            />
+            <select 
+              value={img.color} 
+              onChange={e => updateImage(img.id, 'color', e.target.value)}
+              className="row-input"
+            >
+              <option value="">-- Asignar --</option>
+              {coloresUnicos.map(c => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
           </div>
           <div className="col-orden">
             <input 
