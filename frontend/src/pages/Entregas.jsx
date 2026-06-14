@@ -38,7 +38,7 @@ const Entregas = () => {
       const cacheBuster = new Date().getTime();
       const [entregasRes, reservasRes] = await Promise.all([
         api.get(`/pedidos/entregas/?_t=${cacheBuster}`),
-        api.get(`/pedidos/pedidos/?estado=apartado&sin_ruta=true&_t=${cacheBuster}`)
+        api.get(`/pedidos/?estado=apartado&sin_ruta=true&_t=${cacheBuster}`)
       ]);
       setEntregas(entregasRes.data.results || entregasRes.data);
       setReservas(reservasRes.data.results || reservasRes.data);
@@ -52,7 +52,7 @@ const Entregas = () => {
   const handleCancelarPedido = async (pedidoId) => {
     if (await showConfirm("¿Seguro que deseas cancelar este pedido? Las prendas volverán automáticamente al catálogo.")) {
       try {
-        await api.post(`/pedidos/pedidos/${pedidoId}/cancelar/`);
+        await api.post(`/pedidos/${pedidoId}/cancelar/`);
         showAlert("Pedido cancelado. El stock ha sido devuelto.");
         fetchEntregas();
       } catch (error) {
@@ -64,7 +64,7 @@ const Entregas = () => {
 
   const handleEntregarPedido = async (pedidoId) => {
     try {
-      await api.post(`/pedidos/pedidos/${pedidoId}/entregar/`);
+      await api.post(`/pedidos/${pedidoId}/entregar/`);
       showToast("¡Pedido marcado como entregado! ✅");
       fetchEntregas();
     } catch (error) {
@@ -76,7 +76,7 @@ const Entregas = () => {
   const handleDesvincularPedido = async (pedidoId, rutaId) => {
     if (await showConfirm("¿Seguro que deseas reagendar? El pedido saldrá de esta ruta pero mantendrá las prendas apartadas.")) {
       try {
-        await api.post(`/pedidos/pedidos/${pedidoId}/desvincular_ruta/`, { ruta_id: rutaId });
+        await api.post(`/pedidos/${pedidoId}/desvincular_ruta/`, { ruta_id: rutaId });
         showToast("Pedido reagendado.");
         fetchEntregas();
       } catch (error) {
@@ -114,7 +114,7 @@ const Entregas = () => {
 
     if (isConfirmed && rutaId) {
       try {
-        await api.post(`/pedidos/pedidos/${pedidoId}/asignar_ruta/`, { ruta_id: rutaId });
+        await api.post(`/pedidos/${pedidoId}/asignar_ruta/`, { ruta_id: rutaId });
         showToast("Pedido asignado a la ruta exitosamente.");
         fetchEntregas();
       } catch (error) {
