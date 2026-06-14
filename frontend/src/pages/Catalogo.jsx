@@ -5,12 +5,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
-import { Plus, Check, ImageIcon, Trash2, Search, Edit2, Rocket, X, Share2, Calendar, Star, Images, Send } from 'lucide-react';
+import { Plus, Check, ImageIcon, Trash2, Search, Edit2, Rocket, X, Share2, Calendar, Star, Images, Send, ShoppingBag } from 'lucide-react';
 import GlobalSpinner from '../components/GlobalSpinner';
 import api from '../services/api';
 import './Catalogo.css';
 import { showAlert, showConfirm, showToast } from '../utils/alerts';
 import FacebookPublishModal from '../components/catalogo/FacebookPublishModal';
+import VenderPrendaModal from '../components/catalogo/VenderPrendaModal';
 
 const Catalogo = () => {
   const navigate = useNavigate();
@@ -29,6 +30,9 @@ const Catalogo = () => {
   const [mensajePublicar, setMensajePublicar] = useState('');
   const [fechaPublicar, setFechaPublicar] = useState('');
   const [publicando, setPublicando] = useState(false);
+
+  // Vender desde catálogo
+  const [venderModalPrenda, setVenderModalPrenda] = useState(null);
 
   // Modales existentes
   const [fullscreenImage, setFullscreenImage] = useState(null);
@@ -270,13 +274,16 @@ const Catalogo = () => {
                     </div>
                     {!modoPublicar && (
                       <div style={{ display: 'flex', gap: 2 }}>
+                        <button onClick={(e) => { e.stopPropagation(); setVenderModalPrenda(prenda); }} style={{ background: 'transparent', border: 'none', color: '#25D366', cursor: 'pointer', padding: 4, display: 'inline-flex' }} title="Vender / Asignar a Clienta">
+                          <ShoppingBag size={16} />
+                        </button>
                         <button onClick={(e) => { e.stopPropagation(); setPrendaToPublish(prenda); }} style={{ background: 'transparent', border: 'none', color: '#1877F2', cursor: 'pointer', padding: 4, display: 'inline-flex' }} title="Publicar en Facebook">
                           <Send size={16} />
                         </button>
-                        <button onClick={(e) => { e.stopPropagation(); handleEditarPrenda(prenda); }} style={{ background: 'transparent', border: 'none', color: 'var(--color-primary)', cursor: 'pointer', padding: 4, display: 'inline-flex' }}>
+                        <button onClick={(e) => { e.stopPropagation(); handleEditarPrenda(prenda); }} style={{ background: 'transparent', border: 'none', color: 'var(--color-primary)', cursor: 'pointer', padding: 4, display: 'inline-flex' }} title="Editar prenda">
                           <Edit2 size={16} />
                         </button>
-                        <button onClick={(e) => { e.stopPropagation(); handleArchivarPrenda(prenda.id, prenda.nombre); }} style={{ background: 'transparent', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer', padding: 4, display: 'inline-flex' }}>
+                        <button onClick={(e) => { e.stopPropagation(); handleArchivarPrenda(prenda.id, prenda.nombre); }} style={{ background: 'transparent', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer', padding: 4, display: 'inline-flex' }} title="Archivar prenda">
                           <Trash2 size={16} />
                         </button>
                       </div>
@@ -463,6 +470,16 @@ const Catalogo = () => {
           prenda={prendaToPublish} 
           onClose={() => setPrendaToPublish(null)} 
           onPublished={() => fetchCatalogo()} 
+        />
+      )}
+
+      {venderModalPrenda && (
+        <VenderPrendaModal 
+          prenda={venderModalPrenda} 
+          onClose={() => setVenderModalPrenda(null)} 
+          onSuccess={() => {
+            fetchCatalogo();
+          }} 
         />
       )}
     </div>

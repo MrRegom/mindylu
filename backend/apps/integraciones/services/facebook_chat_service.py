@@ -197,7 +197,9 @@ class FacebookChatService:
             'Content-Type': 'application/json'
         }
         try:
-            requests.post(url_reply, json=payload_reply, headers=headers)
+            r1 = requests.post(url_reply, json=payload_reply, headers=headers)
+            if r1.status_code != 200:
+                logger.error(f"Error respondiendo comentario (Público): {r1.text}")
         except Exception as e:
             logger.warning(f"No se pudo responder al comentario de forma pública: {e}")
             
@@ -211,6 +213,8 @@ class FacebookChatService:
             "tag": "POST_PURCHASE_UPDATE"
         }
         try:
-            requests.post(url_private, json=payload_private, headers=headers)
+            r2 = requests.post(url_private, json=payload_private, headers=headers)
+            if r2.status_code != 200:
+                logger.error(f"Error enviando DM (Privado): {r2.text}")
         except Exception as e:
             logger.warning(f"No se pudo enviar mensaje privado al comentario: {e}")

@@ -553,6 +553,7 @@ def whatsapp_webhook(request):
 def facebook_webhook(request):
     """
     Webhook para recibir eventos de Meta (Facebook Messenger).
+    Deshabilitado a petición de la usuaria para simplificar.
     """
     if request.method == 'GET':
         mode = request.GET.get('hub.mode')
@@ -569,21 +570,8 @@ def facebook_webhook(request):
         return HttpResponse('Bad Request', status=400)
 
     elif request.method == 'POST':
-        try:
-            import json
-            from .services.facebook_chat_service import FacebookChatService
-            
-            body = json.loads(request.body.decode('utf-8'))
-            
-            if body.get('object') == 'page':
-                service = FacebookChatService()
-                service.procesar_webhook_payload(body)
-                return HttpResponse('EVENT_RECEIVED', status=200)
-            else:
-                return HttpResponse('Not Found', status=404)
-        except Exception as e:
-            print(f"Error en webhook FB POST: {e}")
-            return HttpResponse('Internal Server Error', status=500)
+        # Desactivamos el procesamiento de mensajes de Facebook
+        return HttpResponse('EVENT_RECEIVED', status=200)
             
     return HttpResponse('Method Not Allowed', status=405)
 

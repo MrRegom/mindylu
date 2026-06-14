@@ -140,7 +140,7 @@ const EditarPrendaModal = ({ isOpen, onClose, prenda, onSuccess }) => {
         <form onSubmit={handleSubmit} className="editar-form">
           <div className="editar-preview" style={{ marginBottom: '24px' }}>
             <h3>Imágenes de la Prenda</h3>
-            <ImageUploader images={images} setImages={setImages} variantes={variantes} />
+            <ImageUploader images={images} setImages={setImages} variantes={variantes} colores={COLORES_DISPONIBLES.map(c => ({nombre: c}))} />
           </div>
 
           <div className="form-group">

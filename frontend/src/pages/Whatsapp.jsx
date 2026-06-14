@@ -61,6 +61,8 @@ const Whatsapp = () => {
   const { wsMessage, fetchUnreadCount } = useContext(GlobalContext);
 
   const [respuestasRapidas, setRespuestasRapidas] = useState([]);
+  const [cuentasBancarias, setCuentasBancarias] = useState([]);
+  const [rutasActivas, setRutasActivas] = useState([]);
 
   const fetchConversaciones = async (tab = activeTab) => {
     try {
@@ -96,6 +98,21 @@ const Whatsapp = () => {
     }
   };
 
+  const fetchCuentasYRutas = async () => {
+    try {
+      const [resCuentas, resRutas] = await Promise.all([
+        api.get('cuentas/bancos/'),
+        api.get('pedidos/entregas/')
+      ]);
+      setCuentasBancarias(resCuentas.data.results || resCuentas.data);
+      const hoy = new Date().toISOString().split('T')[0];
+      const allRutas = resRutas.data.results || resRutas.data;
+      setRutasActivas(allRutas.filter(r => r.fecha >= hoy));
+    } catch (error) {
+      console.error('Error fetching cuentas/rutas:', error);
+    }
+  };
+
   const fetchMensajes = async (chatId) => {
     try {
       const response = await api.get(`integraciones/whatsapp/conversaciones/${chatId}/mensajes/`);
@@ -111,6 +128,7 @@ const Whatsapp = () => {
   useEffect(() => {
     fetchConversaciones(activeTab);
     fetchRespuestasRapidas();
+    fetchCuentasYRutas();
     if (activeChatRef.current) {
       fetchMensajes(activeChatRef.current);
     }
@@ -225,6 +243,20 @@ const Whatsapp = () => {
   }, []);
 
   const [suggestionModalOpen, setSuggestionModalOpen] = useState(false);
+  const [showCuentasMenu, setShowCuentasMenu] = useState(false);
+  const [showRutasMenu, setShowRutasMenu] = useState(false);
+
+  // Cerrar menús al hacer click fuera
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (!e.target.closest('.quick-menu-container')) {
+        setShowCuentasMenu(false);
+        setShowRutasMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Fetch messages when a chat is selected
   useEffect(() => {
@@ -570,6 +602,77 @@ const Whatsapp = () => {
                 >
                   🛍️ Sugerir Opción
                 </button>
+
+                {/* Dropdown de Cuentas */}
+                <div className="quick-menu-container" style={{ position: 'relative' }}>
+                  <button 
+                    type="button"
+                    className="wa-quick-reply-btn"
+                    style={{ background: '#4a90e2', color: 'white', border: 'none', fontWeight: 'bold' }}
+                    onClick={() => { setShowCuentasMenu(!showCuentasMenu); setShowRutasMenu(false); }}
+                  >
+                    🏦 Cuentas
+                  </button>
+                  {showCuentasMenu && (
+                    <div style={{ position: 'absolute', bottom: '100%', left: 0, marginBottom: '8px', background: 'white', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.15)', padding: '8px', display: 'flex', flexDirection: 'column', gap: '4px', zIndex: 100, width: 'max-content', maxWidth: '300px', maxHeight: '300px', overflowY: 'auto' }}>
+                      {cuentasBancarias.length === 0 ? (
+                        <div style={{ padding: '8px', fontSize: '0.8rem', color: '#888' }}>No hay cuentas guardadas</div>
+                      ) : (
+                        cuentasBancarias.map(c => (
+                          <button 
+                            key={c.id} 
+                            type="button" 
+                            style={{ textAlign: 'left', padding: '8px 12px', border: 'none', background: '#f5f7fa', borderRadius: '8px', cursor: 'pointer', fontSize: '0.8rem' }}
+                            onClick={() => {
+                              const texto = `🏦 *Banco:* ${c.banco}\n📋 *Tipo:* ${c.tipo_cuenta}\n🔢 *Número:* ${c.numero_cuenta}\n👤 *Titular:* ${c.nombre_titular}\n🪪 *RUT:* ${c.rut_titular}`;
+                              setInputText(inputText + (inputText ? '\n\n' : '') + texto);
+                              setShowCuentasMenu(false);
+                            }}
+                          >
+                            <strong>{c.banco}</strong> - {c.nombre_titular}
+                          </button>
+                        ))
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Dropdown de Rutas */}
+                <div className="quick-menu-container" style={{ position: 'relative' }}>
+                  <button 
+                    type="button"
+                    className="wa-quick-reply-btn"
+                    style={{ background: '#f39c12', color: 'white', border: 'none', fontWeight: 'bold' }}
+                    onClick={() => { setShowRutasMenu(!showRutasMenu); setShowCuentasMenu(false); }}
+                  >
+                    🚚 Entregas
+                  </button>
+                  {showRutasMenu && (
+                    <div style={{ position: 'absolute', bottom: '100%', left: 0, marginBottom: '8px', background: 'white', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.15)', padding: '8px', display: 'flex', flexDirection: 'column', gap: '4px', zIndex: 100, width: 'max-content', maxWidth: '300px', maxHeight: '300px', overflowY: 'auto' }}>
+                      {rutasActivas.length === 0 ? (
+                        <div style={{ padding: '8px', fontSize: '0.8rem', color: '#888' }}>No hay rutas programadas</div>
+                      ) : (
+                        rutasActivas.map(r => (
+                          <button 
+                            key={r.id} 
+                            type="button" 
+                            style={{ textAlign: 'left', padding: '8px 12px', border: 'none', background: '#fcf3cf', borderRadius: '8px', cursor: 'pointer', fontSize: '0.8rem' }}
+                            onClick={() => {
+                              const fechaFormateada = new Date(r.fecha).toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'short' });
+                              const horaStr = r.hora_estimada ? r.hora_estimada.substring(0, 5) : 'a convenir';
+                              const punto = r.punto_entrega_detalle ? r.punto_entrega_detalle.nombre : 'Punto por definir';
+                              const texto = `📍 *Ruta:* ${punto}\n📅 *Fecha:* ${fechaFormateada}\n🕒 *Hora:* ${horaStr}`;
+                              setInputText(inputText + (inputText ? '\n\n' : '') + texto);
+                              setShowRutasMenu(false);
+                            }}
+                          >
+                            <strong>{r.fecha}</strong>: {r.punto_entrega_detalle?.nombre}
+                          </button>
+                        ))
+                      )}
+                    </div>
+                  )}
+                </div>
 
                 {respuestasRapidas.map(respuesta => (
                   <button 

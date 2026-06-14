@@ -214,7 +214,9 @@ const PrendaForm = () => {
 
       // Añadir las imágenes reales en el mismo orden
       images.forEach((imgObj) => {
-        payload.append('imagenes', imgObj.file);
+        if (imgObj.file) {
+          payload.append('imagenes', imgObj.file);
+        }
       });
 
       // Guardar la prenda en el backend local

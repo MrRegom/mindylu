@@ -237,7 +237,7 @@ class WhatsappService:
                     texto_envio += f"\n*También tenemos otras opciones de envío:*\n{texto_envio_general}\n"
                 texto_envio += "\n¿De qué sector eres para ver si te podemos sumar a alguna ruta o coordinar tu envío? 💕"
             else:
-                texto_envio = "Por ahora no tenemos entregas programadas, pero realizamos entregas y envíos a convenir. Cuéntame, ¿cuál es tu disponibilidad para que lo coordinemos? 💕"
+                texto_envio = "Por ahora no tenemos entregas programadas, ¡pero te avisaremos en cuanto se abra la agenda para que te anotes! 💕 Mientras tanto, también realizamos envíos a convenir."
             
             respuesta = f"¡Hola Linda! {texto_envio}"
 

@@ -84,7 +84,7 @@ const Layout = () => {
         
         <div className="sidebar-footer">
           <div className="sidebar-user-profile" onClick={() => window.location.href='/panel/perfil'}>
-            <div className="sidebar-avatar">ML</div>
+            <div className="sidebar-avatar">M</div>
             <div className="sidebar-user-info">
               <strong>Mindy Lu</strong>
               <span>Ver perfil</span>
