@@ -20,26 +20,39 @@ class WatermarkService:
 
             # --- 1. MARCA DE AGUA DE TEXTO (Repetida y transparente) ---
             try:
-                text_watermark = "Lu Prenditas"
-                # Tamaño de fuente más pequeño (como el ejemplo de las zapatillas)
+                text_watermark = "Lu Prenditas\nBY MINDY PALACIOS"
+                # Tamaño de fuente más pequeño
                 wm_font_size = max(int(img_width * 0.05), 18)
                 
                 try:
-                    # Usar una fuente más fina (Sans)
                     wm_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", wm_font_size)
                 except IOError:
                     wm_font = ImageFont.load_default()
 
                 dummy_draw = ImageDraw.Draw(Image.new('RGBA', (1, 1)))
-                wm_bbox = dummy_draw.textbbox((0, 0), text_watermark, font=wm_font)
-                wm_width = wm_bbox[2] - wm_bbox[0]
-                wm_height = wm_bbox[3] - wm_bbox[1]
+                
+                # Para centrar el texto multilinea
+                lines = text_watermark.split('\n')
+                max_width = 0
+                total_height = 0
+                for line in lines:
+                    bbox = dummy_draw.textbbox((0, 0), line, font=wm_font)
+                    w = bbox[2] - bbox[0]
+                    h = bbox[3] - bbox[1]
+                    if w > max_width: max_width = w
+                    total_height += h + 10 # 10px de espaciado
 
-                txt_img = Image.new('RGBA', (wm_width + 40, wm_height + 40), (255, 255, 255, 0))
+                txt_img = Image.new('RGBA', (max_width + 40, total_height + 40), (255, 255, 255, 0))
                 txt_draw = ImageDraw.Draw(txt_img)
                 
-                # Letra blanca suave sin sombra oscura para un look más limpio y menos invasivo
-                txt_draw.text((20, 20), text_watermark, font=wm_font, fill=(255, 255, 255, 110))
+                # Dibujar texto centrado
+                current_y = 20
+                for line in lines:
+                    bbox = dummy_draw.textbbox((0, 0), line, font=wm_font)
+                    w = bbox[2] - bbox[0]
+                    x = 20 + (max_width - w) / 2
+                    txt_draw.text((x, current_y), line, font=wm_font, fill=(255, 255, 255, 110))
+                    current_y += (bbox[3] - bbox[1]) + 10
                 
                 txt_rotated = txt_img.rotate(30, expand=True)
                 rw, rh = txt_rotated.size
