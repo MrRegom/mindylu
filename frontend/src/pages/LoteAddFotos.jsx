@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, Upload, Trash2, Plus } from 'lucide-react';
 import api from '../services/api';
 import './CargaMasiva.css';
+import './SubidaMasiva.css';
 
 import { compressImage } from '../utils/imageCompression';
 import { showAlert, showConfirm, showToast } from '../utils/alerts';
@@ -12,6 +13,36 @@ const LoteAddFotos = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [items, setItems] = useState([]);
+  const [colores, setColores] = useState([]);
+  const [tallas, setTallas] = useState([]);
+  const [activeDropdown, setActiveDropdown] = useState(null);
+
+  useEffect(() => {
+    const fetchDatos = async () => {
+      try {
+        const [resTallas, resColores] = await Promise.all([
+          api.get('/catalogo/tallas/'),
+          api.get('/catalogo/colores/')
+        ]);
+        setTallas(resTallas.data.results || resTallas.data);
+        setColores(resColores.data.results || resColores.data);
+      } catch (error) {
+        console.error("Error cargando datos:", error);
+      }
+    };
+    fetchDatos();
+  }, []);
+
+  // Cerrar dropdowns al hacer click fuera
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (!e.target.closest('.custom-select-trigger') && !e.target.closest('.custom-select-dropdown')) {
+        setActiveDropdown(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleFiles = async (e) => {
     const files = Array.from(e.target.files);
@@ -153,13 +184,62 @@ const LoteAddFotos = () => {
                     {item.variantes.map((v) => (
                       <div key={v.id} className="variante-mini-row">
                         <div className="variante-fields">
-                          <div className="variante-field-group">
+                          <div className="variante-field-group" style={{ position: 'relative', zIndex: activeDropdown === `color-${item.id}-${v.id}` ? 100 : 1 }}>
                             <label>Color</label>
-                            <input type="text" placeholder="Ej: Rojo" value={v.color} onChange={(e) => handleVarianteChange(item.id, v.id, 'color', e.target.value)} className="input-mini" />
+                            <div
+                              className={`custom-select-trigger ${v.color ? 'has-value' : ''}`}
+                              onClick={() => setActiveDropdown(prev => prev === `color-${item.id}-${v.id}` ? null : `color-${item.id}-${v.id}`)}
+                            >
+                              <span>{v.color || 'Elegir color...'}</span>
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <polyline points="6 9 12 15 18 9" />
+                              </svg>
+                            </div>
+                            {activeDropdown === `color-${item.id}-${v.id}` && (
+                              <div className="custom-select-dropdown" style={{ zIndex: 100 }}>
+                                {colores.map(c => (
+                                  <div
+                                    key={c.id}
+                                    className={`custom-select-option ${v.color === c.nombre ? 'selected' : ''}`}
+                                    onClick={() => {
+                                      handleVarianteChange(item.id, v.id, 'color', c.nombre);
+                                      setActiveDropdown(null);
+                                    }}
+                                  >
+                                    {c.nombre}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
                           </div>
-                          <div className="variante-field-group">
+                          
+                          <div className="variante-field-group" style={{ position: 'relative', zIndex: activeDropdown === `talla-${item.id}-${v.id}` ? 100 : 1 }}>
                             <label>Talla</label>
-                            <input type="text" placeholder="Ej: L" value={v.talla} onChange={(e) => handleVarianteChange(item.id, v.id, 'talla', e.target.value)} className="input-mini" />
+                            <div
+                              className={`custom-select-trigger ${v.talla ? 'has-value' : ''}`}
+                              onClick={() => setActiveDropdown(prev => prev === `talla-${item.id}-${v.id}` ? null : `talla-${item.id}-${v.id}`)}
+                            >
+                              <span>{v.talla || 'Elegir talla...'}</span>
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <polyline points="6 9 12 15 18 9" />
+                              </svg>
+                            </div>
+                            {activeDropdown === `talla-${item.id}-${v.id}` && (
+                              <div className="custom-select-dropdown" style={{ zIndex: 100 }}>
+                                {tallas.map(t => (
+                                  <div
+                                    key={t.id}
+                                    className={`custom-select-option ${v.talla === t.nombre ? 'selected' : ''}`}
+                                    onClick={() => {
+                                      handleVarianteChange(item.id, v.id, 'talla', t.nombre);
+                                      setActiveDropdown(null);
+                                    }}
+                                  >
+                                    {t.nombre}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
                           </div>
                           <div className="variante-field-group">
                             <label>Stock</label>
