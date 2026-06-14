@@ -12,6 +12,7 @@ const Whatsapp = () => {
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState('whatsapp');
   const messagesEndRef = useRef(null);
   const prevChatsRef = useRef([]);
   const activeChatRef = useRef(activeChatId);
@@ -61,9 +62,9 @@ const Whatsapp = () => {
 
   const [respuestasRapidas, setRespuestasRapidas] = useState([]);
 
-  const fetchConversaciones = async () => {
+  const fetchConversaciones = async (tab = activeTab) => {
     try {
-      const response = await api.get('integraciones/whatsapp/conversaciones/');
+      const response = await api.get(`integraciones/whatsapp/conversaciones/?plataforma=${tab}`);
       const newChats = response.data.conversaciones || [];
       
       // Detectar si hay un nuevo mensaje (incremento en unread_count)
@@ -108,12 +109,12 @@ const Whatsapp = () => {
 
   // Initial fetch
   useEffect(() => {
-    fetchConversaciones();
+    fetchConversaciones(activeTab);
     fetchRespuestasRapidas();
     if (activeChatRef.current) {
       fetchMensajes(activeChatRef.current);
     }
-  }, []);
+  }, [activeTab]);
 
   // Handle incoming global wsMessage
   useEffect(() => {
@@ -121,6 +122,7 @@ const Whatsapp = () => {
 
     if (wsMessage.type === 'chat_message') {
       const data = wsMessage.data;
+      if (data.plataforma && data.plataforma !== activeTab) return;
       
       setChats(prevChats => {
         const chatExists = prevChats.some(c => c.id === data.conversacion_id);
@@ -397,9 +399,9 @@ const Whatsapp = () => {
       <div className="page-header whatsapp-header-desktop" style={{ padding: '12px 24px', borderBottom: '1px solid #faecee', background: '#fff', margin: 0 }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <h1 style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1.1rem', margin: 0, color: '#d16b7e', fontFamily: "'Playfair Display', serif" }}>
-              <MessageCircle size={20} color="#d16b7e" />
-              Bandeja de Entrada
+            <h1 style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1.1rem', margin: 0, color: activeTab === 'whatsapp' ? '#d16b7e' : '#0084FF', fontFamily: "'Playfair Display', serif" }}>
+              <MessageCircle size={20} color={activeTab === 'whatsapp' ? '#d16b7e' : '#0084FF'} />
+              Bandeja de Entrada {activeTab === 'facebook' ? 'Facebook' : 'WhatsApp'}
             </h1>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#fdf5f6', padding: '4px 8px', borderRadius: '12px', color: '#c46c7a', fontSize: '0.65rem', fontWeight: 600, border: '1px solid #faecee' }}>
@@ -423,6 +425,31 @@ const Whatsapp = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
+          </div>
+          
+          <div style={{ display: 'flex', borderBottom: '1px solid #eee', marginBottom: '8px' }}>
+            <button 
+              onClick={() => setActiveTab('whatsapp')}
+              style={{ 
+                flex: 1, padding: '10px 0', border: 'none', background: 'none', cursor: 'pointer',
+                borderBottom: activeTab === 'whatsapp' ? '2px solid #25D366' : '2px solid transparent',
+                color: activeTab === 'whatsapp' ? '#25D366' : '#888',
+                fontWeight: activeTab === 'whatsapp' ? 'bold' : 'normal'
+              }}
+            >
+              WhatsApp
+            </button>
+            <button 
+              onClick={() => setActiveTab('facebook')}
+              style={{ 
+                flex: 1, padding: '10px 0', border: 'none', background: 'none', cursor: 'pointer',
+                borderBottom: activeTab === 'facebook' ? '2px solid #0084FF' : '2px solid transparent',
+                color: activeTab === 'facebook' ? '#0084FF' : '#888',
+                fontWeight: activeTab === 'facebook' ? 'bold' : 'normal'
+              }}
+            >
+              Facebook
+            </button>
           </div>
           <div className="wa-chat-list">
             {filteredChats.length === 0 && (
@@ -585,7 +612,7 @@ const Whatsapp = () => {
               <div style={{ width: 120, height: 120, background: '#e0e0e0', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '24px' }}>
                 <MessageCircle size={64} color="#fff" />
               </div>
-              <h2 style={{ color: '#555', fontWeight: 300 }}>MindyLu WhatsApp</h2>
+              <h2 style={{ color: '#555', fontWeight: 300 }}>MindyLu {activeTab === 'whatsapp' ? 'WhatsApp' : 'Facebook'}</h2>
               <p>Selecciona un chat para comenzar a responder.</p>
             </div>
           )}

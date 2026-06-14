@@ -53,8 +53,8 @@ class WhatsappService:
         if not client_phone or not wam_id:
             return
 
-        # Check if message already exists
-        if Mensaje.objects.filter(wam_id=wam_id).exists():
+        # Check for duplicates
+        if Mensaje.objects.filter(external_id=wam_id).exists():
             return
 
         # Get or create Conversacion
@@ -83,17 +83,16 @@ class WhatsappService:
             conversacion.status = 'OPEN'
             conversacion.save()
 
-        # Create Mensaje
-        mensaje = Mensaje.objects.create(
+        mensaje_obj = Mensaje.objects.create(
             conversacion=conversacion,
-            wam_id=wam_id,
+            external_id=wam_id,
             direction='INBOUND',
             content=content,
             status='delivered'
         )
 
         # Broadcast via WebSocket
-        self._broadcast_websocket(conversacion, mensaje)
+        self._broadcast_websocket(conversacion, mensaje_obj)
 
         # Enviar Notificación Web Push Nivel OS
         self._enviar_notificacion_push(conversacion, client_name, content)
@@ -323,12 +322,12 @@ class WhatsappService:
             data = response.json()
             # Extract new message ID
             messages_info = data.get('messages', [])
-            wam_id = messages_info[0].get('id') if messages_info else f"outbound_{conversacion.id}_{response.status_code}"
+            external_id = messages_info[0].get('id') if messages_info else f"outbound_{conversacion.id}_{response.status_code}"
 
             # Save to DB
             mensaje = Mensaje.objects.create(
                 conversacion=conversacion,
-                wam_id=wam_id,
+                external_id=external_id,
                 direction='OUTBOUND',
                 content=text_body,
                 status='sent'

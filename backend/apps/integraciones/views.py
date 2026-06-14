@@ -549,6 +549,45 @@ def whatsapp_webhook(request):
     return HttpResponse('Method Not Allowed', status=405)
 
 
+@csrf_exempt
+def facebook_webhook(request):
+    """
+    Webhook para recibir eventos de Meta (Facebook Messenger).
+    """
+    if request.method == 'GET':
+        mode = request.GET.get('hub.mode')
+        token = request.GET.get('hub.verify_token')
+        challenge = request.GET.get('hub.challenge')
+
+        VERIFY_TOKEN = config('FACEBOOK_VERIFY_TOKEN', default=config('WHATSAPP_VERIFY_TOKEN', default='mindylu_secret_token_123'))
+
+        if mode and token:
+            if mode == 'subscribe' and token == VERIFY_TOKEN:
+                return HttpResponse(challenge, status=200)
+            else:
+                return HttpResponse('Forbidden', status=403)
+        return HttpResponse('Bad Request', status=400)
+
+    elif request.method == 'POST':
+        try:
+            import json
+            from .services.facebook_chat_service import FacebookChatService
+            
+            body = json.loads(request.body.decode('utf-8'))
+            
+            if body.get('object') == 'page':
+                service = FacebookChatService()
+                service.procesar_webhook_payload(body)
+                return HttpResponse('EVENT_RECEIVED', status=200)
+            else:
+                return HttpResponse('Not Found', status=404)
+        except Exception as e:
+            print(f"Error en webhook FB POST: {e}")
+            return HttpResponse('Internal Server Error', status=500)
+            
+    return HttpResponse('Method Not Allowed', status=405)
+
+
 # --- Nuevos Endpoints para la UI (Bandeja de Entrada) ---
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -559,8 +598,9 @@ from django.db.models import OuterRef, Subquery
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def listar_conversaciones(request):
+    plataforma = request.GET.get('plataforma', 'whatsapp')
     last_msg_qs = Mensaje.objects.filter(conversacion=OuterRef('pk')).order_by('-created_at')
-    conversaciones = Conversacion.objects.filter(tenant=request.user.tenant)\
+    conversaciones = Conversacion.objects.filter(tenant=request.user.tenant, plataforma=plataforma)\
         .annotate(last_message_content=Subquery(last_msg_qs.values('content')[:1]))\
         .order_by('-last_message_at')
     data = []
@@ -571,6 +611,7 @@ def listar_conversaciones(request):
             'client_name': c.client_name,
             'unread_count': c.unread_count,
             'status': c.status,
+            'plataforma': c.plataforma,
             'last_message_at': c.last_message_at.isoformat() if c.last_message_at else None,
             'last_message_content': getattr(c, 'last_message_content', ''),
         })
@@ -579,8 +620,9 @@ def listar_conversaciones(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def obtener_unread_count(request):
+    plataforma = request.GET.get('plataforma', 'whatsapp')
     from django.db.models import Sum
-    total = Conversacion.objects.filter(tenant=request.user.tenant, status='OPEN').aggregate(total=Sum('unread_count'))['total'] or 0
+    total = Conversacion.objects.filter(tenant=request.user.tenant, status='OPEN', plataforma=plataforma).aggregate(total=Sum('unread_count'))['total'] or 0
     return Response({'unread_count': total}, status=200)
 
 
@@ -602,7 +644,7 @@ def listar_mensajes(request, conversacion_id):
     for m in mensajes:
         data.append({
             'id': m.id,
-            'wam_id': m.wam_id,
+            'external_id': m.external_id,
             'direction': m.direction,
             'content': m.content,
             'status': m.status,
@@ -620,15 +662,25 @@ def enviar_mensaje(request, conversacion_id):
     if not text_body and not image_url:
         return Response({'error': 'El contenido no puede estar vacío'}, status=400)
         
-    from .services.whatsapp_service import WhatsappService
-    service = WhatsappService(tenant=request.user.tenant)
-    
-    nuevo_mensaje = service.enviar_mensaje_texto(conversacion_id, text_body, reply_to_wam_id=reply_to, image_url=image_url)
+    from .models import Conversacion
+    try:
+        conversacion = Conversacion.objects.get(id=conversacion_id)
+    except Conversacion.DoesNotExist:
+        return Response({'error': 'Conversacion no encontrada'}, status=404)
+
+    if conversacion.plataforma == 'facebook':
+        from .services.facebook_chat_service import FacebookChatService
+        service = FacebookChatService(tenant=request.user.tenant)
+        nuevo_mensaje = service.enviar_mensaje_texto(conversacion_id, text_body)
+    else:
+        from .services.whatsapp_service import WhatsappService
+        service = WhatsappService(tenant=request.user.tenant)
+        nuevo_mensaje = service.enviar_mensaje_texto(conversacion_id, text_body, reply_to_wam_id=reply_to, image_url=image_url)
     
     if nuevo_mensaje:
         return Response({
             'id': nuevo_mensaje.id,
-            'wam_id': nuevo_mensaje.wam_id,
+            'external_id': nuevo_mensaje.external_id,
             'direction': nuevo_mensaje.direction,
             'content': nuevo_mensaje.content,
             'status': nuevo_mensaje.status,

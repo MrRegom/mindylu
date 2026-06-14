@@ -3,7 +3,7 @@ from django.urls import path
 from .views import (
     sincronizar_facebook, listar_publicaciones_facebook,
     publicar_en_facebook, publicar_lote_en_facebook,
-    obtener_config_whatsapp, conectar_whatsapp, desconectar_whatsapp, whatsapp_webhook,
+    obtener_config_whatsapp, conectar_whatsapp, desconectar_whatsapp, whatsapp_webhook, facebook_webhook,
     listar_conversaciones, listar_mensajes, enviar_mensaje, sugerencias_productos,
     guardar_suscripcion_push, obtener_vapid_public_key, obtener_unread_count,
     eliminar_conversacion
@@ -20,8 +20,9 @@ urlpatterns = [
     path('whatsapp/conectar/', conectar_whatsapp, name='whatsapp_conectar'),
     path('whatsapp/desconectar/', desconectar_whatsapp, name='whatsapp_desconectar'),
     
-    # Webhook de Meta
+    # Webhooks de Meta
     path('whatsapp/webhook/', whatsapp_webhook, name='whatsapp_webhook'),
+    path('facebook/webhook/', facebook_webhook, name='facebook_webhook'),
     
     # Nuevos endpoints de Bandeja de Entrada
     path('whatsapp/conversaciones/', listar_conversaciones, name='whatsapp_conversaciones'),

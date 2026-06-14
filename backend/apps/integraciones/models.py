@@ -25,8 +25,13 @@ class WhatsappConfig(models.Model):
 
 
 class Conversacion(models.Model):
+    PLATFORM_CHOICES = [
+        ('whatsapp', 'WhatsApp'),
+        ('facebook', 'Facebook Messenger'),
+    ]
     tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE)
-    client_phone = models.CharField(max_length=50)
+    plataforma = models.CharField(max_length=20, choices=PLATFORM_CHOICES, default='whatsapp')
+    client_phone = models.CharField(max_length=50) # Used for Phone or FB PSID
     client_name = models.CharField(max_length=150, blank=True)
     last_message_at = models.DateTimeField(auto_now=True)
     unread_count = models.IntegerField(default=0)
@@ -39,7 +44,7 @@ class Conversacion(models.Model):
         verbose_name_plural = "Conversaciones"
 
     def __str__(self):
-        return f"Conversación con {self.client_phone} ({self.status})"
+        return f"[{self.get_plataforma_display()}] Conversación con {self.client_phone} ({self.status})"
 
 
 class Mensaje(models.Model):
@@ -55,7 +60,7 @@ class Mensaje(models.Model):
     ]
 
     conversacion = models.ForeignKey(Conversacion, on_delete=models.CASCADE, related_name='mensajes')
-    wam_id = models.CharField(max_length=255, unique=True, help_text="WhatsApp Message ID")
+    external_id = models.CharField(max_length=255, unique=True, help_text="WhatsApp wam_id o Facebook message_id")
     direction = models.CharField(max_length=10, choices=DIRECTION_CHOICES)
     content = models.TextField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='sent')
