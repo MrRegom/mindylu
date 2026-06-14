@@ -35,6 +35,9 @@ def ejecutar_publicacion_lote(ciclo_id):
 
     media_ids = []
 
+    from apps.integraciones.services.watermark_service import WatermarkService
+    import os
+
     for prenda in prendas:
         imagenes = list(prenda.imagenes.all())
         if imagenes:
@@ -42,16 +45,35 @@ def ejecutar_publicacion_lote(ciclo_id):
                 if len(media_ids) >= 10:
                     break
                 try:
+                    # Preparar talla
+                    talla_str = "Varias"
+                    variantes = prenda.variantes.all()
+                    if variantes.exists():
+                        talla_str = "/".join(set(v.talla for v in variantes if v.talla))
+                    
+                    # Estampar la imagen
+                    watermark_path = WatermarkService.estampar_precio(
+                        image_path=imagen.imagen.path,
+                        precio=prenda.precio,
+                        talla=talla_str
+                    )
+                    
                     url_photo = f"https://graph.facebook.com/v19.0/{page_id}/photos"
                     data = {'published': 'false', 'access_token': access_token}
-                    files = None
-                    if imagen.imagen:
-                        files = {'source': open(imagen.imagen.path, 'rb')}
-                        res = requests.post(url_photo, data=data, files=files)
-                        res.raise_for_status()
-                        res_data = res.json()
-                        if 'id' in res_data:
-                            media_ids.append({"media_fbid": res_data['id']})
+                    
+                    if watermark_path:
+                        with open(watermark_path, 'rb') as f:
+                            files = {'source': f}
+                            res = requests.post(url_photo, data=data, files=files)
+                            res.raise_for_status()
+                            res_data = res.json()
+                            if 'id' in res_data:
+                                media_ids.append({"media_fbid": res_data['id']})
+                        # Limpiar temporal
+                        try:
+                            os.remove(watermark_path)
+                        except:
+                            pass
                 except Exception as e:
                     print(f"Error subiendo imagen a Facebook: {e}")
         elif prenda.foto_url:
