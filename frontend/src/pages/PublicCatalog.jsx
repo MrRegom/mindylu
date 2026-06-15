@@ -10,6 +10,7 @@ import './PublicCatalog.css';
 import { showAlert } from '../utils/alerts';
 import { SkeletonCard } from '../components/Skeleton';
 import { ImageLoader } from '../components/ImageLoader';
+import { LuBot } from '../components/LuBot';
 
 const getImageUrl = (path) => {
   if (!path) return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E";
@@ -309,41 +310,35 @@ const PublicCatalog = () => {
           </div>
         )}
       </header>
-      {/* ── Categories Strip (Falabella Style under banner) ── */}
+      {/* ── Categories Strip (Marquee Style) ── */}
       <section className="pk2-categories-strip">
         <div className="pk2-categories-wrapper">
-          <button className="pk2-cat-arrow left" onClick={(e) => { e.preventDefault(); scrollCategories(-1); }}>
-            <ChevronLeft size={24} strokeWidth={1.5} />
-          </button>
-          
-          <div className="pk2-categories-horizontal-scroll" ref={categoriesScrollRef}>
-            {categorias && categorias.length > 0 ? categorias.map((cat) => (
-              <div 
-                key={cat.id} 
-                className={`pk2-category-item ${categoriaActiva === cat.id ? 'active' : ''}`} 
-                onClick={() => {
-                  setCategoriaActiva(prev => prev === cat.id ? null : cat.id);
-                  document.getElementById('lo-nuevo').scrollIntoView({behavior: 'smooth'});
-                }}
-              >
-                  <div className="pk2-category-img-placeholder">
-                    <div className="pk2-cat-icon-wrapper">
-                      {getCategoryIcon(cat.icono || 'Sparkles', { strokeWidth: 1.5, size: 28, color: categoriaActiva === cat.id ? '#ffffff' : 'var(--pk2-pink)' })}
+          <div className="pk2-categories-marquee" ref={categoriesScrollRef}>
+            <div className="pk2-categories-track">
+              {categorias && categorias.length > 0 ? [...categorias, ...categorias].map((cat, index) => (
+                <div 
+                  key={`${cat.id}-${index}`} 
+                  className={`pk2-category-item ${categoriaActiva === cat.id ? 'active' : ''}`} 
+                  onClick={() => {
+                    setCategoriaActiva(prev => prev === cat.id ? null : cat.id);
+                    document.getElementById('lo-nuevo').scrollIntoView({behavior: 'smooth'});
+                  }}
+                >
+                    <div className="pk2-category-img-placeholder">
+                      <div className="pk2-cat-icon-wrapper">
+                        {getCategoryIcon(cat.icono || 'Sparkles', { strokeWidth: 1.5, size: 28, color: categoriaActiva === cat.id ? '#ffffff' : 'var(--pk2-pink)' })}
+                      </div>
                     </div>
-                  </div>
-                <span>{cat.nombre}</span>
-              </div>
-            )) : (
-              <div className="pk2-category-item">
-                <div className="pk2-category-img-placeholder"></div>
-                <span>Próximamente...</span>
-              </div>
-            )}
+                  <span>{cat.nombre}</span>
+                </div>
+              )) : (
+                <div className="pk2-category-item">
+                  <div className="pk2-category-img-placeholder"></div>
+                  <span>Próximamente...</span>
+                </div>
+              )}
+            </div>
           </div>
-
-          <button className="pk2-cat-arrow right" onClick={(e) => { e.preventDefault(); scrollCategories(1); }}>
-            <ChevronRight size={24} strokeWidth={1.5} />
-          </button>
         </div>
       </section>
 
@@ -546,6 +541,7 @@ const PublicCatalog = () => {
       </div>
       {cartOpen && <div className="pk2-overlay" onClick={() => setCartOpen(false)}></div>}
 
+      <LuBot phoneNumber={config?.whatsapp_contacto || "56912345678"} />
     </div>
   );
 };

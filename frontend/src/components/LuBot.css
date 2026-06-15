@@ -1,0 +1,334 @@
+/* LuBot.css */
+
+.lubot-container {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  z-index: 1000;
+  font-family: var(--font-sans);
+}
+
+/* Floating Action Button */
+.lubot-fab {
+  background: linear-gradient(135deg, #fba5b5, #e07a8f);
+  border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 4px 15px rgba(251, 165, 181, 0.5);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.lubot-fab:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(251, 165, 181, 0.7);
+}
+
+.lubot-fab-hidden {
+  transform: scale(0);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.lubot-fab-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lubot-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #ff4757;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: bold;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+}
+
+/* Chat Window */
+.lubot-window {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 350px;
+  height: 500px;
+  max-height: calc(100vh - 100px);
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform-origin: bottom right;
+  transform: scale(0);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  pointer-events: none;
+}
+
+.lubot-window.open {
+  transform: scale(1);
+  opacity: 1;
+  pointer-events: all;
+}
+
+@media (max-width: 400px) {
+  .lubot-container {
+    bottom: 20px;
+    right: 20px;
+  }
+  .lubot-window {
+    width: calc(100vw - 40px);
+  }
+}
+
+/* Header */
+.lubot-header {
+  background: linear-gradient(135deg, #fba5b5, #fce1e6);
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.lubot-header-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.lubot-avatar-wrapper {
+  position: relative;
+}
+
+.lubot-avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid white;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.lubot-online-dot {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 10px;
+  height: 10px;
+  background: #2ed573;
+  border: 2px solid white;
+  border-radius: 50%;
+}
+
+.lubot-title {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--pk2-black);
+  font-family: var(--font-serif);
+  font-weight: 600;
+}
+
+.lubot-subtitle {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #747d8c;
+  font-weight: 500;
+}
+
+.lubot-close-btn {
+  background: none;
+  border: none;
+  color: var(--pk2-black);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+  border-radius: 50%;
+  transition: background 0.3s;
+}
+
+.lubot-close-btn:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* Body (Chat Area) */
+.lubot-body {
+  flex: 1;
+  background: #fdf6f7; /* Very light pink */
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Scrollbar */
+.lubot-body::-webkit-scrollbar {
+  width: 6px;
+}
+.lubot-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+.lubot-body::-webkit-scrollbar-thumb {
+  background: #fce1e6;
+  border-radius: 10px;
+}
+
+.lubot-message-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+.lubot-message-row.user {
+  flex-direction: row-reverse;
+}
+
+.lubot-msg-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.lubot-message-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 75%;
+}
+
+.lubot-message-row.user .lubot-message-content {
+  align-items: flex-end;
+}
+
+.lubot-bubble {
+  padding: 10px 14px;
+  border-radius: 18px;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.lubot-bubble.bot {
+  background: white;
+  color: var(--pk2-black);
+  border-bottom-left-radius: 4px;
+}
+
+.lubot-bubble.user {
+  background: var(--pk2-pink);
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+.lubot-time {
+  font-size: 0.65rem;
+  color: #a4b0be;
+  margin: 0 4px;
+}
+
+/* Action Button in Chat */
+.lubot-action-btn {
+  background: #2ed573;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 5px;
+  box-shadow: 0 2px 8px rgba(46, 213, 115, 0.4);
+  transition: transform 0.2s;
+}
+
+.lubot-action-btn:hover {
+  transform: translateY(-2px);
+}
+
+/* Typing Indicator */
+.lubot-bubble.typing {
+  padding: 15px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dot-typing {
+  position: relative;
+  left: -9999px;
+  width: 6px;
+  height: 6px;
+  border-radius: 5px;
+  background-color: var(--pk2-pink);
+  color: var(--pk2-pink);
+  box-shadow: 9984px 0 0 0 var(--pk2-pink), 9999px 0 0 0 var(--pk2-pink), 10014px 0 0 0 var(--pk2-pink);
+  animation: dot-typing 1.5s infinite linear;
+}
+
+@keyframes dot-typing {
+  0% {
+    box-shadow: 9984px 0 0 0 var(--pk2-pink), 9999px 0 0 0 var(--pk2-pink), 10014px 0 0 0 var(--pk2-pink);
+  }
+  16.667% {
+    box-shadow: 9984px -6px 0 0 var(--pk2-pink), 9999px 0 0 0 var(--pk2-pink), 10014px 0 0 0 var(--pk2-pink);
+  }
+  33.333% {
+    box-shadow: 9984px 0 0 0 var(--pk2-pink), 9999px -6px 0 0 var(--pk2-pink), 10014px 0 0 0 var(--pk2-pink);
+  }
+  50% {
+    box-shadow: 9984px 0 0 0 var(--pk2-pink), 9999px 0 0 0 var(--pk2-pink), 10014px -6px 0 0 var(--pk2-pink);
+  }
+  66.667% {
+    box-shadow: 9984px 0 0 0 var(--pk2-pink), 9999px 0 0 0 var(--pk2-pink), 10014px 0 0 0 var(--pk2-pink);
+  }
+  100% {
+    box-shadow: 9984px 0 0 0 var(--pk2-pink), 9999px 0 0 0 var(--pk2-pink), 10014px 0 0 0 var(--pk2-pink);
+  }
+}
+
+/* Options */
+.lubot-options-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 5px;
+  align-items: flex-end;
+}
+
+.lubot-option-btn {
+  background: white;
+  border: 1px solid var(--pk2-pink);
+  color: var(--pk2-pink);
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: right;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.lubot-option-btn:hover {
+  background: var(--pk2-pink);
+  color: white;
+}
