@@ -253,8 +253,14 @@ const ConfiguracionTiendaForm = () => {
       envios_texto: '',
       sugerencia_mensaje_top: '',
       sugerencia_mensaje_bottom: '',
-      whatsapp_numero: '56972677820',
+      whatsapp_numero: '56933075784',
       tienda_nombre: 'MindyLu',
+      bot_mensaje_bienvenida: '',
+      bot_opcion_1: '',
+      bot_respuesta_1: '',
+      bot_opcion_2: '',
+      bot_respuesta_2: '',
+      bot_opcion_3: ''
     });
   const [bannerFile, setBannerFile] = useState(null);
   const [polaroid1File, setPolaroid1File] = useState(null);
@@ -303,6 +309,12 @@ const ConfiguracionTiendaForm = () => {
       formData.append('sugerencia_mensaje_bottom', config.sugerencia_mensaje_bottom || '');
       formData.append('whatsapp_numero', config.whatsapp_numero || '');
       formData.append('tienda_nombre', config.tienda_nombre || 'MindyLu');
+      formData.append('bot_mensaje_bienvenida', config.bot_mensaje_bienvenida || '');
+      formData.append('bot_opcion_1', config.bot_opcion_1 || '');
+      formData.append('bot_respuesta_1', config.bot_respuesta_1 || '');
+      formData.append('bot_opcion_2', config.bot_opcion_2 || '');
+      formData.append('bot_respuesta_2', config.bot_respuesta_2 || '');
+      formData.append('bot_opcion_3', config.bot_opcion_3 || '');
       
       if (bannerFile) formData.append('banner_imagen', bannerFile);
       if (polaroid1File) formData.append('polaroid_1_imagen', polaroid1File);
@@ -386,6 +398,36 @@ const ConfiguracionTiendaForm = () => {
           <div className="form-group">
             <label><MessageCircle size={16} /> Texto Inferior Sugerencia WhatsApp</label>
             <textarea name="sugerencia_mensaje_bottom" className="input-field" value={config.sugerencia_mensaje_bottom || ''} onChange={handleChange} rows="2" placeholder="¿Te gusta? 💕" />
+          </div>
+
+          <div className="form-group-row">
+            <div className="form-group" style={{ gridColumn: 'span 2' }}>
+              <label><MessageCircle size={16} /> Mensaje Bienvenida LuBot</label>
+              <textarea name="bot_mensaje_bienvenida" className="input-field" value={config.bot_mensaje_bienvenida || ''} onChange={handleChange} rows="2" placeholder="¡Hola, hermosa! 👋 Soy LuBot..." />
+            </div>
+            
+            <div className="form-group">
+              <label><MessageCircle size={16} /> Bot Opción 1</label>
+              <input type="text" name="bot_opcion_1" className="input-field" value={config.bot_opcion_1 || ''} onChange={handleChange} placeholder="¿Hacen entregas...?" />
+            </div>
+            <div className="form-group">
+              <label><MessageCircle size={16} /> Bot Respuesta 1</label>
+              <textarea name="bot_respuesta_1" className="input-field" value={config.bot_respuesta_1 || ''} onChange={handleChange} rows="3" placeholder="Sí, hacemos envíos..." />
+            </div>
+
+            <div className="form-group">
+              <label><MessageCircle size={16} /> Bot Opción 2</label>
+              <input type="text" name="bot_opcion_2" className="input-field" value={config.bot_opcion_2 || ''} onChange={handleChange} placeholder="Quiero preguntar..." />
+            </div>
+            <div className="form-group">
+              <label><MessageCircle size={16} /> Bot Respuesta 2</label>
+              <textarea name="bot_respuesta_2" className="input-field" value={config.bot_respuesta_2 || ''} onChange={handleChange} rows="3" placeholder="Todas nuestras prendas..." />
+            </div>
+
+            <div className="form-group" style={{ gridColumn: 'span 2' }}>
+              <label><MessageCircle size={16} /> Bot Opción Hablar con Lu (Opción 3)</label>
+              <input type="text" name="bot_opcion_3" className="input-field" value={config.bot_opcion_3 || ''} onChange={handleChange} placeholder="Quiero hablar directo con Lu 💕" />
+            </div>
           </div>
 
           <div className="form-group">

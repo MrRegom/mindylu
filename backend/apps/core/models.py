@@ -196,7 +196,7 @@ class ConfiguracionTienda(models.Model):
     )
     whatsapp_numero = models.CharField(
         max_length=20, 
-        default='56972677820', 
+        default='56933075784', 
         blank=True,
         verbose_name=_('Número de WhatsApp')
     )
@@ -216,6 +216,33 @@ class ConfiguracionTienda(models.Model):
     sugerencia_mensaje_bottom = models.TextField(
         default='¿Te gusta? 💕',
         verbose_name=_('Texto inferior de sugerencia')
+    )
+    bot_mensaje_bienvenida = models.TextField(
+        default='¡Hola, hermosa! 👋 Soy LuBot. ¿En qué te puedo ayudar hoy?',
+        verbose_name=_('Mensaje Bienvenida Bot')
+    )
+    bot_opcion_1 = models.CharField(
+        max_length=150,
+        default='¿Hacen entregas por delivery?',
+        verbose_name=_('Opción 1 Bot')
+    )
+    bot_respuesta_1 = models.TextField(
+        default='¡Hola Linda! Sí, hacemos envíos a todo Chile vía Starken o Chilexpress por pagar. Además, tenemos entregas presenciales en puntos céntricos coordinados previamente. ¿Te gustaría saber algo más?',
+        verbose_name=_('Respuesta 1 Bot')
+    )
+    bot_opcion_2 = models.CharField(
+        max_length=150,
+        default='Quiero preguntar por prendas',
+        verbose_name=_('Opción 2 Bot')
+    )
+    bot_respuesta_2 = models.TextField(
+        default='¡Me encantan! Todas nuestras prendas están en el catálogo. Si buscas tallas o colores específicos, fíjate en los detalles de cada producto. Algunas prendas son exclusivas y de stock limitado. ¡Si quieres ver algo más, dímelo!',
+        verbose_name=_('Respuesta 2 Bot')
+    )
+    bot_opcion_3 = models.CharField(
+        max_length=150,
+        default='Quiero hablar directo con Lu 💕',
+        verbose_name=_('Opción 3 Bot')
     )
 
     class Meta:

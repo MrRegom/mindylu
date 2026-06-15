@@ -541,7 +541,7 @@ const PublicCatalog = () => {
       </div>
       {cartOpen && <div className="pk2-overlay" onClick={() => setCartOpen(false)}></div>}
 
-      <LuBot phoneNumber={config?.whatsapp_contacto || "56912345678"} />
+      <LuBot config={config} />
     </div>
   );
 };

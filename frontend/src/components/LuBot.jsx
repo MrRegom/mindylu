@@ -4,25 +4,37 @@ import './LuBot.css';
 
 const MOCK_AVATAR = "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=200";
 
-const PREDEFINED_QUESTIONS = [
-  { id: 'envios', text: '¿Hacen entregas por delivery?' },
-  { id: 'prendas', text: 'Quiero preguntar por prendas' },
-  { id: 'hablar_lu', text: 'Quiero hablar directo con Lu 💕' }
-];
-
-const PREDEFINED_ANSWERS = {
-  envios: "¡Hola Linda! Sí, hacemos envíos a todo Chile vía Starken o Chilexpress por pagar. Además, tenemos entregas presenciales en puntos céntricos coordinados previamente. ¿Te gustaría saber algo más?",
-  prendas: "¡Me encantan! Todas nuestras prendas están en el catálogo. Si buscas tallas o colores específicos, fíjate en los detalles de cada producto. Algunas prendas son exclusivas y de stock limitado. ¡Si quieres ver algo más, dímelo!",
-};
-
-export const LuBot = ({ phoneNumber = "56912345678" }) => {
+export const LuBot = ({ config }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState([
-    { id: 1, text: "¡Hola, hermosa! 👋 Soy LuBot. ¿En qué te puedo ayudar hoy?", sender: 'bot', timestamp: new Date() }
-  ]);
+  const [messages, setMessages] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
   const [showOptions, setShowOptions] = useState(true);
   const messagesEndRef = useRef(null);
+
+  const phoneNumber = config?.whatsapp_numero || "56933075784";
+  
+  const PREDEFINED_QUESTIONS = [
+    { id: 'opcion_1', text: config?.bot_opcion_1 || '¿Hacen entregas por delivery?' },
+    { id: 'opcion_2', text: config?.bot_opcion_2 || 'Quiero preguntar por prendas' },
+    { id: 'hablar_lu', text: config?.bot_opcion_3 || 'Quiero hablar directo con Lu 💕' }
+  ].filter(q => q.text.trim() !== '');
+
+  const PREDEFINED_ANSWERS = {
+    opcion_1: config?.bot_respuesta_1 || "¡Hola Linda! Sí, hacemos envíos a todo Chile vía Starken o Chilexpress por pagar. Además, tenemos entregas presenciales en puntos céntricos coordinados previamente. ¿Te gustaría saber algo más?",
+    opcion_2: config?.bot_respuesta_2 || "¡Me encantan! Todas nuestras prendas están en el catálogo. Si buscas tallas o colores específicos, fíjate en los detalles de cada producto. Algunas prendas son exclusivas y de stock limitado. ¡Si quieres ver algo más, dímelo!",
+  };
+
+  useEffect(() => {
+    // Set initial welcome message
+    setMessages([
+      { 
+        id: 1, 
+        text: config?.bot_mensaje_bienvenida || "¡Hola, hermosa! 👋 Soy LuBot. ¿En qué te puedo ayudar hoy?", 
+        sender: 'bot', 
+        timestamp: new Date() 
+      }
+    ]);
+  }, [config]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -44,7 +56,7 @@ export const LuBot = ({ phoneNumber = "56912345678" }) => {
         setIsTyping(false);
         setMessages(prev => [...prev, {
           id: Date.now() + 1, 
-          text: "¡Perfecto! Te redirigiré con Lu ahora mismo. Haz clic en el botón de abajo para ir a WhatsApp.", 
+          text: "¡Perfecto! Te redirigiré ahora mismo. Haz clic en el botón de abajo para ir a WhatsApp.", 
           sender: 'bot', 
           timestamp: new Date(),
           isAction: true
