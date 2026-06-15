@@ -42,7 +42,7 @@ class Pedido(models.Model):
     tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name='pedidos')
     clienta = models.ForeignKey(Clienta, on_delete=models.CASCADE, related_name='pedidos')
     
-    estado = models.CharField(max_length=20, choices=Estado.choices, default=Estado.APARTADO)
+    estado = models.CharField(max_length=20, choices=Estado.choices, default=Estado.APARTADO, db_index=True)
     
     fecha_pedido = models.DateTimeField(auto_now_add=True)
     fecha_entrega_acordada = models.DateField(null=True, blank=True)

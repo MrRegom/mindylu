@@ -533,8 +533,10 @@ def whatsapp_webhook(request):
     elif request.method == 'POST':
         try:
             import json
+            import logging
             from .services.whatsapp_service import WhatsappService
             
+            logger = logging.getLogger(__name__)
             body = json.loads(request.body.decode('utf-8'))
             
             # Instanciar el servicio (asume primer tenant o se podria mapear por WABA_ID si hubiera varios)
@@ -542,9 +544,13 @@ def whatsapp_webhook(request):
             service.procesar_webhook_payload(body)
             
             return HttpResponse('EVENT_RECEIVED', status=200)
+        except json.JSONDecodeError as e:
+            logger.error(f"Error decoding JSON in webhook: {e}")
+            return HttpResponse('Bad Request', status=400)
         except Exception as e:
-            print(f"Error en webhook POST: {e}")
-            return HttpResponse('Internal Server Error', status=500)
+            logger.exception(f"Error procesando webhook de WhatsApp: {e}")
+            # Retornamos 200 a Meta para evitar retries infinitos si el payload no es manejable
+            return HttpResponse('EVENT_RECEIVED', status=200)
             
     return HttpResponse('Method Not Allowed', status=405)
 

@@ -82,13 +82,13 @@ class Prenda(models.Model):
         verbose_name=_('Categoría')
     )
     
-    nombre = models.CharField(max_length=255)
+    nombre = models.CharField(max_length=255, db_index=True)
     descripcion = models.TextField(blank=True, null=True, help_text=_('Descripción de la prenda'))
     precio_compra = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True, verbose_name=_('Precio de Compra/Costo'))
     precio = models.DecimalField(max_digits=10, decimal_places=0, verbose_name=_('Precio de Venta')) # CLP no usa decimales
     foto_url = models.URLField(max_length=1000, blank=True, null=True) # En el MVP inicial puede estar vacío si no jalamos la foto
     talla_tipo = models.CharField(max_length=20, choices=TipoTalla.choices, default=TipoTalla.UNICA)
-    estado = models.CharField(max_length=20, choices=Estado.choices, default=Estado.DISPONIBLE)
+    estado = models.CharField(max_length=20, choices=Estado.choices, default=Estado.DISPONIBLE, db_index=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_ultima_carga = models.DateTimeField(
         auto_now=True,
