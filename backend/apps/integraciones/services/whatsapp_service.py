@@ -116,7 +116,15 @@ class WhatsappService:
             self.enviar_mensaje_texto(conversacion.id, "¡Hola! Para ver nuestras tallas y stock disponible en tiempo real, puedes entrar a nuestro catálogo haciendo clic aquí 👇\n\n🛍️ Catálogo: https://157-230-93-24.nip.io/catalogo\n\nAllí encontrarás las medidas exactas de cada prenda. Si tienes dudas con alguna en específico, dime el nombre y te ayudo con gusto. ✨")
             return
 
-        # 2. Bot de Reglas Personalizadas
+        # 2. Bot de Respuesta de Cuentas (Banco)
+        palabras_clave_cuenta = ['cuenta', 'deposito', 'depositar', 'transferir', 'transferencia', 'datos para transferir', 'datos transferencia', 'a que cuenta']
+        # Filtramos para no chocar con "cuándo"
+        content_lower = content.lower()
+        if any(keyword in content_lower for keyword in palabras_clave_cuenta) and "cuando" not in content_lower and "cuándo" not in content_lower:
+            self._responder_consulta_cuenta(conversacion, clienta)
+            return
+
+        # 3. Bot de Reglas Personalizadas
         from apps.integraciones.models import ReglaRespuestaBot
         reglas_activas = ReglaRespuestaBot.objects.filter(tenant=self.tenant, activa=True)
         regla_aplicada = False
@@ -131,13 +139,6 @@ class WhatsappService:
         
         if regla_aplicada:
             return
-
-        # Bot de Respuesta de Cuentas (Banco)
-        palabras_clave_cuenta = ['cuenta', 'deposito', 'depositar', 'transferir', 'transferencia', 'datos para transferir', 'datos transferencia', 'a que cuenta']
-        # Filtramos para no chocar con "cuándo"
-        content_lower = content.lower()
-        if any(keyword in content_lower for keyword in palabras_clave_cuenta) and "cuando" not in content_lower and "cuándo" not in content_lower:
-            self._responder_consulta_cuenta(conversacion, clienta)
 
     def _responder_consulta_stock(self, conversacion, content):
         """

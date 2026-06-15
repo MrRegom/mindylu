@@ -35,6 +35,26 @@ class ClientaSerializer(serializers.ModelSerializer):
             return f"{obj.cuenta_asignada.banco} - {obj.cuenta_asignada.tipo_cuenta} ({obj.cuenta_asignada.numero_cuenta})"
         return None
 
+    def validate_telefono(self, value):
+        import re
+        # Extraer solo numeros
+        telefono_limpio = re.sub(r'\D', '', value)
+        if not telefono_limpio:
+            raise serializers.ValidationError("El número de teléfono no es válido.")
+            
+        request = self.context.get('request')
+        tenant = request.user.tenant if request and hasattr(request.user, 'tenant') else None
+        
+        if tenant:
+            qs = Clienta.objects.filter(tenant=tenant, telefono=telefono_limpio)
+            if self.instance:
+                qs = qs.exclude(pk=self.instance.pk)
+                
+            if qs.exists():
+                raise serializers.ValidationError("Ya existe una clienta registrada con este número de teléfono.")
+                
+        return telefono_limpio
+
     def create(self, validated_data):
         # Auto-asignar el tenant del usuario autenticado
         validated_data['tenant'] = self.context['request'].user.tenant
