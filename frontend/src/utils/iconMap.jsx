@@ -46,17 +46,18 @@ export const CATEGORY_ICONS = {
 };
 
 export const ICON_NAMES_ES = {
-  Shirt: '► Poleras y Blusas',
-  Jacket: '► Chaquetas y Abrigos',
-  Pants: '► Pantalones y Jeans',
-  Sweater: '► Sweaters y Chalecos',
-  Dress: '► Vestidos y Faldas',
-  ShoppingBag: 'Bolsa de Compras',
+  Shirt: 'Blusa',
+  Jacket: 'Chaqueta',
+  Pants: 'Pantalón',
+  Sweater: 'Sweater',
+  Dress: 'Vestido',
+  Sparkles: 'Brillos',
+  ShoppingBag: 'Bolsa',
   Star: 'Estrella',
   Heart: 'Corazón',
   Crown: 'Corona',
   Diamond: 'Diamante',
-  Tag: 'Etiquetas / Descuentos'
+  Tag: 'Etiqueta'
 };
 
 export const getCategoryIcon = (iconName, props = {}) => {
