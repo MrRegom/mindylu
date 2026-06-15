@@ -24,6 +24,7 @@ const Entregas = () => {
   const [reservas, setReservas] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [expandedRutas, setExpandedRutas] = useState({});
+  const [horaEditando, setHoraEditando] = useState(null);
 
   const toggleRutaAccordion = (entregaId) => {
     setExpandedRutas(prev => ({
@@ -128,19 +129,13 @@ const Entregas = () => {
     fetchEntregas();
   }, []);
 
-  const handleSetHora = async (entregaId, horaActual) => {
-    const hora = await showPrompt("Ingresa la hora de entrega", "Ej: 15:30 o 18:00", horaActual || "");
-    if (hora !== null) {
-      const horaLimpia = hora.trim();
-      if (!horaLimpia) return;
-      
-      try {
-        await api.patch(`/pedidos/entregas/${entregaId}/`, { hora_estimada: horaLimpia });
-        fetchEntregas();
-      } catch (error) {
-        showAlert("Hubo un error al guardar la hora.");
-        console.error(error);
-      }
+  const guardarHora = async (entregaId, horaLimpia) => {
+    try {
+      await api.patch(`/pedidos/entregas/${entregaId}/`, { hora_estimada: horaLimpia });
+      fetchEntregas();
+    } catch (error) {
+      showAlert("Hubo un error al guardar la hora.");
+      console.error(error);
     }
   };
 
@@ -608,9 +603,35 @@ const Entregas = () => {
                             <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', fontWeight: 'normal', marginLeft: '4px' }}>({entrega.pedidos.length} pedidos)</span>
                           </h3>
                           <div className="hora-badge-container" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            {entrega.hora_estimada ? (
+                            {horaEditando === entrega.id ? (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <input 
+                                  type="time" 
+                                  autoFocus 
+                                  defaultValue={entrega.hora_estimada?.substring(0, 5) || ''} 
+                                  onBlur={(e) => { 
+                                    setHoraEditando(null); 
+                                    if(e.target.value && e.target.value !== (entrega.hora_estimada?.substring(0, 5) || '')) {
+                                      guardarHora(entrega.id, e.target.value); 
+                                    }
+                                  }} 
+                                  onKeyDown={(e) => { 
+                                    if(e.key === 'Enter') { 
+                                      setHoraEditando(null); 
+                                      if(e.target.value && e.target.value !== (entrega.hora_estimada?.substring(0, 5) || '')) {
+                                        guardarHora(entrega.id, e.target.value); 
+                                      }
+                                    } else if(e.key === 'Escape') {
+                                      setHoraEditando(null);
+                                    } 
+                                  }} 
+                                  style={{ padding: '4px 8px', borderRadius: '6px', border: '1.5px solid var(--color-primary)', outline: 'none', fontSize: '0.85rem' }} 
+                                  onClick={(e) => e.stopPropagation()}
+                                />
+                              </div>
+                            ) : entrega.hora_estimada ? (
                               <>
-                                <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }} onClick={(e) => { e.stopPropagation(); handleSetHora(entrega.id, entrega.hora_estimada); }}>
+                                <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }} onClick={(e) => { e.stopPropagation(); setHoraEditando(entrega.id); }}>
                                   <Clock size={14} /> {entrega.hora_estimada.substring(0, 5)}
                                   <Edit2 size={12} style={{marginLeft: '2px', opacity: 0.5}} />
                                 </span>
@@ -641,8 +662,8 @@ const Entregas = () => {
                                 </button>
                               </>
                             ) : (
-                              <button style={{ background: 'none', border: 'none', color: 'var(--color-primary)', fontSize: '0.85rem', cursor: 'pointer' }} onClick={(e) => { e.stopPropagation(); handleSetHora(entrega.id, null); }}>
-                                Fijar Hora
+                              <button style={{ background: 'none', border: 'none', color: 'var(--color-primary)', fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }} onClick={(e) => { e.stopPropagation(); setHoraEditando(entrega.id); }}>
+                                <Clock size={14} /> Fijar Hora
                               </button>
                             )}
                           </div>
