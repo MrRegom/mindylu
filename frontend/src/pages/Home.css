@@ -605,8 +605,13 @@ body.page-admin {
 }
 
 /* Animations */
-.animate-fade-in { animation: fadeIn 0.6s ease forwards; }
-.animate-slide-up { animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards; opacity: 0; transform: translateY(20px); }
+.animate-fade-in { 
+  animation: fadeIn 0.6s ease both; 
+}
+
+.animate-slide-up { 
+  animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) both; 
+}
 
 @keyframes fadeIn {
   from { opacity: 0; }
