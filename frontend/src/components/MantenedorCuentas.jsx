@@ -100,14 +100,17 @@ const MantenedorCuentas = () => {
   };
 
   return (
-    <div className="mantenedor-card card glass" style={{ gridColumn: '1 / -1' }}>
-      <div className="mantenedor-header" style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Landmark size={20} className="icon-accent" />
-          <h3>Cuentas Bancarias</h3>
+    <div className="mantenedor-card metric-card" style={{ gridColumn: '1 / -1', padding: '0' }}>
+      <div className="metric-decoration"></div>
+      <div className="mantenedor-header" style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(0,0,0,0.04)', paddingBottom: '1rem', paddingTop: '1.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div className="metric-icon-wrapper success" style={{ width: '42px', height: '42px', borderRadius: '12px', flexShrink: 0 }}>
+            <Landmark size={20} />
+          </div>
+          <h3 className="metric-label" style={{ margin: 0, fontSize: '1rem', color: 'var(--text-light)', position: 'relative', zIndex: 2 }}>Cuentas Bancarias</h3>
         </div>
         {!showForm && (
-          <button className="btn-agregar" onClick={() => setShowForm(true)} style={{ padding: '6px 12px' }}>
+          <button className="btn-agregar" onClick={() => setShowForm(true)} style={{ padding: '8px 16px', position: 'relative', zIndex: 2 }}>
             <Plus size={16} /> Agregar Cuenta
           </button>
         )}

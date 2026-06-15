@@ -57,36 +57,75 @@
   }
 }
 
-/* ── Tarjeta mantenedor ── */
+/* ── Tarjeta mantenedor (Estilo Dashboard Metric Card) ── */
 .mantenedor-card {
   display: flex;
   flex-direction: column;
   background: #ffffff;
   border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
   overflow: hidden;
   border: 1px solid rgba(0, 0, 0, 0.04);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  transition: all 0.4s ease;
+  padding-bottom: 0;
 }
 
 .mantenedor-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(220, 180, 190, 0.2);
+}
+
+.mantenedor-card:hover .metric-decoration {
+  transform: scale(1.2) rotate(15deg);
+  opacity: 0.08;
+}
+
+.metric-decoration {
+  position: absolute;
+  right: -20px;
+  top: -20px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: var(--accent-rose);
+  opacity: 0.03;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1;
 }
 
 .mantenedor-header {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 1.25rem 1.5rem;
-  background: #fafafa;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  gap: 1rem;
+  padding: 1.5rem 1.5rem 1rem 1.5rem;
+  background: transparent;
+  position: relative;
+  z-index: 2;
 }
 
-.mantenedor-header h3 {
+.metric-icon-wrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.metric-icon-wrapper.primary { background: var(--gradient-rose); }
+.metric-icon-wrapper.warning { background: var(--gradient-gold); }
+.metric-icon-wrapper.success { background: linear-gradient(135deg, #c5d7c3 0%, #b5c7b3 100%); }
+.metric-icon-wrapper.danger { background: linear-gradient(135deg, #e4b5b5 0%, #c4a9a9 100%); }
+
+.metric-label {
   margin: 0;
-  font-size: 1.1rem;
-  color: #111b21;
+  color: var(--text-light);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .icon-accent {

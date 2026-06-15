@@ -137,10 +137,13 @@ const MantenedorList = ({ titulo, icono, endpoint, placeholder, forceUppercase =
   };
 
   return (
-    <div className="mantenedor-card card glass">
-      <div className="mantenedor-header">
-        {icono}
-        <h3>{titulo}</h3>
+    <div className="mantenedor-card metric-card">
+      <div className="metric-decoration"></div>
+      <div className="mantenedor-header" style={{ borderBottom: 'none', paddingBottom: '0' }}>
+        <div className="metric-icon-wrapper primary" style={{ width: '42px', height: '42px', borderRadius: '12px', flexShrink: 0 }}>
+          {icono}
+        </div>
+        <h3 className="metric-label" style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-light)', position: 'relative', zIndex: 2 }}>{titulo}</h3>
       </div>
 
       {/* Lista de ítems existentes */}
@@ -339,13 +342,16 @@ const ConfiguracionTiendaForm = () => {
   if (loading) return <p className="text-muted text-center py-4">Cargando configuración...</p>;
 
   return (
-    <div className="card glass configuracion-tienda-card" style={{ marginBottom: '24px', overflow: 'hidden', padding: '16px', boxSizing: 'border-box', width: '100%', maxWidth: '100vw' }}>
-      <div className="card-header border-b pb-4 mb-4" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <LayoutTemplate size={24} className="icon-primary" />
-        <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--color-text-strong)' }}>Apariencia de la Tienda</h2>
+    <div className="mantenedor-card metric-card" style={{ marginBottom: '24px', overflow: 'hidden', padding: '0', boxSizing: 'border-box', width: '100%', maxWidth: '100vw' }}>
+      <div className="metric-decoration"></div>
+      <div className="mantenedor-header" style={{ borderBottom: '1px solid rgba(0,0,0,0.04)', paddingBottom: '1rem', paddingTop: '1.5rem', marginBottom: '1rem' }}>
+        <div className="metric-icon-wrapper primary" style={{ width: '42px', height: '42px', borderRadius: '12px', flexShrink: 0 }}>
+          <LayoutTemplate size={20} />
+        </div>
+        <h2 className="metric-label" style={{ margin: 0, fontSize: '1rem', color: 'var(--text-light)', position: 'relative', zIndex: 2 }}>Apariencia de la Tienda</h2>
       </div>
       
-      <div className="apariencia-split-layout">
+      <div className="apariencia-split-layout" style={{ paddingTop: '0' }}>
         <form onSubmit={handleSubmit} className="apariencia-form-col">
           
           <div className="form-group-row">
