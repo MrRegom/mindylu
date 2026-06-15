@@ -67,12 +67,12 @@ const Home = () => {
           <h1>
             ¡Hola, {stats.usuario_nombre ? stats.usuario_nombre.split(' ')[0] : 'Admin'}! <span className="greeting-emoji">✨</span>
           </h1>
-          <p>Bienvenido a tu centro de control inteligente</p>
+          <p>Bienvenida a tu espacio de gestión exclusiva</p>
         </div>
         
         <div className="header-actions">
           <button onClick={fetchDashboard} className="btn-icon-circular" title="Actualizar datos">
-            <RefreshCw size={20} className={isLoading ? "spin" : ""} />
+            <RefreshCw size={20} className={isLoading ? "spin" : ""} strokeWidth={1.5} />
           </button>
           <div className="header-avatar">
             {stats.usuario_avatar ? (
@@ -92,7 +92,7 @@ const Home = () => {
             <div className="hero-amount-wrapper">
               <h2 className="hero-amount">{isLoading ? '...' : formatCurrency(stats.ventas_hoy)}</h2>
               <div className="trend-badge positive">
-                <TrendingUp size={16} />
+                <TrendingUp size={16} strokeWidth={2.5} />
                 <span>+12%</span>
               </div>
             </div>
@@ -104,12 +104,12 @@ const Home = () => {
               <AreaChart data={stats.ventas_semana || []} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorSalesHero" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#ff4785" stopOpacity={0.5}/>
-                    <stop offset="95%" stopColor="#ff4785" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#e8a5b2" stopOpacity={0.6}/>
+                    <stop offset="95%" stopColor="#e8a5b2" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
-                <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(255,255,255,0.1)', strokeWidth: 1, strokeDasharray: '4 4' }} />
-                <Area type="monotone" dataKey="ventas" stroke="#ff4785" strokeWidth={4} fillOpacity={1} fill="url(#colorSalesHero)" animationDuration={1500} />
+                <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(232,165,178,0.3)', strokeWidth: 1, strokeDasharray: '4 4' }} />
+                <Area type="monotone" dataKey="ventas" stroke="#d67a8b" strokeWidth={3} fillOpacity={1} fill="url(#colorSalesHero)" animationDuration={1500} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -120,7 +120,7 @@ const Home = () => {
         {/* Entregas */}
         <div className="metric-card glass-panel animate-slide-up" style={{ animationDelay: '0.2s' }}>
           <div className="metric-icon-wrapper warning">
-            <Package size={24} />
+            <Package size={22} strokeWidth={1.5} />
           </div>
           <div className="metric-info">
             <p className="metric-label">Entregas Pendientes</p>
@@ -132,7 +132,7 @@ const Home = () => {
         {/* Prendas */}
         <div className="metric-card glass-panel animate-slide-up" style={{ animationDelay: '0.3s' }}>
           <div className="metric-icon-wrapper primary">
-            <CreditCard size={24} />
+            <CreditCard size={22} strokeWidth={1.5} />
           </div>
           <div className="metric-info">
             <p className="metric-label">Prendas Activas</p>
@@ -144,7 +144,7 @@ const Home = () => {
         {/* Saldos */}
         <div className="metric-card glass-panel animate-slide-up" style={{ animationDelay: '0.4s' }}>
           <div className="metric-icon-wrapper danger">
-            <DollarSign size={24} />
+            <DollarSign size={22} strokeWidth={1.5} />
           </div>
           <div className="metric-info">
             <p className="metric-label">Saldos por Cobrar</p>
@@ -156,24 +156,24 @@ const Home = () => {
         {/* Clientes */}
         <div className="metric-card glass-panel animate-slide-up" style={{ animationDelay: '0.5s' }}>
           <div className="metric-icon-wrapper success">
-            <User size={24} />
+            <User size={22} strokeWidth={1.5} />
           </div>
           <div className="metric-info">
-            <p className="metric-label">Clientes Activos</p>
+            <p className="metric-label">Clientas Activas</p>
             <h3 className="metric-value">{isLoading ? '...' : stats.clientes_activos}</h3>
           </div>
           <div className="metric-decoration"></div>
         </div>
       </div>
 
-      {/* Banner Promocional Enterprise */}
+      {/* Banner Promocional Boutique */}
       <div className="premium-banner animate-slide-up" style={{ animationDelay: '0.6s' }}>
         <div className="premium-banner-content">
-          <div className="premium-tag"><Sparkles size={14} /> Gestión Optimizada</div>
-          <h2>Control total de tu catálogo</h2>
-          <p>Sube prendas, organiza categorías y dispara tus ventas desde un solo lugar.</p>
+          <div className="premium-tag"><Sparkles size={14} /> Tu Colección</div>
+          <h2>El alma de tu boutique</h2>
+          <p>Organiza tus prendas, añade nuevas tendencias y enamora a tus clientas con cada detalle.</p>
           <button onClick={() => navigate('/panel/catalogo')} className="btn-premium">
-            Gestionar Catálogo <ArrowRight size={18} />
+            Ver Colección <ArrowRight size={18} strokeWidth={1.5} />
           </button>
         </div>
         <div className="premium-banner-bg"></div>
@@ -184,7 +184,7 @@ const Home = () => {
         {/* Top Productos */}
         <div className="advanced-card glass-panel animate-slide-up" style={{ animationDelay: '0.7s' }}>
           <div className="advanced-header">
-            <h3><Activity size={20} className="icon-gradient" /> Top Prendas</h3>
+            <h3><Activity size={22} className="icon-gradient" strokeWidth={1.5} /> Lo Más Deseado</h3>
           </div>
           <div className="advanced-body">
             {stats.top_productos && stats.top_productos.length > 0 ? (
@@ -203,9 +203,9 @@ const Home = () => {
               </div>
             ) : (
               <div className="empty-state">
-                <div className="empty-icon-wrapper"><Package size={32} /></div>
-                <p>Sin ventas registradas aún</p>
-                <span>Sube prendas para comenzar a vender</span>
+                <div className="empty-icon-wrapper"><Package size={36} strokeWidth={1} /></div>
+                <p>Aún no hay favoritos</p>
+                <span>Tus prendas más vendidas brillarán aquí</span>
               </div>
             )}
           </div>
@@ -214,7 +214,7 @@ const Home = () => {
         {/* Actividad Reciente */}
         <div className="advanced-card glass-panel animate-slide-up" style={{ animationDelay: '0.8s' }}>
           <div className="advanced-header">
-            <h3><ShoppingBag size={20} className="icon-gradient" /> Últimos Pedidos</h3>
+            <h3><ShoppingBag size={22} className="icon-gradient" strokeWidth={1.5} /> Últimos Pedidos</h3>
           </div>
           <div className="advanced-body">
             {stats.pedidos_recientes && stats.pedidos_recientes.length > 0 ? (
@@ -222,7 +222,7 @@ const Home = () => {
                 {stats.pedidos_recientes.map((pedido) => (
                   <div key={pedido.id} className="order-item">
                     <div className={`order-icon ${pedido.estado}`}>
-                      <ShoppingBag size={18} />
+                      <ShoppingBag size={20} strokeWidth={1.5} />
                     </div>
                     <div className="order-details">
                       <p className="order-client">{pedido.cliente}</p>
@@ -237,9 +237,9 @@ const Home = () => {
               </div>
             ) : (
               <div className="empty-state">
-                <div className="empty-icon-wrapper"><ShoppingBag size={32} /></div>
-                <p>No hay pedidos recientes</p>
-                <span>Los nuevos pedidos aparecerán aquí</span>
+                <div className="empty-icon-wrapper"><ShoppingBag size={36} strokeWidth={1} /></div>
+                <p>Esperando el primer pedido</p>
+                <span>Pronto tendrás clientas enamoradas de tu ropa</span>
               </div>
             )}
           </div>
