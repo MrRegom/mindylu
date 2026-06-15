@@ -39,3 +39,14 @@ class ClientaSerializer(serializers.ModelSerializer):
         # Auto-asignar el tenant del usuario autenticado
         validated_data['tenant'] = self.context['request'].user.tenant
         return super().create(validated_data)
+
+    def validate_telefono(self, value):
+        if not value:
+            return value
+        tenant = self.context['request'].user.tenant
+        qs = Clienta.objects.filter(tenant=tenant, telefono=value)
+        if self.instance:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise serializers.ValidationError("Ya existe una clienta con este número de teléfono.")
+        return value

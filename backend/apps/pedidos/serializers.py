@@ -16,6 +16,15 @@ class PuntoEntregaSerializer(serializers.ModelSerializer):
         validated_data['tenant'] = self.context['request'].user.tenant
         return super().create(validated_data)
 
+    def validate_nombre(self, value):
+        tenant = self.context['request'].user.tenant
+        qs = PuntoEntrega.objects.filter(tenant=tenant, nombre__iexact=value)
+        if self.instance:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise serializers.ValidationError("Ya existe un lugar de entrega con este nombre.")
+        return value
+
 
 class ItemPedidoSerializer(serializers.ModelSerializer):
     variante_detalle = PrendaVarianteSerializer(source='variante', read_only=True)

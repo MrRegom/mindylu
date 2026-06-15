@@ -23,6 +23,7 @@ class PuntoEntrega(models.Model):
         ordering = ['nombre']
         verbose_name = _('Punto de Entrega')
         verbose_name_plural = _('Puntos de Entrega')
+        unique_together = [['tenant', 'nombre']]
 
     def __str__(self):
         return self.nombre

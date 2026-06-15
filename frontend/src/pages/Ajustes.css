@@ -140,6 +140,8 @@
   max-height: 280px;
   overflow-y: auto;
   background: #ffffff;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .mantenedor-lista::-webkit-scrollbar {
@@ -168,6 +170,8 @@
   background: #ffffff;
   transition: background-color 0.2s;
   min-height: 54px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .mantenedor-item:last-child {
@@ -259,6 +263,8 @@
   padding: 1rem 1.5rem;
   background: #fafafa;
   border-top: 1px solid rgba(0,0,0,0.04);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .mantenedor-form input[type="text"] {

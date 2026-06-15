@@ -108,15 +108,46 @@
 .pk3-qty-selector button:hover { color: #c95171; }
 .pk3-qty-selector span { font-weight: 600; font-size: 1rem; color: var(--pk2-black); }
 
-.pk3-actions { margin-bottom: 40px; }
-.pk3-btn-buy {
-  width: 100%; background: #c95171; color: var(--pk2-white); border: none;
-  padding: 16px; font-size: 1rem; font-weight: 500; border-radius: 4px;
-  cursor: pointer; display: flex; align-items: center; justify-content: center;
-  transition: background 0.3s;
+.pk3-actions-modern {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 40px;
 }
-.pk3-btn-buy:hover { background: #ab445f; }
-.pk3-btn-icon { margin-left: 8px; }
+
+.pk3-btn-outline, .pk3-btn-solid {
+  width: 100%;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.pk3-btn-outline {
+  background: white;
+  color: #c95171;
+  border: 1px solid #c95171;
+}
+
+.pk3-btn-outline:hover {
+  background: #fdf6f7;
+}
+
+.pk3-btn-solid {
+  background: #233139;
+  color: white;
+  border: 1px solid #233139;
+}
+
+.pk3-btn-solid:hover {
+  background: #111b21;
+}
 
 .pk3-description {
   margin-bottom: 30px; border-top: 1px solid #f0f0f0; padding-top: 30px;
@@ -140,44 +171,7 @@
   .pk3-info { padding-top: 10px; }
   .pk3-title { font-size: 1.6rem; margin: 0 0 10px 0; }
   .pk3-price { font-size: 1.4rem; margin: 0 0 20px 0; }
-  /* ── Barra Flotante Ultra Moderna (Estilo App Premium) ── */
-  .pk3-root { padding-bottom: 90px; }
-  .pk3-actions { 
-    position: fixed; bottom: 20px; left: 15px; width: calc(100% - 30px); 
-    background: transparent; 
-    border: none;
-    padding: 0; 
-    z-index: 1000; 
-    display: flex; flex-direction: row; gap: 15px; margin: 0; 
-    box-shadow: none;
-  }
-  .pk3-btn-buy { 
-    padding: 0; height: 48px; font-size: 0.85rem; font-weight: 600; letter-spacing: 0.3px;
-    margin-bottom: 0 !important; flex: 1;
-    display: flex; align-items: center; justify-content: center;
-    border-radius: 50px;
-    color: white;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-    
-    /* GLASSMORPHISM */
-    background: rgba(201, 81, 113, 0.75);
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    box-shadow: 
-      inset 0 4px 8px rgba(255, 255, 255, 0.4), 
-      inset 0 -4px 8px rgba(0, 0, 0, 0.1), 
-      0 10px 20px rgba(201, 81, 113, 0.3);
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-  .pk3-btn-buy:active { transform: scale(0.96); }
-  .whatsapp-btn {
-    background: rgba(37, 211, 102, 0.75);
-    box-shadow: 
-      inset 0 4px 8px rgba(255, 255, 255, 0.5), 
-      inset 0 -4px 8px rgba(0, 0, 0, 0.1), 
-      0 10px 20px rgba(37, 211, 102, 0.3);
-  }
+  .pk3-root { padding-bottom: 30px; }
 }
 @media (max-width: 400px) {
   .pk3-main-image-container { height: 280px; }
