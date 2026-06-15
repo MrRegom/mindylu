@@ -278,6 +278,15 @@ const Entregas = () => {
         showToast(`Lugar "${nombre}" eliminado.`);
         await fetchPuntosEntrega();
         fetchEntregas();
+        
+        // Remover el lugar si estaba seleccionado en el modal
+        setNuevaRutaData(prev => {
+          const newPuntos = { ...prev.puntosSeleccionados };
+          if (newPuntos[puntoId] !== undefined) {
+            delete newPuntos[puntoId];
+          }
+          return { ...prev, puntosSeleccionados: newPuntos };
+        });
       } catch (error) {
         showAlert("No se pudo eliminar el lugar. Es probable que esté siendo usado en entregas activas.");
         console.error(error);
